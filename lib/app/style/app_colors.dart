@@ -3,15 +3,13 @@ import 'package:flutter/material.dart';
 /// Default colors depending on environment
 class AppColors {
   //static const String envId = AppConfig.envId;
-  static const Color primary = Color(
-      0xff009fe3);
-  static const Color primary100 = Color(0xFF173935);
+  static const Color primary = Color(0xFF173935);
 
   static const Color errorRed = Color(0xFFC5032B);
 
   //static const Color surfaceWhite = Color(0xFAf8f9fc);
   static const Color white = Colors.white;
-  static const Color backgroundColor = Color(0xAAE3E7E9);
+  static const Color backgroundColor = Color(0xFFE3E7E9);
 
   static const Color teamBlue = Color(0xFF636BFF);
   static const Color teamRed = Color(0xFFFF404D);
@@ -19,9 +17,7 @@ class AppColors {
   static const Color teamOrange = Color(0xFFFF6E00);
   static const Color appGreen = Color(0xFF173935);
 
-  static const Color alternateButtonColor = Colors.black26;
   static const Color primaryGreen = Color(0xFF80b300);
-  static const Color disabledColor = Colors.black38;
 
   static const redRowBgColor = Color(0xAAFF9999);
   static const greenRowBgColor = Color(0xAA99FF99);

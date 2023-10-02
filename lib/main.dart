@@ -11,7 +11,7 @@ import 'package:work_hu/work_hu_app.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
-  SecurityContext(withTrustedRoots: false);
+  // SecurityContext(withTrustedRoots: false);
   await ScreenUtil.ensureScreenSize();
   await setupLocator();
   runApp(ProviderScope(child: OverlaySupport.global(child: WorkHuApp())));

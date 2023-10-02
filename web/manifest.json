@@ -1,11 +1,11 @@
 {
-    "name": "work_hu",
-    "short_name": "work_hu",
-    "start_url": ".",
+    "name": "Work HU",
+    "short_name": "Work HU",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "See who's leading the local Work competition.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
@@ -20,13 +20,13 @@
             "type": "image/png"
         },
         {
-            "src": "icons/Icon-maskable-192.png",
+            "src": "icons/icon-192-maskable.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "icons/Icon-maskable-512.png",
+            "src": "icons/icon-512-maskable.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"

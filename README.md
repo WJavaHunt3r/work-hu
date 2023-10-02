@@ -1,6 +1,6 @@
 # work_hu
 
-A new Flutter project.
+See who's leading the local Work competition.
 
 ## Getting Started
 
