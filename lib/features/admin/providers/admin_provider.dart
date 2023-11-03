@@ -1,69 +1,54 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
-import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/features/admin/data/api/admin_api.dart';
-import 'package:work_hu/features/admin/data/models/transaction_model.dart';
-import 'package:work_hu/features/admin/data/repository/admin_repository.dart';
+import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/admin/data/state/admin_state.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 
 import '../../../work_hu_app.dart';
 
-final adminApiProvider = Provider<AdminApi>((ref) => AdminApi());
-
-final adminRepoProvider = Provider<AdminRepository>((ref) => AdminRepository(ref.read(adminApiProvider)));
-
 final adminDataProvider = StateNotifierProvider<AdminDataNotifier, AdminState>(
-    (ref) => AdminDataNotifier(ref.read(adminRepoProvider), ref.read(routerProvider)));
+    (ref) => AdminDataNotifier(ref.read(routerProvider), ref.read(userDataProvider)));
 
 class AdminDataNotifier extends StateNotifier<AdminState> {
-  AdminDataNotifier(this.adminRepository, this.router) : super(const AdminState()) {
+  AdminDataNotifier(
+    this.router,
+    this.currentUser,
+  ) : super(const AdminState()) {
     descriptionController = TextEditingController(text: "");
+    dateController = TextEditingController(text: "");
 
     descriptionController.addListener(_updateState);
+    dateController.addListener(_updateState);
   }
 
-  final AdminRepository adminRepository;
   final GoRouter router;
   late final TextEditingController descriptionController;
+  late final TextEditingController dateController;
+  final UserModel? currentUser;
 
-  Future<void> createTransaction(TransactionType transactionType, Account account, [String? name]) async {
-    state = state.copyWith(modelState: ModelState.processing);
-    try {
-      await adminRepository
-          .createTransaction(TransactionModel(name: name ?? descriptionController.value.text, account: account))
-          .then((data) async {
-        state = state.copyWith(modelState: ModelState.empty);
-        descriptionController.clear();
-        router.push("/createTransaction", extra: {
-          "transactionType": transactionType,
-          "account": account,
-          "description": data.name,
-          "transactionId": data.id
-        }).then((success) async {
-          success != null && success == false ? await deleteTransaction(data.id!) : null;
-        });
-      });
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.message);
-    }
-  }
-
-  Future<void> deleteTransaction(num transactionId) async {
-    state = state.copyWith(modelState: ModelState.processing);
-    try {
-      await adminRepository.deleteTransaction(transactionId).then((data) async {
-        state = state.copyWith(modelState: ModelState.empty);
-      });
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.message);
-    }
+  String getTitle({required Account account, required TransactionType transactionType}) {
+    return account == Account.OTHER
+        ? transactionType == TransactionType.VAER_ET_FORBILDE
+            ? "Vær et forbilde points"
+            : "Points"
+        : account == Account.SAMVIRK
+            ? "Samvirk credits"
+            : account == Account.MYSHARE
+                ? transactionType == TransactionType.HOURS
+                    ? "MyShare hours"
+                    : "MyShare credits"
+                : "";
   }
 
   void _updateState() {
-    state = state.copyWith();
+    state = state.copyWith(
+        transactionDate: DateTime.tryParse(dateController.value.text), description: descriptionController.value.text);
+  }
+
+  bool isEmpty() {
+    return descriptionController.value.text.isEmpty;
   }
 }

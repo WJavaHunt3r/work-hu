@@ -1,4 +1,5 @@
-import 'package:work_hu/features/home/data/model/team_model.dart';
+import 'package:dio/dio.dart';
+import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/users/data/api/users_api.dart';
 
@@ -16,4 +17,32 @@ class UsersRepository {
       rethrow;
     }
   }
+
+  Future<UserModel> getUserById(num userId) async {
+    try {
+      final res = await _userApi.getUserById(userId);
+      return UserModel.fromJson(res);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> resetPassword(num userId, num changerId) async {
+    try {
+      final res = await _userApi.resetPassword(userId, changerId);
+      return res;
+    } on DioError catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<UserModel> updateUser(num userId, UserModel user) async {
+    try {
+      final res = await _userApi.updateUser(userId, user);
+      return UserModel.fromJson(res);
+    } on DioError catch (e) {
+      rethrow;
+    }
+  }
+
 }

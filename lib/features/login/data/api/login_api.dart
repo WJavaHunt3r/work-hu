@@ -11,11 +11,9 @@ class LoginApi {
 
   Future<dynamic> loginRequest(String username, String password) async {
     try {
-      final res = await _dioClient.dio
-          .post("/auth/login", data: {'username': username, "password": Utils.encrypt(password)});
+      final res = await _dioClient.dio.post("/auth/login", data: {'username': username, "password": password});
       var jwt = res.headers.value("set-cookie")?.split(';')[0];
-      log(res.headers.toString());
-      if(jwt != null && jwt.isNotEmpty) _dioClient.dio.options.headers.addAll({"Cookie": jwt});
+      if (jwt != null && jwt.isNotEmpty) _dioClient.dio.options.headers.addAll({"Cookie": jwt});
       return res.data;
     } catch (e) {
       rethrow;
@@ -24,8 +22,7 @@ class LoginApi {
 
   Future<dynamic> getUser(String username) async {
     try {
-      final res = await _dioClient.dio
-          .get("/user", queryParameters: {'username': username});
+      final res = await _dioClient.dio.get("/user", queryParameters: {'username': username});
       return res.data;
     } catch (e) {
       rethrow;

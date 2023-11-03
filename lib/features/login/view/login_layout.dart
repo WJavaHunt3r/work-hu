@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/features/login/providers/login_provider.dart';
@@ -17,28 +16,26 @@ class LoginLayout extends ConsumerWidget {
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-                flex: 2,
-                child: Column(
+            Column(
+              children: [
+                SizedBox(
+                  height: 120.sp,
+                  child: Image(
+                    image: const AssetImage("assets/logos/Work_black.png"),
+                    fit: BoxFit.contain,
+                    color: AppColors.primary,
+                    height: 120.sp,
+                  ),
+                ),
+                SizedBox(height: 30.sp,),
+                Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image(
-                      image: const AssetImage("assets/logos/Work_black.png"),
-                      fit: BoxFit.contain,
-                      color: AppColors.primary,
-                      height: 120.sp,
-                    )
-                  ],
-                )),
-            Expanded(
-                flex: 3,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0.sp),
                       child: TextField(
                         controller: loginProvider.usernameController,
+                        textInputAction: TextInputAction.next,
                         decoration: const InputDecoration(labelText: "Username"),
                       ),
                     ),
@@ -46,6 +43,8 @@ class LoginLayout extends ConsumerWidget {
                       controller: loginProvider.passwordController,
                       decoration: const InputDecoration(labelText: "Password"),
                       obscureText: true,
+                      onSubmitted: (value) => loginProvider.login(),
+                      textInputAction: TextInputAction.go,
                     ),
                     Padding(
                         padding: EdgeInsets.symmetric(vertical: 8.0.sp),
@@ -62,16 +61,18 @@ class LoginLayout extends ConsumerWidget {
                           ],
                         )),
                     ref.watch(loginDataProvider).modelState == ModelState.error
-                        ? const Center(
+                        ? Center(
                             child: Text(
-                              "Wrong username or password",
-                              style: TextStyle(color: AppColors.errorRed),
+                              ref.read(loginDataProvider).message,
+                              style: const TextStyle(color: AppColors.errorRed),
                             ),
                           )
                         : const SizedBox()
                   ],
-                )),
-            const Text("Verzió: 1.0.0")
+                ),
+              ],
+            ),
+            const Text("Verzió: 1.0.1"),
           ],
         ),
         ref.watch(loginDataProvider).modelState == ModelState.processing

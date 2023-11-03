@@ -5,6 +5,8 @@ class AppColors {
   //static const String envId = AppConfig.envId;
   static const Color primary = Color(0xFF173935);
 
+  static const Color primary100 = Color(0x44173935);
+
   static const Color errorRed = Color(0xFFC5032B);
 
   //static const Color surfaceWhite = Color(0xFAf8f9fc);

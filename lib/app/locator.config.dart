@@ -12,7 +12,6 @@
 import 'package:get_it/get_it.dart' as _i1;
 import 'package:injectable/injectable.dart' as _i2;
 import 'package:work_hu/api/dio_client.dart' as _i3;
-import 'package:work_hu/app/user_service.dart' as _i4;
 
 extension GetItInjectableX on _i1.GetIt {
 // initializes the registration of main-scope dependencies inside of GetIt
@@ -26,7 +25,6 @@ extension GetItInjectableX on _i1.GetIt {
       environmentFilter,
     );
     gh.singleton<_i3.DioClient>(_i3.DioClient());
-    gh.lazySingleton<_i4.UserService>(() => _i4.UserService());
     return this;
   }
 }

@@ -3,20 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:go_router/go_router.dart';
-import 'package:work_hu/app/data/models/account.dart';
-import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/style/app_style.dart';
 import 'package:work_hu/features/admin/view/admin_page.dart';
-import 'package:work_hu/features/create_transactions/view/create_transactions_page.dart';
+import 'package:work_hu/features/change_password/view/change_password_page.dart';
+import 'package:work_hu/features/home/view/home_page.dart';
 import 'package:work_hu/features/login/view/login_page.dart';
+import 'package:work_hu/features/transaction_items/view/transaction_items_page.dart';
 import 'package:work_hu/features/user_points/view/user_points_page.dart';
+import 'package:work_hu/features/users/view/users_page.dart';
 
-import 'features/home/widgets/home.dart';
-import 'features/hours/widgets/hours.dart';
 import 'features/profile/view/profile_page.dart';
 
 class WorkHuApp extends ConsumerWidget {
-  WorkHuApp({super.key});
+  const WorkHuApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,11 +52,7 @@ final routerProvider = Provider<GoRouter>((ref) => GoRouter(
       routes: <GoRoute>[
         GoRoute(
           path: '/',
-          builder: (BuildContext context, GoRouterState state) => const Home(),
-        ),
-        GoRoute(
-          path: '/points',
-          builder: (BuildContext context, GoRouterState state) => const Hours(),
+          builder: (BuildContext context, GoRouterState state) => const HomePage(),
         ),
         GoRoute(
           path: '/login',
@@ -72,26 +67,23 @@ final routerProvider = Provider<GoRouter>((ref) => GoRouter(
           builder: (BuildContext context, GoRouterState state) => const AdminPage(),
         ),
         GoRoute(
-            path: '/createTransaction',
-            builder: (BuildContext context, GoRouterState state) {
-              if (state.extra != null) {
-                final map = state.extra as Map;
-                return CreateTransactionsPage(
-                    transactionId: num.tryParse(map['transactionId'].toString()) ?? 0,
-                    description: map["description"],
-                    account: Account.values.firstWhere((element) => element == map['account']),
-                    transactionType: TransactionType.values.firstWhere((element) => element == map['transactionType']));
-              }
-              return CreateTransactionsPage(
-                transactionId: 0,
-                description: '',
-                transactionType: TransactionType.POINT,
-                account: Account.OTHER,
-              );
-            }),
+          path: '/users',
+          builder: (BuildContext context, GoRouterState state) => const UsersPage(),
+        ),
         GoRoute(
           path: '/userPoints',
           builder: (BuildContext context, GoRouterState state) => const UserPointsPage(),
+        ),
+        GoRoute(
+          path: '/changePassword',
+          builder: (BuildContext context, GoRouterState state) => const ChangePasswordPage(),
+        ),
+        GoRoute(
+          path: '/transactionItems',
+          builder: (BuildContext context, GoRouterState state) {
+            var map = state.extra as Map<String, dynamic>;
+            return TransactionItemsPage(transactionId: map["transactionId"] ?? 0);
+          },
         ),
       ],
     ));

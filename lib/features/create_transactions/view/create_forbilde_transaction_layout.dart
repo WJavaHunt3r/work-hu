@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/error_alert_dialog.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
-import 'package:work_hu/features/profile/widgets/info_card.dart';
+import 'package:work_hu/features/create_transactions/widget/selection_row.dart';
 
 class CreateForbildeTransactionLayout extends ConsumerWidget {
-  const CreateForbildeTransactionLayout({super.key, required this.transactionId});
-
-  final num transactionId;
+  const CreateForbildeTransactionLayout({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -57,31 +54,5 @@ class CreateForbildeTransactionLayout extends ConsumerWidget {
             )
           : const SizedBox(),
     ]);
-  }
-}
-
-class SelectionRow extends ConsumerWidget {
-  const SelectionRow({required this.id, required this.name, super.key});
-
-  final num id;
-  final String name;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Row(
-      children: [
-        Expanded(child: Text(name, style: const TextStyle(fontWeight: FontWeight.w600))),
-        Checkbox(
-            value: ref
-                    .watch(createTransactionsDataProvider)
-                    .transactionItems
-                    .where((element) => element.userId == id)
-                    .first
-                    .points !=
-                0,
-            onChanged: (changed) =>
-                ref.read(createTransactionsDataProvider.notifier).update(userId: id, points: changed ?? false ? 10 : 0))
-      ],
-    );
   }
 }

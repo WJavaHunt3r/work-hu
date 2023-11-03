@@ -1,70 +1,148 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/src/consumer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:work_hu/app/locator.dart';
+import 'package:go_router/go_router.dart';
+import 'package:work_hu/app/data/models/account.dart';
+import 'package:work_hu/app/data/models/transaction_type.dart';
+import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/title_provider.dart';
 import 'package:work_hu/app/models/role.dart';
-import 'package:work_hu/app/style/app_colors.dart';
-import 'package:work_hu/app/user_service.dart';
-import 'package:work_hu/features/admin/view/admin_layout.dart';
+import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/features/admin/providers/drawer_provider.dart';
+import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
+import 'package:work_hu/features/create_transactions/view/create_forbilde_transaction_layout.dart';
+import 'package:work_hu/features/create_transactions/view/create_transactions_layout.dart';
+import 'package:work_hu/features/transactions/view/transactions_layout.dart';
+import 'package:work_hu/features/user_status/view/user_status_layout.dart';
+import 'package:work_hu/features/users/view/users_layout.dart';
 
-class AdminPage extends StatelessWidget {
-  const AdminPage({super.key});
+class AdminPage extends BasePage {
+  const AdminPage({super.key, super.title = "", super.isListView = true});
 
   @override
-  Widget build(BuildContext context) {
-    var user = locator<UserService>().currentUser;
-    return Scaffold(
-      // drawer: user != null && user.role != Role.USER
-      //     ? Drawer(
-      //         child: ListView(
-      //           children: [
-      //             DrawerHeader(
-      //               child: Text(
-      //                 'Admin',
-      //                 style: TextStyle(fontSize: 18.sp),
-      //               ),
-      //             ),
-      //             ListTile(
-      //               title: const Text('Vær et forbilde'),
-      //               selectedColor: AppColors.errorRed,
-      //               onTap: () {
-      //                 // Then close the drawer
-      //                 Navigator.pop(context);
-      //               },
-      //             ),
-      //             ListTile(
-      //               title: const Text('MyShare transactions'),
-      //               selectedColor: AppColors.errorRed,
-      //               onTap: () {
-      //                 // Then close the drawer
-      //                 Navigator.pop(context);
-      //               },
-      //             ),
-      //             ListTile(
-      //               title: const Text('Samvirk transactions'),
-      //               selectedColor: AppColors.errorRed,
-      //               selected: true,
-      //               onTap: () {
-      //                 // Then close the drawer
-      //                 Navigator.pop(context);
-      //               },
-      //             ),
-      //             ListTile(
-      //               title: const Text('Other Point transactions'),
-      //               selectedColor: AppColors.errorRed,
-      //               onTap: () {
-      //                 // Then close the drawer
-      //                 Navigator.pop(context);
-      //               },
-      //             ),
-      //           ],
-      //         ),
-      //       )
-      //     : null,
-      appBar: AppBar(
-        title: Text("Admin", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18.sp)),
+  Widget buildLayout(BuildContext context, WidgetRef ref) {
+    return _screenWidgets[ref.watch(drawerDataProvider)];
+  }
+
+  @override
+  Drawer? buildDrawer(BuildContext context, WidgetRef ref) {
+    var role = ref.watch(userDataProvider)!.role;
+    return Drawer(
+      child: ListView(
+        children: createDrawerList(role, ref, context),
       ),
-      body: Padding(padding: EdgeInsets.all(12.sp), child: const AdminLayout()),
     );
+  }
+
+  List<Widget> createDrawerList(Role role, WidgetRef ref, BuildContext context) {
+    List<Widget> list = [];
+    if (role != Role.USER) {
+      list.add(DrawerHeader(child: Text("Admin", style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800))));
+      list.add(createListTile(context: context, ref: ref, drawerNm: 0, title: "User status"));
+      list.add(createListTile(
+          context: context,
+          ref: ref,
+          drawerNm: 1,
+          title: "Forbilde points",
+          onTap: () {
+            ref
+                .watch(createTransactionsDataProvider.notifier)
+                .setTransactionTypeAndAccount(TransactionType.VAER_ET_FORBILDE, Account.OTHER);
+            ref.watch(createTransactionsDataProvider.notifier).getUsers();
+          }));
+    }
+    if (role == Role.ADMIN) {
+      list.addAll([
+        createListTile(
+            context: context,
+            ref: ref,
+            drawerNm: 2,
+            title: "MyShare Credits",
+            onTap: () {
+              ref
+                  .watch(createTransactionsDataProvider.notifier)
+                  .setTransactionTypeAndAccount(TransactionType.CREDIT, Account.MYSHARE);
+              ref.watch(createTransactionsDataProvider.notifier).getUsers();
+            }),
+        createListTile(
+            context: context,
+            ref: ref,
+            drawerNm: 3,
+            title: "MyShare Hours",
+            onTap: () {
+              ref
+                  .watch(createTransactionsDataProvider.notifier)
+                  .setTransactionTypeAndAccount(TransactionType.HOURS, Account.MYSHARE);
+              ref.watch(createTransactionsDataProvider.notifier).getUsers();
+            }),
+        createListTile(
+            context: context,
+            ref: ref,
+            drawerNm: 4,
+            title: "Samvirk Points",
+            onTap: () {
+              ref
+                  .watch(createTransactionsDataProvider.notifier)
+                  .setTransactionTypeAndAccount(TransactionType.CREDIT, Account.SAMVIRK);
+              ref.watch(createTransactionsDataProvider.notifier).getUsers();
+            }),
+        createListTile(
+            context: context,
+            ref: ref,
+            drawerNm: 5,
+            title: "Work Points",
+            onTap: () {
+              ref
+                  .watch(createTransactionsDataProvider.notifier)
+                  .setTransactionTypeAndAccount(TransactionType.POINT, Account.OTHER);
+              ref.watch(createTransactionsDataProvider.notifier).getUsers();
+            }),
+        createListTile(context: context, ref: ref, drawerNm: 6, title: "Users"),
+        createListTile(context: context, ref: ref, drawerNm: 7, title: "Transactions")
+      ]);
+    }
+
+    return list;
+  }
+
+  static const List<Widget> _screenWidgets = [
+    UserStatusLayout(),
+    CreateForbildeTransactionLayout(),
+    CreateTransactionsLayout(),
+    CreateTransactionsLayout(),
+    CreateTransactionsLayout(),
+    CreateTransactionsLayout(),
+    UsersLayout(),
+    TransactionsLayout()
+  ];
+
+  ListTile createListTile(
+      {required BuildContext context,
+      required WidgetRef ref,
+      required num drawerNm,
+      required String title,
+      Function()? onTap}) {
+    bool isSelected = ref.watch(drawerDataProvider) == drawerNm;
+    return ListTile(
+      title: Text(title, style: TextStyle(fontWeight: isSelected ? FontWeight.w800 : FontWeight.normal)),
+      selected: isSelected,
+      onTap: () {
+        if (onTap != null) onTap();
+        ref.watch(titleDataProvider.notifier).setTitle(title);
+        ref.watch(drawerDataProvider.notifier).setCurrentDrawer(drawerNm.toInt());
+        context.pop();
+      },
+    );
+  }
+
+  @override
+  List<Widget> buildActions(BuildContext context, WidgetRef ref) {
+    return [
+      IconButton(
+          onPressed: () {
+            context.pop();
+          },
+          icon: const Icon(Icons.close))
+    ];
   }
 }

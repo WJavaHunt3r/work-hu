@@ -3,8 +3,8 @@
     "short_name": "Work HU",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
+    "background_color": "#173935",
+    "theme_color": "#173935",
     "description": "See who's leading the local Work competition.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
@@ -31,5 +31,12 @@
             "type": "image/png",
             "purpose": "maskable"
         }
-    ]
+    ],
+    "author": "",
+    "config": {},
+    "createAt": "",
+    "homepage": "",
+    "identifier": "",
+    "meta": {},
+    "schemaVersion": 0
 }

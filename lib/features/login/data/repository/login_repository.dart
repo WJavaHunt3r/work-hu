@@ -14,7 +14,6 @@ class LoginRepository {
       final res = await _loginApi.loginRequest(username, password);
       return res;
     } on DioError catch (e) {
-      log(e.toString());
       rethrow;
     }
   }
@@ -24,7 +23,6 @@ class LoginRepository {
       final res = await _loginApi.getUser(username);
       return UserModel.fromJson(res);
     } on DioError catch (e) {
-      log(e.toString());
       rethrow;
     }
   }

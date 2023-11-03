@@ -1,24 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_riverpod/src/consumer.dart';
+import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/features/login/view/login_layout.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class LoginPage extends BasePage {
+  const LoginPage({super.key, super.title = "Login"});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-      ),
-      body: SizedBox.expand(
-        child: Center(
-          child: Container(
-            padding: EdgeInsets.all(15.sp),
-            child: LoginLayout(),
-          ),
-        ),
-      ),
-    );
+  Widget buildLayout(BuildContext context, WidgetRef ref) {
+    return const LoginLayout();
   }
 }

@@ -1,24 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/features/user_points/view/user_points_layout.dart';
 
-class UserPointsPage extends StatelessWidget {
-  const UserPointsPage({super.key});
+class UserPointsPage extends BasePage {
+  const UserPointsPage({super.key, super.title = "My Points"});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "My Points",
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w800),
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(12.sp),
-        child: UserPointsLayout(),
-      ),
-    );
+  Widget buildLayout(BuildContext context, WidgetRef ref) {
+    return const UserPointsLayout();
   }
 }

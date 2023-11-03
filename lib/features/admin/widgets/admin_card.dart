@@ -4,11 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 
 class AdminCard extends StatelessWidget {
-  const AdminCard({super.key, required this.onTap, required this.imageAsset, this.backgroundColor});
+  const AdminCard({super.key, required this.onTap, required this.imageAsset, this.backgroundColor, this.child});
 
   final Function() onTap;
   final String imageAsset;
   final Color? backgroundColor;
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +24,8 @@ class AdminCard extends StatelessWidget {
                       color: backgroundColor ?? AppColors.primary,
                       height: 80.sp,
                       child: Padding(
-                        padding: EdgeInsets.all(4.sp),
-                        child: Image(image: AssetImage(imageAsset), fit: BoxFit.fitWidth, height: 100.sp),
+                        padding: EdgeInsets.all(0.sp),
+                        child: child ?? Image(image: AssetImage(imageAsset), fit: BoxFit.fitWidth, height: 100.sp),
                       )),
                 )))
       ],

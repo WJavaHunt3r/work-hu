@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/features/create_transactions/data/models/transaction_item_model.dart';
+import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 
 part 'user_points_state.freezed.dart';
 

@@ -1,81 +1,96 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:work_hu/app/data/models/transaction_type.dart';
-import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/base_list_view.dart';
+import 'package:work_hu/app/widgets/base_tab_bar.dart';
+import 'package:work_hu/app/widgets/list_separator.dart';
+import 'package:work_hu/features/rounds/provider/round_provider.dart';
+import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/user_points/provider/user_points_providers.dart';
+import 'package:work_hu/features/user_points/widgets/points_list_item.dart';
 
 class UserPointsLayout extends ConsumerWidget {
   const UserPointsLayout({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Stack(
-      children: [
-        ListView.separated(
-          itemCount: ref.watch(userPointsDataProvider).transactionItems.length,
+    var items = ref.watch(userPointsDataProvider).transactionItems;
+    var currentRound = ref.watch(roundDataProvider).currentRoundNumber.toInt();
+    return DefaultTabController(
+        length: countItems(items).toInt() + 1,
+        initialIndex: currentRound == 0 || countItems(items).toInt() == 0 ? 0 : currentRound - 1,
+        child: Column(
+          children: [
+            BaseTabBar(
+              tabs: createTabs(items),
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(top: 8.sp),
+                child: TabBarView(clipBehavior: Clip.antiAlias, children: createTabView(items)),
+              ),
+            ),
+          ],
+        ));
+  }
+
+  num countItems(List<TransactionItemModel> items) {
+    var count = items.map((e) => e.round!.roundNumber).toList().isNotEmpty
+        ? items.map((e) => e.round!.roundNumber).toSet().toList().length
+        : 0;
+
+    return count;
+  }
+
+  List<Tab> createTabs(List<TransactionItemModel> items) {
+    var count = countItems(items);
+    var list = <Tab>[];
+    for (num i = 1; i <= count; i++) {
+      list.add(Tab(
+          child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [Text("Round ${i}")],
+      )));
+    }
+    list.add(const Tab(
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [Text("Total")],
+      ),
+    ));
+    return list;
+  }
+
+  List<Widget> createTabView(List<TransactionItemModel> items) {
+    var count = countItems(items);
+    var list = <Widget>[];
+    for (num i = 1; i <= count; i++) {
+      List<TransactionItemModel> currentItems = items.where((element) => element.round!.roundNumber == i).toList();
+      list.add(BaseListView(
           itemBuilder: (BuildContext context, int index) {
-            var current = ref.watch(userPointsDataProvider).transactionItems[index];
+            var current = currentItems[index];
             return PointsListItem(
                 transactionType: current.transactionType,
                 value: current.points,
                 title: current.description,
                 date: current.transactionDate);
           },
-          separatorBuilder: (BuildContext context, int index) {
-            return Padding(
-                padding: EdgeInsets.only(left: 20.sp, right: 20.sp, top: 10.sp, bottom: 10.sp),
-                child: Container(
-                  height: 1.5.sp,
-                  color: AppColors.primary,
-                ));
-          },
-        )
-      ],
-    );
-  }
-}
-
-class PointsListItem extends StatelessWidget {
-  const PointsListItem(
-      {required this.transactionType, super.key, required this.value, required this.title, required this.date});
-
-  final TransactionType transactionType;
-  final num value;
-  final String title;
-  final DateTime date;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.only(left: 12.sp, right: 12.sp),
-        child: SizedBox(
-            child: Column(children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                  child: Text(
-                title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-              )),
-              Text(
-                 value % 1 == 0 ? value.toStringAsFixed(0) : value.toStringAsFixed(1),
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              SizedBox(
-                  width: 60.sp,
-                  child: Text(
-                      "${date.month < 10 ? "0${date.month}" : date.month}.${date.day < 10 ? "0${date.day}" : date.day}",
-                      style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500))),
-            ],
-          )
-        ])));
+          itemCount: currentItems.length,
+          children: const []));
+    }
+    list.add(BaseListView(
+        itemBuilder: (context, index) {
+          var current = items[index];
+          return PointsListItem(
+              transactionType: current.transactionType,
+              value: current.points,
+              title: current.description,
+              date: current.transactionDate);
+        },
+        itemCount: items.length,
+        children: const []));
+    return list;
   }
 }

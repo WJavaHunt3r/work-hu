@@ -57,14 +57,14 @@ class GlobalTheme {
     cardTheme: CardTheme(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
         margin: EdgeInsets.only(top: 8.sp),
-        elevation: 5.sp,
+        elevation: 2.sp,
         surfaceTintColor: AppColors.white,
         color: AppColors.white),
-    // chipTheme: ChipThemeData(
-    //     selectedColor: AppColors.primary,
-    //     backgroundColor: AppColors.white,
-    //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
-    //     labelStyle: TextStyle(fontSize: 14.sp, color: Colors.black)),
+    chipTheme: ChipThemeData(
+        selectedColor: AppColors.primary,
+        backgroundColor: Colors.transparent,
+        side: const BorderSide(color: AppColors.primary),
+        labelStyle: TextStyle(fontSize: 12.sp, color: Colors.black)),
     // dialogTheme: DialogTheme(
     //   titleTextStyle: TextStyle(fontSize: 20.sp, color: Colors.black),
     //   contentTextStyle: TextStyle(fontSize: 14.sp, color: Colors.black),
@@ -91,6 +91,7 @@ class GlobalTheme {
         style: TextButton.styleFrom(
             padding: EdgeInsets.all(10.sp),
             backgroundColor: AppColors.primary,
+            foregroundColor:AppColors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)))),
     progressIndicatorTheme: const ProgressIndicatorThemeData(color: AppColors.primary),
     // disabledColor: Colors.white

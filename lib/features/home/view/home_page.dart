@@ -1,0 +1,47 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/features/home/providers/team_provider.dart';
+import 'package:work_hu/features/home/widgets/error_view.dart';
+import 'package:work_hu/features/home/widgets/status_view.dart';
+import 'package:work_hu/features/rounds/provider/round_provider.dart';
+
+class HomePage extends BasePage {
+  const HomePage({super.key, super.title = "Work HU", super.isListView = true});
+
+  @override
+  List<Widget> buildActions(BuildContext context, WidgetRef ref) {
+    return [ModelState.error, ModelState.processing].contains(ref.watch(teamRoundDataProvider).modelState)
+        ? []
+        : ref.watch(userDataProvider) == null
+            ? [
+                IconButton(
+                    onPressed: () => context.push("/login").then((value) => ref.refresh(teamRoundDataProvider)),
+                    icon: const Icon(Icons.login))
+              ]
+            : [
+                IconButton(
+                    onPressed: () => context.push("/profile").then((value) => ref.refresh(teamRoundDataProvider)),
+                    icon: const Icon(Icons.perm_identity_rounded))
+              ];
+  }
+
+  @override
+  Widget buildLayout(BuildContext context, WidgetRef ref) {
+    return RefreshIndicator(
+        onRefresh: () async => ref.watch(teamRoundDataProvider.notifier).getTeamRounds(),
+        child: Column(
+          children: [
+            Expanded(
+                child: ref.watch(teamRoundDataProvider).modelState == ModelState.processing
+                    ? const Center(child: CircularProgressIndicator())
+                    : ref.watch(teamRoundDataProvider).modelState == ModelState.error
+                        ? const ErrorView()
+                        : StatusView(teamRounds: ref.watch(teamRoundDataProvider).teams)),
+          ],
+        ));
+  }
+}
