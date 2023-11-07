@@ -6,6 +6,8 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/widgets/base_list_view.dart';
+import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
@@ -62,20 +64,19 @@ class UserStatusLayout extends ConsumerWidget {
               ),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                child: Card(
-                  margin: EdgeInsets.symmetric(vertical: 10.sp),
-                  child: ListView.builder(
-                      itemCount: users.length,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (BuildContext context, int index) {
-                        var current = users[index];
-                        var userStatus = current.currentMyShareCredit / current.goal * 100;
-                        var style =
-                            TextStyle(color: userStatus >= currentRoundGoal ? AppColors.white : AppColors.primary);
-                        var toOnTrack = current.goal * currentRoundGoal / 100 - current.currentMyShareCredit;
-                        return ListTile(
+              child: BaseListView(
+                itemCount: users.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var current = users[index];
+                  var userStatus = current.currentMyShareCredit / current.goal * 100;
+                  var style = TextStyle(color: userStatus >= currentRoundGoal ? AppColors.white : AppColors.primary);
+                  var toOnTrack = current.goal * currentRoundGoal / 100 - current.currentMyShareCredit;
+                  var isLast = index == users.length - 1;
+                  return ListCard(
+                      isLast: isLast,
+                      index: index,
+                      child: ListTile(
+                          minVerticalPadding: 0,
                           title: Text(
                             "${current.lastname} ${current.firstname}",
                             style: style,
@@ -92,15 +93,17 @@ class UserStatusLayout extends ConsumerWidget {
                           ),
                           tileColor: userStatus >= currentRoundGoal ? AppColors.primary : AppColors.white,
                           shape: RoundedRectangleBorder(
-                              borderRadius: index == 0
-                                  ? BorderRadius.only(topLeft: Radius.circular(8.sp), topRight: Radius.circular(8.sp))
-                                  : index == users.length - 1
+                              borderRadius: index == 0 && isLast
+                                  ? BorderRadius.circular(8.sp)
+                                  : index == 0
                                       ? BorderRadius.only(
-                                          bottomLeft: Radius.circular(8.sp), bottomRight: Radius.circular(8.sp))
-                                      : BorderRadius.zero),
-                        );
-                      }),
-                ),
+                                          topLeft: Radius.circular(8.sp), topRight: Radius.circular(8.sp))
+                                      : isLast
+                                          ? BorderRadius.only(
+                                              bottomLeft: Radius.circular(8.sp), bottomRight: Radius.circular(8.sp))
+                                          : BorderRadius.zero)));
+                },
+                children: [],
               ),
             ),
           ],

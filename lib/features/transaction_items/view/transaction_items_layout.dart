@@ -9,12 +9,13 @@ import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
+import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
 import 'package:work_hu/features/utils.dart';
 
 class TransactionsLayout extends ConsumerWidget {
-  const TransactionsLayout({super.key, required this.transactionId});
+  const TransactionsLayout({super.key, required this.transaction});
 
-  final num transactionId;
+  final TransactionModel transaction;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,8 +23,39 @@ class TransactionsLayout extends ConsumerWidget {
     return Stack(
       children: [
         RefreshIndicator(
-          onRefresh: () async => ref.watch(transactionItemsDataProvider.notifier).getTransactionItems(transactionId),
+          onRefresh: () async => ref.watch(transactionItemsDataProvider.notifier).getTransactionItems(transaction.id!),
           child: Column(children: [
+            Card(
+              child: Padding(
+                padding: EdgeInsets.all(8.sp),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Transaction Details", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Description"),
+                        Expanded(
+                            child: Text(
+                          transaction.name,
+                          textAlign: TextAlign.end,
+                        ))
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Transaction Date"),
+                        Text(
+                            "${transaction.createDateTime!.year}-${transaction.createDateTime!.month}-${transaction.createDateTime!.day}")
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
             Expanded(
                 child: BaseListView(
                     cardBackgroundColor: Colors.transparent,
@@ -41,8 +73,7 @@ class TransactionsLayout extends ConsumerWidget {
                               isLast: isLast,
                               index: index,
                               child: ListTile(
-                                  title: Text("${current.user?.lastname} ${current.user?.firstname}"),
-                                  subtitle: Text(current.description),
+                                  title: Text("${current.user.lastname} ${current.user.firstname}"),
                                   trailing: Text(
                                     createTrailingText(current),
                                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),

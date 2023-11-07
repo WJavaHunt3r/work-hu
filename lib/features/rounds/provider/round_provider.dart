@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/features/rounds/data/api/round_api.dart';
@@ -25,7 +26,9 @@ class RoundDataNotifier extends StateNotifier<RoundsState> {
     try {
       await roundRepository.getRounds().then((data) async {
         data.sort((a, b) => a.roundNumber.compareTo(b.roundNumber));
-        state = state.copyWith(rounds: data, modelState: ModelState.success);
+        state = state.copyWith(
+            rounds: data.where((element) => element.startDateTime.compareTo(DateTime.now()) < 0).toList(),
+            modelState: ModelState.success);
       });
 
       await roundRepository.getCurrentRounds().then(

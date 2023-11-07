@@ -123,14 +123,14 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   }
 
   update({required num userId, num? hours, double? points, num? credits}) {
-    TransactionItemModel? transactionItem = state.transactionItems.firstWhere((t) => t.userId == userId);
+    TransactionItemModel? transactionItem = state.transactionItems.firstWhere((t) => t.user.id == userId);
     var newItem = transactionItem.copyWith(
         hours: hours ?? transactionItem.hours,
         points: points ?? transactionItem.points,
         credit: credits ?? transactionItem.credit);
 
     state =
-        state.copyWith(transactionItems: state.transactionItems.map((e) => e.userId == userId ? newItem : e).toList());
+        state.copyWith(transactionItems: state.transactionItems.map((e) => e.user.id == userId ? newItem : e).toList());
   }
 
   void _createTransactionItems(List<UserModel> users) {
@@ -150,7 +150,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         transactionId: 0,
         transactionDate: DateUtils.dateOnly(state.transactionDate ?? DateTime.now()),
         description: description ?? state.description,
-        userId: state.selectedUser!.id,
+        user: state.selectedUser!,
         createUserId: currentUserProvider.state!.id,
         points: state.transactionType != TransactionType.CREDIT && state.transactionType != TransactionType.HOURS
             ? double.tryParse(valueController.value.text) ?? 0
@@ -227,7 +227,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     var items = state.transactionItems;
     var rowNm = 0;
     for (var transaction in items) {
-      var user = state.users.firstWhere((element) => element.id == transaction.userId);
+      var user = transaction.user;
       createRow(rowNm, sheetObject, user, transaction);
       rowNm++;
     }
@@ -257,7 +257,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     var items = state.transactionItems;
     var rowNm = 0;
     for (var transaction in items) {
-      var user = state.users.firstWhere((element) => element.id == transaction.userId);
+      var user = transaction.user;
       createRow(rowNm, sheetObject, user, transaction);
       rowNm++;
     }

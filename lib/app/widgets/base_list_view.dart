@@ -24,7 +24,9 @@ class BaseListView extends StatelessWidget {
               shadowColor: shadowColor,
               color: cardBackgroundColor,
               margin: EdgeInsets.symmetric(vertical: 8.sp),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
               child: ListView.builder(
+                  padding: EdgeInsets.all(0),
                   itemCount: itemCount,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

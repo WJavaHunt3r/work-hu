@@ -47,7 +47,9 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
 
     await userRoundRepoProvider.fetchUserRounds(userId: read.state!.id).then((userRounds) {
       userRounds.sort((a, b) => a.round.roundNumber.compareTo(b.round.roundNumber));
-      state = state.copyWith(userRounds: userRounds);
+      state = state.copyWith(
+        userRounds: userRounds.where((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0).toList(),
+      );
     });
   }
 

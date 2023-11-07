@@ -19,10 +19,9 @@ class CreateForbildeTransactionLayout extends ConsumerWidget {
               child: ListView.builder(
                   itemCount: ref.watch(createTransactionsDataProvider).transactionItems.length,
                   itemBuilder: (BuildContext context, int index) {
-                    var item = ref.watch(createTransactionsDataProvider);
+                    var item = ref.watch(createTransactionsDataProvider).transactionItems[index];
                     return SelectionRow(
-                        id: item.transactionItems[index].userId,
-                        name: "${item.users[index].firstname} ${item.users[index].lastname}");
+                        user: item.user);
                   })),
           Row(
             children: [

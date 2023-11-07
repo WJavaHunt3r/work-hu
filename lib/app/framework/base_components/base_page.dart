@@ -28,6 +28,7 @@ abstract class BasePage extends ConsumerWidget {
               actions: buildActions(context, ref),
               automaticallyImplyLeading: automaticallyImplyLeading ?? true,
             ),
+            floatingActionButton: createActionButton(context, ref),
             resizeToAvoidBottomInset: true,
             body: SizedBox.expand(
               child: Container(
@@ -46,6 +47,10 @@ abstract class BasePage extends ConsumerWidget {
   popInvoked(BuildContext context, bool value, WidgetRef ref) {}
 
   Drawer? buildDrawer(BuildContext context, WidgetRef ref) {
+    return null;
+  }
+
+  Widget? createActionButton(BuildContext context, WidgetRef ref) {
     return null;
   }
 }

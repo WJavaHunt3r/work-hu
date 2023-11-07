@@ -17,7 +17,6 @@ class TransactionItemModel with _$TransactionItemModel{
       num? transactionId,
       required DateTime transactionDate,
       required String description,
-      required num userId,
       required num createUserId,
       required double points,
       required TransactionType transactionType,
@@ -25,7 +24,7 @@ class TransactionItemModel with _$TransactionItemModel{
       required num credit,
       required num hours,
       RoundModel? round,
-      UserModel? user}) = _TransactionItemModel;
+      required UserModel user}) = _TransactionItemModel;
 
   factory TransactionItemModel.fromJson(Map<String, dynamic> json) => _$TransactionItemModelFromJson(json);
 }

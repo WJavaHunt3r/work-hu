@@ -43,7 +43,9 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
       await teamRepository.fetchTeamRounds().then((data) async {
         data.sort((a, b) => a.round.roundNumber.compareTo(b.round.roundNumber));
         data.sort((prev, next) => next.teamPoints.compareTo(prev.teamPoints));
-        state = state.copyWith(teams: data, modelState: ModelState.success);
+        state = state.copyWith(
+            teams: data.where((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0).toList(),
+            modelState: ModelState.success);
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);

@@ -82,7 +82,7 @@ final routerProvider = Provider<GoRouter>((ref) => GoRouter(
           path: '/transactionItems',
           builder: (BuildContext context, GoRouterState state) {
             var map = state.extra as Map<String, dynamic>;
-            return TransactionItemsPage(transactionId: map["transactionId"] ?? 0);
+            return TransactionItemsPage(transaction: map["transaction"] ?? 0);
           },
         ),
       ],

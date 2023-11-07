@@ -50,7 +50,7 @@ class CreateTransactionsLayout extends ConsumerWidget {
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemBuilder: (BuildContext context, int index) {
-              var user = users.firstWhere((u) => u.id == items[index].userId);
+              var user = items[index].user;
               return TransactionRowWidget(
                 name: "${user.firstname} ${user.lastname}",
                 index: index,
