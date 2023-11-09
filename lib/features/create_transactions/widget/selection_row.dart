@@ -15,7 +15,13 @@ class SelectionRow extends ConsumerWidget {
         Expanded(
             child: Text("${user.lastname} ${user.firstname}", style: const TextStyle(fontWeight: FontWeight.w600))),
         Checkbox(
-            value: user.points != 0,
+            value: ref
+                    .watch(createTransactionsDataProvider)
+                    .transactionItems
+                    .where((element) => element.user.id == user.id)
+                    .first
+                    .points !=
+                0,
             onChanged: (changed) => ref
                 .read(createTransactionsDataProvider.notifier)
                 .update(userId: user.id, points: changed ?? false ? 10 : 0))

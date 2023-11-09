@@ -31,7 +31,10 @@ class TransactionsLayout extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Transaction Details", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),),
+                    Text(
+                      "Transaction Details",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,11 +49,7 @@ class TransactionsLayout extends ConsumerWidget {
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Transaction Date"),
-                        Text(
-                            "${transaction.createDateTime!.year}-${transaction.createDateTime!.month}-${transaction.createDateTime!.day}")
-                      ],
+                      children: [const Text("Transaction Date"), Text(Utils.dateToString(transaction.createDateTime!))],
                     ),
                   ],
                 ),

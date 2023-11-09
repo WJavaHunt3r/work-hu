@@ -10,6 +10,7 @@ import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
 import 'package:work_hu/features/transactions/providers/transactions_provider.dart';
+import 'package:work_hu/features/utils.dart';
 
 class TransactionsLayout extends ConsumerWidget {
   const TransactionsLayout({super.key});
@@ -26,7 +27,7 @@ class TransactionsLayout extends ConsumerWidget {
             itemBuilder: (BuildContext context, int index) {
               var current = transactions[index];
               var date = current.createDateTime;
-              var dateString = "${date?.year}-${date?.month}-${date?.day}";
+              var dateString = Utils.dateToString(date!);
               return Dismissible(
                   key: UniqueKey(),
                   onDismissed: (direction) =>

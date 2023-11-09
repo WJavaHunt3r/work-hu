@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
-
 import 'dart:typed_data';
+
+import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import "package:pointycastle/export.dart";
-import 'package:convert/convert.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 
 class Utils {
@@ -39,17 +39,16 @@ class Utils {
     return base64String.replaceAll('=', ''); // Remove padding
   }
 
-  /// Hash method with [SHA256]
   static String encrypt(String raw) {
-    var dataToDigest = createUint8ListFromString(raw);
+    var dataToDigest = createUInt8ListFromString(raw);
     var d = Digest('SHA-256');
     var digested = d.process(dataToDigest);
     var hexa = hex.encode(digested);
     return base64.encode(hexa.codeUnits);
   }
 
-  static Uint8List createUint8ListFromString(String s) {
-    var ret = new Uint8List(s.length);
+  static Uint8List createUInt8ListFromString(String s) {
+    var ret = Uint8List(s.length);
     for (var i = 0; i < s.length; i++) {
       ret[i] = s.codeUnitAt(i);
     }
@@ -76,7 +75,9 @@ class Utils {
   static final NumberFormat creditFormat = NumberFormat("#,###");
   static final NumberFormat percentFormat = NumberFormat("#,###.#");
 
-  static String dateToString(DateTime date){
-    return "${date.year}-${date.month}-${date.day}";
+  static String dateToString(DateTime date) {
+    return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day}";
   }
+
+
 }

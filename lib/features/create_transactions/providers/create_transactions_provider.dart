@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:csv/csv.dart';
 import 'package:dio/dio.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +24,7 @@ import 'package:work_hu/features/transactions/data/repository/transactions_repos
 import 'package:work_hu/features/transactions/providers/transactions_provider.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
+import 'package:work_hu/features/utils.dart';
 
 import '../../../work_hu_app.dart';
 
@@ -211,43 +214,48 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   }
 
   Future<void> createCreditsCsv() async {
-    var excel = Excel.createExcel();
-    Sheet sheetObject = excel['Sheet1'];
+    var headers = [
+      "UserId",
+      "Age",
+      "Name",
+      "LastName",
+      "ClubId",
+      "ClubName",
+      "Amount",
+      "ClubTransactionDate",
+      "Description"
+    ];
 
-    sheetObject.cell(CellIndex.indexByString('A1')).value = "UserId";
-    sheetObject.cell(CellIndex.indexByString('B1')).value = "Age";
-    sheetObject.cell(CellIndex.indexByString('C1')).value = "Name";
-    sheetObject.cell(CellIndex.indexByString('D1')).value = "LastName";
-    sheetObject.cell(CellIndex.indexByString('E1')).value = "ClubId";
-    sheetObject.cell(CellIndex.indexByString('F1')).value = "ClubName";
-    sheetObject.cell(CellIndex.indexByString('G1')).value = "Amount";
-    sheetObject.cell(CellIndex.indexByString('H1')).value = "ClubTransactionDate";
-    sheetObject.cell(CellIndex.indexByString('I1')).value = "Description";
+    List<List<dynamic>> list = [];
+    list.add(headers);
 
     var items = state.transactionItems;
-    var rowNm = 0;
-    for (var transaction in items) {
-      var user = transaction.user;
-      createRow(rowNm, sheetObject, user, transaction);
-      rowNm++;
-    }
-    var date = state.transactionDate;
-    excel.save(fileName: 'befizetesek_${date?.year}${date?.month}${date?.day}.xlsx');
-  }
 
-  void createRow(num currentRow, Sheet sheetObject, UserModel user, TransactionItemModel item) {
+    for (var transaction in items) {
+      var date = state.transactionDate;
+      var user = transaction.user;
+      list.add([
+        user.myShareID,
+        (DateTime.now().difference(user.birthDate).inDays / 365).ceil() - 1,
+        user.firstname,
+        user.lastname,
+        3964,
+        "BUK Vácduka",
+        transaction.credit,
+        '${date?.day}/${date?.month}/${date?.year}',
+        state.description
+      ]);
+    }
+    String csv = const ListToCsvConverter().convert(list);
+    Uint8List bytes = Uint8List.fromList(utf8.encode(csv));
+
     var date = state.transactionDate;
-    sheetObject.appendRow([
-      user.myShareID,
-      (DateTime.now().difference(user.birthDate).inDays / 365).ceil() - 1,
-      user.firstname,
-      user.lastname,
-      3964,
-      "BUK Vácduka",
-      item.credit,
-      '${date?.day}/${date?.month}/${date?.year}',
-      state.description
-    ]);
+    await FileSaver.instance.saveFile(
+      name: 'befizetesek_${date?.year}${date?.month}${date?.day}.csv',
+      bytes: bytes,
+      ext: 'csv',
+      mimeType: MimeType.csv,
+    );
   }
 
   Future<void> createHoursCsv() async {
@@ -258,7 +266,6 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     var rowNm = 0;
     for (var transaction in items) {
       var user = transaction.user;
-      createRow(rowNm, sheetObject, user, transaction);
       rowNm++;
     }
     var date = state.transactionDate;
@@ -290,9 +297,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
             valueController.text = creditHUF.toString();
             state = state.copyWith(selectedUser: user);
 
-            addTransaction(
-                description:
-                    "Samvirk befizetés ${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day}");
+            addTransaction(description: "Samvirk befizetés ${Utils.dateToString(date)}");
           }
           rowNb++;
         }
