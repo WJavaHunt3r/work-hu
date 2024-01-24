@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/home/data/model/team_round_model.dart';
 import 'package:work_hu/features/home/widgets/samvirk_status.dart';
 import 'package:work_hu/features/home/widgets/status_row.dart';
-import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
+import 'package:work_hu/features/utils.dart';
 
 class StatusView extends ConsumerWidget {
   const StatusView({super.key, required this.teamRounds});
@@ -128,14 +127,7 @@ class StatusView extends ConsumerWidget {
       totalTeamRounds.add(TeamRoundModel(
           id: 0,
           samvirkPayments: 0,
-          round: RoundModel(
-              id: 0,
-              roundNumber: 0,
-              samvirkGoal: 0,
-              myShareGoal: 0,
-              samvirkChurchGoal: 0,
-              startDateTime: DateTime.now(),
-              endDateTime: DateTime.now()),
+          round: Utils.createEmptyRound(),
           team: teamRounds.firstWhere((element) => element.team.color == e).team,
           teamPoints: sum));
     }

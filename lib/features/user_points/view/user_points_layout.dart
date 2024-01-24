@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
-import 'package:work_hu/app/widgets/list_separator.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/user_points/provider/user_points_providers.dart';
@@ -15,10 +14,10 @@ class UserPointsLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var items = ref.watch(userPointsDataProvider).transactionItems;
-    var currentRound = ref.watch(roundDataProvider).currentRoundNumber.toInt();
+    var currentRound = ref.watch(roundDataProvider).currentRoundNumber;
     return DefaultTabController(
         length: countItems(items).toInt() + 1,
-        initialIndex: currentRound == 0 || countItems(items).toInt() == 0 ? 0 : currentRound - 1,
+        initialIndex: currentRound == 0 || countItems(items).toInt() == 0 ? 0 : currentRound.toInt() - 1,
         child: Column(
           children: [
             BaseTabBar(

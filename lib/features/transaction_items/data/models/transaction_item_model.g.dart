@@ -47,6 +47,7 @@ const _$TransactionTypeEnumMap = {
   TransactionType.HOURS: 'HOURS',
   TransactionType.CREDIT: 'CREDIT',
   TransactionType.POINT: 'POINT',
+  TransactionType.BMM_PERFECT_WEEK: 'BMM_PERFECT_WEEK',
   TransactionType.VAER_ET_FORBILDE: 'VAER_ET_FORBILDE',
 };
 

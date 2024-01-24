@@ -53,6 +53,7 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
   }
 
   Future<void> checkLoginCredentials() async {
+    await getTeamRounds();
     var username = await Utils.getData('user');
     var password = await Utils.getData('password');
 
@@ -67,6 +68,5 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
         await loginRepository.getUser(username).then((value) => userSessionProvider.setUser(value));
       }
     }
-    await getTeamRounds();
   }
 }

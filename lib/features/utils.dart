@@ -8,6 +8,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import "package:pointycastle/export.dart";
 import 'package:work_hu/app/data/models/transaction_type.dart';
+import 'package:work_hu/features/rounds/data/model/round_model.dart';
+import 'package:work_hu/features/season/data/model/season_model.dart';
 
 class Utils {
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -72,12 +74,27 @@ class Utils {
     return "";
   }
 
-  static final NumberFormat creditFormat = NumberFormat("#,###");
-  static final NumberFormat percentFormat = NumberFormat("#,###.#");
+  static final NumberFormat creditFormat = NumberFormat("# ###");
+  static final NumberFormat percentFormat = NumberFormat("# ###.#");
 
   static String dateToString(DateTime date) {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day}";
   }
 
-
+  static RoundModel createEmptyRound() {
+    return RoundModel(
+        id: 0,
+        roundNumber: 0,
+        samvirkGoal: 0,
+        myShareGoal: 0,
+        samvirkChurchGoal: 0,
+        startDateTime: DateTime.now(),
+        endDateTime: DateTime.now(),
+        season: SeasonModel(
+          id: 0,
+          seasonYear: DateTime.now().year,
+          startDate: DateTime.now(),
+          endDate: DateTime.now(),
+        ));
+  }
 }

@@ -13,7 +13,7 @@ _$_UserRoundModel _$$_UserRoundModelFromJson(Map<String, dynamic> json) =>
       myShareOnTrackPoints: json['myShareOnTrackPoints'] as bool,
       samvirkOnTrackPoints: json['samvirkOnTrackPoints'] as bool,
       samvirkPayments: json['samvirkPayments'] as int,
-      forbildePoints: (json['forbildePoints'] as num).toDouble(),
+      bMMPerfectWeekPoints: (json['bMMPerfectWeekPoints'] as num).toDouble(),
       samvirkPoints: (json['samvirkPoints'] as num).toDouble(),
       roundPoints: (json['roundPoints'] as num).toDouble(),
     );
@@ -25,7 +25,7 @@ Map<String, dynamic> _$$_UserRoundModelToJson(_$_UserRoundModel instance) =>
       'myShareOnTrackPoints': instance.myShareOnTrackPoints,
       'samvirkOnTrackPoints': instance.samvirkOnTrackPoints,
       'samvirkPayments': instance.samvirkPayments,
-      'forbildePoints': instance.forbildePoints,
+      'bMMPerfectWeekPoints': instance.bMMPerfectWeekPoints,
       'samvirkPoints': instance.samvirkPoints,
       'roundPoints': instance.roundPoints,
     };

@@ -12,6 +12,7 @@ import 'package:work_hu/features/admin/providers/drawer_provider.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
 import 'package:work_hu/features/create_transactions/view/create_forbilde_transaction_layout.dart';
 import 'package:work_hu/features/create_transactions/view/create_transactions_layout.dart';
+import 'package:work_hu/features/goal/view/goals_layout.dart';
 import 'package:work_hu/features/transactions/view/transactions_layout.dart';
 import 'package:work_hu/features/user_status/view/user_status_layout.dart';
 import 'package:work_hu/features/users/view/users_layout.dart';
@@ -43,11 +44,11 @@ class AdminPage extends BasePage {
           context: context,
           ref: ref,
           drawerNm: 1,
-          title: "Forbilde points",
+          title: "BMM Perfect Weeks",
           onTap: () {
             ref
                 .watch(createTransactionsDataProvider.notifier)
-                .setTransactionTypeAndAccount(TransactionType.VAER_ET_FORBILDE, Account.OTHER);
+                .setTransactionTypeAndAccount(TransactionType.BMM_PERFECT_WEEK, Account.OTHER);
             ref.watch(createTransactionsDataProvider.notifier).getUsers();
           }));
     }
@@ -79,7 +80,7 @@ class AdminPage extends BasePage {
             context: context,
             ref: ref,
             drawerNm: 4,
-            title: "Samvirk Points",
+            title: "Samvirk Credit",
             onTap: () {
               ref
                   .watch(createTransactionsDataProvider.notifier)
@@ -98,7 +99,8 @@ class AdminPage extends BasePage {
               ref.watch(createTransactionsDataProvider.notifier).getUsers();
             }),
         createListTile(context: context, ref: ref, drawerNm: 6, title: "Users"),
-        createListTile(context: context, ref: ref, drawerNm: 7, title: "Transactions")
+        createListTile(context: context, ref: ref, drawerNm: 7, title: "Goals"),
+        createListTile(context: context, ref: ref, drawerNm: 8, title: "Transactions")
       ]);
     }
 
@@ -113,15 +115,15 @@ class AdminPage extends BasePage {
     CreateTransactionsLayout(),
     CreateTransactionsLayout(),
     UsersLayout(),
+    GoalsLayout(),
     TransactionsLayout()
   ];
 
-  ListTile createListTile(
-      {required BuildContext context,
-      required WidgetRef ref,
-      required num drawerNm,
-      required String title,
-      Function()? onTap}) {
+  ListTile createListTile({required BuildContext context,
+    required WidgetRef ref,
+    required num drawerNm,
+    required String title,
+    Function()? onTap}) {
     bool isSelected = ref.watch(drawerDataProvider) == drawerNm;
     return ListTile(
       title: Text(title, style: TextStyle(fontWeight: isSelected ? FontWeight.w800 : FontWeight.normal)),

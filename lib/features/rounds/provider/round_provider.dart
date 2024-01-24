@@ -16,15 +16,15 @@ class RoundDataNotifier extends StateNotifier<RoundsState> {
   RoundDataNotifier(
     this.roundRepository,
   ) : super(const RoundsState()) {
-    getRounds();
+    getRounds(DateTime.now().year);
   }
 
   final RoundRepository roundRepository;
 
-  Future<void> getRounds() async {
+  Future<void> getRounds(num? seasonYear) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await roundRepository.getRounds().then((data) async {
+      await roundRepository.getRounds(seasonYear).then((data) async {
         data.sort((a, b) => a.roundNumber.compareTo(b.roundNumber));
         state = state.copyWith(
             rounds: data.where((element) => element.startDateTime.compareTo(DateTime.now()) < 0).toList(),

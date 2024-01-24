@@ -31,7 +31,7 @@ class AdminDataNotifier extends StateNotifier<AdminState> {
 
   String getTitle({required Account account, required TransactionType transactionType}) {
     return account == Account.OTHER
-        ? transactionType == TransactionType.VAER_ET_FORBILDE
+        ? transactionType == TransactionType.BMM_PERFECT_WEEK
             ? "Vær et forbilde points"
             : "Points"
         : account == Account.SAMVIRK

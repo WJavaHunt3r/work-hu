@@ -17,6 +17,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$UserStatusState {
   List<UserModel> get users => throw _privateConstructorUsedError;
+  List<GoalModel> get goals => throw _privateConstructorUsedError;
   num get selectedTeamId => throw _privateConstructorUsedError;
   OrderByType get selectedOrderType => throw _privateConstructorUsedError;
   ModelState get modelState => throw _privateConstructorUsedError;
@@ -35,6 +36,7 @@ abstract class $UserStatusStateCopyWith<$Res> {
   @useResult
   $Res call(
       {List<UserModel> users,
+      List<GoalModel> goals,
       num selectedTeamId,
       OrderByType selectedOrderType,
       ModelState modelState,
@@ -55,6 +57,7 @@ class _$UserStatusStateCopyWithImpl<$Res, $Val extends UserStatusState>
   @override
   $Res call({
     Object? users = null,
+    Object? goals = null,
     Object? selectedTeamId = null,
     Object? selectedOrderType = null,
     Object? modelState = null,
@@ -65,6 +68,10 @@ class _$UserStatusStateCopyWithImpl<$Res, $Val extends UserStatusState>
           ? _value.users
           : users // ignore: cast_nullable_to_non_nullable
               as List<UserModel>,
+      goals: null == goals
+          ? _value.goals
+          : goals // ignore: cast_nullable_to_non_nullable
+              as List<GoalModel>,
       selectedTeamId: null == selectedTeamId
           ? _value.selectedTeamId
           : selectedTeamId // ignore: cast_nullable_to_non_nullable
@@ -95,6 +102,7 @@ abstract class _$$_UserStatusStateCopyWith<$Res>
   @useResult
   $Res call(
       {List<UserModel> users,
+      List<GoalModel> goals,
       num selectedTeamId,
       OrderByType selectedOrderType,
       ModelState modelState,
@@ -113,6 +121,7 @@ class __$$_UserStatusStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? users = null,
+    Object? goals = null,
     Object? selectedTeamId = null,
     Object? selectedOrderType = null,
     Object? modelState = null,
@@ -123,6 +132,10 @@ class __$$_UserStatusStateCopyWithImpl<$Res>
           ? _value._users
           : users // ignore: cast_nullable_to_non_nullable
               as List<UserModel>,
+      goals: null == goals
+          ? _value._goals
+          : goals // ignore: cast_nullable_to_non_nullable
+              as List<GoalModel>,
       selectedTeamId: null == selectedTeamId
           ? _value.selectedTeamId
           : selectedTeamId // ignore: cast_nullable_to_non_nullable
@@ -148,11 +161,13 @@ class __$$_UserStatusStateCopyWithImpl<$Res>
 class _$_UserStatusState extends _UserStatusState {
   const _$_UserStatusState(
       {final List<UserModel> users = const [],
+      final List<GoalModel> goals = const [],
       this.selectedTeamId = 0,
       this.selectedOrderType = OrderByType.NAME,
       this.modelState = ModelState.empty,
       this.message = ""})
       : _users = users,
+        _goals = goals,
         super._();
 
   final List<UserModel> _users;
@@ -162,6 +177,15 @@ class _$_UserStatusState extends _UserStatusState {
     if (_users is EqualUnmodifiableListView) return _users;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_users);
+  }
+
+  final List<GoalModel> _goals;
+  @override
+  @JsonKey()
+  List<GoalModel> get goals {
+    if (_goals is EqualUnmodifiableListView) return _goals;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_goals);
   }
 
   @override
@@ -179,7 +203,7 @@ class _$_UserStatusState extends _UserStatusState {
 
   @override
   String toString() {
-    return 'UserStatusState(users: $users, selectedTeamId: $selectedTeamId, selectedOrderType: $selectedOrderType, modelState: $modelState, message: $message)';
+    return 'UserStatusState(users: $users, goals: $goals, selectedTeamId: $selectedTeamId, selectedOrderType: $selectedOrderType, modelState: $modelState, message: $message)';
   }
 
   @override
@@ -188,6 +212,7 @@ class _$_UserStatusState extends _UserStatusState {
         (other.runtimeType == runtimeType &&
             other is _$_UserStatusState &&
             const DeepCollectionEquality().equals(other._users, _users) &&
+            const DeepCollectionEquality().equals(other._goals, _goals) &&
             (identical(other.selectedTeamId, selectedTeamId) ||
                 other.selectedTeamId == selectedTeamId) &&
             (identical(other.selectedOrderType, selectedOrderType) ||
@@ -201,6 +226,7 @@ class _$_UserStatusState extends _UserStatusState {
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(_users),
+      const DeepCollectionEquality().hash(_goals),
       selectedTeamId,
       selectedOrderType,
       modelState,
@@ -216,6 +242,7 @@ class _$_UserStatusState extends _UserStatusState {
 abstract class _UserStatusState extends UserStatusState {
   const factory _UserStatusState(
       {final List<UserModel> users,
+      final List<GoalModel> goals,
       final num selectedTeamId,
       final OrderByType selectedOrderType,
       final ModelState modelState,
@@ -224,6 +251,8 @@ abstract class _UserStatusState extends UserStatusState {
 
   @override
   List<UserModel> get users;
+  @override
+  List<GoalModel> get goals;
   @override
   num get selectedTeamId;
   @override

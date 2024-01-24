@@ -7,6 +7,7 @@ import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/home/widgets/error_view.dart';
 import 'package:work_hu/features/home/widgets/status_view.dart';
+import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 
 class HomePage extends BasePage {
@@ -24,7 +25,10 @@ class HomePage extends BasePage {
               ]
             : [
                 IconButton(
-                    onPressed: () => context.push("/profile").then((value) => ref.refresh(teamRoundDataProvider)),
+                    onPressed: () {
+                      ref.watch(profileDataProvider.notifier).getUserGoal();
+                      context.push("/profile").then((value) => ref.refresh(teamRoundDataProvider));
+                    },
                     icon: const Icon(Icons.perm_identity_rounded))
               ];
   }

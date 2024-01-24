@@ -7,9 +7,9 @@ class UserRoundRepository {
 
   UserRoundRepository(this._userApi);
 
-  Future<List<UserRoundModel>> fetchUserRounds({num? userId, num? roundId}) async {
+  Future<List<UserRoundModel>> fetchUserRounds({num? userId, num? roundId, num? seasonYear}) async {
     try {
-      final res = await _userApi.fetchUserRoundsApiRequest(userId, roundId);
+      final res = await _userApi.fetchUserRoundsApiRequest(userId, roundId, seasonYear);
       return res.map((e) => UserRoundModel.fromJson(e)).toList();
     } on DioError catch (e) {
       rethrow;

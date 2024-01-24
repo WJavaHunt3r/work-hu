@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/features/goal/data/repository/goal_repository.dart';
+import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/login/data/repository/login_repository.dart';
 import 'package:work_hu/features/login/providers/login_provider.dart';
 import 'package:work_hu/features/profile/data/api/user_round_api.dart';
@@ -14,14 +16,15 @@ final userRoundsRepoProvider =
     Provider<UserRoundRepository>((ref) => UserRoundRepository(ref.read(userRoundsApiProvider)));
 
 final profileDataProvider = StateNotifierProvider.autoDispose<ProfileDataNotifier, ProfileState>((ref) =>
-    ProfileDataNotifier(
-        ref.read(loginRepoProvider), ref.read(userDataProvider.notifier), ref.read(userRoundsRepoProvider)));
+    ProfileDataNotifier(ref.read(loginRepoProvider), ref.read(userDataProvider.notifier),
+        ref.read(userRoundsRepoProvider), ref.read(goalRepoProvider)));
 
 class ProfileDataNotifier extends StateNotifier<ProfileState> {
   ProfileDataNotifier(
     this.loginRepository,
     this.read,
     this.userRoundRepoProvider,
+    this.goalRepoProvider,
   ) : super(const ProfileState()) {
     getUserInfo();
   }
@@ -29,6 +32,7 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
   final UserDataNotifier read;
   final LoginRepository loginRepository;
   final UserRoundRepository userRoundRepoProvider;
+  final GoalRepository goalRepoProvider;
 
   Future<void> getUserInfo() async {
     state = state.copyWith(modelState: ModelState.processing);
@@ -45,11 +49,13 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
       read.setUser(data);
     });
 
-    await userRoundRepoProvider.fetchUserRounds(userId: read.state!.id).then((userRounds) {
+    await userRoundRepoProvider.fetchUserRounds(userId: read.state!.id, seasonYear: 2024).then((userRounds) async {
       userRounds.sort((a, b) => a.round.roundNumber.compareTo(b.round.roundNumber));
-      state = state.copyWith(
-        userRounds: userRounds.where((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0).toList(),
-      );
+      await goalRepoProvider.getGoalByUserAndSeason(read.state!.id, DateTime.now().year).then((goal) => state =
+          state.copyWith(
+              userGoal: goal,
+              userRounds:
+                  userRounds.where((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0).toList()));
     });
   }
 
@@ -58,5 +64,16 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
     await Utils.saveData("password", "");
 
     read.setUser(null);
+  }
+
+  Future<void> getUserGoal() async {
+    state = state.copyWith(modelState: ModelState.processing);
+    try {
+      await goalRepoProvider
+          .getGoalByUserAndSeason(read.state!.id, DateTime.now().year)
+          .then((goal) => state = state.copyWith(userGoal: goal, modelState: ModelState.success));
+    } catch (e) {
+      state = state.copyWith(modelState: ModelState.error);
+    }
   }
 }

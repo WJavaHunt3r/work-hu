@@ -6,9 +6,10 @@ class UserRoundApi {
 
   UserRoundApi();
 
-  Future<List<dynamic>> fetchUserRoundsApiRequest([num? userId, num? roundId]) async {
+  Future<List<dynamic>> fetchUserRoundsApiRequest([num? userId, num? roundId, num? seasonYear]) async {
     try {
-      final res = await _dioClient.dio.get("/userRounds", queryParameters: {"userId": userId, "roundId": roundId});
+      final res = await _dioClient.dio
+          .get("/userRounds", queryParameters: {"userId": userId, "roundId": roundId, "seasonYear": seasonYear});
       return res.data;
     } catch (e) {
       rethrow;

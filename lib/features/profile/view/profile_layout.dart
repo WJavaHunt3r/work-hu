@@ -14,6 +14,7 @@ class ProfileLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var user = ref.watch(userDataProvider);
+
     return user == null
         ? const SizedBox()
         : Column(

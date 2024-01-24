@@ -17,6 +17,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$ProfileState {
   List<UserRoundModel> get userRounds => throw _privateConstructorUsedError;
+  GoalModel? get userGoal => throw _privateConstructorUsedError;
   ModelState get modelState => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -30,7 +31,12 @@ abstract class $ProfileStateCopyWith<$Res> {
           ProfileState value, $Res Function(ProfileState) then) =
       _$ProfileStateCopyWithImpl<$Res, ProfileState>;
   @useResult
-  $Res call({List<UserRoundModel> userRounds, ModelState modelState});
+  $Res call(
+      {List<UserRoundModel> userRounds,
+      GoalModel? userGoal,
+      ModelState modelState});
+
+  $GoalModelCopyWith<$Res>? get userGoal;
 }
 
 /// @nodoc
@@ -47,6 +53,7 @@ class _$ProfileStateCopyWithImpl<$Res, $Val extends ProfileState>
   @override
   $Res call({
     Object? userRounds = null,
+    Object? userGoal = freezed,
     Object? modelState = null,
   }) {
     return _then(_value.copyWith(
@@ -54,11 +61,27 @@ class _$ProfileStateCopyWithImpl<$Res, $Val extends ProfileState>
           ? _value.userRounds
           : userRounds // ignore: cast_nullable_to_non_nullable
               as List<UserRoundModel>,
+      userGoal: freezed == userGoal
+          ? _value.userGoal
+          : userGoal // ignore: cast_nullable_to_non_nullable
+              as GoalModel?,
       modelState: null == modelState
           ? _value.modelState
           : modelState // ignore: cast_nullable_to_non_nullable
               as ModelState,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $GoalModelCopyWith<$Res>? get userGoal {
+    if (_value.userGoal == null) {
+      return null;
+    }
+
+    return $GoalModelCopyWith<$Res>(_value.userGoal!, (value) {
+      return _then(_value.copyWith(userGoal: value) as $Val);
+    });
   }
 }
 
@@ -70,7 +93,13 @@ abstract class _$$_ProfileStateCopyWith<$Res>
       __$$_ProfileStateCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<UserRoundModel> userRounds, ModelState modelState});
+  $Res call(
+      {List<UserRoundModel> userRounds,
+      GoalModel? userGoal,
+      ModelState modelState});
+
+  @override
+  $GoalModelCopyWith<$Res>? get userGoal;
 }
 
 /// @nodoc
@@ -85,6 +114,7 @@ class __$$_ProfileStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? userRounds = null,
+    Object? userGoal = freezed,
     Object? modelState = null,
   }) {
     return _then(_$_ProfileState(
@@ -92,6 +122,10 @@ class __$$_ProfileStateCopyWithImpl<$Res>
           ? _value._userRounds
           : userRounds // ignore: cast_nullable_to_non_nullable
               as List<UserRoundModel>,
+      userGoal: freezed == userGoal
+          ? _value.userGoal
+          : userGoal // ignore: cast_nullable_to_non_nullable
+              as GoalModel?,
       modelState: null == modelState
           ? _value.modelState
           : modelState // ignore: cast_nullable_to_non_nullable
@@ -105,6 +139,7 @@ class __$$_ProfileStateCopyWithImpl<$Res>
 class _$_ProfileState extends _ProfileState {
   const _$_ProfileState(
       {final List<UserRoundModel> userRounds = const [],
+      this.userGoal,
       this.modelState = ModelState.empty})
       : _userRounds = userRounds,
         super._();
@@ -119,12 +154,14 @@ class _$_ProfileState extends _ProfileState {
   }
 
   @override
+  final GoalModel? userGoal;
+  @override
   @JsonKey()
   final ModelState modelState;
 
   @override
   String toString() {
-    return 'ProfileState(userRounds: $userRounds, modelState: $modelState)';
+    return 'ProfileState(userRounds: $userRounds, userGoal: $userGoal, modelState: $modelState)';
   }
 
   @override
@@ -134,13 +171,15 @@ class _$_ProfileState extends _ProfileState {
             other is _$_ProfileState &&
             const DeepCollectionEquality()
                 .equals(other._userRounds, _userRounds) &&
+            (identical(other.userGoal, userGoal) ||
+                other.userGoal == userGoal) &&
             (identical(other.modelState, modelState) ||
                 other.modelState == modelState));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType,
-      const DeepCollectionEquality().hash(_userRounds), modelState);
+      const DeepCollectionEquality().hash(_userRounds), userGoal, modelState);
 
   @JsonKey(ignore: true)
   @override
@@ -152,11 +191,14 @@ class _$_ProfileState extends _ProfileState {
 abstract class _ProfileState extends ProfileState {
   const factory _ProfileState(
       {final List<UserRoundModel> userRounds,
+      final GoalModel? userGoal,
       final ModelState modelState}) = _$_ProfileState;
   const _ProfileState._() : super._();
 
   @override
   List<UserRoundModel> get userRounds;
+  @override
+  GoalModel? get userGoal;
   @override
   ModelState get modelState;
   @override

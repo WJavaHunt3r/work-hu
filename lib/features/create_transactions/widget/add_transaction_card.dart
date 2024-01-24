@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/data/models/account.dart';
-import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
@@ -28,13 +27,16 @@ class AddTransactionCard extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            DropdownSearch<UserModel>(
-                asyncItems: (filter) => ref.read(createTransactionsDataProvider.notifier).filterUsers(filter),
-                selectedItem: ref.read(createTransactionsDataProvider).selectedUser,
-                onChanged: (user) => ref.read(createTransactionsDataProvider.notifier).updateSelectedUser(user),
-                itemAsString: (user) =>
-                    "${user.lastname} ${user.firstname} (${(DateTime.now().difference(user.birthDate).inDays / 365).ceil() - 1})",
-                popupProps: const PopupProps.menu(showSearchBox: true, searchDelay: Duration(milliseconds: 500))),
+            FocusScope(
+                node: ref.read(createTransactionsDataProvider.notifier).usersFocusNode,
+                child: DropdownSearch<UserModel>(
+                  asyncItems: (filter) => ref.read(createTransactionsDataProvider.notifier).filterUsers(filter),
+                  selectedItem: ref.read(createTransactionsDataProvider).selectedUser,
+                  onChanged: (user) => ref.read(createTransactionsDataProvider.notifier).updateSelectedUser(user),
+                  itemAsString: (user) =>
+                      "${user.lastname} ${user.firstname} (${(DateTime.now().difference(user.birthDate).inDays / 365).ceil() - 1})",
+                  popupProps: const PopupProps.menu(showSearchBox: true, searchDelay: Duration(milliseconds: 200)),
+                )),
             SizedBox(height: 10.sp),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -44,6 +46,8 @@ class AddTransactionCard extends ConsumerWidget {
                     child: TextField(
                       controller: ref.read(createTransactionsDataProvider.notifier).valueController,
                       keyboardType: TextInputType.number,
+                      focusNode: ref.read(createTransactionsDataProvider.notifier).valueFocusNode,
+                      textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                           labelText:
                               Utils.getTransactionTypeText(ref.watch(createTransactionsDataProvider).transactionType)),

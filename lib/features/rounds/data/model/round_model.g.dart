@@ -15,6 +15,7 @@ _$_RoundModel _$$_RoundModelFromJson(Map<String, dynamic> json) =>
       samvirkGoal: json['samvirkGoal'] as num,
       samvirkChurchGoal: json['samvirkChurchGoal'] as num,
       roundNumber: json['roundNumber'] as num,
+      season: SeasonModel.fromJson(json['season'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$_RoundModelToJson(_$_RoundModel instance) =>
@@ -26,4 +27,5 @@ Map<String, dynamic> _$$_RoundModelToJson(_$_RoundModel instance) =>
       'samvirkGoal': instance.samvirkGoal,
       'samvirkChurchGoal': instance.samvirkChurchGoal,
       'roundNumber': instance.roundNumber,
+      'season': instance.season,
     };

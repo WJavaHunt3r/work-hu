@@ -27,10 +27,8 @@ mixin _$UserModel {
   TeamModel? get team => throw _privateConstructorUsedError;
   Role get role => throw _privateConstructorUsedError;
   num get myShareID => throw _privateConstructorUsedError;
-  num get goal => throw _privateConstructorUsedError;
   num get baseMyShareCredit => throw _privateConstructorUsedError;
   num get currentMyShareCredit => throw _privateConstructorUsedError;
-  double get points => throw _privateConstructorUsedError;
   bool get changedPassword => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -52,10 +50,8 @@ abstract class $UserModelCopyWith<$Res> {
       TeamModel? team,
       Role role,
       num myShareID,
-      num goal,
       num baseMyShareCredit,
       num currentMyShareCredit,
-      double points,
       bool changedPassword});
 
   $TeamModelCopyWith<$Res>? get team;
@@ -81,10 +77,8 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? team = freezed,
     Object? role = null,
     Object? myShareID = null,
-    Object? goal = null,
     Object? baseMyShareCredit = null,
     Object? currentMyShareCredit = null,
-    Object? points = null,
     Object? changedPassword = null,
   }) {
     return _then(_value.copyWith(
@@ -116,10 +110,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.myShareID
           : myShareID // ignore: cast_nullable_to_non_nullable
               as num,
-      goal: null == goal
-          ? _value.goal
-          : goal // ignore: cast_nullable_to_non_nullable
-              as num,
       baseMyShareCredit: null == baseMyShareCredit
           ? _value.baseMyShareCredit
           : baseMyShareCredit // ignore: cast_nullable_to_non_nullable
@@ -128,10 +118,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.currentMyShareCredit
           : currentMyShareCredit // ignore: cast_nullable_to_non_nullable
               as num,
-      points: null == points
-          ? _value.points
-          : points // ignore: cast_nullable_to_non_nullable
-              as double,
       changedPassword: null == changedPassword
           ? _value.changedPassword
           : changedPassword // ignore: cast_nullable_to_non_nullable
@@ -167,10 +153,8 @@ abstract class _$$_UserModelCopyWith<$Res> implements $UserModelCopyWith<$Res> {
       TeamModel? team,
       Role role,
       num myShareID,
-      num goal,
       num baseMyShareCredit,
       num currentMyShareCredit,
-      double points,
       bool changedPassword});
 
   @override
@@ -195,10 +179,8 @@ class __$$_UserModelCopyWithImpl<$Res>
     Object? team = freezed,
     Object? role = null,
     Object? myShareID = null,
-    Object? goal = null,
     Object? baseMyShareCredit = null,
     Object? currentMyShareCredit = null,
-    Object? points = null,
     Object? changedPassword = null,
   }) {
     return _then(_$_UserModel(
@@ -230,10 +212,6 @@ class __$$_UserModelCopyWithImpl<$Res>
           ? _value.myShareID
           : myShareID // ignore: cast_nullable_to_non_nullable
               as num,
-      goal: null == goal
-          ? _value.goal
-          : goal // ignore: cast_nullable_to_non_nullable
-              as num,
       baseMyShareCredit: null == baseMyShareCredit
           ? _value.baseMyShareCredit
           : baseMyShareCredit // ignore: cast_nullable_to_non_nullable
@@ -242,10 +220,6 @@ class __$$_UserModelCopyWithImpl<$Res>
           ? _value.currentMyShareCredit
           : currentMyShareCredit // ignore: cast_nullable_to_non_nullable
               as num,
-      points: null == points
-          ? _value.points
-          : points // ignore: cast_nullable_to_non_nullable
-              as double,
       changedPassword: null == changedPassword
           ? _value.changedPassword
           : changedPassword // ignore: cast_nullable_to_non_nullable
@@ -256,7 +230,7 @@ class __$$_UserModelCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_UserModel implements _UserModel {
+class _$_UserModel extends _UserModel {
   const _$_UserModel(
       {required this.id,
       required this.firstname,
@@ -265,11 +239,10 @@ class _$_UserModel implements _UserModel {
       this.team,
       required this.role,
       required this.myShareID,
-      required this.goal,
       required this.baseMyShareCredit,
       required this.currentMyShareCredit,
-      required this.points,
-      required this.changedPassword});
+      required this.changedPassword})
+      : super._();
 
   factory _$_UserModel.fromJson(Map<String, dynamic> json) =>
       _$$_UserModelFromJson(json);
@@ -289,19 +262,15 @@ class _$_UserModel implements _UserModel {
   @override
   final num myShareID;
   @override
-  final num goal;
-  @override
   final num baseMyShareCredit;
   @override
   final num currentMyShareCredit;
-  @override
-  final double points;
   @override
   final bool changedPassword;
 
   @override
   String toString() {
-    return 'UserModel(id: $id, firstname: $firstname, lastname: $lastname, birthDate: $birthDate, team: $team, role: $role, myShareID: $myShareID, goal: $goal, baseMyShareCredit: $baseMyShareCredit, currentMyShareCredit: $currentMyShareCredit, points: $points, changedPassword: $changedPassword)';
+    return 'UserModel(id: $id, firstname: $firstname, lastname: $lastname, birthDate: $birthDate, team: $team, role: $role, myShareID: $myShareID, baseMyShareCredit: $baseMyShareCredit, currentMyShareCredit: $currentMyShareCredit, changedPassword: $changedPassword)';
   }
 
   @override
@@ -320,12 +289,10 @@ class _$_UserModel implements _UserModel {
             (identical(other.role, role) || other.role == role) &&
             (identical(other.myShareID, myShareID) ||
                 other.myShareID == myShareID) &&
-            (identical(other.goal, goal) || other.goal == goal) &&
             (identical(other.baseMyShareCredit, baseMyShareCredit) ||
                 other.baseMyShareCredit == baseMyShareCredit) &&
             (identical(other.currentMyShareCredit, currentMyShareCredit) ||
                 other.currentMyShareCredit == currentMyShareCredit) &&
-            (identical(other.points, points) || other.points == points) &&
             (identical(other.changedPassword, changedPassword) ||
                 other.changedPassword == changedPassword));
   }
@@ -341,10 +308,8 @@ class _$_UserModel implements _UserModel {
       team,
       role,
       myShareID,
-      goal,
       baseMyShareCredit,
       currentMyShareCredit,
-      points,
       changedPassword);
 
   @JsonKey(ignore: true)
@@ -361,7 +326,7 @@ class _$_UserModel implements _UserModel {
   }
 }
 
-abstract class _UserModel implements UserModel {
+abstract class _UserModel extends UserModel {
   const factory _UserModel(
       {required final num id,
       required final String firstname,
@@ -370,11 +335,10 @@ abstract class _UserModel implements UserModel {
       final TeamModel? team,
       required final Role role,
       required final num myShareID,
-      required final num goal,
       required final num baseMyShareCredit,
       required final num currentMyShareCredit,
-      required final double points,
       required final bool changedPassword}) = _$_UserModel;
+  const _UserModel._() : super._();
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
       _$_UserModel.fromJson;
@@ -394,13 +358,9 @@ abstract class _UserModel implements UserModel {
   @override
   num get myShareID;
   @override
-  num get goal;
-  @override
   num get baseMyShareCredit;
   @override
   num get currentMyShareCredit;
-  @override
-  double get points;
   @override
   bool get changedPassword;
   @override

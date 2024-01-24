@@ -27,6 +27,15 @@ class UsersRepository {
     }
   }
 
+  Future<UserModel> getUserByMyShareId(num myShareId) async {
+    try {
+      final res = await _userApi.getUserByMyShareId(myShareId);
+      return UserModel.fromJson(res);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<String> resetPassword(num userId, num changerId) async {
     try {
       final res = await _userApi.resetPassword(userId, changerId);
@@ -44,5 +53,4 @@ class UsersRepository {
       rethrow;
     }
   }
-
 }

@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,6 +17,8 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/create_transactions/data/state/create_transactions_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/features/rounds/data/state/rounds_state.dart';
+import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
@@ -35,16 +38,19 @@ final createTransactionsDataProvider =
             ref.read(usersRepoProvider),
             ref.read(userDataProvider.notifier),
             ref.read(transactionsRepoProvider),
-            ref.read(transactionItemsRepoProvider)));
+            ref.read(transactionItemsRepoProvider),
+            ref.read(roundDataProvider.notifier)));
 
 class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsState> {
   CreateTransactionsDataNotifier(this.router, this.usersRepository, this.currentUserProvider,
-      this.transactionRepository, this.transactionItemsRepository)
+      this.transactionRepository, this.transactionItemsRepository, this.roundDataNotifier)
       : super(const CreateTransactionsState()) {
     valueController = TextEditingController(text: "");
     exchangeController = TextEditingController(text: "33");
     descriptionController = TextEditingController(text: "");
     dateController = TextEditingController(text: DateTime.now().toString());
+    valueFocusNode = FocusNode();
+    usersFocusNode = FocusScopeNode();
 
     descriptionController.addListener(_updateDateAndDescription);
     dateController.addListener(_updateDateAndDescription);
@@ -55,12 +61,15 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   final UsersRepository usersRepository;
   final GoRouter router;
   final UserDataNotifier currentUserProvider;
+  final RoundDataNotifier roundDataNotifier;
   late final TextEditingController valueController;
   late final TextEditingController exchangeController;
   late final TextEditingController descriptionController;
   late final TextEditingController dateController;
   final TransactionRepository transactionRepository;
   final TransactionItemsRepository transactionItemsRepository;
+  late final FocusNode valueFocusNode;
+  late final FocusScopeNode usersFocusNode;
 
   Future<void> getUsers({bool? listO36}) async {
     var user = currentUserProvider.state;
@@ -69,9 +78,9 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     state = state.copyWith(modelState: ModelState.processing);
     try {
       await usersRepository
-          .getUsers(state.transactionType == TransactionType.VAER_ET_FORBILDE ? user!.team : null, listO36)
+          .getUsers(state.transactionType == TransactionType.BMM_PERFECT_WEEK ? user!.team : null, listO36)
           .then((data) {
-        state.account == Account.OTHER && state.transactionType == TransactionType.VAER_ET_FORBILDE
+        state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK
             ? _createTransactionItems(data)
             : _clearTransactions();
         state = state.copyWith(
@@ -90,8 +99,8 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
       await transactionRepository
           .createTransaction(
               TransactionModel(
-                name: state.account == Account.OTHER && state.transactionType == TransactionType.VAER_ET_FORBILDE
-                    ? "${currentUserProvider.state!.team!.color} csapat Vær et forbilde pontszámai"
+                name: state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK
+                    ? "${currentUserProvider.state!.team!.color} csapat tökéletes pontszámai"
                     : descriptionController.value.text,
                 account: state.account,
               ),
@@ -155,6 +164,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         description: description ?? state.description,
         user: state.selectedUser!,
         createUserId: currentUserProvider.state!.id,
+        round: roundDataNotifier.state.rounds.where((element) => element.season.seasonYear == DateTime.now().year).first,
         points: state.transactionType != TransactionType.CREDIT && state.transactionType != TransactionType.HOURS
             ? double.tryParse(valueController.value.text) ?? 0
             : 0,
@@ -167,6 +177,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
       var text = valueController.value.text;
       var sum = state.sum + num.parse(text.isNotEmpty ? text : "0");
       state = state.copyWith(transactionItems: transactions, sum: sum, modelState: ModelState.empty);
+      usersFocusNode.requestFocus();
       _clearAddFields();
     }
   }
@@ -204,6 +215,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   }
 
   updateSelectedUser(UserModel? u) {
+    valueFocusNode.requestFocus();
     state = state.copyWith(selectedUser: u);
   }
 
@@ -242,7 +254,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         3964,
         "BUK Vácduka",
         transaction.credit,
-        '${date?.day}/${date?.month}/${date?.year}',
+        '${date?.month}/${date?.day}/${date?.year}',
         state.description
       ]);
     }
@@ -250,12 +262,22 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     Uint8List bytes = Uint8List.fromList(utf8.encode(csv));
 
     var date = state.transactionDate;
-    await FileSaver.instance.saveFile(
-      name: 'befizetesek_${date?.year}${date?.month}${date?.day}.csv',
-      bytes: bytes,
-      ext: 'csv',
-      mimeType: MimeType.csv,
-    );
+
+    if (kIsWeb) {
+      await FileSaver.instance.saveFile(
+        name: 'befizetesek_${Utils.dateToString(date ?? DateTime.now())}',
+        bytes: bytes,
+        ext: 'csv',
+        mimeType: MimeType.csv,
+      );
+    } else {
+      await FileSaver.instance.saveAs(
+        name: 'befizetesek_${Utils.dateToString(date ?? DateTime.now())}',
+        bytes: bytes,
+        ext: 'csv',
+        mimeType: MimeType.csv,
+      );
+    }
   }
 
   Future<void> createHoursCsv() async {
@@ -293,7 +315,14 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
             var user = state.users.firstWhere((element) => element.myShareID.toString() == field[1]);
             var creditNok = field[5];
             var creditHUF = int.parse(creditNok) * double.parse(exchangeController.value.text);
-            var date = DateFormat("yyyy/MM/dd").parse(field[7]);
+            DateTime date;
+            if (field[7].split(".")) {
+              date = DateFormat("yyyy.MM.dd").parse(field[7]);
+            } else if (field[7].split("//")) {
+              date = DateFormat("yyyy/MM/dd").parse(field[7]);
+            } else {
+              date = DateTime.now();
+            }
             valueController.text = creditHUF.toString();
             state = state.copyWith(selectedUser: user);
 

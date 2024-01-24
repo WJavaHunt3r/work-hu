@@ -25,7 +25,7 @@ mixin _$UserRoundModel {
   bool get myShareOnTrackPoints => throw _privateConstructorUsedError;
   bool get samvirkOnTrackPoints => throw _privateConstructorUsedError;
   int get samvirkPayments => throw _privateConstructorUsedError;
-  double get forbildePoints => throw _privateConstructorUsedError;
+  double get bMMPerfectWeekPoints => throw _privateConstructorUsedError;
   double get samvirkPoints => throw _privateConstructorUsedError;
   double get roundPoints => throw _privateConstructorUsedError;
 
@@ -47,7 +47,7 @@ abstract class $UserRoundModelCopyWith<$Res> {
       bool myShareOnTrackPoints,
       bool samvirkOnTrackPoints,
       int samvirkPayments,
-      double forbildePoints,
+      double bMMPerfectWeekPoints,
       double samvirkPoints,
       double roundPoints});
 
@@ -73,7 +73,7 @@ class _$UserRoundModelCopyWithImpl<$Res, $Val extends UserRoundModel>
     Object? myShareOnTrackPoints = null,
     Object? samvirkOnTrackPoints = null,
     Object? samvirkPayments = null,
-    Object? forbildePoints = null,
+    Object? bMMPerfectWeekPoints = null,
     Object? samvirkPoints = null,
     Object? roundPoints = null,
   }) {
@@ -98,9 +98,9 @@ class _$UserRoundModelCopyWithImpl<$Res, $Val extends UserRoundModel>
           ? _value.samvirkPayments
           : samvirkPayments // ignore: cast_nullable_to_non_nullable
               as int,
-      forbildePoints: null == forbildePoints
-          ? _value.forbildePoints
-          : forbildePoints // ignore: cast_nullable_to_non_nullable
+      bMMPerfectWeekPoints: null == bMMPerfectWeekPoints
+          ? _value.bMMPerfectWeekPoints
+          : bMMPerfectWeekPoints // ignore: cast_nullable_to_non_nullable
               as double,
       samvirkPoints: null == samvirkPoints
           ? _value.samvirkPoints
@@ -144,7 +144,7 @@ abstract class _$$_UserRoundModelCopyWith<$Res>
       bool myShareOnTrackPoints,
       bool samvirkOnTrackPoints,
       int samvirkPayments,
-      double forbildePoints,
+      double bMMPerfectWeekPoints,
       double samvirkPoints,
       double roundPoints});
 
@@ -170,7 +170,7 @@ class __$$_UserRoundModelCopyWithImpl<$Res>
     Object? myShareOnTrackPoints = null,
     Object? samvirkOnTrackPoints = null,
     Object? samvirkPayments = null,
-    Object? forbildePoints = null,
+    Object? bMMPerfectWeekPoints = null,
     Object? samvirkPoints = null,
     Object? roundPoints = null,
   }) {
@@ -195,9 +195,9 @@ class __$$_UserRoundModelCopyWithImpl<$Res>
           ? _value.samvirkPayments
           : samvirkPayments // ignore: cast_nullable_to_non_nullable
               as int,
-      forbildePoints: null == forbildePoints
-          ? _value.forbildePoints
-          : forbildePoints // ignore: cast_nullable_to_non_nullable
+      bMMPerfectWeekPoints: null == bMMPerfectWeekPoints
+          ? _value.bMMPerfectWeekPoints
+          : bMMPerfectWeekPoints // ignore: cast_nullable_to_non_nullable
               as double,
       samvirkPoints: null == samvirkPoints
           ? _value.samvirkPoints
@@ -220,7 +220,7 @@ class _$_UserRoundModel implements _UserRoundModel {
       required this.myShareOnTrackPoints,
       required this.samvirkOnTrackPoints,
       required this.samvirkPayments,
-      required this.forbildePoints,
+      required this.bMMPerfectWeekPoints,
       required this.samvirkPoints,
       required this.roundPoints});
 
@@ -238,7 +238,7 @@ class _$_UserRoundModel implements _UserRoundModel {
   @override
   final int samvirkPayments;
   @override
-  final double forbildePoints;
+  final double bMMPerfectWeekPoints;
   @override
   final double samvirkPoints;
   @override
@@ -246,7 +246,7 @@ class _$_UserRoundModel implements _UserRoundModel {
 
   @override
   String toString() {
-    return 'UserRoundModel(round: $round, user: $user, myShareOnTrackPoints: $myShareOnTrackPoints, samvirkOnTrackPoints: $samvirkOnTrackPoints, samvirkPayments: $samvirkPayments, forbildePoints: $forbildePoints, samvirkPoints: $samvirkPoints, roundPoints: $roundPoints)';
+    return 'UserRoundModel(round: $round, user: $user, myShareOnTrackPoints: $myShareOnTrackPoints, samvirkOnTrackPoints: $samvirkOnTrackPoints, samvirkPayments: $samvirkPayments, bMMPerfectWeekPoints: $bMMPerfectWeekPoints, samvirkPoints: $samvirkPoints, roundPoints: $roundPoints)';
   }
 
   @override
@@ -262,8 +262,8 @@ class _$_UserRoundModel implements _UserRoundModel {
                 other.samvirkOnTrackPoints == samvirkOnTrackPoints) &&
             (identical(other.samvirkPayments, samvirkPayments) ||
                 other.samvirkPayments == samvirkPayments) &&
-            (identical(other.forbildePoints, forbildePoints) ||
-                other.forbildePoints == forbildePoints) &&
+            (identical(other.bMMPerfectWeekPoints, bMMPerfectWeekPoints) ||
+                other.bMMPerfectWeekPoints == bMMPerfectWeekPoints) &&
             (identical(other.samvirkPoints, samvirkPoints) ||
                 other.samvirkPoints == samvirkPoints) &&
             (identical(other.roundPoints, roundPoints) ||
@@ -279,7 +279,7 @@ class _$_UserRoundModel implements _UserRoundModel {
       myShareOnTrackPoints,
       samvirkOnTrackPoints,
       samvirkPayments,
-      forbildePoints,
+      bMMPerfectWeekPoints,
       samvirkPoints,
       roundPoints);
 
@@ -304,7 +304,7 @@ abstract class _UserRoundModel implements UserRoundModel {
       required final bool myShareOnTrackPoints,
       required final bool samvirkOnTrackPoints,
       required final int samvirkPayments,
-      required final double forbildePoints,
+      required final double bMMPerfectWeekPoints,
       required final double samvirkPoints,
       required final double roundPoints}) = _$_UserRoundModel;
 
@@ -322,7 +322,7 @@ abstract class _UserRoundModel implements UserRoundModel {
   @override
   int get samvirkPayments;
   @override
-  double get forbildePoints;
+  double get bMMPerfectWeekPoints;
   @override
   double get samvirkPoints;
   @override

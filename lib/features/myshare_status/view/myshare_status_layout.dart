@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/features/profile/providers/profile_providers.dart';
+import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
@@ -14,20 +16,30 @@ class MyShareStatusLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var currentRound = ref
-        .watch(roundDataProvider)
-        .rounds
-        .firstWhere((element) => element.roundNumber == ref.watch(roundDataProvider).currentRoundNumber);
-    var userStatus = user.currentMyShareCredit / user.goal * 100;
-    var isOnTrack = currentRound.myShareGoal <= userStatus;
-    var toOnTrack = Utils.creditFormat.format(user.goal * currentRound.myShareGoal / 100 - user.currentMyShareCredit);
+    RoundModel? currentRound;
+    try {
+      currentRound = ref
+          .watch(roundDataProvider)
+          .rounds
+          .firstWhere((element) => element.roundNumber == ref.watch(roundDataProvider).currentRoundNumber);
+    } catch (e) {
+      currentRound = null;
+    }
+
+    var userGoal = ref.watch(profileDataProvider).userGoal;
+    var userStatus = userGoal == null ? 0 : user.currentMyShareCredit / userGoal.goal * 100;
+    var isOnTrack = currentRound == null ? false : (currentRound.myShareGoal ?? 0) <= userStatus;
+    var toOnTrack = currentRound == null
+        ? 0
+        : Utils.creditFormat
+            .format((userGoal?.goal ?? 0) * (currentRound.myShareGoal ?? 0) / 100 - user.currentMyShareCredit);
     return Column(children: [
       SfRadialGauge(
         enableLoadingAnimation: true,
         axes: [
           RadialAxis(
             minimum: 0,
-            maximum: user.goal.toDouble(),
+            maximum: userGoal?.goal.toDouble() ?? 1,
             axisLineStyle: AxisLineStyle(thickness: 15.sp, cornerStyle: CornerStyle.bothCurve),
             showLabels: false,
             showTicks: false,
@@ -39,7 +51,7 @@ class MyShareStatusLayout extends ConsumerWidget {
                 width: 15.sp,
               ),
               MarkerPointer(
-                value: currentRound.myShareGoal / 100 * user.goal,
+                value: (currentRound?.myShareGoal ?? 0) / 100 * (userGoal?.goal ?? 0),
               )
             ],
             annotations: [
@@ -67,7 +79,7 @@ class MyShareStatusLayout extends ConsumerWidget {
         children: [
           Expanded(
               child: Text(
-            isOnTrack ? "You are On Track" : "$toOnTrack Ft to be On Track",
+            currentRound == null ? "No round or goal set" : isOnTrack ? "You are On Track" : "$toOnTrack Ft to be On Track",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.w800, color: AppColors.primary),
           )),

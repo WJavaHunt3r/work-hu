@@ -6,9 +6,9 @@ class RoundApi {
 
   RoundApi();
 
-  Future<List<dynamic>> getRounds() async {
+  Future<List<dynamic>> getRounds(num? seasonYear) async {
     try {
-      final res = await _dioClient.dio.get("/rounds");
+      final res = await _dioClient.dio.get("/rounds", queryParameters: {"seasonYear": seasonYear});
       return res.data;
     } catch (e) {
       rethrow;

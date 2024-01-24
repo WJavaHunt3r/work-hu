@@ -16,10 +16,8 @@ _$_UserModel _$$_UserModelFromJson(Map<String, dynamic> json) => _$_UserModel(
           : TeamModel.fromJson(json['team'] as Map<String, dynamic>),
       role: $enumDecode(_$RoleEnumMap, json['role']),
       myShareID: json['myShareID'] as num,
-      goal: json['goal'] as num,
       baseMyShareCredit: json['baseMyShareCredit'] as num,
       currentMyShareCredit: json['currentMyShareCredit'] as num,
-      points: (json['points'] as num).toDouble(),
       changedPassword: json['changedPassword'] as bool,
     );
 
@@ -32,10 +30,8 @@ Map<String, dynamic> _$$_UserModelToJson(_$_UserModel instance) =>
       'team': instance.team,
       'role': _$RoleEnumMap[instance.role]!,
       'myShareID': instance.myShareID,
-      'goal': instance.goal,
       'baseMyShareCredit': instance.baseMyShareCredit,
       'currentMyShareCredit': instance.currentMyShareCredit,
-      'points': instance.points,
       'changedPassword': instance.changedPassword,
     };
 

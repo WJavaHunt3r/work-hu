@@ -27,6 +27,7 @@ mixin _$RoundModel {
   num get samvirkGoal => throw _privateConstructorUsedError;
   num get samvirkChurchGoal => throw _privateConstructorUsedError;
   num get roundNumber => throw _privateConstructorUsedError;
+  SeasonModel get season => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -47,7 +48,10 @@ abstract class $RoundModelCopyWith<$Res> {
       num myShareGoal,
       num samvirkGoal,
       num samvirkChurchGoal,
-      num roundNumber});
+      num roundNumber,
+      SeasonModel season});
+
+  $SeasonModelCopyWith<$Res> get season;
 }
 
 /// @nodoc
@@ -70,6 +74,7 @@ class _$RoundModelCopyWithImpl<$Res, $Val extends RoundModel>
     Object? samvirkGoal = null,
     Object? samvirkChurchGoal = null,
     Object? roundNumber = null,
+    Object? season = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -100,7 +105,19 @@ class _$RoundModelCopyWithImpl<$Res, $Val extends RoundModel>
           ? _value.roundNumber
           : roundNumber // ignore: cast_nullable_to_non_nullable
               as num,
+      season: null == season
+          ? _value.season
+          : season // ignore: cast_nullable_to_non_nullable
+              as SeasonModel,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $SeasonModelCopyWith<$Res> get season {
+    return $SeasonModelCopyWith<$Res>(_value.season, (value) {
+      return _then(_value.copyWith(season: value) as $Val);
+    });
   }
 }
 
@@ -119,7 +136,11 @@ abstract class _$$_RoundModelCopyWith<$Res>
       num myShareGoal,
       num samvirkGoal,
       num samvirkChurchGoal,
-      num roundNumber});
+      num roundNumber,
+      SeasonModel season});
+
+  @override
+  $SeasonModelCopyWith<$Res> get season;
 }
 
 /// @nodoc
@@ -140,6 +161,7 @@ class __$$_RoundModelCopyWithImpl<$Res>
     Object? samvirkGoal = null,
     Object? samvirkChurchGoal = null,
     Object? roundNumber = null,
+    Object? season = null,
   }) {
     return _then(_$_RoundModel(
       id: null == id
@@ -170,6 +192,10 @@ class __$$_RoundModelCopyWithImpl<$Res>
           ? _value.roundNumber
           : roundNumber // ignore: cast_nullable_to_non_nullable
               as num,
+      season: null == season
+          ? _value.season
+          : season // ignore: cast_nullable_to_non_nullable
+              as SeasonModel,
     ));
   }
 }
@@ -184,7 +210,8 @@ class _$_RoundModel implements _RoundModel {
       required this.myShareGoal,
       required this.samvirkGoal,
       required this.samvirkChurchGoal,
-      required this.roundNumber});
+      required this.roundNumber,
+      required this.season});
 
   factory _$_RoundModel.fromJson(Map<String, dynamic> json) =>
       _$$_RoundModelFromJson(json);
@@ -203,10 +230,12 @@ class _$_RoundModel implements _RoundModel {
   final num samvirkChurchGoal;
   @override
   final num roundNumber;
+  @override
+  final SeasonModel season;
 
   @override
   String toString() {
-    return 'RoundModel(id: $id, startDateTime: $startDateTime, endDateTime: $endDateTime, myShareGoal: $myShareGoal, samvirkGoal: $samvirkGoal, samvirkChurchGoal: $samvirkChurchGoal, roundNumber: $roundNumber)';
+    return 'RoundModel(id: $id, startDateTime: $startDateTime, endDateTime: $endDateTime, myShareGoal: $myShareGoal, samvirkGoal: $samvirkGoal, samvirkChurchGoal: $samvirkChurchGoal, roundNumber: $roundNumber, season: $season)';
   }
 
   @override
@@ -226,13 +255,14 @@ class _$_RoundModel implements _RoundModel {
             (identical(other.samvirkChurchGoal, samvirkChurchGoal) ||
                 other.samvirkChurchGoal == samvirkChurchGoal) &&
             (identical(other.roundNumber, roundNumber) ||
-                other.roundNumber == roundNumber));
+                other.roundNumber == roundNumber) &&
+            (identical(other.season, season) || other.season == season));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, id, startDateTime, endDateTime,
-      myShareGoal, samvirkGoal, samvirkChurchGoal, roundNumber);
+      myShareGoal, samvirkGoal, samvirkChurchGoal, roundNumber, season);
 
   @JsonKey(ignore: true)
   @override
@@ -256,7 +286,8 @@ abstract class _RoundModel implements RoundModel {
       required final num myShareGoal,
       required final num samvirkGoal,
       required final num samvirkChurchGoal,
-      required final num roundNumber}) = _$_RoundModel;
+      required final num roundNumber,
+      required final SeasonModel season}) = _$_RoundModel;
 
   factory _RoundModel.fromJson(Map<String, dynamic> json) =
       _$_RoundModel.fromJson;
@@ -275,6 +306,8 @@ abstract class _RoundModel implements RoundModel {
   num get samvirkChurchGoal;
   @override
   num get roundNumber;
+  @override
+  SeasonModel get season;
   @override
   @JsonKey(ignore: true)
   _$$_RoundModelCopyWith<_$_RoundModel> get copyWith =>

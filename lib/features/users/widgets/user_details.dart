@@ -48,39 +48,64 @@ class UserDetails extends ConsumerWidget {
                         child: BaseTextFormField(
                       labelText: "Lastname",
                       initialValue: user.lastname,
+                      onChanged: (String text) {},
                     )),
                     Expanded(
                         child: BaseTextFormField(
                       labelText: "Firstname",
                       initialValue: user.firstname,
+                      onChanged: (String text) {},
                     )),
                   ],
                 ),
                 BaseTextFormField(
                   labelText: "Date of birth",
                   initialValue: Utils.dateToString(user.birthDate),
+                  onChanged: (String text) {},
                 ),
                 Row(
                   children: [
-                    Expanded(
-                      child: BaseTextFormField(
-                        labelText: "MyShare goal",
-                        initialValue: user.goal.toString(),
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: BaseTextFormField(
+                    //     labelText: "MyShare goal",
+                    //     initialValue: user.goal.toString(),
+                    //     onChanged: (String text) => text.isNotEmpty
+                    //         ? ref
+                    //             .watch(usersDataProvider.notifier)
+                    //             .updateCurrentUser(user.copyWith(goal: num.tryParse(text) ?? 0))
+                    //         : null,
+                    //   ),
+                    // ),
                     Expanded(
                       child: BaseTextFormField(
                         enabled: false,
                         labelText: "Current MyShare credit",
                         initialValue: user.currentMyShareCredit.toString(),
+                        onChanged: (String text) => text.isNotEmpty
+                            ? ref
+                                .watch(usersDataProvider.notifier)
+                                .updateCurrentUser(user.copyWith(currentMyShareCredit: num.tryParse(text) ?? 0))
+                            : null,
                       ),
                     ),
+                    Expanded(
+                      child: BaseTextFormField(
+                        labelText: "Base MyShare credit",
+                        initialValue: user.baseMyShareCredit.toString(),
+                        onChanged: (String text) => text.isNotEmpty
+                            ? ref
+                                .watch(usersDataProvider.notifier)
+                                .updateCurrentUser(user.copyWith(baseMyShareCredit: num.tryParse(text) ?? 0))
+                            : null,
+                      ),
+                    )
                   ],
                 ),
                 user.team != null
                     ? BaseTextFormField(
                         labelText: "Team",
                         initialValue: user.team!.color,
+                        onChanged: (String text) {},
                       )
                     : const SizedBox(),
                 Padding(

@@ -9,6 +9,7 @@ import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:work_hu/features/profile/widgets/info_card.dart';
+import 'package:work_hu/features/user_points/provider/user_points_providers.dart';
 import 'package:work_hu/features/utils.dart';
 
 class ProfileGrid extends ConsumerWidget {
@@ -19,6 +20,7 @@ class ProfileGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var goal = ref.watch(profileDataProvider).userGoal;
     final NumberFormat numberFormat = NumberFormat("#,###");
     final NumberFormat pointsFormat = NumberFormat("#,###.#");
     return Column(children: [
@@ -35,8 +37,10 @@ class ProfileGrid extends ConsumerWidget {
                         children: [
                           Align(
                             alignment: Alignment.center,
-                            child: Text("${numberFormat.format(user.currentMyShareCredit / user.goal * 100)}%",
-                                style: TextStyle(fontSize: 35.sp, fontWeight: FontWeight.w800)),
+                            child: goal == null
+                                ? Text("Nincs cél beállítva")
+                                : Text("${numberFormat.format(user.currentMyShareCredit / goal!.goal * 100)}%",
+                                    style: TextStyle(fontSize: 35.sp, fontWeight: FontWeight.w800)),
                           ),
                           if (userRoundModel.myShareOnTrackPoints)
                             Align(
@@ -58,7 +62,7 @@ class ProfileGrid extends ConsumerWidget {
                       transitionDuration: const Duration(milliseconds: 200),
                       context: context,
                       pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
-                        return MyShareStatusPage(user:user);
+                        return MyShareStatusPage(user: user);
                       }))),
           SizedBox(
             width: 12.sp,
@@ -67,8 +71,10 @@ class ProfileGrid extends ConsumerWidget {
             child: InfoCard(
                 height: 100.sp,
                 padding: 10.sp,
-                onTap: () =>
-                    context.push("/userPoints").then((value) => ref.read(profileDataProvider.notifier).getUserInfo()),
+                onTap: () {
+                  ref.watch(userPointsDataProvider.notifier).getTransactionItems();
+                  context.push("/userPoints").then((value) => ref.read(profileDataProvider.notifier).getUserInfo());
+                },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

@@ -28,6 +28,15 @@ class UsersApi {
     }
   }
 
+  Future<dynamic> getUserByMyShareId(num myShareId) async {
+    try {
+      final res = await _dioClient.dio.get("/user", queryParameters: {"myShareId": myShareId});
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<dynamic> resetPassword(num userID, num changerId) async {
     try {
       final res = await _dioClient.dio.post("/auth/resetPassword", data: {'userId': userID, "changerId": changerId});

@@ -8,6 +8,8 @@ import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
+import 'package:work_hu/features/goal/data/model/goal_model.dart';
+import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
@@ -22,6 +24,7 @@ class UserStatusLayout extends ConsumerWidget {
     var users = ref.watch(userStatusDataProvider).users;
     var currentRoundNumber = ref.read(roundDataProvider).currentRoundNumber;
     var rounds = ref.read(roundDataProvider).rounds;
+    var goals = ref.watch(goalDataProvider).goals;
     var currentRoundGoal =
         rounds.isEmpty ? 0 : rounds.firstWhere((element) => element.roundNumber == currentRoundNumber).myShareGoal;
     return Stack(
@@ -68,9 +71,13 @@ class UserStatusLayout extends ConsumerWidget {
                 itemCount: users.length,
                 itemBuilder: (BuildContext context, int index) {
                   var current = users[index];
-                  var userStatus = current.currentMyShareCredit / current.goal * 100;
+                  var currentUserGoal = goals.where((g) => g.user.id == current.id).isEmpty
+                      ? null
+                      : goals.firstWhere((g) => g.user.id == current.id);
+                  var currentGoal = currentUserGoal?.goal ?? 0;
+                  var userStatus = current.currentMyShareCredit / currentGoal * 100;
                   var style = TextStyle(color: userStatus >= currentRoundGoal ? AppColors.white : AppColors.primary);
-                  var toOnTrack = current.goal * currentRoundGoal / 100 - current.currentMyShareCredit;
+                  var toOnTrack = currentGoal * currentRoundGoal / 100 - current.currentMyShareCredit;
                   var isLast = index == users.length - 1;
                   return ListCard(
                       isLast: isLast,
