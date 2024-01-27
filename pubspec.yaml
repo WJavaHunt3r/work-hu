@@ -34,6 +34,7 @@ dependencies:
   file_picker: ^6.0.0
   csv: ^5.1.0
   file_saver: ^0.2.8
+  drop_down_search_field: ^1.0.3
 
 dev_dependencies:
   flutter_test:

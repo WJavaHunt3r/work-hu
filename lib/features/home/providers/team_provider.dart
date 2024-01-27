@@ -59,7 +59,7 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
 
     var user = userSessionProvider.state;
     if (username.isNotEmpty && password.isNotEmpty && user == null) {
-      state = state.copyWith(modelState: ModelState.processing);
+      //state = state.copyWith(modelState: ModelState.processing);
       read.state = LoginState(username: username, password: password);
       await read.login();
       state = state.copyWith(modelState: read.state.modelState);

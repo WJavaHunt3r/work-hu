@@ -47,8 +47,8 @@ class TabView extends ConsumerWidget {
         samvirkPayments: userRounds.isNotEmpty
             ? userRounds.map((e) => e.samvirkPayments).reduce((value, element) => value + element)
             : 0,
-        bMMPerfectWeekPoints: userRounds.isNotEmpty
-            ? userRounds.map((e) => e.bMMPerfectWeekPoints).reduce((value, element) => value + element)
+        bmmperfectWeekPoints: userRounds.isNotEmpty
+            ? userRounds.map((e) => e.bmmperfectWeekPoints).reduce((value, element) => value + element)
             : 0,
         samvirkPoints: userRounds.isNotEmpty
             ? userRounds.map((e) => e.samvirkPoints).reduce((value, element) => value + element)

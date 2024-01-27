@@ -46,6 +46,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
       this.transactionRepository, this.transactionItemsRepository, this.roundDataNotifier)
       : super(const CreateTransactionsState()) {
     valueController = TextEditingController(text: "");
+    userController = TextEditingController(text: "");
     exchangeController = TextEditingController(text: "33");
     descriptionController = TextEditingController(text: "");
     dateController = TextEditingController(text: DateTime.now().toString());
@@ -66,6 +67,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   late final TextEditingController exchangeController;
   late final TextEditingController descriptionController;
   late final TextEditingController dateController;
+  late final TextEditingController userController;
   final TransactionRepository transactionRepository;
   final TransactionItemsRepository transactionItemsRepository;
   late final FocusNode valueFocusNode;
@@ -164,7 +166,8 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         description: description ?? state.description,
         user: state.selectedUser!,
         createUserId: currentUserProvider.state!.id,
-        round: roundDataNotifier.state.rounds.where((element) => element.season.seasonYear == DateTime.now().year).first,
+        round:
+            roundDataNotifier.state.rounds.where((element) => element.season.seasonYear == DateTime.now().year).first,
         points: state.transactionType != TransactionType.CREDIT && state.transactionType != TransactionType.HOURS
             ? double.tryParse(valueController.value.text) ?? 0
             : 0,
@@ -177,8 +180,8 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
       var text = valueController.value.text;
       var sum = state.sum + num.parse(text.isNotEmpty ? text : "0");
       state = state.copyWith(transactionItems: transactions, sum: sum, modelState: ModelState.empty);
-      usersFocusNode.requestFocus();
       _clearAddFields();
+      usersFocusNode.requestFocus();
     }
   }
 
@@ -203,6 +206,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
 
   _clearAddFields() {
     valueController.clear();
+    userController.clear();
     state = state.copyWith(selectedUser: null);
   }
 
@@ -216,11 +220,16 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
 
   updateSelectedUser(UserModel? u) {
     valueFocusNode.requestFocus();
+    userController.text = "${u?.getFullName()} ( ${u?.getAge()}) ";
     state = state.copyWith(selectedUser: u);
   }
 
   Future<List<UserModel>> filterUsers(String filter) async {
-    var filtered = state.users.where((u) => u.firstname.startsWith(filter) || u.lastname.startsWith(filter)).toList();
+    var filtered = state.users
+        .where((u) =>
+            u.firstname.toLowerCase().startsWith(filter.toLowerCase()) ||
+            u.lastname.toLowerCase().startsWith(filter.toLowerCase()))
+        .toList();
     filtered.sort((a, b) => ("${a.lastname} ${a.firstname}").compareTo("${b.lastname} ${b.firstname}"));
     return filtered;
   }

@@ -13,7 +13,7 @@ class UserRoundModel with _$UserRoundModel{
     required bool myShareOnTrackPoints,
     required bool samvirkOnTrackPoints,
     required int samvirkPayments,
-    required double bMMPerfectWeekPoints,
+    required double bmmperfectWeekPoints,
     required double samvirkPoints,
     required double roundPoints,
   }) = _UserRoundModel;

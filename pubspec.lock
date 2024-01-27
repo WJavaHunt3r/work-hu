@@ -233,6 +233,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.6"
+  drop_down_search_field:
+    dependency: "direct main"
+    description:
+      name: drop_down_search_field
+      sha256: a0a1d24ae3d688142ffbee803fd7ce27f1d4121e06ae89c4c9a2685a1c0fe0e8
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   dropdown_search:
     dependency: "direct main"
     description:
@@ -712,6 +720,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.6"
+  pointer_interceptor:
+    dependency: transitive
+    description:
+      name: pointer_interceptor
+      sha256: bd18321519718678d5fa98ad3a3359cbc7a31f018554eab80b73d08a7f0c165a
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.1"
+  pointer_interceptor_ios:
+    dependency: transitive
+    description:
+      name: pointer_interceptor_ios
+      sha256: "4282ebfe21b54e21e26ab982c6086f0a67dc63423026bfba8db39a2e22045f26"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.0"
+  pointer_interceptor_platform_interface:
+    dependency: transitive
+    description:
+      name: pointer_interceptor_platform_interface
+      sha256: "59a446ead3be360bde72c3725f5ecacbba203c8a760e3061024c20f7da53f825"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.0"
+  pointer_interceptor_web:
+    dependency: transitive
+    description:
+      name: pointer_interceptor_web
+      sha256: "2a8a069206f7b234a895d30ccab8b18ea267eeb79a832e5e3d1b6464d659eb6a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.0"
   pointycastle:
     dependency: "direct main"
     description:
@@ -1023,4 +1063,4 @@ packages:
     version: "3.1.2"
 sdks:
   dart: ">=3.2.0-0 <4.0.0"
-  flutter: ">=3.10.0"
+  flutter: ">=3.13.0"

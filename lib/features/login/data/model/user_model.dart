@@ -27,4 +27,8 @@ class UserModel with _$UserModel {
   String getFullName() {
     return "$firstname $lastname";
   }
+
+  num getAge() {
+    return (DateTime.now().difference(birthDate).inDays / 365).ceil() - 1;
+  }
 }
