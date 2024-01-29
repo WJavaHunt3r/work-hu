@@ -25,7 +25,7 @@ class UserModel with _$UserModel {
   const UserModel._();
 
   String getFullName() {
-    return "$firstname $lastname";
+    return "$lastname $firstname";
   }
 
   num getAge() {
