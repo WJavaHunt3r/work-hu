@@ -23,7 +23,7 @@ class AddTransactionCard extends ConsumerWidget {
     var isError = ref.watch(createTransactionsDataProvider).modelState == ModelState.error;
     return InfoCard(
         padding: 8.sp,
-        height: isError ? 150.sp : 120.sp,
+        height: isError ? 200.sp : 120.sp,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

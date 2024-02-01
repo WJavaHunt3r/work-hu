@@ -323,13 +323,17 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
             var creditNok = field[5];
             var creditHUF = int.parse(creditNok) * double.parse(exchangeController.value.text);
             DateTime date;
-            if (field[7].split(".")) {
+            try {
+              field[7].split(".");
               date = DateFormat("yyyy.MM.dd").parse(field[7]);
-            } else if (field[7].split("//")) {
-              date = DateFormat("yyyy/MM/dd").parse(field[7]);
-            } else {
-              date = DateTime.now();
+            } catch (e) {
+              try {
+                date = DateFormat("yyyy/MM/dd").parse(field[7]);
+              } catch (e) {
+                date = DateTime.now();
+              }
             }
+
             valueController.text = creditHUF.toString();
             state = state.copyWith(selectedUser: user);
 
