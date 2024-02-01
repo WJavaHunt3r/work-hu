@@ -43,7 +43,7 @@ class SamvirkStatus extends ConsumerWidget {
                     const Text("Samvirk Status:"),
                     Text(
                       itemCount.toDouble() == 0 ? 0.0.toString() : numberFormat.format(samvirkStatus).toString(),
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
@@ -76,7 +76,7 @@ class SamvirkStatus extends ConsumerWidget {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [Text("0"), Text(numberFormat.format(maximum))],
+                  children: [const Text("0"), Text(numberFormat.format(maximum))],
                 )
               ])),
         ));

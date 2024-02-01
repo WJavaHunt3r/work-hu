@@ -8,6 +8,7 @@ import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/title_provider.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/features/activities/view/activities_layout.dart';
 import 'package:work_hu/features/admin/providers/drawer_provider.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
 import 'package:work_hu/features/create_transactions/view/create_forbilde_transaction_layout.dart';
@@ -39,11 +40,12 @@ class AdminPage extends BasePage {
     List<Widget> list = [];
     if (role != Role.USER) {
       list.add(DrawerHeader(child: Text("Admin", style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800))));
-      list.add(createListTile(context: context, ref: ref, drawerNm: 0, title: "User status"));
+      list.add(createListTile(context: context, ref: ref, drawerNm: 0, title: "Activities"));
+      list.add(createListTile(context: context, ref: ref, drawerNm: 1, title: "User status"));
       list.add(createListTile(
           context: context,
           ref: ref,
-          drawerNm: 1,
+          drawerNm: 2,
           title: "BMM Perfect Weeks",
           onTap: () {
             ref
@@ -57,7 +59,7 @@ class AdminPage extends BasePage {
         createListTile(
             context: context,
             ref: ref,
-            drawerNm: 2,
+            drawerNm: 3,
             title: "MyShare Credits",
             onTap: () {
               ref
@@ -68,7 +70,7 @@ class AdminPage extends BasePage {
         createListTile(
             context: context,
             ref: ref,
-            drawerNm: 3,
+            drawerNm: 4,
             title: "MyShare Hours",
             onTap: () {
               ref
@@ -79,7 +81,7 @@ class AdminPage extends BasePage {
         createListTile(
             context: context,
             ref: ref,
-            drawerNm: 4,
+            drawerNm: 5,
             title: "Samvirk Credit",
             onTap: () {
               ref
@@ -90,7 +92,7 @@ class AdminPage extends BasePage {
         createListTile(
             context: context,
             ref: ref,
-            drawerNm: 5,
+            drawerNm: 6,
             title: "Work Points",
             onTap: () {
               ref
@@ -98,9 +100,9 @@ class AdminPage extends BasePage {
                   .setTransactionTypeAndAccount(TransactionType.POINT, Account.OTHER);
               ref.watch(createTransactionsDataProvider.notifier).getUsers();
             }),
-        createListTile(context: context, ref: ref, drawerNm: 6, title: "Users"),
-        createListTile(context: context, ref: ref, drawerNm: 7, title: "Goals"),
-        createListTile(context: context, ref: ref, drawerNm: 8, title: "Transactions")
+        createListTile(context: context, ref: ref, drawerNm: 7, title: "Users"),
+        createListTile(context: context, ref: ref, drawerNm: 8, title: "Goals"),
+        createListTile(context: context, ref: ref, drawerNm: 9, title: "Transactions")
       ]);
     }
 
@@ -108,6 +110,7 @@ class AdminPage extends BasePage {
   }
 
   static const List<Widget> _screenWidgets = [
+    ActivitiesLayout(),
     UserStatusLayout(),
     CreateForbildeTransactionLayout(),
     CreateTransactionsLayout(),
@@ -119,11 +122,12 @@ class AdminPage extends BasePage {
     TransactionsLayout()
   ];
 
-  ListTile createListTile({required BuildContext context,
-    required WidgetRef ref,
-    required num drawerNm,
-    required String title,
-    Function()? onTap}) {
+  ListTile createListTile(
+      {required BuildContext context,
+      required WidgetRef ref,
+      required num drawerNm,
+      required String title,
+      Function()? onTap}) {
     bool isSelected = ref.watch(drawerDataProvider) == drawerNm;
     return ListTile(
       title: Text(title, style: TextStyle(fontWeight: isSelected ? FontWeight.w800 : FontWeight.normal)),

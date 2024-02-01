@@ -9,7 +9,6 @@ import 'package:work_hu/features/login/data/state/login_state.dart';
 import 'package:work_hu/features/login/providers/login_provider.dart';
 import 'package:work_hu/features/profile/data/repository/user_round_repository.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
-import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/utils.dart';
 
 final teamApiProvider = Provider<TeamRoundApi>((ref) => TeamRoundApi());

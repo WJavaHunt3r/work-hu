@@ -33,7 +33,7 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
       await usersRepository
           .getUsers(team)
           .then((value) {
-            value.sort((a,b) => ("${a.lastname} ${a.firstname}").compareTo("${b.lastname} ${b.firstname}"));
+            value.sort((a,b) => (a.getFullName()).compareTo(b.getFullName()));
             state = state.copyWith(users: value, modelState: ModelState.success);
       });
     } on DioError catch (e) {

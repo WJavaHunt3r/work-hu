@@ -49,7 +49,7 @@ class UserPointsLayout extends ConsumerWidget {
           child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [Text("Round ${i}")],
+        children: [Text("Round $i")],
       )));
     }
     list.add(const Tab(

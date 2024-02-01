@@ -20,7 +20,7 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
     this.currentUser,
     this.read,
     this.goalRepoProvider,
-  ) : super(UserStatusState()) {
+  ) : super(const UserStatusState()) {
     getUsers();
   }
 
@@ -55,7 +55,7 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   orderUsers() {
     var sorted = state.users.toList();
     if (state.selectedOrderType == OrderByType.NAME) {
-      sorted.sort((a, b) => ("${a.lastname} ${a.firstname}").compareTo("${b.lastname} ${b.firstname}"));
+      sorted.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     } else if (state.selectedOrderType == OrderByType.STATUS) {
       sorted.sort((a, b) => (a.currentMyShareCredit / state.goals.firstWhere((g) => g.user.id == a.id).goal)
           .compareTo(b.currentMyShareCredit / state.goals.firstWhere((g) => g.user.id == b.id).goal));

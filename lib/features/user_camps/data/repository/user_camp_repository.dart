@@ -11,7 +11,7 @@ class UserCampRepository {
     try {
       final res = await _userCampApi.getUserCamps(seasonId);
       return res.map((e) => UserCampModel.fromJson(e)).toList();
-    } on DioError catch (e) {
+    } on DioError {
       rethrow;
     }
   }

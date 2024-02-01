@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:csv/csv.dart';
 import 'package:dio/dio.dart';
@@ -17,7 +16,6 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/create_transactions/data/state/create_transactions_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/rounds/data/state/rounds_state.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
@@ -136,7 +134,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     state = state.copyWith(transactionType: transactionType, account: account);
   }
 
-  update({required num userId, num? hours, double? points, num? credits}) {
+  update({required num userId, double? hours, double? points, num? credits}) {
     TransactionItemModel? transactionItem = state.transactionItems.firstWhere((t) => t.user.id == userId);
     var newItem = transactionItem.copyWith(
         hours: hours ?? transactionItem.hours,
@@ -174,7 +172,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         transactionType: state.transactionType,
         account: state.account,
         credit: state.transactionType == TransactionType.CREDIT ? num.tryParse(valueController.value.text) ?? 0 : 0,
-        hours: state.transactionType == TransactionType.HOURS ? num.tryParse(valueController.value.text) ?? 0 : 0,
+        hours: state.transactionType == TransactionType.HOURS ? double.tryParse(valueController.value.text) ?? 0 : 0,
       ));
 
       var text = valueController.value.text;
@@ -227,10 +225,10 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   Future<List<UserModel>> filterUsers(String filter) async {
     var filtered = state.users
         .where((u) =>
-            u.firstname.toLowerCase().startsWith(filter.toLowerCase()) ||
-            u.lastname.toLowerCase().startsWith(filter.toLowerCase()))
+            Utils.changeHunChars(u.firstname.toLowerCase()).startsWith(filter.toLowerCase()) ||
+            Utils.changeHunChars(u.lastname.toLowerCase()).startsWith(filter.toLowerCase()))
         .toList();
-    filtered.sort((a, b) => ("${a.lastname} ${a.firstname}").compareTo("${b.lastname} ${b.firstname}"));
+    filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     return filtered;
   }
 

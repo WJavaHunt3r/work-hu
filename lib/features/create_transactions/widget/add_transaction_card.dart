@@ -1,11 +1,10 @@
-import 'package:drop_down_search_field/drop_down_search_field.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/work_drop_down_dearch_form_field.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/profile/widgets/info_card.dart';
@@ -28,27 +27,14 @@ class AddTransactionCard extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            DropDownSearchFormField<UserModel>(
+            WorkDropDownSearchFormField<UserModel>(
+              // focusNode: ref.watch(createTransactionsDataProvider.notifier).usersFocusNode,
               direction: AxisDirection.up,
-              displayAllSuggestionWhenTap: false,
-              suggestionsBoxDecoration:
-                  SuggestionsBoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8.sp)),
-              textFieldConfiguration: TextFieldConfiguration(
-                // scrollPadding: EdgeInsets.all(0),
-                controller: ref.read(createTransactionsDataProvider.notifier).userController,
-                autofocus: true,
-                focusNode: ref.read(createTransactionsDataProvider.notifier).usersFocusNode,
-              ),
+              controller: ref.read(createTransactionsDataProvider.notifier).userController,
+              autofocus: true,
               onSuggestionSelected: (UserModel suggestion) =>
                   ref.read(createTransactionsDataProvider.notifier).updateSelectedUser(suggestion),
-              itemBuilder: (BuildContext context, UserModel itemData) {
-                return Padding(
-                  padding: const EdgeInsets.all(1.0),
-                  child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(vertical: 0.sp, horizontal: 5),
-                      title: Text("${itemData.getFullName()} (${itemData.getAge()})")),
-                );
-              },
+              itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
               suggestionsCallback: (String pattern) =>
                   ref.read(createTransactionsDataProvider.notifier).filterUsers(pattern),
             ),
@@ -62,7 +48,11 @@ class AddTransactionCard extends ConsumerWidget {
                       controller: ref.read(createTransactionsDataProvider.notifier).valueController,
                       keyboardType: TextInputType.number,
                       focusNode: ref.read(createTransactionsDataProvider.notifier).valueFocusNode,
-                      textInputAction: TextInputAction.go,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: ref.watch(createTransactionsDataProvider).selectedUser != null &&
+                              ref.watch(createTransactionsDataProvider.notifier).valueController.value.text.isNotEmpty
+                          ? (text) => ref.read(createTransactionsDataProvider.notifier).addTransaction()
+                          : null,
                       decoration: InputDecoration(
                           labelText:
                               Utils.getTransactionTypeText(ref.watch(createTransactionsDataProvider).transactionType)),

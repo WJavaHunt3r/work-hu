@@ -4,8 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/style/app_style.dart';
+import 'package:work_hu/features/activity_items/view/activity_items_layout.dart';
 import 'package:work_hu/features/admin/view/admin_page.dart';
 import 'package:work_hu/features/change_password/view/change_password_page.dart';
+import 'package:work_hu/features/create_activity/view/create_activity_page.dart';
 import 'package:work_hu/features/home/view/home_page.dart';
 import 'package:work_hu/features/login/view/login_page.dart';
 import 'package:work_hu/features/transaction_items/view/transaction_items_page.dart';
@@ -79,11 +81,22 @@ final routerProvider = Provider<GoRouter>((ref) => GoRouter(
           builder: (BuildContext context, GoRouterState state) => const ChangePasswordPage(),
         ),
         GoRoute(
+          path: '/createActivity',
+          builder: (BuildContext context, GoRouterState state) => const CreateActivityPage(),
+        ),
+        GoRoute(
           path: '/transactionItems',
           builder: (BuildContext context, GoRouterState state) {
             var map = state.extra as Map<String, dynamic>;
             return TransactionItemsPage(transaction: map["transaction"] ?? 0);
           },
         ),
+        GoRoute(
+          path: '/activityItems',
+          builder: (BuildContext context, GoRouterState state) {
+            var map = state.extra as num;
+            return ActivityItemsLayout(activityId: map);
+          },
+        )
       ],
     ));

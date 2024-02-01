@@ -71,7 +71,7 @@ class TransactionsLayout extends ConsumerWidget {
                               isLast: isLast,
                               index: index,
                               child: ListTile(
-                                  title: Text("${current.user.lastname} ${current.user.firstname}"),
+                                  title: Text(current.user.getFullName()),
                                   trailing: Text(
                                     createTrailingText(current),
                                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
@@ -101,7 +101,7 @@ class TransactionsLayout extends ConsumerWidget {
       return "${Utils.creditFormat.format(current.credit)} Ft";
     }
     if (current.transactionType == TransactionType.HOURS) {
-      return "${Utils.percentFormat.format(current.hours)} h";
+      return "${current.hours} h";
     }
     return "${Utils.percentFormat.format(current.points)} p";
   }

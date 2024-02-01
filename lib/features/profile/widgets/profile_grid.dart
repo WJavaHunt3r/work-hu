@@ -38,15 +38,15 @@ class ProfileGrid extends ConsumerWidget {
                           Align(
                             alignment: Alignment.center,
                             child: goal == null
-                                ? Text("Nincs cél beállítva")
-                                : Text("${numberFormat.format(user.currentMyShareCredit / goal!.goal * 100)}%",
+                                ? const Text("Nincs cél beállítva")
+                                : Text("${numberFormat.format(user.currentMyShareCredit / goal.goal * 100)}%",
                                     style: TextStyle(fontSize: 35.sp, fontWeight: FontWeight.w800)),
                           ),
                           if (userRoundModel.myShareOnTrackPoints)
                             Align(
                               alignment: Alignment.topRight,
                               child: Image(
-                                image: AssetImage("assets/img/myshare-logo.png"),
+                                image: const AssetImage("assets/img/myshare-logo.png"),
                                 fit: BoxFit.fitWidth,
                                 height: 20.sp,
                               ),
@@ -112,7 +112,7 @@ class ProfileGrid extends ConsumerWidget {
                           Align(
                             alignment: Alignment.topRight,
                             child: Image(
-                              image: AssetImage("assets/img/Samvirk_logo.png"),
+                              image: const AssetImage("assets/img/Samvirk_logo.png"),
                               fit: BoxFit.fitWidth,
                               height: 20.sp,
                             ),

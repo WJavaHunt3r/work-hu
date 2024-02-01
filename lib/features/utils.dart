@@ -97,4 +97,25 @@ class Utils {
           endDate: DateTime.now(),
         ));
   }
+
+  static String changeHunChars(String text) {
+    for (String entry in getEngChar().keys) {
+      text = text.replaceAll(entry, getEngChar()[entry] ?? "");
+    }
+    return text;
+  }
+
+  static Map<String, String> getEngChar() {
+    return <String, String>{
+      "ö": "o",
+      "ü": "u",
+      "ó": "o",
+      "ő": "o",
+      "ú": "u",
+      "ű": "u",
+      "é": "e",
+      "á": "a",
+      "í": "i",
+    };
+  }
 }

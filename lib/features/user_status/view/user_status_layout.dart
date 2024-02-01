@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
-import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
@@ -85,7 +83,7 @@ class UserStatusLayout extends ConsumerWidget {
                       child: ListTile(
                           minVerticalPadding: 0,
                           title: Text(
-                            "${current.lastname} ${current.firstname}",
+                            current.getFullName(),
                             style: style,
                           ),
                           subtitle: userStatus >= currentRoundGoal
@@ -110,7 +108,7 @@ class UserStatusLayout extends ConsumerWidget {
                                               bottomLeft: Radius.circular(8.sp), bottomRight: Radius.circular(8.sp))
                                           : BorderRadius.zero)));
                 },
-                children: [],
+                children: const [],
               ),
             ),
           ],

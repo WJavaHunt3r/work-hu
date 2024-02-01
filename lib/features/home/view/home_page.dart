@@ -8,7 +8,6 @@ import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/home/widgets/error_view.dart';
 import 'package:work_hu/features/home/widgets/status_view.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
-import 'package:work_hu/features/rounds/provider/round_provider.dart';
 
 class HomePage extends BasePage {
   const HomePage({super.key, super.title = "Work HU", super.isListView = true});
@@ -47,5 +46,15 @@ class HomePage extends BasePage {
                         : StatusView(teamRounds: ref.watch(teamRoundDataProvider).teams)),
           ],
         ));
+  }
+
+  @override
+  Widget? createActionButton(BuildContext context, WidgetRef ref) {
+    return ref.watch(userDataProvider)?.isMentor() ?? false
+        ? FloatingActionButton(
+            onPressed: () => context.push("/createActivity"),
+            child: const Icon(Icons.add),
+          )
+        : null;
   }
 }

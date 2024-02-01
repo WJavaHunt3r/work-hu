@@ -40,7 +40,7 @@ class UsersRepository {
     try {
       final res = await _userApi.resetPassword(userId, changerId);
       return res;
-    } on DioError catch (e) {
+    } on DioError {
       rethrow;
     }
   }
@@ -49,7 +49,7 @@ class UsersRepository {
     try {
       final res = await _userApi.updateUser(userId, user);
       return UserModel.fromJson(res);
-    } on DioError catch (e) {
+    } on DioError {
       rethrow;
     }
   }

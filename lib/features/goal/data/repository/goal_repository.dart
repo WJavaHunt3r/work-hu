@@ -11,7 +11,7 @@ class GoalRepository {
     try {
       final res = await _goalApi.getGoals(seasonYear);
       return res.map((e) => GoalModel.fromJson(e)).toList();
-    } on DioError catch (e) {
+    } on DioError {
       rethrow;
     }
   }

@@ -16,7 +16,7 @@ class GoalsLayout extends ConsumerWidget {
     var goals = ref.watch(goalDataProvider).goals;
     return Column(
       children: [
-        TextButton(onPressed: ()=> ref.read(goalDataProvider.notifier).uploadGoalsCsv(), child: Text("Upload")),
+        TextButton(onPressed: ()=> ref.read(goalDataProvider.notifier).uploadGoalsCsv(), child: const Text("Upload")),
         Expanded(
           child: Stack(children: [
             RefreshIndicator(

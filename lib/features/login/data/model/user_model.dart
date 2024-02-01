@@ -31,4 +31,8 @@ class UserModel with _$UserModel {
   num getAge() {
     return (DateTime.now().difference(birthDate).inDays / 365).ceil() - 1;
   }
+
+  bool isMentor() {
+    return getAge() > 18;
+  }
 }
