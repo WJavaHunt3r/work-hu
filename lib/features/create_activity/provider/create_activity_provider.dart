@@ -42,8 +42,8 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
     valueFocusNode = FocusNode();
     usersFocusNode = FocusScopeNode();
 
-    descriptionController.addListener(_updateDateAndDescription);
-    dateController.addListener(_updateDateAndDescription);
+    descriptionController.addListener(_updateDescription);
+    dateController.addListener(_updateDate);
     hoursController.addListener(_updateState);
     userController.addListener(_collapsePanel);
     getUsers();
@@ -82,9 +82,14 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
     }
   }
 
-  void _updateDateAndDescription() {
-    state = state.copyWith(
-        activityDate: DateTime.tryParse(dateController.value.text), description: descriptionController.value.text);
+  void _updateDate() {
+    state = state.copyWith(activityDate: DateTime.tryParse(dateController.value.text));
+    _updateItems();
+  }
+
+  void _updateDescription() {
+    state = state.copyWith(description: descriptionController.value.text);
+    _updateItems();
   }
 
   setTransactionTypeAndAccount(TransactionType transactionType, Account account) {
@@ -136,10 +141,6 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
     state = state.copyWith(selectedUser: null);
   }
 
-  _clearTransactions() {
-    state = state.copyWith(activityItems: [], sum: 0);
-  }
-
   updateCollapsed(bool collapsed) {
     state = state.copyWith(isCollapsed: collapsed);
   }
@@ -172,16 +173,29 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
       employerController.text = "";
       state = state.copyWith(employer: null);
     }
-    state = state.copyWith(
-        account: isPaid ? Account.MYSHARE : Account.OTHER,
-        transactionType: isPaid ? TransactionType.HOURS : TransactionType.POINT);
+    var account = isPaid ? Account.MYSHARE : Account.OTHER;
+    var trType = isPaid ? TransactionType.HOURS : TransactionType.POINT;
+    state = state.copyWith(account: account, transactionType: trType);
+    _updateItems();
+  }
+
+  _updateItems() {
+    List<ActivityItemsModel> items = [];
+    items.addAll(state.activityItems);
+    List<ActivityItemsModel> newItems = [];
+    for (var item in items) {
+      newItems.add(item.copyWith(
+          account: state.account, transactionType: state.transactionType, description: state.description));
+    }
+
+    state = state.copyWith(activityItems: newItems);
   }
 
   Future<List<UserModel>> filterUsers(String filter) async {
     var filtered = state.users
         .where((u) =>
-            Utils.changeHunChars(u.firstname.toLowerCase()).startsWith(filter.toLowerCase()) ||
-            Utils.changeHunChars(u.lastname.toLowerCase()).startsWith(filter.toLowerCase()))
+            Utils.changeHunChars(u.firstname.toLowerCase()).startsWith(Utils.changeHunChars(filter.toLowerCase())) ||
+            Utils.changeHunChars(u.lastname.toLowerCase()).startsWith(Utils.changeHunChars(filter.toLowerCase())))
         .toList();
     filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     return filtered;
@@ -201,15 +215,16 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
               registeredInApp: false,
               registeredInMyShare: false,
               transactionType: state.transactionType))
-          .then((data) async {
+          .then((activity) async {
         List<ActivityItemsModel> newItems = [];
         for (var item in state.activityItems) {
-          newItems.add(item.copyWith(activity: data));
+          newItems.add(item.copyWith(activity: activity));
         }
         state = state.copyWith(activityItems: newItems);
         await activityItemsRepository
             .postActivityItems(newItems.where((element) => element.hours != 0).toList())
             .then((data) {
+          Utils.createActivityCsv(newItems, activity);
           pop();
           state = state.copyWith(creationState: ModelState.success, modelState: ModelState.success, errorMessage: data);
         });

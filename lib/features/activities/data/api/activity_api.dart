@@ -37,6 +37,15 @@ class ActivityApi {
     }
   }
 
+  Future<dynamic> registerActivity(num activityId, num userId) async {
+    try {
+      final res = await _dioClient.dio.get("/register", queryParameters: {"activityId": activityId, "userId": userId});
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<dynamic> postActivity(ActivityModel activity) async {
     try {
       final res = await _dioClient.dio.post("/activity", data: activity);

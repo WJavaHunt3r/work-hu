@@ -85,6 +85,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
             : _clearTransactions();
         state = state.copyWith(
           modelState: ModelState.success,
+          creationState: ModelState.empty,
           users: data,
         );
       });
@@ -116,8 +117,14 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
             .sendTransactions(
                 newItems.where((element) => element.points != 0 || element.hours != 0 || element.credit != 0).toList())
             .then((data) {
-          _clearAllFields();
-          state = state.copyWith(modelState: ModelState.success);
+          if (state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK) {
+            _clearAllFields();
+            _createTransactionItems(state.users);
+          } else {
+            _clearAllFields();
+          }
+
+          state = state.copyWith(modelState: ModelState.success, creationState: ModelState.success);
         });
       });
     } on DioError catch (e) {
@@ -141,8 +148,9 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         points: points ?? transactionItem.points,
         credit: credits ?? transactionItem.credit);
 
-    state =
-        state.copyWith(transactionItems: state.transactionItems.map((e) => e.user.id == userId ? newItem : e).toList());
+    state = state.copyWith(
+        transactionItems: state.transactionItems.map((e) => e.user.id == userId ? newItem : e).toList(),
+        creationState: ModelState.empty);
   }
 
   void _createTransactionItems(List<UserModel> users) {
@@ -205,11 +213,11 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   _clearAddFields() {
     valueController.clear();
     userController.clear();
-    state = state.copyWith(selectedUser: null);
+    state = state.copyWith(selectedUser: null, creationState: ModelState.empty);
   }
 
   _clearTransactions() {
-    state = state.copyWith(transactionItems: [], sum: 0);
+    state = state.copyWith(transactionItems: [], sum: 0, creationState: ModelState.empty);
   }
 
   _updateState() {
@@ -225,8 +233,8 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   Future<List<UserModel>> filterUsers(String filter) async {
     var filtered = state.users
         .where((u) =>
-            Utils.changeHunChars(u.firstname.toLowerCase()).startsWith(filter.toLowerCase()) ||
-            Utils.changeHunChars(u.lastname.toLowerCase()).startsWith(filter.toLowerCase()))
+            Utils.changeHunChars(u.firstname.toLowerCase()).startsWith(Utils.changeHunChars(filter.toLowerCase())) ||
+            Utils.changeHunChars(u.lastname.toLowerCase()).startsWith(Utils.changeHunChars(filter.toLowerCase())))
         .toList();
     filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     return filtered;
@@ -350,6 +358,6 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   void _clearAllFields() {
     descriptionController.clear();
     _clearTransactions();
-    dateController.clear();
+    dateController.text = DateTime.now().toString();
   }
 }

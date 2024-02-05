@@ -30,10 +30,17 @@ class ActivityDetails extends ConsumerWidget {
           SizedBox(height: 5.sp),
           TextField(
             controller: ref.watch(createActivityDataProvider.notifier).descriptionController,
-            decoration: const InputDecoration(labelText: "Description"),
+            decoration: InputDecoration(
+                labelText: "Description",
+                // suffixIcon: IconButton(
+                //   onPressed: () => ref.watch(createActivityDataProvider.notifier).updateDescription(
+                //       ref.watch(createActivityDataProvider.notifier).descriptionController.value.text),
+                //   icon: const Icon(Icons.done),
+                ),
             autofillHints: ["Terem takarítás", "Pipetta"],
             autocorrect: true,
             textInputAction: TextInputAction.next,
+            // onSubmitted: (text) => ref.watch(createActivityDataProvider.notifier).updateDescription(text),
           ),
           SizedBox(height: 5.sp),
           Row(

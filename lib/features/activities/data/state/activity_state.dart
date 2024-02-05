@@ -9,6 +9,8 @@ abstract class ActivityState with _$ActivityState {
   const factory ActivityState(
       {@Default([]) List<ActivityModel> activities,
       @Default(ModelState.empty) ModelState modelState,
+      @Default(false) bool isExpanded,
+      @Default(ModelState.empty) ModelState registerState,
       @Default("") String message}) = _ActivityState;
 
   const ActivityState._();

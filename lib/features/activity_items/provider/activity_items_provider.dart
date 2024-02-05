@@ -35,4 +35,5 @@ class ActivityItemsDataNotifier extends StateNotifier<ActivityItemsState> {
   }
 
   Future<void> deleteActivityItem(num num, int index) async {}
+
 }

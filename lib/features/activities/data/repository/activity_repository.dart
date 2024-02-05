@@ -35,6 +35,15 @@ class ActivityRepository {
     }
   }
 
+  Future<String> registerActivity(num activityId, num userId) async {
+    try {
+      final res = await _activityApi.registerActivity(activityId, userId);
+      return res;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<ActivityModel> postActivity(ActivityModel activity) async {
     try {
       final res = await _activityApi.postActivity(activity);

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/home/widgets/error_view.dart';
@@ -34,8 +36,9 @@ class HomePage extends BasePage {
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
-    return RefreshIndicator(
-        onRefresh: () async => ref.watch(teamRoundDataProvider.notifier).getTeamRounds(),
+    return Stack(children: [
+      Padding(
+        padding: EdgeInsets.only(top: 8.sp),
         child: Column(
           children: [
             Expanded(
@@ -45,7 +48,11 @@ class HomePage extends BasePage {
                         ? const ErrorView()
                         : StatusView(teamRounds: ref.watch(teamRoundDataProvider).teams)),
           ],
-        ));
+        ),
+      ),
+      RefreshIndicator(
+          onRefresh: () async => ref.watch(teamRoundDataProvider.notifier).getTeamRounds(), child: SizedBox.expand())
+    ]);
   }
 
   @override

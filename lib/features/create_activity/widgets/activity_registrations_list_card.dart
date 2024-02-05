@@ -12,25 +12,23 @@ class ActivityRegistrationListCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var items = ref.watch(createActivityDataProvider).activityItems;
-    return Expanded(
-      child: SingleChildScrollView(
-          child: Card(
-        margin: EdgeInsets.only(bottom: 8.sp, top: 8.sp),
-        color: Colors.transparent,
-        child: ListView.builder(
-          itemCount: ref.watch(createActivityDataProvider).activityItems.length,
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemBuilder: (BuildContext context, int index) {
-            var user = items[index].user;
-            return RegistrationRowWidget(
-                name: user.getFullName(),
-                index: index,
-                isLast: index == ref.watch(createActivityDataProvider).activityItems.length - 1,
-                value: items[index].hours);
-          },
-        ),
-      )),
-    );
+    return SingleChildScrollView(
+        child: Card(
+      margin: EdgeInsets.only(bottom: 8.sp, top: 8.sp),
+      color: Colors.transparent,
+      child: ListView.builder(
+        itemCount: ref.watch(createActivityDataProvider).activityItems.length,
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemBuilder: (BuildContext context, int index) {
+          var user = items[index].user;
+          return RegistrationRowWidget(
+              name: user.getFullName(),
+              index: index,
+              isLast: index == ref.watch(createActivityDataProvider).activityItems.length - 1,
+              value: items[index].hours);
+        },
+      ),
+    ));
   }
 }

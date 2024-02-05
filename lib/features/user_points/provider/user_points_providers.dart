@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/features/activity_items/data/repository/activity_items_repository.dart';
+import 'package:work_hu/features/activity_items/data/state/activity_items_state.dart';
+import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/rounds/data/repository/round_repository.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
@@ -15,7 +18,7 @@ import '../../../work_hu_app.dart';
 
 final userPointsDataProvider = StateNotifierProvider.autoDispose<UserPointsDataNotifier, UserPointsState>((ref) =>
     UserPointsDataNotifier(ref.read(transactionItemsRepoProvider), ref.read(routerProvider), ref.read(userDataProvider),
-        ref.read(roundRepoProvider)));
+        ref.read(roundRepoProvider), ref.read(activityItemsRepoProvider)));
 
 class UserPointsDataNotifier extends StateNotifier<UserPointsState> {
   UserPointsDataNotifier(
@@ -23,12 +26,14 @@ class UserPointsDataNotifier extends StateNotifier<UserPointsState> {
     this.router,
     this.currentUser,
     this.roundRepository,
+    this.activityItemsRepository,
   ) : super(const UserPointsState());
 
   final TransactionItemsRepository transactionItemsRepository;
   final GoRouter router;
   final UserModel? currentUser;
   final RoundRepository roundRepository;
+  final ActivityItemsRepository activityItemsRepository;
 
   Future<void> getTransactionItems() async {
     state = state.copyWith(modelState: ModelState.processing);
@@ -42,7 +47,10 @@ class UserPointsDataNotifier extends StateNotifier<UserPointsState> {
             transactionItems.addAll(items);
           });
         }
-        state = state.copyWith(transactionItems: transactionItems, modelState: ModelState.success);
+        var activityItems =
+            await activityItemsRepository.getActivityItems(registeredInApp: false, userId: currentUser!.id);
+        state = state.copyWith(
+            activityItems: activityItems, transactionItems: transactionItems, modelState: ModelState.success);
       });
     } on DioError catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.message);

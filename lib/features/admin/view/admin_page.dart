@@ -11,7 +11,7 @@ import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/activities/view/activities_layout.dart';
 import 'package:work_hu/features/admin/providers/drawer_provider.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
-import 'package:work_hu/features/create_transactions/view/create_forbilde_transaction_layout.dart';
+import 'package:work_hu/features/create_transactions/view/create_bmm_transaction_layout.dart';
 import 'package:work_hu/features/create_transactions/view/create_transactions_layout.dart';
 import 'package:work_hu/features/goal/view/goals_layout.dart';
 import 'package:work_hu/features/transactions/view/transactions_layout.dart';
@@ -38,9 +38,9 @@ class AdminPage extends BasePage {
 
   List<Widget> createDrawerList(Role role, WidgetRef ref, BuildContext context) {
     List<Widget> list = [];
+    list.add(DrawerHeader(child: Text("Admin", style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800))));
+    list.add(createListTile(context: context, ref: ref, drawerNm: 0, title: "Activities"));
     if (role != Role.USER) {
-      list.add(DrawerHeader(child: Text("Admin", style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800))));
-      list.add(createListTile(context: context, ref: ref, drawerNm: 0, title: "Activities"));
       list.add(createListTile(context: context, ref: ref, drawerNm: 1, title: "User status"));
       list.add(createListTile(
           context: context,
@@ -112,7 +112,7 @@ class AdminPage extends BasePage {
   static const List<Widget> _screenWidgets = [
     ActivitiesLayout(),
     UserStatusLayout(),
-    CreateForbildeTransactionLayout(),
+    CreateBMMTransactionLayout(),
     CreateTransactionsLayout(),
     CreateTransactionsLayout(),
     CreateTransactionsLayout(),

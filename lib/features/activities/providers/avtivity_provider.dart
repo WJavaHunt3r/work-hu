@@ -19,7 +19,9 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
   ActivityDataNotifier(
     this.activityRepository,
     this.currentUserProvider,
-  ) : super(const ActivityState());
+  ) : super(const ActivityState()) {
+    getActivities();
+  }
 
   final ActivityRepository activityRepository;
   final UserDataNotifier currentUserProvider;
@@ -30,9 +32,10 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
       num? createUserId,
       bool? registeredInApp,
       bool? registeredInMyShare}) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.processing, registerState: ModelState.empty);
     var user = currentUserProvider.state!;
-    if (user.role == Role.ADMIN) {
+    if (user.role != Role.ADMIN) {
+      createUserId = user.id;
     }
     try {
       await activityRepository
@@ -43,6 +46,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
               createUserId: createUserId,
               employerId: employerId)
           .then((data) async {
+        data.sort((a, b) => b.activityDateTime.compareTo(a.activityDateTime));
         state = state.copyWith(activities: data, modelState: ModelState.success);
       });
     } catch (e) {
@@ -51,6 +55,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
   }
 
   Future<void> deleteActivity(num id, int index) async {
+    List<ActivityModel> origItems = state.activities;
     List<ActivityModel> items = [];
     for (var a in state.activities) {
       if (a.id != id) {
@@ -62,6 +67,32 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
     try {
       await activityRepository.deleteActivity(id, user.id).then((data) async {
         state = state.copyWith(activities: items, modelState: ModelState.success);
+      });
+    } catch (e) {
+      state = state.copyWith(modelState: ModelState.error, activities: origItems);
+    }
+  }
+
+  void updateIsExpanded(bool isExpanded) {
+    state = state.copyWith(isExpanded: isExpanded);
+  }
+
+  Future<void> registerActivity(num id) async {
+    var user = currentUserProvider.state!;
+    try {
+      await activityRepository.registerActivity(id, user.id).then((data) async {
+        state = state.copyWith(message: data, modelState: ModelState.success, registerState: ModelState.success);
+      });
+    } catch (e) {
+      state = state.copyWith(modelState: ModelState.error);
+    }
+  }
+
+  Future<void> putActivity(ActivityModel activity) async {
+    var newActivity = activity.copyWith(registeredInMyShare: true);
+    try {
+      await activityRepository.putActivity(newActivity, activity.id!).then((data) async {
+        getActivities();
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);

@@ -48,7 +48,12 @@ class TransactionsLayout extends ConsumerWidget {
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [const Text("Transaction Date"), Text(Utils.dateToString(transaction.createDateTime!))],
+                      children: [
+                        const Text("Transaction Date"),
+                        Text(Utils.dateToString(transactionItems.isNotEmpty
+                            ? transactionItems.first.transactionDate
+                            : transaction.createDateTime!))
+                      ],
                     ),
                   ],
                 ),

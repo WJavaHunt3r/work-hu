@@ -17,22 +17,22 @@ class SuccessAlertDialog extends StatelessWidget {
             title: Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.primaryGreen, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
             ),
             content: content ??
                 TextButton(
                     style: ButtonStyle(
                       side: MaterialStateBorderSide.resolveWith(
-                        (states) => BorderSide(color: AppColors.primaryGreen, width: 2.sp),
+                        (states) => BorderSide(color: AppColors.primary, width: 2.sp),
                       ),
                       backgroundColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
                       foregroundColor: MaterialStateColor.resolveWith((states) => AppColors.white),
-                      overlayColor: MaterialStateColor.resolveWith((states) => AppColors.primaryGreen),
+                      overlayColor: MaterialStateColor.resolveWith((states) => AppColors.primary),
                     ),
                     onPressed: () => context.pop(),
                     child: const Text(
                       "OK",
-                      style: TextStyle(color: AppColors.primaryGreen, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                     ))));
   }
 }

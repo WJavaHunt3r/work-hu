@@ -8,10 +8,13 @@ class ActivityItemsApi {
 
   ActivityItemsApi();
 
-  Future<List<dynamic>> getActivities({num? activityId}) async {
+  Future<List<dynamic>> getActivities({num? activityId, num? userId, num? roundId, bool? registeredInApp}) async {
     try {
       final res = await _dioClient.dio.get("/activityItems", queryParameters: {
         "activityId": activityId,
+        "userId": userId,
+        "roundId": roundId,
+        "registeredInApp": registeredInApp,
       });
       return res.data;
     } catch (e) {

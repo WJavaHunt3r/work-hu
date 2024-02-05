@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 
@@ -34,5 +35,9 @@ class UserModel with _$UserModel {
 
   bool isMentor() {
     return getAge() > 18;
+  }
+
+  bool isAdmin() {
+    return role == Role.ADMIN;
   }
 }

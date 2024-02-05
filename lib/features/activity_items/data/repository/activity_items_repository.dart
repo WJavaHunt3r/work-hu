@@ -7,9 +7,11 @@ class ActivityItemsRepository {
 
   ActivityItemsRepository(this._activityApi);
 
-  Future<List<ActivityItemsModel>> getActivityItems({num? activityId}) async {
+  Future<List<ActivityItemsModel>> getActivityItems(
+      {num? activityId, num? userId, num? roundId, bool? registeredInApp}) async {
     try {
-      final res = await _activityApi.getActivities(activityId: activityId);
+      final res = await _activityApi.getActivities(
+          activityId: activityId, userId: userId, registeredInApp: registeredInApp, roundId: roundId);
       return res.map((e) => ActivityItemsModel.fromJson(e)).toList();
     } on DioError {
       rethrow;
@@ -33,7 +35,6 @@ class ActivityItemsRepository {
       rethrow;
     }
   }
-
 
   Future<ActivityItemsModel> postActivityItem(ActivityItemsModel activity) async {
     try {
