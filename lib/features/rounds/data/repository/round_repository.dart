@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:work_hu/features/rounds/data/api/round_api.dart';
@@ -13,7 +12,7 @@ class RoundRepository {
     try {
       final res = await _roundApi.getRounds(seasonYear);
       return res.map((e) => RoundModel.fromJson(e)).toList();
-    } on DioError catch (e) {
+    } on DioError {
       rethrow;
     }
   }
@@ -22,7 +21,7 @@ class RoundRepository {
     try {
       final res = await _roundApi.getCurrentRound();
       return RoundModel.fromJson(res);
-    } on DioError catch (e) {
+    } on DioError {
       rethrow;
     }
   }
@@ -31,7 +30,7 @@ class RoundRepository {
     try {
       final res = await _roundApi.getRound(roundId);
       return RoundModel.fromJson(res);
-    } on DioError catch (e) {
+    } on DioError {
       rethrow;
     }
   }

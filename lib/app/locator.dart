@@ -6,5 +6,5 @@ final GetIt locator = GetIt.instance;
 
 @InjectableInit()
 Future<void> setupLocator() async {
-  await locator.init();
+  locator.init();
 }

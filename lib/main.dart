@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:work_hu/app/locator.dart';
-import 'package:work_hu/app/style/app_style.dart';
 import 'package:work_hu/work_hu_app.dart';
 
 void main() async {
@@ -14,7 +13,7 @@ void main() async {
   // SecurityContext(withTrustedRoots: false);
   await ScreenUtil.ensureScreenSize();
   await setupLocator();
-  runApp(ProviderScope(child: OverlaySupport.global(child: WorkHuApp())));
+  runApp(const ProviderScope(child: OverlaySupport.global(child: WorkHuApp())));
 }
 
 class MyHttpOverrides extends HttpOverrides {

@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
-import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:work_hu/features/profile/widgets/profile_grid.dart';
-import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
-import 'package:work_hu/features/season/data/model/season_model.dart';
 import 'package:work_hu/features/utils.dart';
 
 class TabView extends ConsumerWidget {

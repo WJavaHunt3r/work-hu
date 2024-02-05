@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/login/data/api/login_api.dart';
@@ -59,7 +58,7 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
           }
         });
       });
-    } on DioError catch (e) {
+    } on DioError {
       // if(e.type == DioErrorType.)
       state = state.copyWith(
           username: "", password: "", modelState: ModelState.error, message: "Wrong username or password");

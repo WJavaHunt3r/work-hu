@@ -24,7 +24,7 @@ class ProfileHeader extends ConsumerWidget {
         Padding(
             padding: EdgeInsets.symmetric(vertical: 12.sp),
             child: Text(
-              "${user.firstname} ${user.lastname}",
+              user.getFullName(),
               style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.w800),
             ))
       ],

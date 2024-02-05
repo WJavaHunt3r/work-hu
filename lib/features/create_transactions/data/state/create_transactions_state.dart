@@ -19,6 +19,7 @@ abstract class CreateTransactionsState with _$CreateTransactionsState {
       @Default(0) num sum,
       UserModel? selectedUser,
       @Default(ModelState.empty) ModelState modelState,
+          @Default(ModelState.empty) ModelState creationState,
       @Default("") String message}) = _CreateTransactionsState;
 
   const CreateTransactionsState._();

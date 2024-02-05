@@ -27,13 +27,13 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
   final GoRouter router;
   final UserModel? currentUser;
 
-  Future<void> getUsers([TeamModel? team]) async {
+  Future<void> getUsers() async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
       await usersRepository
-          .getUsers(team)
+          .getUsers(null, true)
           .then((value) {
-            value.sort((a,b) => ("${a.lastname} ${a.firstname}").compareTo("${b.lastname} ${b.firstname}"));
+            value.sort((a,b) => (a.getFullName()).compareTo(b.getFullName()));
             state = state.copyWith(users: value, modelState: ModelState.success);
       });
     } on DioError catch (e) {

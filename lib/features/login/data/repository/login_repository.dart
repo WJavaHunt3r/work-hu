@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:work_hu/features/login/data/api/login_api.dart';
@@ -13,7 +12,7 @@ class LoginRepository {
     try {
       final res = await _loginApi.loginRequest(username, password);
       return res;
-    } on DioError catch (e) {
+    } on DioError {
       rethrow;
     }
   }
@@ -22,7 +21,7 @@ class LoginRepository {
     try {
       final res = await _loginApi.getUser(username);
       return UserModel.fromJson(res);
-    } on DioError catch (e) {
+    } on DioError {
       rethrow;
     }
   }

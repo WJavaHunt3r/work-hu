@@ -1,8 +1,6 @@
-import 'dart:developer';
 
 import 'package:work_hu/api/dio_client.dart';
 import 'package:work_hu/app/locator.dart';
-import 'package:work_hu/features/utils.dart';
 
 class LoginApi {
   final DioClient _dioClient = locator<DioClient>();

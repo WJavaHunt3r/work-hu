@@ -46,7 +46,7 @@ class UserListItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
-        title: Text("${user.lastname} ${user.firstname}"),
+        title: Text(user.getFullName()),
         trailing: IconButton(
             onPressed: () {
               ref.read(usersDataProvider.notifier).setSelectedUser(user);

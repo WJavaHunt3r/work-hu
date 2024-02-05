@@ -69,6 +69,10 @@ class MyShareStatusLayout extends ConsumerWidget {
                     "${Utils.creditFormat.format(user.currentMyShareCredit)} Ft",
                     style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800, color: AppColors.primary),
                   ),
+                  Text(
+                    "Goal: ${Utils.creditFormat.format(userGoal?.goal ?? 0)} Ft",
+                    style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800, color: AppColors.primary),
+                  ),
                 ],
               ))
             ],
@@ -79,7 +83,11 @@ class MyShareStatusLayout extends ConsumerWidget {
         children: [
           Expanded(
               child: Text(
-            currentRound == null ? "No round or goal set" : isOnTrack ? "You are On Track" : "$toOnTrack Ft to be On Track",
+            currentRound == null
+                ? "No round or goal set"
+                : isOnTrack
+                    ? "You are On Track"
+                    : "$toOnTrack Ft to be On Track",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.w800, color: AppColors.primary),
           )),

@@ -52,7 +52,7 @@ class CreateTransactionsLayout extends ConsumerWidget {
             itemBuilder: (BuildContext context, int index) {
               var user = items[index].user;
               return TransactionRowWidget(
-                name: "${user.firstname} ${user.lastname}",
+                name: user.getFullName(),
                 index: index,
                 isLast: index == ref.watch(createTransactionsDataProvider).transactionItems.length - 1,
                 value: transactionType == TransactionType.HOURS

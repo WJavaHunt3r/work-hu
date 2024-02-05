@@ -17,9 +17,7 @@ class PointsListItem extends StatelessWidget {
       contentPadding: EdgeInsets.all(5.sp),
       title: Text(
         title,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+        style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w800),
       ),
       trailing: Text(
         value % 1 == 0 ? value.toStringAsFixed(0) : value.toStringAsFixed(1),

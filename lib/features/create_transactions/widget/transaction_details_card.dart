@@ -1,9 +1,7 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
 
 class TransactionDetailsCard extends ConsumerWidget {

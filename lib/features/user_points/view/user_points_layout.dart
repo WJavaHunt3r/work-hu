@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
+import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/user_points/provider/user_points_providers.dart';
@@ -14,6 +15,7 @@ class UserPointsLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var items = ref.watch(userPointsDataProvider).transactionItems;
+    var activityItems = ref.watch(userPointsDataProvider).activityItems;
     var currentRound = ref.watch(roundDataProvider).currentRoundNumber;
     return DefaultTabController(
         length: countItems(items).toInt() + 1,
@@ -26,7 +28,7 @@ class UserPointsLayout extends ConsumerWidget {
             Expanded(
               child: Padding(
                 padding: EdgeInsets.only(top: 8.sp),
-                child: TabBarView(clipBehavior: Clip.antiAlias, children: createTabView(items)),
+                child: TabBarView(clipBehavior: Clip.antiAlias, children: createTabView(items, activityItems)),
               ),
             ),
           ],
@@ -49,7 +51,7 @@ class UserPointsLayout extends ConsumerWidget {
           child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [Text("Round ${i}")],
+        children: [Text("Round $i")],
       )));
     }
     list.add(const Tab(
@@ -62,22 +64,48 @@ class UserPointsLayout extends ConsumerWidget {
     return list;
   }
 
-  List<Widget> createTabView(List<TransactionItemModel> items) {
+  List<Widget> createTabView(List<TransactionItemModel> items, List<ActivityItemsModel> activityItems) {
     var count = countItems(items);
     var list = <Widget>[];
     for (num i = 1; i <= count; i++) {
       List<TransactionItemModel> currentItems = items.where((element) => element.round!.roundNumber == i).toList();
-      list.add(BaseListView(
-          itemBuilder: (BuildContext context, int index) {
-            var current = currentItems[index];
-            return PointsListItem(
-                transactionType: current.transactionType,
-                value: current.points,
-                title: current.description,
-                date: current.transactionDate);
-          },
-          itemCount: currentItems.length,
-          children: const []));
+      List<ActivityItemsModel> currentActivityItems = activityItems.where((a) => a.round.roundNumber == i).toList();
+      list.add(
+        BaseListView(
+            itemBuilder: (BuildContext context, int index) {
+              var current = currentItems[index];
+              return PointsListItem(
+                  transactionType: current.transactionType,
+                  value: current.points,
+                  title: current.description,
+                  date: current.transactionDate);
+            },
+            itemCount: currentItems.length,
+            children: [
+              activityItems.isEmpty
+                  ? const SizedBox()
+                  : Text(
+                      "Waiting for approval",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
+                    ),
+              Card(
+                margin: EdgeInsets.symmetric(vertical: 8.sp),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
+                child: ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemBuilder: (BuildContext context, int index) {
+                      var current = activityItems[index];
+                      return PointsListItem(
+                          transactionType: current.transactionType,
+                          value: current.hours * 4,
+                          title: current.description,
+                          date: current.activity?.activityDateTime ?? DateTime.now());
+                    },
+                    itemCount: activityItems.length),
+              )
+            ]),
+      );
     }
     list.add(BaseListView(
         itemBuilder: (context, index) {

@@ -15,11 +15,11 @@ class ProfilePage extends BasePage {
   @override
   List<Widget> buildActions(BuildContext context, WidgetRef ref) {
     var user = ref.watch(userDataProvider);
-    return user != null && user.role != Role.USER
+    return user != null && user.role != Role.USER || user != null && user.isMentor()
         ? [
             IconButton(
                 onPressed: () {
-                  ref.watch(titleDataProvider.notifier).setTitle("User status");
+                  ref.watch(titleDataProvider.notifier).setTitle("Activities");
                   context.push("/admin").then((value) => ref.watch(profileDataProvider.notifier).getUserInfo());
                 },
                 icon: const Icon(Icons.admin_panel_settings_outlined))

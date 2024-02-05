@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'dart:core';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:work_hu/app/data/models/account.dart';
@@ -22,7 +21,7 @@ class TransactionItemModel with _$TransactionItemModel{
       required TransactionType transactionType,
       required Account account,
       required num credit,
-      required num hours,
+      required double hours,
       RoundModel? round,
       required UserModel user}) = _TransactionItemModel;
 

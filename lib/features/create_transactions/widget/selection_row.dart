@@ -13,7 +13,7 @@ class SelectionRow extends ConsumerWidget {
     return Row(
       children: [
         Expanded(
-            child: Text("${user.lastname} ${user.firstname}", style: const TextStyle(fontWeight: FontWeight.w600))),
+            child: Text(user.getFullName(), style: const TextStyle(fontWeight: FontWeight.w600))),
         Checkbox(
             value: ref
                     .watch(createTransactionsDataProvider)

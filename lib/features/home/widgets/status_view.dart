@@ -110,7 +110,7 @@ class StatusView extends ConsumerWidget {
               ));
         },
         itemCount: totalTeamRounds.length,
-        children: []));
+        children: const []));
 
     return list;
   }

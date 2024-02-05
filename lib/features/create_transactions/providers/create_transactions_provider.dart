@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:csv/csv.dart';
 import 'package:dio/dio.dart';
@@ -17,7 +16,6 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/create_transactions/data/state/create_transactions_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/rounds/data/state/rounds_state.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
@@ -87,6 +85,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
             : _clearTransactions();
         state = state.copyWith(
           modelState: ModelState.success,
+          creationState: ModelState.empty,
           users: data,
         );
       });
@@ -118,8 +117,14 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
             .sendTransactions(
                 newItems.where((element) => element.points != 0 || element.hours != 0 || element.credit != 0).toList())
             .then((data) {
-          _clearAllFields();
-          state = state.copyWith(modelState: ModelState.success);
+          if (state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK) {
+            _clearAllFields();
+            _createTransactionItems(state.users);
+          } else {
+            _clearAllFields();
+          }
+
+          state = state.copyWith(modelState: ModelState.success, creationState: ModelState.success);
         });
       });
     } on DioError catch (e) {
@@ -136,15 +141,16 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     state = state.copyWith(transactionType: transactionType, account: account);
   }
 
-  update({required num userId, num? hours, double? points, num? credits}) {
+  update({required num userId, double? hours, double? points, num? credits}) {
     TransactionItemModel? transactionItem = state.transactionItems.firstWhere((t) => t.user.id == userId);
     var newItem = transactionItem.copyWith(
         hours: hours ?? transactionItem.hours,
         points: points ?? transactionItem.points,
         credit: credits ?? transactionItem.credit);
 
-    state =
-        state.copyWith(transactionItems: state.transactionItems.map((e) => e.user.id == userId ? newItem : e).toList());
+    state = state.copyWith(
+        transactionItems: state.transactionItems.map((e) => e.user.id == userId ? newItem : e).toList(),
+        creationState: ModelState.empty);
   }
 
   void _createTransactionItems(List<UserModel> users) {
@@ -174,7 +180,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         transactionType: state.transactionType,
         account: state.account,
         credit: state.transactionType == TransactionType.CREDIT ? num.tryParse(valueController.value.text) ?? 0 : 0,
-        hours: state.transactionType == TransactionType.HOURS ? num.tryParse(valueController.value.text) ?? 0 : 0,
+        hours: state.transactionType == TransactionType.HOURS ? double.tryParse(valueController.value.text) ?? 0 : 0,
       ));
 
       var text = valueController.value.text;
@@ -207,11 +213,11 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   _clearAddFields() {
     valueController.clear();
     userController.clear();
-    state = state.copyWith(selectedUser: null);
+    state = state.copyWith(selectedUser: null, creationState: ModelState.empty);
   }
 
   _clearTransactions() {
-    state = state.copyWith(transactionItems: [], sum: 0);
+    state = state.copyWith(transactionItems: [], sum: 0, creationState: ModelState.empty);
   }
 
   _updateState() {
@@ -227,10 +233,10 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   Future<List<UserModel>> filterUsers(String filter) async {
     var filtered = state.users
         .where((u) =>
-            u.firstname.toLowerCase().startsWith(filter.toLowerCase()) ||
-            u.lastname.toLowerCase().startsWith(filter.toLowerCase()))
+            Utils.changeHunChars(u.firstname.toLowerCase()).startsWith(Utils.changeHunChars(filter.toLowerCase())) ||
+            Utils.changeHunChars(u.lastname.toLowerCase()).startsWith(Utils.changeHunChars(filter.toLowerCase())))
         .toList();
-    filtered.sort((a, b) => ("${a.lastname} ${a.firstname}").compareTo("${b.lastname} ${b.firstname}"));
+    filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     return filtered;
   }
 
@@ -325,13 +331,17 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
             var creditNok = field[5];
             var creditHUF = int.parse(creditNok) * double.parse(exchangeController.value.text);
             DateTime date;
-            if (field[7].split(".")) {
+            try {
+              field[7].split(".");
               date = DateFormat("yyyy.MM.dd").parse(field[7]);
-            } else if (field[7].split("//")) {
-              date = DateFormat("yyyy/MM/dd").parse(field[7]);
-            } else {
-              date = DateTime.now();
+            } catch (e) {
+              try {
+                date = DateFormat("yyyy/MM/dd").parse(field[7]);
+              } catch (e) {
+                date = DateTime.now();
+              }
             }
+
             valueController.text = creditHUF.toString();
             state = state.copyWith(selectedUser: user);
 
@@ -348,6 +358,6 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   void _clearAllFields() {
     descriptionController.clear();
     _clearTransactions();
-    dateController.clear();
+    dateController.text = DateTime.now().toString();
   }
 }

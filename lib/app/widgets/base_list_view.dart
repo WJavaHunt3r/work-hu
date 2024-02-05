@@ -8,17 +8,19 @@ class BaseListView extends StatelessWidget {
       required this.itemCount,
       required this.children,
       this.shadowColor,
-      this.cardBackgroundColor});
+      this.cardBackgroundColor,
+      this.physics});
 
   final Function(BuildContext context, int index) itemBuilder;
   final int itemCount;
   final List<Widget> children;
   final Color? shadowColor;
   final Color? cardBackgroundColor;
+  final ScrollPhysics? physics;
 
   @override
   Widget build(BuildContext context) {
-    return ListView(children: [
+    return ListView(physics: physics, children: [
       itemCount != 0
           ? Card(
               shadowColor: shadowColor,
@@ -26,7 +28,7 @@ class BaseListView extends StatelessWidget {
               margin: EdgeInsets.symmetric(vertical: 8.sp),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
               child: ListView.builder(
-                  padding: EdgeInsets.all(0),
+                  padding: const EdgeInsets.all(0),
                   itemCount: itemCount,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
