@@ -11,6 +11,7 @@ abstract class TeamRoundState with _$TeamRoundState {
     @Default([]) List<TeamRoundModel> teams,
     @Default([]) List<UserRoundModel> users,
     @Default(ModelState.empty) ModelState modelState,
+    @Default("") String message,
 }) = _TeamRoundState;
 
   const TeamRoundState._();

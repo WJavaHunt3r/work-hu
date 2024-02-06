@@ -74,6 +74,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
 
         final input = utf8.decode(file.bytes!);
         final fields = const CsvToListConverter().convert(input);
+        var seasons = await seasonRepository.getSeasons();
         var rowNb = 0;
         for (var row in fields) {
           if (rowNb != 0) {
@@ -82,7 +83,6 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
             if (!state.goals.any((element) => element.user.id == user.id)) {
               var goal = num.tryParse(field[6]) ?? 0;
               var status = num.tryParse(field[5]) ?? 0;
-              var seasons = await seasonRepository.getSeasons();
               GoalModel goalModel = GoalModel(
                   goal: goal, user: user, season: seasons.firstWhere((s) => s.seasonYear == DateTime.now().year));
 
@@ -102,11 +102,20 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
   }
 
   Future<void> deleteGoal(num goalId) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    List<GoalModel> origItems = state.goals;
+    List<GoalModel> items = [];
+    for (var a in origItems) {
+      if (a.id != goalId) {
+        items.add(a);
+      }
+    }
+    state = state.copyWith(goals: items, modelState: ModelState.processing);
     try {
-      await goalRepository.deleteGoal(goalId, currentUserProvider.state!.id);
+      await goalRepository
+          .deleteGoal(goalId, currentUserProvider.state!.id)
+          .then((value) => state = state.copyWith(goals: items, modelState: ModelState.success));
     } catch (e) {
-      state = state.copyWith(modelState: ModelState.error);
+      state = state.copyWith(modelState: ModelState.error, goals: origItems);
     }
   }
 }

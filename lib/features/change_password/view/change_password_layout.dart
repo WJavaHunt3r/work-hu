@@ -56,15 +56,6 @@ class ChangePasswordLayout extends ConsumerWidget {
                 decoration: const InputDecoration(labelText: "New password again"),
               ),
             ),
-            ref.watch(changePasswordDataProvider).modelState == ModelState.error
-                ? Center(
-                    child: Text(
-                      ref.watch(changePasswordDataProvider).message,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppColors.errorRed),
-                    ),
-                  )
-                : const SizedBox(),
             Padding(
               padding: EdgeInsets.only(top: 4.sp),
               child: Row(
@@ -78,7 +69,17 @@ class ChangePasswordLayout extends ConsumerWidget {
                       )),
                 ],
               ),
-            )
+            ),
+            ref.watch(changePasswordDataProvider).modelState == ModelState.error
+                ? Center(
+                    child: Text(
+                      ref.watch(changePasswordDataProvider).message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: AppColors.errorRed),
+                    ),
+                  )
+                : const SizedBox(),
+
           ],
         ),
       )),

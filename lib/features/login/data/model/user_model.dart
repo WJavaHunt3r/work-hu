@@ -19,7 +19,9 @@ class UserModel with _$UserModel {
       required num myShareID,
       required num baseMyShareCredit,
       required num currentMyShareCredit,
-      required bool changedPassword}) = _UserModel;
+      required bool changedPassword,
+      required num? familyId,
+      required num? spouseId}) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 

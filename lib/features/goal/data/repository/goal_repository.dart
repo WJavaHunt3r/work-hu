@@ -52,10 +52,10 @@ class GoalRepository {
     }
   }
 
-  Future<GoalModel> deleteGoal(num goalId, userId) async {
+  Future<String> deleteGoal(num goalId, userId) async {
     try {
       final res = await _goalApi.deleteGoal(goalId, userId);
-      return GoalModel.fromJson(res);
+      return res;
     } catch (e) {
       rethrow;
     }
