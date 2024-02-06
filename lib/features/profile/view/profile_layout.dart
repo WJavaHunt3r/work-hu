@@ -24,7 +24,7 @@ class ProfileLayout extends ConsumerWidget {
                   child: ListView(
                 children: [
                   const ProfileHeader(),
-                  TabView(user: user),
+                  ref.watch(profileDataProvider).userGoal == null ? const SizedBox() : TabView(user: user),
                 ],
               )),
               Row(
