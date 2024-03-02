@@ -53,7 +53,7 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
       read.setUser(data);
     });
 
-    await userRoundRepoProvider.fetchUserRounds(userId: read.state!.id, seasonYear: 2024).then((userRounds) async {
+    await userRoundRepoProvider.fetchUserRounds(userId: read.state!.id, seasonYear: DateTime.now().year).then((userRounds) async {
       userRounds.sort((a, b) => a.round.roundNumber.compareTo(b.round.roundNumber));
       await goalRepoProvider.getGoalByUserAndSeason(read.state!.id, DateTime.now().year).then((goal) async {
         if (read.state!.spouseId != null) {

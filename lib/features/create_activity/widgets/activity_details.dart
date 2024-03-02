@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
-import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/work_drop_down_dearch_form_field.dart';
 import 'package:work_hu/features/create_activity/provider/create_activity_provider.dart';
@@ -21,7 +20,7 @@ class ActivityDetails extends ConsumerWidget {
           TextField(
             controller: ref.watch(createActivityDataProvider.notifier).dateController,
             decoration: InputDecoration(
-                labelText: "Activity Date",
+                labelText: "create_activity_activity_date".i18n(),
                 suffixIcon: IconButton(
                   onPressed: () => _selectDate(context, ref),
                   icon: const Icon(Icons.calendar_month),
@@ -30,13 +29,7 @@ class ActivityDetails extends ConsumerWidget {
           SizedBox(height: 5.sp),
           TextField(
             controller: ref.watch(createActivityDataProvider.notifier).descriptionController,
-            decoration: InputDecoration(
-                labelText: "Description",
-                // suffixIcon: IconButton(
-                //   onPressed: () => ref.watch(createActivityDataProvider.notifier).updateDescription(
-                //       ref.watch(createActivityDataProvider.notifier).descriptionController.value.text),
-                //   icon: const Icon(Icons.done),
-                ),
+            decoration: InputDecoration(labelText: "create_activity_description".i18n()),
             autofillHints: ["Terem takarítás", "Pipetta"],
             autocorrect: true,
             textInputAction: TextInputAction.next,
@@ -46,7 +39,7 @@ class ActivityDetails extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Paid"),
+              Text("create_activity_paid_activity".i18n()),
               Switch(
                   activeColor: AppColors.primary,
                   inactiveTrackColor: AppColors.primary100,
@@ -55,10 +48,10 @@ class ActivityDetails extends ConsumerWidget {
             ],
           ),
           SizedBox(height: 5.sp),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text("Employer"),
+              Text("create_activity_employer".i18n()),
             ],
           ),
           WorkDropDownSearchFormField<UserModel>(
@@ -69,10 +62,10 @@ class ActivityDetails extends ConsumerWidget {
             suggestionsCallback: (String pattern) => ref.read(createActivityDataProvider.notifier).filterUsers(pattern),
             controller: ref.watch(createActivityDataProvider.notifier).employerController,
           ),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text("Responsible"),
+              Text("create_activity_responsible".i18n()),
             ],
           ),
           WorkDropDownSearchFormField<UserModel>(

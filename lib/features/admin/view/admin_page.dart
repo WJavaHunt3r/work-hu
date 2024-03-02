@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/src/consumer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/framework/base_components/base_page.dart';
@@ -14,6 +15,8 @@ import 'package:work_hu/features/create_transactions/providers/create_transactio
 import 'package:work_hu/features/create_transactions/view/create_bmm_transaction_layout.dart';
 import 'package:work_hu/features/create_transactions/view/create_transactions_layout.dart';
 import 'package:work_hu/features/goal/view/goals_layout.dart';
+import 'package:work_hu/features/mentees/view/mentees_layout.dart';
+import 'package:work_hu/features/mentor_mentee/view/mentor_mentee_layout.dart';
 import 'package:work_hu/features/transactions/view/transactions_layout.dart';
 import 'package:work_hu/features/user_status/view/user_status_layout.dart';
 import 'package:work_hu/features/users/view/users_layout.dart';
@@ -39,14 +42,15 @@ class AdminPage extends BasePage {
   List<Widget> createDrawerList(Role role, WidgetRef ref, BuildContext context) {
     List<Widget> list = [];
     list.add(DrawerHeader(child: Text("Admin", style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800))));
-    list.add(createListTile(context: context, ref: ref, drawerNm: 0, title: "Activities"));
+    list.add(createListTile(context: context, ref: ref, drawerNm: 0, title: "admin_mentees".i18n()));
+    list.add(createListTile(context: context, ref: ref, drawerNm: 1, title: "admin_activities".i18n()));
     if (role != Role.USER) {
-      list.add(createListTile(context: context, ref: ref, drawerNm: 1, title: "User status"));
+      list.add(createListTile(context: context, ref: ref, drawerNm: 2, title: "admin_myshare_status".i18n()));
       list.add(createListTile(
           context: context,
           ref: ref,
-          drawerNm: 2,
-          title: "BMM Perfect Weeks",
+          drawerNm: 3,
+          title: "admin_bmm_perfect_weeks".i18n(),
           onTap: () {
             ref
                 .watch(createTransactionsDataProvider.notifier)
@@ -59,8 +63,8 @@ class AdminPage extends BasePage {
         createListTile(
             context: context,
             ref: ref,
-            drawerNm: 3,
-            title: "MyShare Credits",
+            drawerNm: 4,
+            title: "admin_myshare_credits".i18n(),
             onTap: () {
               ref
                   .watch(createTransactionsDataProvider.notifier)
@@ -70,8 +74,8 @@ class AdminPage extends BasePage {
         createListTile(
             context: context,
             ref: ref,
-            drawerNm: 4,
-            title: "MyShare Hours",
+            drawerNm: 5,
+            title: "admin_myshare_hours".i18n(),
             onTap: () {
               ref
                   .watch(createTransactionsDataProvider.notifier)
@@ -81,8 +85,8 @@ class AdminPage extends BasePage {
         createListTile(
             context: context,
             ref: ref,
-            drawerNm: 5,
-            title: "Samvirk Credit",
+            drawerNm: 6,
+            title: "admin_samvirk_credit".i18n(),
             onTap: () {
               ref
                   .watch(createTransactionsDataProvider.notifier)
@@ -92,17 +96,18 @@ class AdminPage extends BasePage {
         createListTile(
             context: context,
             ref: ref,
-            drawerNm: 6,
-            title: "Work Points",
+            drawerNm: 7,
+            title: "admin_work_points".i18n(),
             onTap: () {
               ref
                   .watch(createTransactionsDataProvider.notifier)
                   .setTransactionTypeAndAccount(TransactionType.POINT, Account.OTHER);
               ref.watch(createTransactionsDataProvider.notifier).getUsers();
             }),
-        createListTile(context: context, ref: ref, drawerNm: 7, title: "Users"),
-        createListTile(context: context, ref: ref, drawerNm: 8, title: "Goals"),
-        createListTile(context: context, ref: ref, drawerNm: 9, title: "Transactions")
+        createListTile(context: context, ref: ref, drawerNm: 8, title: "admin_users".i18n()),
+        createListTile(context: context, ref: ref, drawerNm: 9, title: "admin_goals".i18n()),
+        createListTile(context: context, ref: ref, drawerNm: 10, title: "admin_mentor_mentees".i18n()),
+        createListTile(context: context, ref: ref, drawerNm: 11, title: "admin_transactions".i18n())
       ]);
     }
 
@@ -110,6 +115,7 @@ class AdminPage extends BasePage {
   }
 
   static const List<Widget> _screenWidgets = [
+    MenteesLayout(),
     ActivitiesLayout(),
     UserStatusLayout(),
     CreateBMMTransactionLayout(),
@@ -119,6 +125,7 @@ class AdminPage extends BasePage {
     CreateTransactionsLayout(),
     UsersLayout(),
     GoalsLayout(),
+    MentorMenteeLayout(),
     TransactionsLayout()
   ];
 

@@ -19,7 +19,7 @@ class ProfilePage extends BasePage {
         ? [
             IconButton(
                 onPressed: () {
-                  ref.watch(titleDataProvider.notifier).setTitle("Activities");
+                  ref.watch(titleDataProvider.notifier).setTitle("Mentees");
                   context.push("/admin").then((value) => ref.watch(profileDataProvider.notifier).getUserInfo());
                 },
                 icon: const Icon(Icons.admin_panel_settings_outlined))

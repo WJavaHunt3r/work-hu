@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
@@ -8,7 +9,7 @@ import 'package:work_hu/features/create_activity/provider/create_activity_provid
 import 'package:work_hu/features/create_activity/view/create_activity_layout.dart';
 
 class CreateActivityPage extends BasePage {
-  const CreateActivityPage({super.title = "New Activity", super.key, super.canPop = false});
+  const CreateActivityPage({super.title = "create_activity_new_activity_viewname", super.key, super.canPop = false});
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
@@ -32,13 +33,8 @@ class CreateActivityPage extends BasePage {
         builder: (context) {
           return ConfirmAlertDialog(
               onConfirm: () => context.pop(true),
-              title: "Exit",
-              content: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("All data will be lost!"),
-                ],
-              ));
+              title: "exit".i18n(),
+              content: Text("create_activity_exit_warning".i18n()), );
         }).then((popped) => popped ?? false ? context.pop() : null);
   }
 }

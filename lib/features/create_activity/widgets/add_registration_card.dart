@@ -24,7 +24,7 @@ class AddRegistrationCard extends ConsumerWidget {
           children: [
             WorkDropDownSearchFormField<UserModel>(
               direction: AxisDirection.up,
-              onTap: ()=> ref.watch(createActivityDataProvider.notifier).updateCollapsed(false),
+              onTap: () => ref.watch(createActivityDataProvider.notifier).updateCollapsed(false),
               controller: ref.read(createActivityDataProvider.notifier).userController,
               onSuggestionSelected: (UserModel suggestion) =>
                   ref.read(createActivityDataProvider.notifier).updateSelectedUser(suggestion),
@@ -40,7 +40,7 @@ class AddRegistrationCard extends ConsumerWidget {
                     width: 150.sp,
                     child: TextField(
                       controller: ref.read(createActivityDataProvider.notifier).hoursController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
                       focusNode: ref.read(createActivityDataProvider.notifier).valueFocusNode,
                       textInputAction: TextInputAction.go,
                       onSubmitted: ref.watch(createActivityDataProvider).selectedUser != null &&
@@ -80,8 +80,7 @@ class AddRegistrationCard extends ConsumerWidget {
                 ? Padding(
                     padding: EdgeInsets.only(top: 8.sp, left: 8.sp, right: 8.sp),
                     child: Text(
-                      "Error",
-                      // ref.watch(createActivityDataProvider).message,
+                      ref.watch(createActivityDataProvider).errorMessage,
                       style: const TextStyle(color: AppColors.errorRed),
                     ),
                   )

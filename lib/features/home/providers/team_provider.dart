@@ -53,6 +53,7 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
 
   Future<void> checkLoginCredentials() async {
     await getTeamRounds();
+    state = state.copyWith(modelState: ModelState.processing);
     var username = await Utils.getData('user');
     var password = await Utils.getData('password');
 
@@ -61,11 +62,12 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
       //state = state.copyWith(modelState: ModelState.processing);
       read.state = LoginState(username: username, password: password);
       await read.login();
-      state = state.copyWith(message: read.state.message);
+      state = state.copyWith(message: read.state.message, modelState: ModelState.success);
     } else {
       if (user == null && username.isNotEmpty) {
         await loginRepository.getUser(username).then((value) => userSessionProvider.setUser(value));
       }
+      state = state.copyWith(modelState: ModelState.success);
     }
   }
 }

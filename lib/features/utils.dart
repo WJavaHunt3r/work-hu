@@ -1,9 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
+import 'package:csv/csv.dart';
 import 'package:excel/excel.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
@@ -11,13 +10,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
-import "package:pointycastle/export.dart";
+import 'package:pointycastle/api.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/season/data/model/season_model.dart';
+import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 
 class Utils {
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -82,8 +82,12 @@ class Utils {
     return "";
   }
 
-  static final NumberFormat creditFormat = NumberFormat("# ###");
-  static final NumberFormat percentFormat = NumberFormat("# ###.#");
+  static final NumberFormat creditFormat = NumberFormat("#,###");
+  static final NumberFormat percentFormat = NumberFormat.decimalPatternDigits(decimalDigits: 1);
+
+  static String creditFormatting(num number) {
+    return creditFormat.format(number).replaceAll(",", " ");
+  }
 
   static String dateToString(DateTime date) {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day}";
@@ -106,7 +110,7 @@ class Utils {
         ));
   }
 
-  static String changeHunChars(String text) {
+  static String changeSpecChars(String text) {
     for (String entry in getEngChar().keys) {
       text = text.replaceAll(entry, getEngChar()[entry] ?? "");
     }
@@ -124,10 +128,13 @@ class Utils {
       "é": "e",
       "á": "a",
       "í": "i",
+      " ": "_",
+      "/": "",
+      "-": "_",
     };
   }
 
-  static void createActivityCsv(List<ActivityItemsModel> items, ActivityModel activity) async {
+  static void createActivityXlsx(List<ActivityItemsModel> items, ActivityModel activity) async {
     ByteData data = await rootBundle.load('assets/docs/munkalap_sablon_uj.xlsx');
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     var excel = Excel.decodeBytes(bytes);
@@ -202,23 +209,67 @@ class Utils {
     }
 
     if (kIsWeb) {
-      excel.save(fileName: "${dateToString(date).replaceAll("-", "")}_${changeHunChars(activity.description)}.xlsx");
-      // await FileSaver.instance.saveFile(
-      //   name: "${dateToString(date).replaceAll("-", "")}_${changeHunChars(activity.description)}",
-      //   bytes: bytes,
-      //   ext: 'csv',
-      //   mimeType: MimeType.csv,
-      // );
+      excel.save(fileName: "${dateToString(date).replaceAll("-", "")}_${changeSpecChars(activity.description)}.xlsx");
     } else {
       var newBytes = excel.save();
       if (newBytes != null) {
         await FileSaver.instance.saveAs(
-          name: "${dateToString(date).replaceAll("-", "")}_${changeHunChars(activity.description)}",
+          name: "${dateToString(date).replaceAll("-", "")}_${changeSpecChars(activity.description)}",
           bytes: Uint8List.fromList(newBytes),
           ext: 'xlsx',
           mimeType: MimeType.microsoftExcel,
         );
       }
+    }
+  }
+
+  static Future<void> createCreditCsv(List<TransactionItemModel> items, DateTime date, String description) async {
+    var headers = [
+      "UserId",
+      "Age",
+      "Name",
+      "LastName",
+      "ClubId",
+      "ClubName",
+      "Amount",
+      "ClubTransactionDate",
+      "Description"
+    ];
+
+    List<List<dynamic>> list = [];
+    list.add(headers);
+
+    for (var transaction in items) {
+      var user = transaction.user;
+      list.add([
+        user.myShareID,
+        (DateTime.now().difference(user.birthDate).inDays / 365).ceil() - 1,
+        user.firstname,
+        user.lastname,
+        3964,
+        "BUK Vácduka",
+        transaction.credit,
+        '${date.month}/${date.day}/${date.year}',
+        description
+      ]);
+    }
+    String csv = const ListToCsvConverter().convert(list);
+    Uint8List bytes = Uint8List.fromList(utf8.encode(csv));
+
+    if (kIsWeb) {
+      await FileSaver.instance.saveFile(
+        name: '${dateToString(date).replaceAll("-", "")}_${changeSpecChars(description)}',
+        bytes: bytes,
+        ext: 'csv',
+        mimeType: MimeType.csv,
+      );
+    } else {
+      await FileSaver.instance.saveAs(
+        name: '${dateToString(date).replaceAll("-", "")}_${changeSpecChars(description)}',
+        bytes: bytes,
+        ext: 'csv',
+        mimeType: MimeType.csv,
+      );
     }
   }
 }

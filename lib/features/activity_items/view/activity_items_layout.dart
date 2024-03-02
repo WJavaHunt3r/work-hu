@@ -14,7 +14,7 @@ import 'package:work_hu/features/utils.dart';
 
 class ActivityItemsLayout extends BasePage {
   const ActivityItemsLayout(
-      {required this.activityId, super.key, super.title = "Registrations", super.isListView = true});
+      {required this.activityId, super.key, super.title = "activity_items_registrations", super.isListView = true});
 
   final num activityId;
 
@@ -52,6 +52,16 @@ class ActivityItemsLayout extends BasePage {
           ))
         ]),
       ),
+      Positioned(
+        bottom: 25.sp,
+        left: 5.sp,
+        child: FloatingActionButton(
+            child: const Image(
+              image: AssetImage("assets/img/myshare-logo.png"),
+              fit: BoxFit.fitWidth,
+            ),
+            onPressed: () => ref.watch(activityItemsDataProvider.notifier).createCreditCsv()),
+      ),
       ref.watch(activityItemsDataProvider).modelState == ModelState.error
           ? Center(
               child: Text(
@@ -87,5 +97,13 @@ class ActivityItemsLayout extends BasePage {
           ),
           subtitle: Text(dateString),
         ));
+  }
+
+  @override
+  Widget? createActionButton(BuildContext context, WidgetRef ref) {
+    return FloatingActionButton(
+      onPressed: () => ref.watch(activityItemsDataProvider.notifier).createActivityXlsx(),
+      child: const Icon(Icons.download),
+    );
   }
 }

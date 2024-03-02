@@ -103,7 +103,7 @@ class TransactionsLayout extends ConsumerWidget {
 
   String createTrailingText(TransactionItemModel current) {
     if (current.transactionType == TransactionType.CREDIT) {
-      return "${Utils.creditFormat.format(current.credit)} Ft";
+      return "${Utils.creditFormatting(current.credit)} Ft";
     }
     if (current.transactionType == TransactionType.HOURS) {
       return "${current.hours} h";

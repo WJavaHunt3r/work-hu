@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/title_provider.dart';
 
 abstract class BasePage extends ConsumerWidget {
@@ -21,7 +22,7 @@ abstract class BasePage extends ConsumerWidget {
             drawer: buildDrawer(context, ref),
             appBar: AppBar(
               title: Text(
-                title.isEmpty ? ref.watch(titleDataProvider) : title,
+                title.isEmpty ? ref.watch(titleDataProvider) : title.i18n(),
                 style: const TextStyle(fontWeight: FontWeight.w800),
               ),
               actions: buildActions(context, ref),

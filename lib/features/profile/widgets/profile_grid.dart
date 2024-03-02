@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
@@ -56,14 +57,20 @@ class ProfileGrid extends ConsumerWidget {
                       Text("MyShare Status", style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600)),
                     ],
                   ),
-                  onTap: () => showGeneralDialog(
-                      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-                      barrierColor: AppColors.primary,
-                      transitionDuration: const Duration(milliseconds: 200),
-                      context: context,
-                      pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
-                        return MyShareStatusPage(user: user);
-                      }))),
+                  onTap: () => ref.watch(profileDataProvider).userGoal == null
+                      ? null
+                      : showGeneralDialog(
+                          barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                          barrierColor: AppColors.primary,
+                          transitionDuration: const Duration(milliseconds: 200),
+                          context: context,
+                          pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
+                            return MyShareStatusPage(
+                                userGoalRound: UserGoalUserRoundModel(
+                                    user: user,
+                                    goal: ref.watch(profileDataProvider).userGoal!,
+                                    userRound: userRoundModel));
+                          }))),
           SizedBox(
             width: 12.sp,
           ),
@@ -103,7 +110,7 @@ class ProfileGrid extends ConsumerWidget {
                       children: [
                         Align(
                             alignment: Alignment.center,
-                            child: Text("${pointsFormat.format(userRoundModel.samvirkPayments)} Ft",
+                            child: Text("${Utils.creditFormatting(userRoundModel.samvirkPayments)} Ft",
                                 style: TextStyle(fontSize: 35.sp, fontWeight: FontWeight.w800),
                                 textScaler: TextScaler.linear(
                                   Utils.textScaleFactor(context),

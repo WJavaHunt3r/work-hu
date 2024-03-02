@@ -8,20 +8,22 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/features/home/data/model/team_round_model.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
+import 'package:work_hu/features/rounds/data/model/round_model.dart';
+import 'package:work_hu/features/utils.dart';
 
 class SamvirkStatus extends ConsumerWidget {
-  SamvirkStatus({required this.itemCount, required this.teamRounds, required this.currentRound, super.key});
+  SamvirkStatus({required this.itemCount, required this.teamRounds, required this.currentRoundNumber, super.key});
 
   final num itemCount;
 
   final List<TeamRoundModel> teamRounds;
-  final num currentRound;
+  final num currentRoundNumber;
   final NumberFormat numberFormat = NumberFormat("#,###.#");
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var currentTeamRounds =
-        ref.watch(teamRoundDataProvider).teams.where((element) => element.round.roundNumber == currentRound);
+        ref.watch(teamRoundDataProvider).teams.where((element) => element.round.roundNumber == currentRoundNumber);
     var samvirkStatus = currentTeamRounds.isEmpty
         ? 0.0
         : ref
@@ -30,6 +32,7 @@ class SamvirkStatus extends ConsumerWidget {
             .where((element) => element.round == currentTeamRounds.first.round)
             .map((e) => e.samvirkPayments)
             .reduce((value, element) => value + element);
+    RoundModel? currentRound = currentTeamRounds.isEmpty ? null : currentTeamRounds.first.round;
     var maximum = currentTeamRounds.isEmpty ? 10.0 : currentTeamRounds.first.round.samvirkChurchGoal.toDouble();
     return Padding(
         padding: EdgeInsets.only(bottom: 8.sp),
@@ -42,7 +45,7 @@ class SamvirkStatus extends ConsumerWidget {
                   children: [
                     const Text("Samvirk Status:"),
                     Text(
-                      itemCount.toDouble() == 0 ? 0.0.toString() : numberFormat.format(samvirkStatus).toString(),
+                      itemCount.toDouble() == 0 ? 0.0.toString() : Utils.creditFormatting(samvirkStatus).toString(),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     )
                   ],
@@ -76,7 +79,14 @@ class SamvirkStatus extends ConsumerWidget {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [const Text("0"), Text(numberFormat.format(maximum))],
+                  children: [const Text("0"), Text(Utils.creditFormatting(maximum))],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(currentRound != null ? Utils.dateToString(currentRound.startDateTime) : ""),
+                    Text(currentRound != null ? Utils.dateToString(currentRound.endDateTime) : ""),
+                  ],
                 )
               ])),
         ));

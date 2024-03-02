@@ -40,9 +40,9 @@ class GoalsLayout extends ConsumerWidget {
                                 //         (value) => ref.watch(goalsDataProvider.notifier).getTransactions());
                               },
                               title: Text(current.user.getFullName()),
-                              subtitle: Text("${Utils.creditFormat.format(current.user.currentMyShareCredit)} Ft"),
+                              subtitle: Text("${Utils.creditFormatting(current.user.currentMyShareCredit)} Ft"),
                               trailing: Text(
-                                "${Utils.creditFormat.format(current.goal)} Ft",
+                                "${Utils.creditFormatting(current.goal)} Ft",
                                 style: TextStyle(fontSize: 18.sp),
                               ),
                             )));

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
+import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/user_provider.dart';
@@ -49,10 +51,12 @@ class ActivityListItem extends ConsumerWidget {
                             ref.watch(activityDataProvider.notifier).registerActivity(current.id!);
                             context.pop();
                           },
-                          title: "Register Activity",
-                          content: const Text("Are you sure you register this activity"))),
+                          title: "activities_confirm_activity_register_title".i18n(),
+                          content: Text("activities_confirm_activity_register_question".i18n()))),
                 )
-              : user.role == Role.ADMIN && !current.registeredInMyShare
+              : user.role == Role.ADMIN &&
+                      !current.registeredInMyShare &&
+                      current.transactionType != TransactionType.POINT
                   ? MaterialButton(
                       child: const Image(
                         image: AssetImage("assets/img/myshare-logo.png"),
@@ -65,11 +69,11 @@ class ActivityListItem extends ConsumerWidget {
                                 ref.watch(activityDataProvider.notifier).putActivity(current);
                                 context.pop();
                               },
-                              title: "Register in MyShare",
-                              content:
-                                  const Text("Are you sure you want to set this activity as registered in MyShare?"))),
+                              title: "activities_confirm_register_in_myshare_title".i18n(),
+                              content: Text("activities_confirm_register_in_myshare_question".i18n()))),
                     )
-                  : current.registeredInMyShare && current.registeredInApp
+                  : current.registeredInMyShare && current.registeredInApp ||
+                          current.registeredInApp && current.transactionType == TransactionType.POINT
                       ? const Icon(
                           Icons.done_outline,
                           color: AppColors.primaryGreen,

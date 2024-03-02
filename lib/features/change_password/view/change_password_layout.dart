@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/features/change_password/provider/change_password_provider.dart';
@@ -26,7 +27,7 @@ class ChangePasswordLayout extends ConsumerWidget {
               child: TextField(
                 controller: ref.watch(changePasswordDataProvider.notifier).usernameController,
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(labelText: "Username"),
+                decoration: InputDecoration(labelText: "change_password_username".i18n()),
               ),
             ),
             Padding(
@@ -35,7 +36,7 @@ class ChangePasswordLayout extends ConsumerWidget {
                 obscureText: true,
                 controller: ref.watch(changePasswordDataProvider.notifier).passwordController,
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(labelText: "Old password"),
+                decoration: InputDecoration(labelText: "change_password_old_password".i18n()),
               ),
             ),
             Padding(
@@ -44,7 +45,7 @@ class ChangePasswordLayout extends ConsumerWidget {
                 obscureText: true,
                 controller: ref.watch(changePasswordDataProvider.notifier).newPasswordController,
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(labelText: "New password"),
+                decoration: InputDecoration(labelText: "change_password_new_password".i18n()),
               ),
             ),
             Padding(
@@ -53,7 +54,7 @@ class ChangePasswordLayout extends ConsumerWidget {
                 obscureText: true,
                 controller: ref.watch(changePasswordDataProvider.notifier).newPasswordAgainController,
                 textInputAction: TextInputAction.go,
-                decoration: const InputDecoration(labelText: "New password again"),
+                decoration: InputDecoration(labelText: "change_password_new_password_again".i18n()),
               ),
             ),
             Padding(
@@ -63,8 +64,8 @@ class ChangePasswordLayout extends ConsumerWidget {
                 children: [
                   TextButton(
                       onPressed: () => ref.read(changePasswordDataProvider.notifier).changePassword(),
-                      child: const Text(
-                        "Change password",
+                      child: Text(
+                        "change_password_change_action".i18n(),
                         style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.white),
                       )),
                 ],
@@ -79,7 +80,6 @@ class ChangePasswordLayout extends ConsumerWidget {
                     ),
                   )
                 : const SizedBox(),
-
           ],
         ),
       )),

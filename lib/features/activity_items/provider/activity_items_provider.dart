@@ -4,6 +4,8 @@ import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/activity_items/data/api/activity_items_api.dart';
 import 'package:work_hu/features/activity_items/data/repository/activity_items_repository.dart';
 import 'package:work_hu/features/activity_items/data/state/activity_items_state.dart';
+import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
+import 'package:work_hu/features/utils.dart';
 
 final activityItemsApiProvider = Provider<ActivityItemsApi>((ref) => ActivityItemsApi());
 
@@ -23,8 +25,7 @@ class ActivityItemsDataNotifier extends StateNotifier<ActivityItemsState> {
   final UserDataNotifier currentUserProvider;
 
   Future<void> getActivityItems({required num activityId}) async {
-    state = state.copyWith(modelState: ModelState.processing);
-    var user = currentUserProvider.state!;
+    state = state.copyWith(modelState: ModelState.processing, activityId: activityId);
     try {
       await activityRepository.getActivityItems(activityId: activityId).then((data) async {
         state = state.copyWith(activityItems: data, modelState: ModelState.success);
@@ -36,4 +37,25 @@ class ActivityItemsDataNotifier extends StateNotifier<ActivityItemsState> {
 
   Future<void> deleteActivityItem(num num, int index) async {}
 
+  Future<void> createActivityXlsx() async {
+    Utils.createActivityXlsx(state.activityItems, state.activityItems.first.activity!);
+  }
+
+  Future<void> createCreditCsv() async {
+    var list = <TransactionItemModel>[];
+    for (var item in state.activityItems) {
+      list.add(TransactionItemModel(
+          transactionDate: item.activity!.activityDateTime,
+          description: item.description,
+          createUserId: item.createUser.id,
+          points: item.hours * 4,
+          transactionType: item.transactionType,
+          account: item.account,
+          credit: item.hours * 2000,
+          hours: item.hours,
+          user: item.user));
+    }
+    Utils.createCreditCsv(
+        list, state.activityItems.first.activity!.activityDateTime, state.activityItems.first.activity!.description);
+  }
 }

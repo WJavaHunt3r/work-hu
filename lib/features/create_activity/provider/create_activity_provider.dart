@@ -194,8 +194,8 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
   Future<List<UserModel>> filterUsers(String filter) async {
     var filtered = state.users
         .where((u) =>
-            Utils.changeHunChars(u.firstname.toLowerCase()).startsWith(Utils.changeHunChars(filter.toLowerCase())) ||
-            Utils.changeHunChars(u.lastname.toLowerCase()).startsWith(Utils.changeHunChars(filter.toLowerCase())))
+            Utils.changeSpecChars(u.firstname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
+            Utils.changeSpecChars(u.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())))
         .toList();
     filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     return filtered;
@@ -224,7 +224,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
         await activityItemsRepository
             .postActivityItems(newItems.where((element) => element.hours != 0).toList())
             .then((data) {
-          Utils.createActivityCsv(newItems, activity);
+          Utils.createActivityXlsx(newItems, activity);
           pop();
           state = state.copyWith(creationState: ModelState.success, modelState: ModelState.success, errorMessage: data);
         });

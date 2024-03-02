@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/style/app_style.dart';
 import 'package:work_hu/features/activity_items/view/activity_items_layout.dart';
 import 'package:work_hu/features/admin/view/admin_page.dart';
@@ -32,15 +34,24 @@ class WorkHuApp extends ConsumerWidget {
             builder: (context, child) {
               final theme = GlobalTheme();
               final router = ref.watch(routerProvider);
+              LocalJsonLocalization.delegate.directories = ['lib/I18n'];
               return MaterialApp.router(
                 scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
                 debugShowCheckedModeBanner: false,
                 title: 'WORK HU',
                 theme: theme.globalTheme,
                 routerConfig: router,
-                // routeInformationParser: router.routeInformationParser,
-                // routeInformationProvider: router.routeInformationProvider,
-                // routerDelegate: router.routerDelegate,
+                supportedLocales: const [
+                  Locale('en', 'US'),
+                  Locale('hu', 'HU'),
+                ],
+                locale: Locale('hu', 'HU'),
+                localizationsDelegates: [
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                  LocalJsonLocalization.delegate,
+                ],
               );
             });
       },

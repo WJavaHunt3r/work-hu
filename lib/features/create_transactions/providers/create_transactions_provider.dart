@@ -2,10 +2,7 @@ import 'dart:convert';
 
 import 'package:csv/csv.dart';
 import 'package:dio/dio.dart';
-import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:file_saver/file_saver.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -156,7 +153,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   void _createTransactionItems(List<UserModel> users) {
     for (UserModel u in users) {
       state = state.copyWith(selectedUser: u);
-      addTransaction(description: "${currentUserProvider.state!.team!.color} csapat Vær et forbilde pontszámai");
+      addTransaction(description: "${currentUserProvider.state!.team!.color} csapat tökéletes BMM hét");
     }
   }
 
@@ -233,81 +230,18 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   Future<List<UserModel>> filterUsers(String filter) async {
     var filtered = state.users
         .where((u) =>
-            Utils.changeHunChars(u.firstname.toLowerCase()).startsWith(Utils.changeHunChars(filter.toLowerCase())) ||
-            Utils.changeHunChars(u.lastname.toLowerCase()).startsWith(Utils.changeHunChars(filter.toLowerCase())))
+            Utils.changeSpecChars(u.firstname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
+            Utils.changeSpecChars(u.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())))
         .toList();
     filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     return filtered;
   }
 
   Future<void> createCreditsCsv() async {
-    var headers = [
-      "UserId",
-      "Age",
-      "Name",
-      "LastName",
-      "ClubId",
-      "ClubName",
-      "Amount",
-      "ClubTransactionDate",
-      "Description"
-    ];
-
-    List<List<dynamic>> list = [];
-    list.add(headers);
-
-    var items = state.transactionItems;
-
-    for (var transaction in items) {
-      var date = state.transactionDate;
-      var user = transaction.user;
-      list.add([
-        user.myShareID,
-        (DateTime.now().difference(user.birthDate).inDays / 365).ceil() - 1,
-        user.firstname,
-        user.lastname,
-        3964,
-        "BUK Vácduka",
-        transaction.credit,
-        '${date?.month}/${date?.day}/${date?.year}',
-        state.description
-      ]);
-    }
-    String csv = const ListToCsvConverter().convert(list);
-    Uint8List bytes = Uint8List.fromList(utf8.encode(csv));
-
-    var date = state.transactionDate;
-
-    if (kIsWeb) {
-      await FileSaver.instance.saveFile(
-        name: 'befizetesek_${Utils.dateToString(date ?? DateTime.now())}',
-        bytes: bytes,
-        ext: 'csv',
-        mimeType: MimeType.csv,
-      );
-    } else {
-      await FileSaver.instance.saveAs(
-        name: 'befizetesek_${Utils.dateToString(date ?? DateTime.now())}',
-        bytes: bytes,
-        ext: 'csv',
-        mimeType: MimeType.csv,
-      );
-    }
+    Utils.createCreditCsv(state.transactionItems, state.transactionDate ?? DateTime.now(), state.description);
   }
 
-  Future<void> createHoursCsv() async {
-    var excel = Excel.createExcel();
-    Sheet sheetObject = excel['Sheet1'];
-
-    var items = state.transactionItems;
-    var rowNm = 0;
-    for (var transaction in items) {
-      var user = transaction.user;
-      rowNm++;
-    }
-    var date = state.transactionDate;
-    excel.save(fileName: 'befizetesek_${date?.year}${date?.month}${date?.day}.xlsx');
-  }
+  Future<void> createHoursCsv() async {}
 
   Future<void> uploadSamvirkCsv() async {
     try {

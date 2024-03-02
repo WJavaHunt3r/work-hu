@@ -6,7 +6,7 @@ import 'package:work_hu/features/change_password/provider/change_password_provid
 import 'package:work_hu/features/change_password/view/change_password_layout.dart';
 
 class ChangePasswordPage extends BasePage {
-  const ChangePasswordPage({super.key, super.title = "Change password", super.canPop = false});
+  const ChangePasswordPage({super.key, super.title = "change_password_viewname", super.canPop = false});
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {

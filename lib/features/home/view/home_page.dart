@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/home/widgets/error_view.dart';
@@ -50,8 +49,6 @@ class HomePage extends BasePage {
           ],
         ),
       ),
-      RefreshIndicator(
-          onRefresh: () async => ref.watch(teamRoundDataProvider.notifier).getTeamRounds(), child: SizedBox.expand())
     ]);
   }
 

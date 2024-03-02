@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 
 class ConfirmAlertDialog extends StatelessWidget {
@@ -37,9 +38,9 @@ class ConfirmAlertDialog extends StatelessWidget {
                 overlayColor: MaterialStateColor.resolveWith((states) => AppColors.primary),
               ),
               onPressed: () => context.pop(),
-              child: const Text(
-                "Cancel",
-                style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+              child: Text(
+                "cancel".i18n(),
+                style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
               )),
           TextButton(
               style: ButtonStyle(
@@ -47,9 +48,9 @@ class ConfirmAlertDialog extends StatelessWidget {
                 foregroundColor: MaterialStateColor.resolveWith((states) => AppColors.white),
               ),
               onPressed: onConfirm,
-              child: const Text(
-                "Confirm",
-                style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+              child: Text(
+                "confirm".i18n(),
+                style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
               ))
         ],
         content: content);

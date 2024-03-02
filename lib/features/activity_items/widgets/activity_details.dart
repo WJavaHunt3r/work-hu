@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
-import 'package:work_hu/features/activities/providers/avtivity_provider.dart';
-import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
-import 'package:work_hu/features/utils.dart';
 
 class ActivityDetails extends StatelessWidget {
   const ActivityDetails({super.key, required this.activity, required this.hourCount});
@@ -21,19 +18,22 @@ class ActivityDetails extends StatelessWidget {
         BaseTextFormField(
             enabled: false,
             initialValue: activity.activityDateTime.toString(),
-            labelText: "Activity Date",
+            labelText: "activity_activity_date".i18n(),
             onChanged: (text) => ()),
         BaseTextFormField(
-            enabled: false, initialValue: activity.description, labelText: "Description", onChanged: (text) => ()),
+            enabled: false,
+            initialValue: activity.description,
+            labelText: "activity_description".i18n(),
+            onChanged: (text) => ()),
         BaseTextFormField(
             enabled: false,
             initialValue: activity.responsible.getFullName(),
-            labelText: "Responsible",
+            labelText: "activity_responsible".i18n(),
             onChanged: (text) => ()),
         BaseTextFormField(
             enabled: false,
             initialValue: activity.employer.getFullName(),
-            labelText: "Employer",
+            labelText: "activity_employer".i18n(),
             onChanged: (text) => ()),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -41,23 +41,26 @@ class ActivityDetails extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("Action"),
+                Text("activity_registered_in_app".i18n()),
                 Checkbox(value: activity.registeredInApp, onChanged: null),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("MyShare"),
+                Text("activity_registered_in_myshare".i18n()),
                 Checkbox(value: activity.registeredInMyShare, onChanged: null),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Paid"),
-                Checkbox(value: activity.account == Account.MYSHARE, onChanged: null,),
-              ],
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("activity_paid_activity".i18n()),
+            Checkbox(
+              value: activity.account == Account.MYSHARE,
+              onChanged: null,
             ),
           ],
         ),
@@ -67,10 +70,10 @@ class ActivityDetails extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Sum Hours:",
+                "activity_sum_hours".i18n(),
                 style: (TextStyle(fontSize: 15.sp)),
               ),
-              Text(Utils.creditFormat.format(hourCount), style: (TextStyle(fontSize: 15.sp)))
+              Text(hourCount.toString(), style: (TextStyle(fontSize: 15.sp)))
             ],
           ),
         )

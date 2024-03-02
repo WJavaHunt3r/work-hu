@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:work_hu/app/data/models/account.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/app/widgets/error_alert_dialog.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 import 'package:work_hu/features/create_activity/provider/create_activity_provider.dart';
-import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
-import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/utils.dart';
 
 class ActivitySumCard extends ConsumerWidget {
@@ -30,7 +28,7 @@ class ActivitySumCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Text("Count: "),
+              Text("create_activity_count".i18n()),
               Text(
                 items.length.toStringAsFixed(0),
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -39,12 +37,15 @@ class ActivitySumCard extends ConsumerWidget {
           ),
           Row(
             children: [
+              Text("create_activity_sum"
+                  .i18n([Utils.getTransactionTypeText(ref.watch(createActivityDataProvider).transactionType, false)])),
               Text(
-                  "Sum (${Utils.getTransactionTypeText(ref.watch(createActivityDataProvider).transactionType, false)}): "),
-              Text(
-                sum % 1 == 0 ? sum.toStringAsFixed(0) : sum.toStringAsFixed(1),
+                "${sum % 1 == 0 ? sum.toStringAsFixed(0) : sum.toStringAsFixed(1)}",
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
+              Text(ref.watch(createActivityDataProvider).transactionType == TransactionType.HOURS
+                  ? " (${sum * 2000})Ft"
+                  : "")
             ],
           ),
           TextButton(
@@ -53,7 +54,7 @@ class ActivitySumCard extends ConsumerWidget {
                       barrierDismissible: false,
                       context: context,
                       builder: (BuildContext context) {
-                        return const ErrorAlertDialog(title: "Add at least one registration!");
+                        return ErrorAlertDialog(title: "create_activity_warning".i18n());
                       })
                   : showDialog(
                       context: context,
@@ -63,9 +64,8 @@ class ActivitySumCard extends ConsumerWidget {
                             ref.read(createActivityDataProvider.notifier).sendActivity();
                             context.pop(true);
                           },
-                          title: 'Confirm activity registration',
-                          content: const Text("Are you sure you want to send the activity registrations?",
-                              textAlign: TextAlign.center),
+                          title: "create_confirm_activity_send".i18n(),
+                          content: Text("create_confirm_activity_send_question".i18n(), textAlign: TextAlign.center),
                         );
                       }),
               style: ButtonStyle(

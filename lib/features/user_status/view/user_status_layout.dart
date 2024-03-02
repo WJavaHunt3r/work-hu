@@ -91,7 +91,7 @@ class UserStatusLayout extends ConsumerWidget {
                                   "On Track",
                                   style: TextStyle(color: AppColors.white),
                                 )
-                              : Text("${Utils.creditFormat.format(toOnTrack)} to be On track"),
+                              : Text("${Utils.creditFormatting(toOnTrack)} to be On track"),
                           trailing: Text(
                             "${Utils.percentFormat.format(userStatus)}%",
                             style: style.copyWith(fontSize: 15.sp),

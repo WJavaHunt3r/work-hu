@@ -9,6 +9,7 @@ abstract class ActivityItemsState with _$ActivityItemsState {
   const factory ActivityItemsState(
       {@Default([]) List<ActivityItemsModel> activityItems,
       @Default(ModelState.empty) ModelState modelState,
+        @Default(0) num activityId,
       @Default("") String message}) = _ActivityItemsState;
 
   const ActivityItemsState._();
