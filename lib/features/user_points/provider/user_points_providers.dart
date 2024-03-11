@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/activity_items/data/repository/activity_items_repository.dart';
-import 'package:work_hu/features/activity_items/data/state/activity_items_state.dart';
 import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/rounds/data/repository/round_repository.dart';
@@ -43,10 +42,10 @@ class UserPointsDataNotifier extends StateNotifier<UserPointsState> {
         var transactionItems = <TransactionItemModel>[];
         for (var r in rounds) {
           await transactionItemsRepository.getTransactionItems(userId: currentUser!.id, roundId: r.id).then((items) {
-            items.sort((a, b) => a.transactionDate.compareTo(b.transactionDate));
             transactionItems.addAll(items);
           });
         }
+        transactionItems.sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
         var activityItems =
             await activityItemsRepository.getActivityItems(registeredInApp: false, userId: currentUser!.id);
         state = state.copyWith(

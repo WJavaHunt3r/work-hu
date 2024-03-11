@@ -48,7 +48,7 @@ class ActivityApi {
 
   Future<dynamic> postActivity(ActivityModel activity) async {
     try {
-      final res = await _dioClient.dio.post("/activity", data: activity);
+      final res = await _dioClient.dio.post("/activity", data: activity.toJson());
       return res.data;
     } catch (e) {
       rethrow;

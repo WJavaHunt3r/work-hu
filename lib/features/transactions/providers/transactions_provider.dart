@@ -11,7 +11,7 @@ final transactionsApiProvider = Provider<TransactionApi>((ref) => TransactionApi
 final transactionsRepoProvider =
     Provider<TransactionRepository>((ref) => TransactionRepository(ref.read(transactionsApiProvider)));
 
-final transactionsDataProvider = StateNotifierProvider<TransactionsDataNotifier, TransactionsState>(
+final transactionsDataProvider = StateNotifierProvider.autoDispose<TransactionsDataNotifier, TransactionsState>(
     (ref) => TransactionsDataNotifier(ref.read(transactionsRepoProvider), ref.read(userDataProvider.notifier)));
 
 class TransactionsDataNotifier extends StateNotifier<TransactionsState> {

@@ -10,8 +10,8 @@ class GoalModel with _$GoalModel {
   const factory GoalModel({
     num? id,
     required num goal,
-    required UserModel user,
-    required SeasonModel season
+    UserModel? user,
+    SeasonModel? season
   }) = _GoalModel;
 
   factory GoalModel.fromJson(Map<String, dynamic> json) => _$GoalModelFromJson(json);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
@@ -17,22 +18,15 @@ class UserPointsLayout extends ConsumerWidget {
     var items = ref.watch(userPointsDataProvider).transactionItems;
     var activityItems = ref.watch(userPointsDataProvider).activityItems;
     var currentRound = ref.watch(roundDataProvider).currentRoundNumber;
-    return DefaultTabController(
-        length: countItems(items).toInt() + 1,
-        initialIndex: currentRound == 0 || countItems(items).toInt() == 0 ? 0 : currentRound.toInt() - 1,
-        child: Column(
-          children: [
-            BaseTabBar(
+    return items.isNotEmpty
+        ? DefaultTabController(
+            length: currentRound.toInt() + 1,
+            initialIndex: currentRound == 0 ? 0 : currentRound.toInt() - 1,
+            child: BaseTabView(
               tabs: createTabs(items),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(top: 8.sp),
-                child: TabBarView(clipBehavior: Clip.antiAlias, children: createTabView(items, activityItems)),
-              ),
-            ),
-          ],
-        ));
+              tabViews: createTabView(items, activityItems),
+            ))
+        : SizedBox();
   }
 
   num countItems(List<TransactionItemModel> items) {
@@ -51,14 +45,16 @@ class UserPointsLayout extends ConsumerWidget {
           child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [Text("Round $i")],
+        children: [
+          Text("round_number".i18n([i.toString()]))
+        ],
       )));
     }
-    list.add(const Tab(
+    list.add(Tab(
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [Text("Total")],
+        children: [Text("total".i18n())],
       ),
     ));
     return list;
@@ -69,7 +65,6 @@ class UserPointsLayout extends ConsumerWidget {
     var list = <Widget>[];
     for (num i = 1; i <= count; i++) {
       List<TransactionItemModel> currentItems = items.where((element) => element.round!.roundNumber == i).toList();
-      List<ActivityItemsModel> currentActivityItems = activityItems.where((a) => a.round.roundNumber == i).toList();
       list.add(
         BaseListView(
             itemBuilder: (BuildContext context, int index) {
@@ -85,7 +80,7 @@ class UserPointsLayout extends ConsumerWidget {
               activityItems.isEmpty
                   ? const SizedBox()
                   : Text(
-                      "Waiting for approval",
+                      "user_points_waiting_for_approval".i18n(),
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
                     ),
               Card(

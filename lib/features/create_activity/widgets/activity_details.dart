@@ -32,6 +32,9 @@ class ActivityDetails extends ConsumerWidget {
             decoration: InputDecoration(labelText: "create_activity_description".i18n()),
             autofillHints: ["Terem takarítás", "Pipetta"],
             autocorrect: true,
+            onTap: () => ref.watch(createActivityDataProvider.notifier).descriptionController.selection = TextSelection(
+                baseOffset: 0,
+                extentOffset: ref.watch(createActivityDataProvider.notifier).descriptionController.value.text.length),
             textInputAction: TextInputAction.next,
             // onSubmitted: (text) => ref.watch(createActivityDataProvider.notifier).updateDescription(text),
           ),
@@ -56,6 +59,9 @@ class ActivityDetails extends ConsumerWidget {
           ),
           WorkDropDownSearchFormField<UserModel>(
             enabled: ref.watch(createActivityDataProvider).account == Account.MYSHARE,
+            onTap: () => ref.watch(createActivityDataProvider.notifier).employerController.selection = TextSelection(
+                baseOffset: 0,
+                extentOffset: ref.watch(createActivityDataProvider.notifier).employerController.value.text.length),
             onSuggestionSelected: (UserModel suggestion) =>
                 ref.read(createActivityDataProvider.notifier).updateEmployer(suggestion),
             itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
@@ -74,6 +80,9 @@ class ActivityDetails extends ConsumerWidget {
             itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
             suggestionsCallback: (String pattern) => ref.read(createActivityDataProvider.notifier).filterUsers(pattern),
             controller: ref.watch(createActivityDataProvider.notifier).responsibleController,
+            onTap: () => ref.watch(createActivityDataProvider.notifier).responsibleController.selection = TextSelection(
+                baseOffset: 0,
+                extentOffset: ref.watch(createActivityDataProvider.notifier).responsibleController.value.text.length),
           )
         ],
       ),

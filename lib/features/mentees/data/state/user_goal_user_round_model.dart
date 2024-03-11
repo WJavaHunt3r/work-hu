@@ -12,15 +12,15 @@ class UserGoalUserRoundModel {
 
   @override
   String toString() {
-    return "${user.getFullName()} ${Utils.percentFormat.format(user.currentMyShareCredit / goal.goal)} ${goal.goal * userRound.round.myShareGoal / 100}";
+    return "${user.getFullName()} ${Utils.percentFormat.format(user.currentMyShareCredit / goal.goal!)} ${goal.goal! * userRound.round.myShareGoal / 100}";
   }
 
   bool isOnTrack() => getStatus() >= userRound.round.myShareGoal;
 
-  num getStatus() => user.currentMyShareCredit / goal.goal * 100;
+  num getStatus() => user.currentMyShareCredit / goal.goal! * 100;
 
-  String getStatusString() => "${Utils.percentFormat.format(user.currentMyShareCredit / goal.goal * 100)}%";
+  String getStatusString() => "${Utils.percentFormat.format(user.currentMyShareCredit / goal.goal! * 100)}%";
 
   String getRemainingAmount() =>
-      "${Utils.creditFormatting(goal.goal * userRound.round.myShareGoal / 100 - user.currentMyShareCredit)}Ft to be On Track";
+      "${Utils.creditFormatting(goal.goal! * userRound.round.myShareGoal / 100 - user.currentMyShareCredit)}Ft to be On Track";
 }

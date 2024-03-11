@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
@@ -39,7 +40,7 @@ class ProfileGrid extends ConsumerWidget {
                           Align(
                             alignment: Alignment.center,
                             child: goal == null
-                                ? const Text("Nincs cél beállítva")
+                                ? Text("profile_no_goal".i18n())
                                 : Text("${numberFormat.format(user.currentMyShareCredit / goal.goal * 100)}%",
                                     style: TextStyle(fontSize: 35.sp, fontWeight: FontWeight.w800)),
                           ),
@@ -54,7 +55,7 @@ class ProfileGrid extends ConsumerWidget {
                             )
                         ],
                       ),
-                      Text("MyShare Status", style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600)),
+                      Text("profile_myshare_status".i18n(), style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600)),
                     ],
                   ),
                   onTap: () => ref.watch(profileDataProvider).userGoal == null
@@ -88,7 +89,7 @@ class ProfileGrid extends ConsumerWidget {
                     Text(pointsFormat.format(userRoundModel.roundPoints),
                         style: TextStyle(fontSize: 35.sp, fontWeight: FontWeight.w800)),
                     Text(
-                      "Points",
+                      "profile_points".i18n(),
                       style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600),
                     ),
                   ],
@@ -127,7 +128,7 @@ class ProfileGrid extends ConsumerWidget {
                       ],
                     ),
                     Text(
-                      "Samvirk payments",
+                      "profile_samvirk_payments".i18n(),
                       style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600),
                     ),
                   ],

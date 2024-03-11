@@ -37,7 +37,7 @@ class ActivityListItem extends ConsumerWidget {
           title: Text(
             current.description,
           ),
-          trailing: user.role == Role.ADMIN && !current.registeredInApp
+          trailing: user.id == 255 && !current.registeredInApp
               ? MaterialButton(
                   child: Image(
                     image: const AssetImage("assets/img/WORK_Logo_01_RGB.png"),
@@ -51,10 +51,10 @@ class ActivityListItem extends ConsumerWidget {
                             ref.watch(activityDataProvider.notifier).registerActivity(current.id!);
                             context.pop();
                           },
-                          title: "activities_confirm_activity_register_title".i18n(),
+                          title: "activities_register_confirm_title".i18n(),
                           content: Text("activities_confirm_activity_register_question".i18n()))),
                 )
-              : user.role == Role.ADMIN &&
+              : user.id == 255 &&
                       !current.registeredInMyShare &&
                       current.transactionType != TransactionType.POINT
                   ? MaterialButton(

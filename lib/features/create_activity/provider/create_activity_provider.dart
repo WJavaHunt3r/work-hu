@@ -158,23 +158,26 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
   updateEmployer(UserModel u) {
     employerController.text = "${u.getFullName()} (${u.getAge()}) ";
     state = state.copyWith(employer: u);
+    updateAccount(state.account == Account.MYSHARE);
   }
 
   updateResponsible(UserModel u) {
     responsibleController.text = "${u.getFullName()} (${u.getAge()}) ";
     state = state.copyWith(responsible: u);
+    _updateItems();
   }
 
   updateAccount(bool isPaid) {
     if (!isPaid) {
       updateEmployer(
           state.users.firstWhere((element) => element.myShareID == 0, orElse: () => currentUserProvider.state!));
-    } else {
-      employerController.text = "";
-      state = state.copyWith(employer: null);
     }
     var account = isPaid ? Account.MYSHARE : Account.OTHER;
-    var trType = isPaid ? TransactionType.HOURS : TransactionType.POINT;
+    var trType = isPaid && state.employer?.myShareID != 0
+        ? TransactionType.HOURS
+        : isPaid && state.employer?.myShareID == 0
+            ? TransactionType.DUKA_MUNKA
+            : TransactionType.POINT;
     state = state.copyWith(account: account, transactionType: trType);
     _updateItems();
   }
@@ -195,7 +198,9 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
     var filtered = state.users
         .where((u) =>
             Utils.changeSpecChars(u.firstname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
-            Utils.changeSpecChars(u.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())))
+            Utils.changeSpecChars(u.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
+            Utils.changeSpecChars("${u.lastname.toLowerCase()} ${u.firstname.toLowerCase()}")
+                .startsWith(Utils.changeSpecChars(filter.toLowerCase())))
         .toList();
     filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     return filtered;

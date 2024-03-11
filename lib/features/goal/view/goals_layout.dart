@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/src/consumer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
+import 'package:work_hu/app/widgets/base_search_bar.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
+import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
+import 'package:work_hu/features/goal/widgets/goals_maintenance.dart';
 import 'package:work_hu/features/utils.dart';
 
 class GoalsLayout extends ConsumerWidget {
@@ -13,10 +17,12 @@ class GoalsLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var goals = ref.watch(goalDataProvider).goals;
+    var goals = ref.watch(goalDataProvider).filtered;
     return Column(
       children: [
-        TextButton(onPressed: ()=> ref.read(goalDataProvider.notifier).uploadGoalsCsv(), child: const Text("Upload")),
+        BaseSearchBar(
+          onChanged: (text) => ref.watch(goalDataProvider.notifier).filterGoals(text),
+        ),
         Expanded(
           child: Stack(children: [
             RefreshIndicator(
@@ -35,24 +41,50 @@ class GoalsLayout extends ConsumerWidget {
                             index: index,
                             child: ListTile(
                               onTap: () {
-                                // ref.watch(transactionItemsDataProvider.notifier).getTransactionItems(current.id!);
-                                // context.push("/transactionItems", extra: {"transaction": current}).then(
-                                //         (value) => ref.watch(goalsDataProvider.notifier).getTransactions());
+                                ref.watch(goalDataProvider.notifier).setSelectedGoal(current);
+                                showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (context) => GoalsMaintenance(mode: GoalsMaintenance.EDIT));
                               },
-                              title: Text(current.user.getFullName()),
-                              subtitle: Text("${Utils.creditFormatting(current.user.currentMyShareCredit)} Ft"),
+                              title: Text(current.user!.getFullName()),
+                              subtitle: Text("${Utils.creditFormatting(current.user!.currentMyShareCredit)} Ft"),
                               trailing: Text(
-                                "${Utils.creditFormatting(current.goal)} Ft",
+                                "${Utils.creditFormatting(current.goal!)} Ft",
                                 style: TextStyle(fontSize: 18.sp),
                               ),
                             )));
                   },
-                  itemCount: ref.watch(goalDataProvider).goals.length,
+                  itemCount: goals.length,
                   shadowColor: Colors.transparent,
                   cardBackgroundColor: Colors.transparent,
                   children: const [],
                 ))
               ]),
+            ),
+            Positioned(
+              bottom: 20.sp,
+              right: 20.sp,
+              child: FloatingActionButton(
+                child: const Icon(Icons.add),
+                onPressed: () {
+                  ref.watch(goalDataProvider.notifier).setSelectedGoal(const GoalModel(goal: 0));
+                  showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) => GoalsMaintenance(mode: GoalsMaintenance.CREATE));
+                },
+              ),
+            ),
+            Positioned(
+              bottom: 20.sp,
+              left: 20.sp,
+              child: FloatingActionButton(
+                child: const Icon(Icons.upload),
+                onPressed: () {
+                  ref.read(goalDataProvider.notifier).uploadGoalsCsv();
+                },
+              ),
             ),
             ref.watch(goalDataProvider).modelState == ModelState.error
                 ? Center(

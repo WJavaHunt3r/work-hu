@@ -33,18 +33,9 @@ class ActivitiesLayout extends ConsumerWidget {
         child: DefaultTabController(
             length: 2,
             initialIndex: 0,
-            child: Column(
-              children: [
-                BaseTabBar(
-                  tabs: createTabs(),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 8.sp),
-                    child: TabBarView(clipBehavior: Clip.antiAlias, children: createTabView(activities, ref)),
-                  ),
-                ),
-              ],
+            child: BaseTabView(
+              tabs: createTabs(),
+              tabViews: createTabView(activities, ref),
             )),
       ),
       ref.watch(activityDataProvider).modelState == ModelState.error
@@ -62,7 +53,7 @@ class ActivitiesLayout extends ConsumerWidget {
     ]);
   }
 
-  List<Widget> createTabs() {
+  List<Tab> createTabs() {
     var list = <Tab>[];
     list.add(Tab(
         child: Row(

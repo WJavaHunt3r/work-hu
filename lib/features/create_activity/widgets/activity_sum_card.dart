@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
@@ -43,9 +44,13 @@ class ActivitySumCard extends ConsumerWidget {
                 "${sum % 1 == 0 ? sum.toStringAsFixed(0) : sum.toStringAsFixed(1)}",
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(ref.watch(createActivityDataProvider).transactionType == TransactionType.HOURS
+              Text(ref.watch(createActivityDataProvider).account == Account.MYSHARE &&
+                      ref.watch(createActivityDataProvider).transactionType == TransactionType.HOURS
                   ? " (${sum * 2000})Ft"
-                  : "")
+                  : ref.watch(createActivityDataProvider).account == Account.MYSHARE &&
+                          ref.watch(createActivityDataProvider).transactionType == TransactionType.DUKA_MUNKA
+                      ? " (${sum * 1000})Ft"
+                      : "")
             ],
           ),
           TextButton(

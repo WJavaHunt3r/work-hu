@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/style/app_colors.dart';
@@ -69,9 +70,9 @@ class UserStatusLayout extends ConsumerWidget {
                 itemCount: users.length,
                 itemBuilder: (BuildContext context, int index) {
                   var current = users[index];
-                  var currentUserGoal = goals.where((g) => g.user.id == current.id).isEmpty
+                  var currentUserGoal = goals.where((g) => g.user!.id == current.id).isEmpty
                       ? null
-                      : goals.firstWhere((g) => g.user.id == current.id);
+                      : goals.firstWhere((g) => g.user!.id == current.id);
                   var currentGoal = currentUserGoal?.goal ?? 0;
                   var userStatus = current.currentMyShareCredit / currentGoal * 100;
                   var style = TextStyle(color: userStatus >= currentRoundGoal ? AppColors.white : AppColors.primary);
@@ -91,7 +92,7 @@ class UserStatusLayout extends ConsumerWidget {
                                   "On Track",
                                   style: TextStyle(color: AppColors.white),
                                 )
-                              : Text("${Utils.creditFormatting(toOnTrack)} to be On track"),
+                              : Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(toOnTrack)])),
                           trailing: Text(
                             "${Utils.percentFormat.format(userStatus)}%",
                             style: style.copyWith(fontSize: 15.sp),
@@ -140,14 +141,14 @@ class UserStatusLayout extends ConsumerWidget {
 
     chips.add(BaseFilterChip(
       isSelected: ref.watch(userStatusDataProvider).selectedOrderType == OrderByType.NAME,
-      title: 'Name',
+      title: "myshare_status_name".i18n(),
       onSelected: (bool selected) => ref
           .watch(userStatusDataProvider.notifier)
           .setSelectedOrderType(selected ? OrderByType.NAME : OrderByType.NONE),
     ));
     chips.add(BaseFilterChip(
       isSelected: ref.watch(userStatusDataProvider).selectedOrderType == OrderByType.STATUS,
-      title: 'Status',
+      title: "myshare_status_status".i18n(),
       onSelected: (bool selected) => ref
           .watch(userStatusDataProvider.notifier)
           .setSelectedOrderType(selected ? OrderByType.STATUS : OrderByType.NONE),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
@@ -56,7 +57,7 @@ class MyShareStatusLayout extends StatelessWidget {
                     style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800, color: AppColors.primary),
                   ),
                   Text(
-                    "Goal: ${Utils.creditFormatting(userGoal.goal)} Ft",
+                    "myshare_status_goal".i18n([Utils.creditFormatting(userGoal.goal)]),
                     style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800, color: AppColors.primary),
                   ),
                 ],
@@ -69,7 +70,9 @@ class MyShareStatusLayout extends StatelessWidget {
         children: [
           Expanded(
               child: Text(
-            isOnTrack ? "You are On Track" : "$toOnTrack Ft to be On Track",
+            isOnTrack
+                ? "myshare_status_your_ontrack".i18n()
+                : "myshare_status_to_be_ontrack".i18n([toOnTrack.toString()]),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.w800, color: AppColors.primary),
           )),

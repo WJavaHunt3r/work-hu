@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/features/create_activity/provider/create_activity_provider.dart';
 import 'package:work_hu/features/create_activity/widgets/registration_row_widget.dart';
-import 'package:work_hu/features/create_transactions/widget/transaction_row_widget.dart';
 
 class ActivityRegistrationListCard extends ConsumerWidget {
   const ActivityRegistrationListCard({super.key});

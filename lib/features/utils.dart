@@ -93,6 +93,10 @@ class Utils {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day}";
   }
 
+  static String dateToStringWithTime(DateTime date) {
+    return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day} ${date.hour < 10 ? "0${date.hour}" : date.hour}:${date.minute < 10 ? "0${date.minute}" : date.minute}";
+  }
+
   static RoundModel createEmptyRound() {
     return RoundModel(
         id: 0,
@@ -107,7 +111,8 @@ class Utils {
           seasonYear: DateTime.now().year,
           startDate: DateTime.now(),
           endDate: DateTime.now(),
-        ));
+        ),
+        freezeDateTime: DateTime.now());
   }
 
   static String changeSpecChars(String text) {
@@ -174,9 +179,11 @@ class Utils {
     sumHoursCell.value = DoubleCellValue(sumHours);
 
     var sumCreditsCell = sheetObject.cell(CellIndex.indexByString('F4'));
-    var sumCredits = activity.account == Account.OTHER
-        ? 0
-        : items.map((e) => (e.hours * 2000).toInt()).reduce((value, element) => value + element);
+    var sumCredits = activity.account == Account.MYSHARE && activity.transactionType == TransactionType.DUKA_MUNKA
+        ? items.map((e) => (e.hours * 1000).toInt()).reduce((value, element) => value + element)
+        : activity.account == Account.OTHER && activity.transactionType == TransactionType.POINT
+            ? 0
+            : items.map((e) => (e.hours * 2000).toInt()).reduce((value, element) => value + element);
     sumCreditsCell.value = null;
     sumCreditsCell.value = IntCellValue(sumCredits);
 
@@ -204,8 +211,11 @@ class Utils {
 
       var creditCell = sheetObject.cell(CellIndex.indexByString('F${5 + items.indexOf(item) + 1}'));
       creditCell.value = null;
-      creditCell.value =
-          activity.account == Account.OTHER ? const TextCellValue("") : DoubleCellValue(item.hours * 2000);
+      creditCell.value = activity.account == Account.MYSHARE && activity.transactionType == TransactionType.DUKA_MUNKA
+          ? DoubleCellValue(item.hours * 1000)
+          : activity.account == Account.MYSHARE && activity.transactionType == TransactionType.HOURS
+              ? DoubleCellValue(item.hours * 2000)
+              : const TextCellValue("");
     }
 
     if (kIsWeb) {
