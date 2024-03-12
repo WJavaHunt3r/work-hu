@@ -70,7 +70,7 @@ class ProfileGrid extends ConsumerWidget {
                                 userGoalRound: UserGoalUserRoundModel(
                                     user: user,
                                     goal: ref.watch(profileDataProvider).userGoal!,
-                                    userRound: userRoundModel));
+                                    round: userRoundModel.round));
                           }))),
           SizedBox(
             width: 12.sp,

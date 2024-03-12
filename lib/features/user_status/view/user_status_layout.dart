@@ -10,6 +10,8 @@ import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
+import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
+import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
 import 'package:work_hu/features/user_status/widgets/base_filter_chip.dart';
@@ -24,8 +26,9 @@ class UserStatusLayout extends ConsumerWidget {
     var currentRoundNumber = ref.read(roundDataProvider).currentRoundNumber;
     var rounds = ref.read(roundDataProvider).rounds;
     var goals = ref.watch(goalDataProvider).goals;
-    var currentRoundGoal =
-        rounds.isEmpty ? 0 : rounds.firstWhere((element) => element.roundNumber == currentRoundNumber).myShareGoal;
+    var currentRound =
+        rounds.isEmpty ? null : rounds.firstWhere((element) => element.roundNumber == currentRoundNumber);
+    var currentRoundGoal = currentRound == null ? 0 : currentRound.myShareGoal;
     return Stack(
       children: [
         Column(
@@ -82,6 +85,16 @@ class UserStatusLayout extends ConsumerWidget {
                       isLast: isLast,
                       index: index,
                       child: ListTile(
+                          onTap: () => showGeneralDialog(
+                              barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                              barrierColor: AppColors.primary,
+                              transitionDuration: const Duration(milliseconds: 200),
+                              context: context,
+                              pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
+                                return MyShareStatusPage(
+                                    userGoalRound: UserGoalUserRoundModel(
+                                        user: current, goal: currentUserGoal!, round: currentRound!));
+                              }),
                           minVerticalPadding: 0,
                           title: Text(
                             current.getFullName(),

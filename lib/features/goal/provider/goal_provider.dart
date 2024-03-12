@@ -49,7 +49,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
   Future<void> getGoals(num? seasonYear) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await goalRepository.getGoals(seasonYear).then((data) async {
+      await goalRepository.getGoals(seasonYear ?? DateTime.now().year).then((data) async {
         data.sort((a, b) => (a.user!.getFullName()).compareTo(b.user!.getFullName()));
         state = state.copyWith(goals: data, filtered: data, modelState: ModelState.success);
       });
@@ -142,7 +142,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
         if (mode == GoalsMaintenance.CREATE) {
           await goalRepository.postGoal(state.selectedGoal);
         } else if (mode == GoalsMaintenance.EDIT) {
-          await goalRepository.putGoal(state.selectedGoal, state.selectedGoal.id!);
+          await goalRepository.putGoal(state.selectedGoal, currentUserProvider.state!.id);
         }
         state = state.copyWith(selectedGoal: const GoalModel(goal: 0));
       }

@@ -43,8 +43,9 @@ class MenteesDataNotifier extends StateNotifier<MenteesState> {
               list.add(UserGoalUserRoundModel(
                   user: mentee.mentee,
                   goal: goal,
-                  userRound:
-                      userRounds.firstWhere((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0)));
+                  round: userRounds
+                      .firstWhere((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0)
+                      .round));
             });
           });
 

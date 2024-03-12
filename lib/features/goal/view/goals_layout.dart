@@ -6,6 +6,7 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_search_bar.dart';
+import 'package:work_hu/app/widgets/error_alert_dialog.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
@@ -18,6 +19,16 @@ class GoalsLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var goals = ref.watch(goalDataProvider).filtered;
+    Future(() => ref.read(goalDataProvider).modelState == ModelState.error
+        ? showDialog(
+            context: context,
+            builder: (context) {
+              return ErrorAlertDialog(
+                content: SingleChildScrollView(child: Text(ref.read(goalDataProvider).message)),
+                title: 'Error',
+              );
+            }).then((value) => ref.watch(goalDataProvider.notifier).getGoals(DateTime.now().year))
+        : null);
     return Column(
       children: [
         BaseSearchBar(
@@ -43,9 +54,10 @@ class GoalsLayout extends ConsumerWidget {
                               onTap: () {
                                 ref.watch(goalDataProvider.notifier).setSelectedGoal(current);
                                 showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (context) => GoalsMaintenance(mode: GoalsMaintenance.EDIT));
+                                        barrierDismissible: false,
+                                        context: context,
+                                        builder: (context) => GoalsMaintenance(mode: GoalsMaintenance.EDIT))
+                                    .then((value) => ref.watch(goalDataProvider.notifier).getGoals(null));
                               },
                               title: Text(current.user!.getFullName()),
                               subtitle: Text("${Utils.creditFormatting(current.user!.currentMyShareCredit)} Ft"),
@@ -86,15 +98,6 @@ class GoalsLayout extends ConsumerWidget {
                 },
               ),
             ),
-            ref.watch(goalDataProvider).modelState == ModelState.error
-                ? Center(
-                    child: Text(
-                      ref.watch(goalDataProvider).message,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppColors.errorRed),
-                    ),
-                  )
-                : const SizedBox(),
             ref.watch(goalDataProvider).modelState == ModelState.processing
                 ? const Center(child: CircularProgressIndicator())
                 : const SizedBox()

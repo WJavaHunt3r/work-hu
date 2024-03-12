@@ -15,12 +15,19 @@ class MyShareStatusLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     var userGoal = userGoalRound.goal;
     var user = userGoalRound.user;
-    var currentRound = userGoalRound.userRound.round;
+
+    var currentRound = userGoalRound.round;
     var userStatus = user.currentMyShareCredit / userGoal.goal * 100;
     var isOnTrack = userGoalRound.isOnTrack();
     var toOnTrack =
         Utils.creditFormatting((userGoal.goal) * (currentRound.myShareGoal) / 100 - user.currentMyShareCredit);
     return Column(children: [
+      Padding(
+          padding: EdgeInsets.symmetric(vertical: 12.sp),
+          child: Text(
+            user.getFullName(),
+            style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.w800),
+          )),
       SfRadialGauge(
         enableLoadingAnimation: true,
         axes: [

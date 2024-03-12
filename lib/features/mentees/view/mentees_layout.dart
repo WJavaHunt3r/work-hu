@@ -43,7 +43,7 @@ class MenteesLayout extends ConsumerWidget {
                                         (BuildContext context, Animation animation, Animation secondaryAnimation) {
                                       return MyShareStatusPage(
                                           userGoalRound: UserGoalUserRoundModel(
-                                              user: current.user, goal: current.goal, userRound: current.userRound));
+                                              user: current.user, goal: current.goal, round: current.round));
                                     }),
                                 subtitle: Text(
                                   current.isOnTrack() ? "On Track" : current.getRemainingAmount(),

@@ -43,9 +43,9 @@ class GoalRepository {
     }
   }
 
-  Future<GoalModel> putGoal(GoalModel goal, num goalId) async {
+  Future<GoalModel> putGoal(GoalModel goal, num userId) async {
     try {
-      final res = await _goalApi.putGoal(goal, goalId);
+      final res = await _goalApi.putGoal(goal, userId);
       return GoalModel.fromJson(res);
     } catch (e) {
       rethrow;
