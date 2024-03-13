@@ -54,9 +54,7 @@ class ActivityListItem extends ConsumerWidget {
                           title: "activities_register_confirm_title".i18n(),
                           content: Text("activities_confirm_activity_register_question".i18n()))),
                 )
-              : user.id == 255 &&
-                      !current.registeredInMyShare &&
-                      current.transactionType != TransactionType.POINT
+              : user.id == 255 && !current.registeredInMyShare && current.transactionType != TransactionType.POINT
                   ? MaterialButton(
                       child: const Image(
                         image: AssetImage("assets/img/myshare-logo.png"),
@@ -66,22 +64,48 @@ class ActivityListItem extends ConsumerWidget {
                           context: context,
                           builder: (context) => ConfirmAlertDialog(
                               onConfirm: () {
-                                ref.watch(activityDataProvider.notifier).putActivity(current);
+                                ref
+                                    .watch(activityDataProvider.notifier)
+                                    .putActivity(current.copyWith(registeredInMyShare: true));
                                 context.pop();
                               },
                               title: "activities_confirm_register_in_myshare_title".i18n(),
                               content: Text("activities_confirm_register_in_myshare_question".i18n()))),
                     )
-                  : current.registeredInMyShare && current.registeredInApp ||
-                          current.registeredInApp && current.transactionType == TransactionType.POINT
-                      ? const Icon(
-                          Icons.done_outline,
-                          color: AppColors.primaryGreen,
+                  : user.id == 255 &&
+                              current.registeredInMyShare &&
+                              current.registeredInApp &&
+                              !current.registeredInTeams
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.group,
+                            size: 25.sp,
+                            color: Colors.deepPurple,
+                          ),
+                          onPressed: () => showDialog(
+                              context: context,
+                              builder: (context) => ConfirmAlertDialog(
+                                  onConfirm: () {
+                                    ref.watch(activityDataProvider.notifier).registerActivityInTeams(current.id!);
+                                    context.pop();
+                                  },
+                                  title: "activities_confirm_register_in_teams_title".i18n(),
+                                  content: Text("activities_confirm_register_in_teams_question".i18n()))),
                         )
-                      : null,
+                      : current.registeredInMyShare && current.registeredInApp ||
+                              current.registeredInApp && current.transactionType == TransactionType.POINT
+                          ? const Icon(
+                              Icons.done_outline,
+                              color: AppColors.primaryGreen,
+                            )
+                          : null,
           subtitle: Row(
             children: [
-              Text("$dateString - ${current.responsible.getFullName()} "),
+              Expanded(
+                  child: Text(
+                "$dateString - ${current.responsible.getFullName()}",
+                overflow: TextOverflow.ellipsis,
+              )),
             ],
           ),
         ));

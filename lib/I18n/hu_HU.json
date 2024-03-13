@@ -8,6 +8,8 @@
   "activities_confirm_activity_register_question": "Biztosan regisztrálod a munkát?",
   "activities_confirm_register_in_myshare_title": "Regsiztrálva MySharebe",
   "activities_confirm_register_in_myshare_question": "Biztosan MyShare-be regisztrálva státuszba teszed ezt a munkát?",
+  "activities_confirm_register_in_teams_title": "Regisztrálás Teamsbe",
+  "activities_confirm_register_in_teams_question": "Biztosan regisztrálod Teamsbe a munkát?",
   "activity_items_registrations": "Jelentkezések",
   "activity_activity_date": "Munka Dátuma",
   "activity_description": "Munka megnevezése",

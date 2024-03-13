@@ -8,6 +8,8 @@
   "activities_confirm_activity_register_question": "Are you sure you want to register this activity?",
   "activities_confirm_register_in_myshare_title": "Register in MyShare",
   "activities_confirm_register_in_myshare_question": "Are you sure you want to set this activity as registered in MyShare?",
+  "activities_confirm_register_in_teams_title": "Register in Teams",
+  "activities_confirm_register_in_teams_question": "Are you sure you want to register this activity in Teams?",
   "activity_items_registrations": "Registrations",
   "activities_activity_date": "Activity Date",
   "activities_description": "Description",

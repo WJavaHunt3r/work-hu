@@ -1,3 +1,8 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
+import 'package:excel/excel.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 
@@ -39,7 +44,18 @@ class ActivityApi {
 
   Future<dynamic> registerActivity(num activityId, num userId) async {
     try {
-      final res = await _dioClient.dio.get("/register", queryParameters: {"activityId": activityId, "userId": userId});
+      final res = await _dioClient.dio
+          .post("/register", queryParameters: {"activityId": activityId, "userId": userId});
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> registerActivityInTeams(num activityId, num userId) async {
+    try {
+      final res = await _dioClient.dio
+          .post("/registerInTeams", queryParameters: {"activityId": activityId, "userId": userId});
       return res.data;
     } catch (e) {
       rethrow;

@@ -75,7 +75,9 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
           modelState: ModelState.success,
           users: data,
         );
-        updateAccount(false);
+        updateAccount(true);
+        updateEmployer(
+            state.users.firstWhere((element) => element.myShareID == 0, orElse: () => currentUserProvider.state!));
       });
     } on DioError catch (e) {
       state = state.copyWith(modelState: ModelState.error, errorMessage: e.message);
@@ -219,7 +221,8 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
               responsible: state.responsible!,
               registeredInApp: false,
               registeredInMyShare: false,
-              transactionType: state.transactionType))
+              transactionType: state.transactionType,
+              registeredInTeams: false))
           .then((activity) async {
         List<ActivityItemsModel> newItems = [];
         for (var item in state.activityItems) {
@@ -229,7 +232,6 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
         await activityItemsRepository
             .postActivityItems(newItems.where((element) => element.hours != 0).toList())
             .then((data) {
-          Utils.createActivityXlsx(newItems, activity);
           pop();
           state = state.copyWith(creationState: ModelState.success, modelState: ModelState.success, errorMessage: data);
         });

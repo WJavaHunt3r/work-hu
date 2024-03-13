@@ -139,7 +139,28 @@ class Utils {
     };
   }
 
+  static String createFileName(ActivityModel activity) {
+    return "${dateToString(activity.activityDateTime).replaceAll("-", "")}_${changeSpecChars(activity.description)}";
+  }
+
   static void createActivityXlsx(List<ActivityItemsModel> items, ActivityModel activity) async {
+    var excel = await buildActivityXlsx(items, activity);
+    if (kIsWeb) {
+      excel.save(fileName: "${createFileName(activity)}.xlsx");
+    } else {
+      var newBytes = excel.save();
+      if (newBytes != null) {
+        await FileSaver.instance.saveAs(
+          name: createFileName(activity),
+          bytes: Uint8List.fromList(newBytes),
+          ext: 'xlsx',
+          mimeType: MimeType.microsoftExcel,
+        );
+      }
+    }
+  }
+
+  static Future<Excel> buildActivityXlsx(List<ActivityItemsModel> items, ActivityModel activity) async {
     ByteData data = await rootBundle.load('assets/docs/munkalap_sablon_uj.xlsx');
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     var excel = Excel.decodeBytes(bytes);
@@ -218,19 +239,7 @@ class Utils {
               : const TextCellValue("");
     }
 
-    if (kIsWeb) {
-      excel.save(fileName: "${dateToString(date).replaceAll("-", "")}_${changeSpecChars(activity.description)}.xlsx");
-    } else {
-      var newBytes = excel.save();
-      if (newBytes != null) {
-        await FileSaver.instance.saveAs(
-          name: "${dateToString(date).replaceAll("-", "")}_${changeSpecChars(activity.description)}",
-          bytes: Uint8List.fromList(newBytes),
-          ext: 'xlsx',
-          mimeType: MimeType.microsoftExcel,
-        );
-      }
-    }
+    return excel;
   }
 
   static Future<void> createCreditCsv(List<TransactionItemModel> items, DateTime date, String description) async {
