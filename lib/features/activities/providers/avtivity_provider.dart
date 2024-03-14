@@ -85,8 +85,6 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
   Future<void> registerActivity(num id) async {
     var user = currentUserProvider.state!;
     try {
-      var items = await activityItemsRepository.getActivityItems(activityId: id);
-      var activity = state.activities.firstWhere((element) => element.id == id);
       await activityRepository.registerActivity(id, user.id).then((data) async {
         state = state.copyWith(message: data, modelState: ModelState.success, registerState: ModelState.success);
       });
@@ -109,9 +107,6 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
     state = state.copyWith(modelState: ModelState.processing, registerState: ModelState.processing);
     var user = currentUserProvider.state!;
     try {
-      var items = await activityItemsRepository.getActivityItems(activityId: id);
-      var activity = state.activities.firstWhere((element) => element.id == id);
-
       await activityRepository.registerActivityInTeams(id, user.id).then((data) async {
         state = state.copyWith(message: data, modelState: ModelState.success, registerState: ModelState.success);
       });

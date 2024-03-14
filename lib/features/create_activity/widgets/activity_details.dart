@@ -28,6 +28,7 @@ class ActivityDetails extends ConsumerWidget {
           ),
           SizedBox(height: 5.sp),
           TextField(
+            textCapitalization: TextCapitalization.sentences,
             controller: ref.watch(createActivityDataProvider.notifier).descriptionController,
             decoration: InputDecoration(labelText: "create_activity_description".i18n()),
             autofillHints: ["Terem takarítás", "Pipetta"],
