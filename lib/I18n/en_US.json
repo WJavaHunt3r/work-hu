@@ -1,4 +1,10 @@
 {
+  "base_text_points": "Points",
+  "base_text_points_short": "p",
+  "base_text_hours": "Hours",
+  "base_text_hours_short": "h",
+  "base_text_credits": "Credit",
+  "base_text_credits_short": "Ft",
   "cancel": "Cancel",
   "confirm": "Confirm",
   "exit": "Exit",
@@ -52,6 +58,7 @@
   "create_confirm_activity_send_question": "Are you sure you want to send the activity registrations?",
   "create_activity_count": "Count",
   "create_activity_activity_details": "Activity details",
+  "create_activity_description_error" : "Activity description missing!",
   "home_server_error": "Server Error",
   "round_number": "Round %s",
   "total": "Total",
@@ -90,5 +97,6 @@
   "user_details_role": "Role",
   "user_details_reset_password": "Reset password",
   "user_details_email": "Email",
-  "user_details_phone_number": "Phone number"
+  "user_details_phone_number": "Phone number",
+  "transactions_round": "Round"
 }

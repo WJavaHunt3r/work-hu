@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/users/data/api/users_api.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/data/state/users_state.dart';
@@ -40,8 +39,8 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
         value.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
         state = state.copyWith(users: value, filtered: value, modelState: ModelState.success);
       });
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.message);
+    } on DioException catch (e) {
+      state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
   }
 
@@ -50,8 +49,8 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
     try {
       await usersRepository.resetPassword(userId, currentUser!.id);
       state = state.copyWith(modelState: ModelState.success);
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.message);
+    } on DioException catch (e) {
+      state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
   }
 
@@ -60,8 +59,8 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
     try {
       var updatedUser = await usersRepository.updateUser(currentUser!.id, user);
       state = state.copyWith(currentUser: updatedUser, modelState: ModelState.success);
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.message);
+    } on DioException catch (e) {
+      state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
   }
 

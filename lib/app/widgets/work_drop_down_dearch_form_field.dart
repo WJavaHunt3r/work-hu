@@ -29,16 +29,17 @@ class WorkDropDownSearchFormField<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropDownSearchFormField<T>(
-        direction: direction ?? AxisDirection.up,
-        displayAllSuggestionWhenTap: false,
+    return DropDownSearchField<T>(
+        direction: AxisDirection.down,
+        suggestionsBoxVerticalOffset: 2.sp,
+        suggestionsBoxController: SuggestionsBoxController(),
         suggestionsBoxDecoration:
-            SuggestionsBoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8.sp)),
+            SuggestionsBoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8.sp), offsetX: 2),
         textFieldConfiguration: TextFieldConfiguration(
+            scrollPadding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
             autofocus: autofocus ?? false,
             enabled: enabled ?? true,
             controller: controller,
-            focusNode: focusNode,
             onTap: onTap),
         onSuggestionSelected: onSuggestionSelected,
         itemBuilder: (BuildContext context, T itemData) {
@@ -49,6 +50,9 @@ class WorkDropDownSearchFormField<T> extends StatelessWidget {
                 title: itemBuilder(context, itemData)),
           );
         },
-        suggestionsCallback: suggestionsCallback);
+        suggestionsCallback: suggestionsCallback,
+        minCharsForSuggestions: 2,
+        autoFlipMinHeight: 10.sp,
+        displayAllSuggestionWhenTap: false);
   }
 }

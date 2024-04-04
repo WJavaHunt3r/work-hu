@@ -17,7 +17,7 @@ abstract class BasePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return PopScope(
         canPop: canPop,
-        onPopInvoked: (value) => popInvoked(context, value, ref),
+        onPopInvoked: (didPop) => popInvoked(context, didPop, ref),
         child: Scaffold(
             drawer: buildDrawer(context, ref),
             appBar: AppBar(
@@ -29,7 +29,7 @@ abstract class BasePage extends ConsumerWidget {
               automaticallyImplyLeading: automaticallyImplyLeading ?? true,
             ),
             floatingActionButton: createActionButton(context, ref),
-            resizeToAvoidBottomInset: true,
+            resizeToAvoidBottomInset: false,
             body: SizedBox.expand(
               child: Container(
                 padding: EdgeInsets.only(left: 8.sp, right: 8.sp, top: isListView ? 0 : 8.sp, bottom: 0.sp),
@@ -44,7 +44,7 @@ abstract class BasePage extends ConsumerWidget {
     return [];
   }
 
-  popInvoked(BuildContext context, bool value, WidgetRef ref) {}
+  popInvoked(BuildContext context, bool didPop, WidgetRef ref) {}
 
   Drawer? buildDrawer(BuildContext context, WidgetRef ref) {
     return null;

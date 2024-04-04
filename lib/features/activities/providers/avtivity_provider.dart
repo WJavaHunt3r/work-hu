@@ -83,6 +83,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
   }
 
   Future<void> registerActivity(num id) async {
+    state = state.copyWith(modelState: ModelState.processing);
     var user = currentUserProvider.state!;
     try {
       await activityRepository.registerActivity(id, user.id).then((data) async {
@@ -94,6 +95,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
   }
 
   Future<void> putActivity(ActivityModel activity) async {
+    state = state.copyWith(modelState: ModelState.processing);
     try {
       await activityRepository.putActivity(activity, activity.id!).then((data) async {
         getActivities();

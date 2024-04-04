@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:work_hu/app/style/app_colors.dart';
@@ -24,10 +25,13 @@ class StatusRow extends StatelessWidget {
     return ListTile(
         contentPadding: EdgeInsets.all(4.sp),
         horizontalTitleGap: 0.sp,
-        leading: Image(
-          image: AssetImage("assets/logos/WORK_${logoColor}_black_Vácduka.png"),
-          fit: BoxFit.contain,
-          height: 40.sp,
+        leading: SizedBox(
+          width: 35.sp,
+          child: SvgPicture.asset(
+            "assets/logos/${logoColor}_vacduka.svg",
+            height: 40.sp,
+            fit: BoxFit.contain,
+          ),
         ),
         title: Row(
           children: [

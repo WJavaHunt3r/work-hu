@@ -26,32 +26,29 @@ class ActivityItemsLayout extends BasePage {
     var items = ref.watch(activityItemsDataProvider).activityItems;
     var activity = items.isNotEmpty ? items.first.activity : null;
     return Stack(children: [
-      RefreshIndicator(
-        onRefresh: () async => ref.read(activityItemsDataProvider.notifier).getActivityItems(activityId: 0),
-        child: Column(children: [
-          activity == null
-              ? const SizedBox()
-              : ActivityDetailsPanel(activity, items.map((e) => e.hours).reduce((a, b) => a + b)),
-          Expanded(
-              child: BaseListView(
-            itemBuilder: (BuildContext context, int index) {
-              var current = items[index];
-              return current.activity?.registeredInApp ?? false || current.activity!.registeredInMyShare
-                  ? listItem(items, context, index, ref)
-                  : Dismissible(
-                      key: UniqueKey(),
-                      onDismissed: (direction) =>
-                          ref.read(activityItemsDataProvider.notifier).deleteActivityItem(current.id!, index),
-                      dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
-                      child: listItem(items, context, index, ref));
-            },
-            itemCount: ref.watch(activityItemsDataProvider).activityItems.length,
-            shadowColor: Colors.transparent,
-            cardBackgroundColor: Colors.transparent,
-            children: const [],
-          ))
-        ]),
-      ),
+      Column(children: [
+        activity == null
+            ? const SizedBox()
+            : ActivityDetailsPanel(activity, items.map((e) => e.hours).reduce((a, b) => a + b)),
+        Expanded(
+            child: BaseListView(
+          itemBuilder: (BuildContext context, int index) {
+            var current = items[index];
+            return current.activity?.registeredInApp ?? false || current.activity!.registeredInMyShare
+                ? listItem(items, context, index, ref)
+                : Dismissible(
+                    key: UniqueKey(),
+                    onDismissed: (direction) =>
+                        ref.read(activityItemsDataProvider.notifier).deleteActivityItem(current.id!, index),
+                    dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
+                    child: listItem(items, context, index, ref));
+          },
+          itemCount: ref.watch(activityItemsDataProvider).activityItems.length,
+          shadowColor: Colors.transparent,
+          cardBackgroundColor: Colors.transparent,
+          children: const [],
+        ))
+      ]),
       Positioned(
         bottom: 25.sp,
         left: 5.sp,

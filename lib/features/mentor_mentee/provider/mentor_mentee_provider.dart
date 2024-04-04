@@ -18,7 +18,8 @@ import 'package:work_hu/features/utils.dart';
 
 final mentorMenteeApiProvider = Provider<MentorMenteeApi>((ref) => MentorMenteeApi());
 
-final mentorMenteeRepoProvider = Provider<MentorMenteeRepository>((ref) => MentorMenteeRepository(ref.read(mentorMenteeApiProvider)));
+final mentorMenteeRepoProvider =
+    Provider<MentorMenteeRepository>((ref) => MentorMenteeRepository(ref.read(mentorMenteeApiProvider)));
 
 final mentorMenteeDataProvider = StateNotifierProvider.autoDispose<MentorMenteeDataNotifier, MentorMenteeState>((ref) =>
     MentorMenteeDataNotifier(ref.read(userRoundsRepoProvider), ref.read(goalRepoProvider), ref.read(usersRepoProvider),
@@ -96,8 +97,8 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
           users: data,
         );
       });
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.message);
+    } on DioException catch (e) {
+      state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
   }
 

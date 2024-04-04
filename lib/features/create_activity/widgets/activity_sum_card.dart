@@ -22,7 +22,7 @@ class ActivitySumCard extends ConsumerWidget {
     var sum = ref.watch(createActivityDataProvider).sum;
     return Card(
         child: Padding(
-      padding: EdgeInsets.all(8.sp),
+      padding: EdgeInsets.only(left:4.sp, right: 4.sp),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -41,15 +41,15 @@ class ActivitySumCard extends ConsumerWidget {
               Text("create_activity_sum"
                   .i18n([Utils.getTransactionTypeText(ref.watch(createActivityDataProvider).transactionType, false)])),
               Text(
-                "${sum % 1 == 0 ? sum.toStringAsFixed(0) : sum.toStringAsFixed(1)}",
+                sum % 1 == 0 ? sum.toStringAsFixed(0) : sum.toStringAsFixed(1),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(ref.watch(createActivityDataProvider).account == Account.MYSHARE &&
                       ref.watch(createActivityDataProvider).transactionType == TransactionType.HOURS
-                  ? " (${sum * 2000})Ft"
+                  ? " (${(sum * 2000).toInt()} Ft)"
                   : ref.watch(createActivityDataProvider).account == Account.MYSHARE &&
                           ref.watch(createActivityDataProvider).transactionType == TransactionType.DUKA_MUNKA
-                      ? " (${sum * 1000})Ft"
+                      ? " (${(sum * 1000).toInt()} Ft)"
                       : "")
             ],
           ),

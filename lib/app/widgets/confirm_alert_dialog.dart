@@ -30,12 +30,12 @@ class ConfirmAlertDialog extends StatelessWidget {
         actions: [
           TextButton(
               style: ButtonStyle(
-                side: MaterialStateBorderSide.resolveWith(
+                side: WidgetStateBorderSide.resolveWith(
                   (states) => BorderSide(color: AppColors.primary, width: 2.sp),
                 ),
-                backgroundColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
-                foregroundColor: MaterialStateColor.resolveWith((states) => AppColors.white),
-                overlayColor: MaterialStateColor.resolveWith((states) => AppColors.primary),
+                backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
+                foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
+                overlayColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
               ),
               onPressed: () => context.pop(),
               child: Text(
@@ -44,8 +44,8 @@ class ConfirmAlertDialog extends StatelessWidget {
               )),
           TextButton(
               style: ButtonStyle(
-                backgroundColor: MaterialStateColor.resolveWith((states) => AppColors.primary),
-                foregroundColor: MaterialStateColor.resolveWith((states) => AppColors.white),
+                backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
+                foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
               ),
               onPressed: onConfirm,
               child: Text(

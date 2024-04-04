@@ -18,10 +18,13 @@ class CollapsableDetailsLayout extends ConsumerWidget {
               canTapOnHeader: true,
               isExpanded: ref.watch(createActivityDataProvider).isCollapsed,
               headerBuilder: (context, isOpen) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [Text("create_activity_activity_details".i18n(), style: TextStyle(fontSize: 15.sp))],
+                return Padding(
+                  padding: const EdgeInsets.all(0.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [Text("create_activity_activity_details".i18n(), style: TextStyle(fontSize: 15.sp))],
+                  ),
                 );
               },
               body: const Column(

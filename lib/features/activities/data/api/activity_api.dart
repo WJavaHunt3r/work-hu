@@ -44,8 +44,7 @@ class ActivityApi {
 
   Future<dynamic> registerActivity(num activityId, num userId) async {
     try {
-      final res = await _dioClient.dio
-          .post("/register", queryParameters: {"activityId": activityId, "userId": userId});
+      final res = await _dioClient.dio.post("/register", queryParameters: {"activityId": activityId, "userId": userId});
       return res.data;
     } catch (e) {
       rethrow;
@@ -54,8 +53,8 @@ class ActivityApi {
 
   Future<dynamic> registerActivityInTeams(num activityId, num userId) async {
     try {
-      final res = await _dioClient.dio
-          .post("/registerInTeams", queryParameters: {"activityId": activityId, "userId": userId});
+      final res =
+          await _dioClient.dio.post("/registerInTeams", queryParameters: {"activityId": activityId, "userId": userId});
       return res.data;
     } catch (e) {
       rethrow;
@@ -73,7 +72,8 @@ class ActivityApi {
 
   Future<dynamic> putActivity(ActivityModel activity, num activityId) async {
     try {
-      final res = await _dioClient.dio.put("/activity", queryParameters: {"activityId": activityId}, data: activity);
+      final res =
+          await _dioClient.dio.put("/activity", queryParameters: {"activityId": activityId}, data: activity.toJson());
       return res.data;
     } catch (e) {
       rethrow;

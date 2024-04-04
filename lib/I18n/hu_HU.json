@@ -1,4 +1,10 @@
 {
+  "base_text_points": "Pont",
+  "base_text_points_short": "p",
+  "base_text_hours": "Óra",
+  "base_text_hours_short": "ó",
+  "base_text_credits": "Kredit",
+  "base_text_credits_short": "Ft",
   "cancel": "Mégsem",
   "confirm": "Megerősít",
   "exit": "Kilépés",
@@ -52,6 +58,7 @@
   "create_confirm_activity_send_question": "Biztosan elküldöd a munkalapot?",
   "create_activity_count": "Elem: ",
   "create_activity_activity_details": "Munka részletei",
+  "create_activity_description_error" : "Hiányzó munka leírás!",
   "home_server_error": "Szerver nem elérhető",
   "round_number": "%s. Kör",
   "total": "Teljes",
@@ -90,5 +97,6 @@
   "user_details_role": "Szerepkör",
   "user_details_reset_password": "Jelszó visszaállítás",
   "user_details_email": "Email",
-  "user_details_phone_number": "Telefonszám"
+  "user_details_phone_number": "Telefonszám",
+  "transactions_round": "Kör"
 }

@@ -86,8 +86,8 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
           users: data,
         );
       });
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.message);
+    } on DioException catch (e) {
+      state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
   }
 
@@ -124,8 +124,8 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
           state = state.copyWith(modelState: ModelState.success, creationState: ModelState.success);
         });
       });
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.message);
+    } on DioException catch (e) {
+      state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
   }
 

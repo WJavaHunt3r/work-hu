@@ -20,7 +20,7 @@ class RoundDataNotifier extends StateNotifier<RoundsState> {
 
   final RoundRepository roundRepository;
 
-  Future<void> getRounds(num? seasonYear) async {
+  Future<void> getRounds([num? seasonYear]) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
       await roundRepository.getRounds(seasonYear).then((data) async {

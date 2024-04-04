@@ -17,8 +17,8 @@ class AddRegistrationCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var isError = ref.watch(createActivityDataProvider).modelState == ModelState.error;
     return InfoCard(
-        padding: 8.sp,
-        height: isError ? 150.sp : 120.sp,
+        padding: 4.sp,
+        height: isError ? 150.sp : 110.sp,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -40,7 +40,7 @@ class AddRegistrationCard extends ConsumerWidget {
                     width: 150.sp,
                     child: TextField(
                       controller: ref.read(createActivityDataProvider.notifier).hoursController,
-                      keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       focusNode: ref.read(createActivityDataProvider.notifier).valueFocusNode,
                       textInputAction: TextInputAction.go,
                       onSubmitted: ref.watch(createActivityDataProvider).selectedUser != null &&
@@ -55,16 +55,16 @@ class AddRegistrationCard extends ConsumerWidget {
                         ? () => ref.read(createActivityDataProvider.notifier).addRegistration()
                         : null,
                     style: ButtonStyle(
-                      side: MaterialStateBorderSide.resolveWith(
+                      side: WidgetStateBorderSide.resolveWith(
                         (states) {
-                          if (states.contains(MaterialState.disabled)) {
+                          if (states.contains(WidgetState.disabled)) {
                             return BorderSide(color: Colors.grey.shade300, width: 2.sp);
                           }
                           return BorderSide(color: AppColors.primary, width: 2.sp);
                         },
                       ),
-                      backgroundColor: MaterialStateColor.resolveWith((states) {
-                        if (states.contains(MaterialState.disabled)) {
+                      backgroundColor: WidgetStateColor.resolveWith((states) {
+                        if (states.contains(WidgetState.disabled)) {
                           return Colors.grey.shade300;
                         }
                         return AppColors.primary;

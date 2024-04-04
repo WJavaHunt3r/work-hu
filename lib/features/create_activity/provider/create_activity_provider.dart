@@ -63,6 +63,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
   final ActivityItemsRepository activityItemsRepository;
   late final FocusNode valueFocusNode;
   late final FocusScopeNode usersFocusNode;
+  final ScrollController scrollController = ScrollController();
 
   Future<void> getUsers({bool? listO36}) async {
     var user = currentUserProvider.state;
@@ -79,8 +80,8 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
         updateEmployer(
             state.users.firstWhere((element) => element.myShareID == 0, orElse: () => currentUserProvider.state!));
       });
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, errorMessage: e.message);
+    } on DioException catch (e) {
+      state = state.copyWith(modelState: ModelState.error, errorMessage: e.response?.data);
     }
   }
 
@@ -99,17 +100,18 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
   }
 
   addRegistration({String? description}) {
+    var hours = hoursController.value.text.replaceAll(",", ".");
     var registration = ActivityItemsModel(
       description: description ?? state.description,
       user: state.selectedUser!,
       round: roundDataNotifier.state.rounds.where((element) => element.season.seasonYear == DateTime.now().year).first,
       transactionType: state.transactionType,
       account: state.account,
-      hours: double.tryParse(hoursController.value.text) ?? 0,
+      hours: double.tryParse(hours) ?? 0,
       createUser: currentUserProvider.state!,
     );
 
-    var text = hoursController.value.text;
+    var text = hours;
     var sum = state.sum + num.parse(text.isNotEmpty ? text : "0");
 
     var items = <ActivityItemsModel>[];
@@ -236,8 +238,8 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
           state = state.copyWith(creationState: ModelState.success, modelState: ModelState.success, errorMessage: data);
         });
       });
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, errorMessage: e.message);
+    } on DioException catch (e) {
+      state = state.copyWith(modelState: ModelState.error, errorMessage: e.toString());
     }
   }
 

@@ -31,7 +31,7 @@ class ActivityListItem extends ConsumerWidget {
         child: ListTile(
           onTap: () {
             context
-                .push("/activityItems", extra: current.id)
+                .push("/activity/${current.id}")
                 .then((value) => ref.watch(activityDataProvider.notifier).getActivities());
           },
           title: Text(
@@ -73,9 +73,9 @@ class ActivityListItem extends ConsumerWidget {
                               content: Text("activities_confirm_register_in_myshare_question".i18n()))),
                     )
                   : user.id == 255 &&
-                              current.registeredInMyShare &&
-                              current.registeredInApp &&
-                              !current.registeredInTeams
+                          current.registeredInMyShare &&
+                          current.registeredInApp &&
+                          !current.registeredInTeams
                       ? IconButton(
                           icon: Icon(
                             Icons.group,

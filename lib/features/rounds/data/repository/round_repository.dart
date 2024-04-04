@@ -8,7 +8,7 @@ class RoundRepository {
 
   RoundRepository(this._roundApi);
 
-  Future<List<RoundModel>> getRounds(num? seasonYear) async {
+  Future<List<RoundModel>> getRounds([num? seasonYear]) async {
     try {
       final res = await _roundApi.getRounds(seasonYear);
       return res.map((e) => RoundModel.fromJson(e)).toList();

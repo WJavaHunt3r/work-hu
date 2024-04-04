@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:localization/localization.dart';
 import 'package:pointycastle/api.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
@@ -73,11 +74,11 @@ class Utils {
 
   static String getTransactionTypeText(TransactionType transactionType, [bool long = true]) {
     if (transactionType == TransactionType.POINT) {
-      return long ? "Points" : "p";
-    } else if (transactionType == TransactionType.HOURS) {
-      return long ? "Hours" : "h";
+      return long ? "base_text_points".i18n() : "base_text_points_short".i18n();
+    } else if (transactionType == TransactionType.HOURS || transactionType == TransactionType.DUKA_MUNKA) {
+      return long ? "base_text_hours".i18n() : "base_text_hours_short".i18n();
     } else if (transactionType == TransactionType.CREDIT) {
-      return long ? "Credits" : "Ft";
+      return long ? "base_text_credits".i18n() : "base_text_credits_short".i18n();
     }
     return "";
   }

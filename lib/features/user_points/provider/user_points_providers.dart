@@ -51,8 +51,8 @@ class UserPointsDataNotifier extends StateNotifier<UserPointsState> {
         state = state.copyWith(
             activityItems: activityItems, transactionItems: transactionItems, modelState: ModelState.success);
       });
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.message);
+    } on DioException catch (e) {
+      state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
   }
 }

@@ -28,7 +28,7 @@ class BaseListView extends StatelessWidget {
               margin: EdgeInsets.symmetric(vertical: 8.sp),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
               child: ListView.builder(
-                  padding: const EdgeInsets.all(0),
+                  padding: EdgeInsets.all(0.sp),
                   itemCount: itemCount,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

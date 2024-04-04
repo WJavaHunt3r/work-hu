@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
+import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
+import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
 import 'package:work_hu/features/transactions/providers/transactions_provider.dart';
@@ -22,6 +25,26 @@ class TransactionsLayout extends ConsumerWidget {
       RefreshIndicator(
         onRefresh: () async => ref.read(transactionsDataProvider.notifier).getTransactions(),
         child: Column(children: [
+          Padding(
+            padding: EdgeInsets.only(top: 4.sp, bottom: 4.sp),
+            child: DropdownButtonFormField<RoundModel>(
+                decoration: InputDecoration(labelText: "transactions_round".i18n()),
+                value: ref.watch(transactionsDataProvider).rounds.isEmpty
+                    ? null
+                    : ref
+                        .watch(transactionsDataProvider)
+                        .rounds
+                        .firstWhere((r) => r.id == ref.watch(transactionsDataProvider).selectedRoundId),
+                items: ref
+                    .watch(transactionsDataProvider)
+                    .rounds
+                    .map((e) => DropdownMenuItem<RoundModel>(
+                          value: e,
+                          child: Text("${e.season.seasonYear.toString()}/${e.roundNumber}"),
+                        ))
+                    .toList(),
+                onChanged: (value) => ref.watch(transactionsDataProvider.notifier).setSelectedRound(value?.id ?? 0)),
+          ),
           Expanded(
               child: BaseListView(
             itemBuilder: (BuildContext context, int index) {
@@ -30,8 +53,17 @@ class TransactionsLayout extends ConsumerWidget {
               var dateString = Utils.dateToString(date!);
               return Dismissible(
                   key: UniqueKey(),
-                  onDismissed: (direction) =>
-                      ref.read(transactionsDataProvider.notifier).deleteTransaction(current.id!, index),
+                  onDismissed: (direction) => showDialog(
+                          context: context,
+                          builder: (buildContext) {
+                            return ConfirmAlertDialog(
+                              onConfirm: () => buildContext.pop(true),
+                              title: "exit".i18n(),
+                              content: Text("create_activity_exit_warning".i18n()),
+                            );
+                          })
+                      .then((confirmed) =>
+                          ref.read(transactionsDataProvider.notifier).deleteTransaction(current.id!, index)),
                   dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
                   child: ListCard(
                       isLast: transactions.length - 1 == index,

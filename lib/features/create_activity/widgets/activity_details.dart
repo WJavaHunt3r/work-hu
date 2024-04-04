@@ -58,16 +58,23 @@ class ActivityDetails extends ConsumerWidget {
               Text("create_activity_employer".i18n()),
             ],
           ),
-          WorkDropDownSearchFormField<UserModel>(
-            enabled: ref.watch(createActivityDataProvider).account == Account.MYSHARE,
-            onTap: () => ref.watch(createActivityDataProvider.notifier).employerController.selection = TextSelection(
-                baseOffset: 0,
-                extentOffset: ref.watch(createActivityDataProvider.notifier).employerController.value.text.length),
-            onSuggestionSelected: (UserModel suggestion) =>
-                ref.read(createActivityDataProvider.notifier).updateEmployer(suggestion),
-            itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
-            suggestionsCallback: (String pattern) => ref.read(createActivityDataProvider.notifier).filterUsers(pattern),
-            controller: ref.watch(createActivityDataProvider.notifier).employerController,
+          SizedBox(
+            child: WorkDropDownSearchFormField<UserModel>(
+              direction: AxisDirection.down,
+              enabled: ref.watch(createActivityDataProvider).account == Account.MYSHARE,
+              onTap: () {
+                ref.watch(createActivityDataProvider.notifier).employerController.selection = TextSelection(
+                    baseOffset: 0,
+                    extentOffset: ref.watch(createActivityDataProvider.notifier).employerController.value.text.length);
+              },
+              onSuggestionSelected: (UserModel suggestion) {
+                ref.read(createActivityDataProvider.notifier).updateEmployer(suggestion);
+              },
+              itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
+              suggestionsCallback: (String pattern) =>
+                  ref.read(createActivityDataProvider.notifier).filterUsers(pattern),
+              controller: ref.watch(createActivityDataProvider.notifier).employerController,
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -76,6 +83,7 @@ class ActivityDetails extends ConsumerWidget {
             ],
           ),
           WorkDropDownSearchFormField<UserModel>(
+            direction: AxisDirection.up,
             onSuggestionSelected: (UserModel suggestion) =>
                 ref.read(createActivityDataProvider.notifier).updateResponsible(suggestion),
             itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
@@ -84,7 +92,18 @@ class ActivityDetails extends ConsumerWidget {
             onTap: () => ref.watch(createActivityDataProvider.notifier).responsibleController.selection = TextSelection(
                 baseOffset: 0,
                 extentOffset: ref.watch(createActivityDataProvider.notifier).responsibleController.value.text.length),
-          )
+          ),
+          ref.watch(createActivityDataProvider).description.isEmpty
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "create_activity_description_error".i18n(),
+                      style: const TextStyle(color: AppColors.errorRed),
+                    ),
+                  ],
+                )
+              : SizedBox(),
         ],
       ),
     );
