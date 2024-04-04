@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 
@@ -20,8 +19,10 @@ class UserModel with _$UserModel {
       required num baseMyShareCredit,
       required num currentMyShareCredit,
       required bool changedPassword,
-      required num? familyId,
-      required num? spouseId}) = _UserModel;
+      num? familyId,
+      num? spouseId,
+      num? phoneNumber,
+      String? email}) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 

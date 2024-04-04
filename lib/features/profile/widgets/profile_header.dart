@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
 
@@ -18,10 +19,10 @@ class ProfileHeader extends ConsumerWidget {
                 Icons.person_outline,
                 size: 100.sp,
               )
-            : Image(
-                image: AssetImage("assets/logos/WORK_${user.team!.color}_black_Vácduka.png"),
-                fit: BoxFit.contain,
+            : SvgPicture.asset(
+                "assets/logos/${user.team!.color}_vacduka.svg",
                 height: 120.sp,
+                fit: BoxFit.contain,
               ),
         Padding(
             padding: EdgeInsets.symmetric(vertical: 12.sp),

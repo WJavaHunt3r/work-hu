@@ -16,7 +16,7 @@ abstract class CreateActivityState with _$CreateActivityState {
       UserModel? employer,
       DateTime? activityDate,
       @Default(TransactionType.POINT) TransactionType transactionType,
-      @Default(Account.OTHER) Account account,
+      @Default(Account.MYSHARE) Account account,
       @Default("") String description,
       @Default(0) num sum,
       UserModel? selectedUser,

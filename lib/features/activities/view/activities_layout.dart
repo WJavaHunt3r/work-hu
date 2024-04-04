@@ -6,6 +6,7 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
+import 'package:work_hu/app/widgets/error_alert_dialog.dart';
 import 'package:work_hu/app/widgets/success_alert_dialog.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 import 'package:work_hu/features/activities/providers/avtivity_provider.dart';
@@ -25,7 +26,13 @@ class ActivitiesLayout extends ConsumerWidget {
             builder: (context) {
               return SuccessAlertDialog(title: ref.read(activityDataProvider).message);
             }).then((value) => ref.watch(activityDataProvider.notifier).getActivities())
-        : null);
+        : ref.read(activityDataProvider).modelState == ModelState.error
+            ? showDialog(
+                context: context,
+                builder: (context) {
+                  return ErrorAlertDialog(title: "error".i18n(), content: Text(ref.read(activityDataProvider).message));
+                })
+            : null);
     var activities = ref.watch(activityDataProvider).activities;
     return Stack(children: [
       RefreshIndicator(
@@ -33,36 +40,18 @@ class ActivitiesLayout extends ConsumerWidget {
         child: DefaultTabController(
             length: 2,
             initialIndex: 0,
-            child: Column(
-              children: [
-                BaseTabBar(
-                  tabs: createTabs(),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 8.sp),
-                    child: TabBarView(clipBehavior: Clip.antiAlias, children: createTabView(activities, ref)),
-                  ),
-                ),
-              ],
+            child: BaseTabView(
+              tabs: createTabs(),
+              tabViews: createTabView(activities, ref),
             )),
       ),
-      ref.watch(activityDataProvider).modelState == ModelState.error
-          ? Center(
-              child: Text(
-                ref.watch(activityDataProvider).message,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.errorRed),
-              ),
-            )
-          : const SizedBox(),
       ref.watch(activityDataProvider).modelState == ModelState.processing
           ? const Center(child: CircularProgressIndicator())
           : const SizedBox()
     ]);
   }
 
-  List<Widget> createTabs() {
+  List<Tab> createTabs() {
     var list = <Tab>[];
     list.add(Tab(
         child: Row(
@@ -84,8 +73,9 @@ class ActivitiesLayout extends ConsumerWidget {
   List<Widget> createTabView(List<ActivityModel> items, WidgetRef ref) {
     var list = <Widget>[];
 
-    List<ActivityModel> currentItems =
-        items.where((element) => !element.registeredInApp && !element.registeredInMyShare).toList();
+    List<ActivityModel> currentItems = items
+        .where((element) => !element.registeredInApp && !element.registeredInMyShare && !element.registeredInTeams)
+        .toList();
     list.add(BaseListView(
         cardBackgroundColor: Colors.transparent,
         itemBuilder: (BuildContext context, int index) {

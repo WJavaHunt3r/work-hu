@@ -27,9 +27,9 @@ class TransactionApi {
     }
   }
 
-  Future<List<dynamic>> getTransactions() async {
+  Future<List<dynamic>> getTransactions([num? roundId]) async {
     try {
-      final res = await _dioClient.dio.get("/transactions");
+      final res = await _dioClient.dio.get("/transactions", queryParameters: {"roundId": roundId});
       return res.data;
     } catch (e) {
       rethrow;

@@ -5,7 +5,7 @@ import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/features/user_points/view/user_points_layout.dart';
 
 class UserPointsPage extends BasePage {
-  const UserPointsPage({super.key, super.title = "My Points"});
+  const UserPointsPage({super.key, super.title = "user_points_title"});
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/error_alert_dialog.dart';
@@ -17,7 +18,7 @@ class CreateBMMTransactionLayout extends ConsumerWidget {
         ? showDialog(
             context: context,
             builder: (context) {
-              return const SuccessAlertDialog(title: "BMM points successfully submitted");
+              return SuccessAlertDialog(title: "create_bmm_transaction_success_message".i18n());
             })
         : null);
     return Stack(children: [
@@ -33,23 +34,26 @@ class CreateBMMTransactionLayout extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                  child: TextButton(
-                      onPressed: () => ref.watch(createTransactionsDataProvider.notifier).isEmpty()
-                          ? showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return const ErrorAlertDialog(title: "Select at least one person!");
-                              })
-                          : ref.read(createTransactionsDataProvider.notifier).sendTransactions(),
-                      style: ButtonStyle(
-                        side: MaterialStateBorderSide.resolveWith(
-                          (states) => BorderSide(color: AppColors.primary, width: 2.sp),
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 8.sp, top: 4.sp),
+                    child: TextButton(
+                        onPressed: () => ref.watch(createTransactionsDataProvider.notifier).isEmpty()
+                            ? showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return ErrorAlertDialog(title: "create_bmm_transaction_error_message".i18n());
+                                })
+                            : ref.read(createTransactionsDataProvider.notifier).sendTransactions(),
+                        style: ButtonStyle(
+                          side: MaterialStateBorderSide.resolveWith(
+                            (states) => BorderSide(color: AppColors.primary, width: 2.sp),
+                          ),
+                          backgroundColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
                         ),
-                        backgroundColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
-                      ),
-                      child:
-                          const Text("Send", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800))))
+                        child: Text("create_bmm_transaction_send".i18n(),
+                            style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800))),
+                  ))
             ],
           )
         ],

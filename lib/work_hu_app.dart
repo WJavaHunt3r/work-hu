@@ -23,40 +23,34 @@ class WorkHuApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FlutterWebFrame(
-      builder: (context) {
-        return ScreenUtilInit(
-            designSize: const Size(360, 690),
-            minTextAdapt: true,
-            ensureScreenSize: true,
-            useInheritedMediaQuery: true,
-            splitScreenMode: false,
-            builder: (context, child) {
-              final theme = GlobalTheme();
-              final router = ref.watch(routerProvider);
-              LocalJsonLocalization.delegate.directories = ['lib/I18n'];
-              return MaterialApp.router(
-                scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
-                debugShowCheckedModeBanner: false,
-                title: 'WORK HU',
-                theme: theme.globalTheme,
-                routerConfig: router,
-                supportedLocales: const [
-                  Locale('en', 'US'),
-                  Locale('hu', 'HU'),
-                ],
-                locale: Locale('hu', 'HU'),
-                localizationsDelegates: [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                  LocalJsonLocalization.delegate,
-                ],
-              );
-            });
-      },
-      maximumSize: const Size(475.0, 812.0),
-    );
+    return ScreenUtilInit(
+        designSize: const Size(360, 690),
+        minTextAdapt: true,
+        ensureScreenSize: true,
+        splitScreenMode: false,
+        builder: (context, child) {
+          final theme = GlobalTheme();
+          final router = ref.watch(routerProvider);
+          LocalJsonLocalization.delegate.directories = ['lib/I18n'];
+          return MaterialApp.router(
+            scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
+            debugShowCheckedModeBanner: false,
+            title: 'WORK HU',
+            theme: theme.globalTheme,
+            routerConfig: router,
+            supportedLocales: const [
+              Locale('en', 'US'),
+              Locale('hu', 'HU'),
+            ],
+            locale: Locale('hu', 'HU'),
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              LocalJsonLocalization.delegate,
+            ],
+          );
+        });
   }
 }
 
@@ -103,10 +97,9 @@ final routerProvider = Provider<GoRouter>((ref) => GoRouter(
           },
         ),
         GoRoute(
-          path: '/activityItems',
+          path: '/activity/:id',
           builder: (BuildContext context, GoRouterState state) {
-            var map = state.extra as num;
-            return ActivityItemsLayout(activityId: map);
+            return ActivityItemsLayout(activityId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
           },
         )
       ],

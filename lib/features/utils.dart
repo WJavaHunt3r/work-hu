@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:localization/localization.dart';
 import 'package:pointycastle/api.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
@@ -73,11 +74,11 @@ class Utils {
 
   static String getTransactionTypeText(TransactionType transactionType, [bool long = true]) {
     if (transactionType == TransactionType.POINT) {
-      return long ? "Points" : "p";
-    } else if (transactionType == TransactionType.HOURS) {
-      return long ? "Hours" : "h";
+      return long ? "base_text_points".i18n() : "base_text_points_short".i18n();
+    } else if (transactionType == TransactionType.HOURS || transactionType == TransactionType.DUKA_MUNKA) {
+      return long ? "base_text_hours".i18n() : "base_text_hours_short".i18n();
     } else if (transactionType == TransactionType.CREDIT) {
-      return long ? "Credits" : "Ft";
+      return long ? "base_text_credits".i18n() : "base_text_credits_short".i18n();
     }
     return "";
   }
@@ -91,6 +92,10 @@ class Utils {
 
   static String dateToString(DateTime date) {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day}";
+  }
+
+  static String dateToStringWithTime(DateTime date) {
+    return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day} ${date.hour < 10 ? "0${date.hour}" : date.hour}:${date.minute < 10 ? "0${date.minute}" : date.minute}";
   }
 
   static RoundModel createEmptyRound() {
@@ -107,7 +112,8 @@ class Utils {
           seasonYear: DateTime.now().year,
           startDate: DateTime.now(),
           endDate: DateTime.now(),
-        ));
+        ),
+        freezeDateTime: DateTime.now());
   }
 
   static String changeSpecChars(String text) {
@@ -134,7 +140,28 @@ class Utils {
     };
   }
 
+  static String createFileName(ActivityModel activity) {
+    return "${dateToString(activity.activityDateTime).replaceAll("-", "")}_${changeSpecChars(activity.description)}";
+  }
+
   static void createActivityXlsx(List<ActivityItemsModel> items, ActivityModel activity) async {
+    var excel = await buildActivityXlsx(items, activity);
+    if (kIsWeb) {
+      excel.save(fileName: "${createFileName(activity)}.xlsx");
+    } else {
+      var newBytes = excel.save();
+      if (newBytes != null) {
+        await FileSaver.instance.saveAs(
+          name: createFileName(activity),
+          bytes: Uint8List.fromList(newBytes),
+          ext: 'xlsx',
+          mimeType: MimeType.microsoftExcel,
+        );
+      }
+    }
+  }
+
+  static Future<Excel> buildActivityXlsx(List<ActivityItemsModel> items, ActivityModel activity) async {
     ByteData data = await rootBundle.load('assets/docs/munkalap_sablon_uj.xlsx');
     var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     var excel = Excel.decodeBytes(bytes);
@@ -174,9 +201,11 @@ class Utils {
     sumHoursCell.value = DoubleCellValue(sumHours);
 
     var sumCreditsCell = sheetObject.cell(CellIndex.indexByString('F4'));
-    var sumCredits = activity.account == Account.OTHER
-        ? 0
-        : items.map((e) => (e.hours * 2000).toInt()).reduce((value, element) => value + element);
+    var sumCredits = activity.account == Account.MYSHARE && activity.transactionType == TransactionType.DUKA_MUNKA
+        ? items.map((e) => (e.hours * 1000).toInt()).reduce((value, element) => value + element)
+        : activity.account == Account.OTHER && activity.transactionType == TransactionType.POINT
+            ? 0
+            : items.map((e) => (e.hours * 2000).toInt()).reduce((value, element) => value + element);
     sumCreditsCell.value = null;
     sumCreditsCell.value = IntCellValue(sumCredits);
 
@@ -204,23 +233,14 @@ class Utils {
 
       var creditCell = sheetObject.cell(CellIndex.indexByString('F${5 + items.indexOf(item) + 1}'));
       creditCell.value = null;
-      creditCell.value =
-          activity.account == Account.OTHER ? const TextCellValue("") : DoubleCellValue(item.hours * 2000);
+      creditCell.value = activity.account == Account.MYSHARE && activity.transactionType == TransactionType.DUKA_MUNKA
+          ? DoubleCellValue(item.hours * 1000)
+          : activity.account == Account.MYSHARE && activity.transactionType == TransactionType.HOURS
+              ? DoubleCellValue(item.hours * 2000)
+              : const TextCellValue("");
     }
 
-    if (kIsWeb) {
-      excel.save(fileName: "${dateToString(date).replaceAll("-", "")}_${changeSpecChars(activity.description)}.xlsx");
-    } else {
-      var newBytes = excel.save();
-      if (newBytes != null) {
-        await FileSaver.instance.saveAs(
-          name: "${dateToString(date).replaceAll("-", "")}_${changeSpecChars(activity.description)}",
-          bytes: Uint8List.fromList(newBytes),
-          ext: 'xlsx',
-          mimeType: MimeType.microsoftExcel,
-        );
-      }
-    }
+    return excel;
   }
 
   static Future<void> createCreditCsv(List<TransactionItemModel> items, DateTime date, String description) async {

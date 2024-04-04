@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
@@ -9,10 +10,13 @@ import 'package:work_hu/features/goal/data/api/goal_api.dart';
 import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/goal/data/repository/goal_repository.dart';
 import 'package:work_hu/features/goal/data/state/goal_state.dart';
+import 'package:work_hu/features/goal/widgets/goals_maintenance.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/season/data/repository/season_repository.dart';
 import 'package:work_hu/features/season/provider/season_provider.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
+import 'package:work_hu/features/utils.dart';
 
 final goalApiProvider = Provider<GoalApi>((ref) => GoalApi());
 
@@ -32,18 +36,22 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
     this.currentUserProvider,
   ) : super(const GoalState()) {
     getGoals(DateTime.now().year);
+
+    userController = TextEditingController(text: "");
   }
 
   final GoalRepository goalRepository;
   final UsersRepository usersRepository;
   final SeasonRepository seasonRepository;
   final UserDataNotifier currentUserProvider;
+  late final TextEditingController userController;
 
   Future<void> getGoals(num? seasonYear) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await goalRepository.getGoals(seasonYear).then((data) async {
-        state = state.copyWith(goals: data, modelState: ModelState.success);
+      await goalRepository.getGoals(seasonYear ?? DateTime.now().year).then((data) async {
+        data.sort((a, b) => (a.user!.getFullName()).compareTo(b.user!.getFullName()));
+        state = state.copyWith(goals: data, filtered: data, modelState: ModelState.success);
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
@@ -61,6 +69,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
   }
 
   Future<void> uploadGoalsCsv() async {
+    state = state.copyWith(modelState: ModelState.processing);
     try {
       FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -80,7 +89,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
           if (rowNb != 0) {
             var field = row[0].split(";");
             var user = await usersRepository.getUserByMyShareId(num.tryParse(field[0]) ?? 0);
-            if (!state.goals.any((element) => element.user.id == user.id)) {
+            if (!state.goals.any((element) => element.user!.id == user.id)) {
               var goal = num.tryParse(field[6]) ?? 0;
               var status = num.tryParse(field[5]) ?? 0;
               GoalModel goalModel = GoalModel(
@@ -96,6 +105,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
           rowNb++;
         }
       }
+      state = state.copyWith(modelState: ModelState.success);
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: "Not supported: ${e.toString()}");
     }
@@ -117,5 +127,66 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error, goals: origItems);
     }
+  }
+
+  Future<void> updateGoal(GoalModel goal) async {
+    userController.text = "${goal.user?.getFullName()} (${goal.user?.getAge()}) ";
+    state = state.copyWith(selectedGoal: goal);
+  }
+
+  Future<void> saveGoal(String mode) async {
+    state = state.copyWith(modelState: ModelState.processing);
+    var goal = state.selectedGoal;
+    try {
+      if (goal.season != null && goal.user != null && goal.goal != 0) {
+        if (mode == GoalsMaintenance.CREATE) {
+          await goalRepository.postGoal(state.selectedGoal);
+        } else if (mode == GoalsMaintenance.EDIT) {
+          await goalRepository.putGoal(state.selectedGoal, currentUserProvider.state!.id);
+        }
+        state = state.copyWith(selectedGoal: const GoalModel(goal: 0));
+      }
+    } catch (e) {
+      state = state.copyWith(modelState: ModelState.error, message: e.toString());
+    }
+  }
+
+  Future<void> setSelectedGoal(GoalModel goal) async {
+    if (goal.season == null) {
+      await seasonRepository
+          .getSeasons()
+          .then((value) => goal = goal.copyWith(season: value.firstWhere((s) => s.seasonYear == DateTime.now().year)));
+      userController.text = "";
+    } else {
+      userController.text = "${goal.user?.getFullName()} (${goal.user?.getAge()})";
+    }
+    state = state.copyWith(selectedGoal: goal);
+  }
+
+  Future<List<UserModel>> filterUsers(String filter) async {
+    var users = await usersRepository.getUsers(null, true);
+    var filtered = users
+        .where((u) =>
+            Utils.changeSpecChars(u.firstname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
+            Utils.changeSpecChars(u.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
+            Utils.changeSpecChars("${u.lastname.toLowerCase()} ${u.firstname.toLowerCase()}")
+                .startsWith(Utils.changeSpecChars(filter.toLowerCase())))
+        .toList();
+    filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
+    return filtered;
+  }
+
+  Future<void> filterGoals(String filter) async {
+    var goals = state.goals;
+    state = state.copyWith(
+        filtered: goals
+            .where((goal) =>
+                Utils.changeSpecChars(goal.user!.firstname.toLowerCase())
+                    .startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
+                Utils.changeSpecChars(goal.user!.lastname.toLowerCase())
+                    .startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
+                Utils.changeSpecChars("${goal.user!.lastname.toLowerCase()} ${goal.user!.firstname.toLowerCase()}")
+                    .startsWith(Utils.changeSpecChars(filter.toLowerCase())))
+            .toList());
   }
 }

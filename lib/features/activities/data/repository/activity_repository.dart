@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:excel/excel.dart';
 import 'package:work_hu/features/activities/data/api/activity_api.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 
@@ -65,6 +66,15 @@ class ActivityRepository {
   Future<String> deleteActivity(num activityId, userId) async {
     try {
       final res = await _activityApi.deleteActivity(activityId, userId);
+      return res;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> registerActivityInTeams(num activityId, num userId) async {
+    try {
+      final res = await _activityApi.registerActivityInTeams(activityId, userId);
       return res;
     } catch (e) {
       rethrow;

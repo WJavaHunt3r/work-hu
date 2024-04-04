@@ -19,20 +19,22 @@ class ErrorAlertDialog extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.errorRed, fontWeight: FontWeight.bold),
             ),
-            content: content ??
-                TextButton(
-                    style: ButtonStyle(
-                      side: MaterialStateBorderSide.resolveWith(
-                        (states) => BorderSide(color: AppColors.errorRed, width: 2.sp),
-                      ),
-                      backgroundColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
-                      foregroundColor: MaterialStateColor.resolveWith((states) => AppColors.white),
-                      overlayColor: MaterialStateColor.resolveWith((states) => AppColors.errorRed),
+            actions: [
+              TextButton(
+                  style: ButtonStyle(
+                    side: MaterialStateBorderSide.resolveWith(
+                      (states) => BorderSide(color: AppColors.errorRed, width: 2.sp),
                     ),
-                    onPressed: () => context.pop(),
-                    child: const Text(
-                      "OK",
-                      style: TextStyle(color: AppColors.errorRed, fontWeight: FontWeight.bold),
-                    ))));
+                    backgroundColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
+                    foregroundColor: MaterialStateColor.resolveWith((states) => AppColors.white),
+                    overlayColor: MaterialStateColor.resolveWith((states) => AppColors.errorRed),
+                  ),
+                  onPressed: () => context.pop(),
+                  child: const Text(
+                    "OK",
+                    style: TextStyle(color: AppColors.errorRed, fontWeight: FontWeight.bold),
+                  ))
+            ],
+            content: content));
   }
 }

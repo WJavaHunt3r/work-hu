@@ -14,4 +14,13 @@ class TeamApi {
       rethrow;
     }
   }
+
+  Future<List<dynamic>> getTeams() async {
+    try {
+      final res = await _dioClient.dio.get("/teams");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

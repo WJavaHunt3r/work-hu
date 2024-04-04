@@ -88,3 +88,7 @@ app.*.map.json
 /lib/features/profile/data/model/user_round_model.g.dart
 /lib/features/user_status/data/state/user_status_state.freezed.dart
 /lib/features/users/data/state/users_state.freezed.dart
+/lib/features/mentees/data/state/mentees_state.freezed.dart
+/lib/features/mentor_mentee/data/model/mentor_mentee_model.freezed.dart
+/lib/features/mentor_mentee/data/model/mentor_mentee_model.g.dart
+/lib/features/mentor_mentee/data/state/mentor_mentee_state.freezed.dart

@@ -63,6 +63,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
   final ActivityItemsRepository activityItemsRepository;
   late final FocusNode valueFocusNode;
   late final FocusScopeNode usersFocusNode;
+  final ScrollController scrollController = ScrollController();
 
   Future<void> getUsers({bool? listO36}) async {
     var user = currentUserProvider.state;
@@ -75,10 +76,12 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
           modelState: ModelState.success,
           users: data,
         );
-        updateAccount(false);
+        updateAccount(true);
+        updateEmployer(
+            state.users.firstWhere((element) => element.myShareID == 0, orElse: () => currentUserProvider.state!));
       });
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, errorMessage: e.message);
+    } on DioException catch (e) {
+      state = state.copyWith(modelState: ModelState.error, errorMessage: e.response?.data);
     }
   }
 
@@ -97,17 +100,18 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
   }
 
   addRegistration({String? description}) {
+    var hours = hoursController.value.text.replaceAll(",", ".");
     var registration = ActivityItemsModel(
       description: description ?? state.description,
       user: state.selectedUser!,
       round: roundDataNotifier.state.rounds.where((element) => element.season.seasonYear == DateTime.now().year).first,
       transactionType: state.transactionType,
       account: state.account,
-      hours: double.tryParse(hoursController.value.text) ?? 0,
+      hours: double.tryParse(hours) ?? 0,
       createUser: currentUserProvider.state!,
     );
 
-    var text = hoursController.value.text;
+    var text = hours;
     var sum = state.sum + num.parse(text.isNotEmpty ? text : "0");
 
     var items = <ActivityItemsModel>[];
@@ -158,23 +162,26 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
   updateEmployer(UserModel u) {
     employerController.text = "${u.getFullName()} (${u.getAge()}) ";
     state = state.copyWith(employer: u);
+    updateAccount(state.account == Account.MYSHARE);
   }
 
   updateResponsible(UserModel u) {
     responsibleController.text = "${u.getFullName()} (${u.getAge()}) ";
     state = state.copyWith(responsible: u);
+    _updateItems();
   }
 
   updateAccount(bool isPaid) {
     if (!isPaid) {
       updateEmployer(
           state.users.firstWhere((element) => element.myShareID == 0, orElse: () => currentUserProvider.state!));
-    } else {
-      employerController.text = "";
-      state = state.copyWith(employer: null);
     }
     var account = isPaid ? Account.MYSHARE : Account.OTHER;
-    var trType = isPaid ? TransactionType.HOURS : TransactionType.POINT;
+    var trType = isPaid && state.employer?.myShareID != 0
+        ? TransactionType.HOURS
+        : isPaid && state.employer?.myShareID == 0
+            ? TransactionType.DUKA_MUNKA
+            : TransactionType.POINT;
     state = state.copyWith(account: account, transactionType: trType);
     _updateItems();
   }
@@ -195,7 +202,9 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
     var filtered = state.users
         .where((u) =>
             Utils.changeSpecChars(u.firstname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
-            Utils.changeSpecChars(u.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())))
+            Utils.changeSpecChars(u.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
+            Utils.changeSpecChars("${u.lastname.toLowerCase()} ${u.firstname.toLowerCase()}")
+                .startsWith(Utils.changeSpecChars(filter.toLowerCase())))
         .toList();
     filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     return filtered;
@@ -214,7 +223,8 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
               responsible: state.responsible!,
               registeredInApp: false,
               registeredInMyShare: false,
-              transactionType: state.transactionType))
+              transactionType: state.transactionType,
+              registeredInTeams: false))
           .then((activity) async {
         List<ActivityItemsModel> newItems = [];
         for (var item in state.activityItems) {
@@ -224,13 +234,12 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
         await activityItemsRepository
             .postActivityItems(newItems.where((element) => element.hours != 0).toList())
             .then((data) {
-          Utils.createActivityXlsx(newItems, activity);
           pop();
           state = state.copyWith(creationState: ModelState.success, modelState: ModelState.success, errorMessage: data);
         });
       });
-    } on DioError catch (e) {
-      state = state.copyWith(modelState: ModelState.error, errorMessage: e.message);
+    } on DioException catch (e) {
+      state = state.copyWith(modelState: ModelState.error, errorMessage: e.toString());
     }
   }
 

@@ -57,8 +57,8 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
     if (state.selectedOrderType == OrderByType.NAME) {
       sorted.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     } else if (state.selectedOrderType == OrderByType.STATUS) {
-      sorted.sort((a, b) => (a.currentMyShareCredit / state.goals.firstWhere((g) => g.user.id == a.id).goal)
-          .compareTo(b.currentMyShareCredit / state.goals.firstWhere((g) => g.user.id == b.id).goal));
+      sorted.sort((a, b) => (a.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == a.id).goal!)
+          .compareTo(b.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == b.id).goal!));
     }
 
     state = state.copyWith(users: sorted);

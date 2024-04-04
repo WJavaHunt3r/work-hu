@@ -41,7 +41,11 @@ class AdminPage extends BasePage {
 
   List<Widget> createDrawerList(Role role, WidgetRef ref, BuildContext context) {
     List<Widget> list = [];
-    list.add(DrawerHeader(child: Text("Admin", style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800))));
+    list.add(SizedBox(
+      height: 100.sp,
+      child: DrawerHeader(
+          margin: EdgeInsets.zero, child: Text("Admin", style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w800))),
+    ));
     list.add(createListTile(context: context, ref: ref, drawerNm: 0, title: "admin_mentees".i18n()));
     list.add(createListTile(context: context, ref: ref, drawerNm: 1, title: "admin_activities".i18n()));
     if (role != Role.USER) {
@@ -129,22 +133,26 @@ class AdminPage extends BasePage {
     TransactionsLayout()
   ];
 
-  ListTile createListTile(
+  SizedBox createListTile(
       {required BuildContext context,
       required WidgetRef ref,
       required num drawerNm,
       required String title,
       Function()? onTap}) {
     bool isSelected = ref.watch(drawerDataProvider) == drawerNm;
-    return ListTile(
-      title: Text(title, style: TextStyle(fontWeight: isSelected ? FontWeight.w800 : FontWeight.normal)),
-      selected: isSelected,
-      onTap: () {
-        if (onTap != null) onTap();
-        ref.watch(titleDataProvider.notifier).setTitle(title);
-        ref.watch(drawerDataProvider.notifier).setCurrentDrawer(drawerNm.toInt());
-        context.pop();
-      },
+    return SizedBox(
+      height: 38.sp,
+      child: ListTile(
+        titleAlignment: ListTileTitleAlignment.center,
+        title: Text(title, style: TextStyle(fontWeight: isSelected ? FontWeight.w800 : FontWeight.normal)),
+        selected: isSelected,
+        onTap: () {
+          if (onTap != null) onTap();
+          ref.watch(titleDataProvider.notifier).setTitle(title);
+          ref.watch(drawerDataProvider.notifier).setCurrentDrawer(drawerNm.toInt());
+          context.pop();
+        },
+      ),
     );
   }
 

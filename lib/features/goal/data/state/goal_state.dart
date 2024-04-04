@@ -8,7 +8,9 @@ part 'goal_state.freezed.dart';
 abstract class GoalState with _$GoalState {
   const factory GoalState(
       {@Default([]) List<GoalModel> goals,
+      @Default([]) List<GoalModel> filtered,
       @Default(ModelState.empty) ModelState modelState,
+      @Default(GoalModel(goal: 0)) GoalModel selectedGoal,
       @Default("") String message}) = _GoalState;
 
   const GoalState._();

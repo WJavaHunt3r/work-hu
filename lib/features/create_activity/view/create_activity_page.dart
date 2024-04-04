@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
@@ -9,7 +10,8 @@ import 'package:work_hu/features/create_activity/provider/create_activity_provid
 import 'package:work_hu/features/create_activity/view/create_activity_layout.dart';
 
 class CreateActivityPage extends BasePage {
-  const CreateActivityPage({super.title = "create_activity_new_activity_viewname", super.key, super.canPop = false});
+  const CreateActivityPage(
+      {super.title = "create_activity_new_activity_viewname", super.key, super.canPop = false, isListView = true});
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
@@ -27,14 +29,17 @@ class CreateActivityPage extends BasePage {
   }
 
   @override
-  popInvoked(BuildContext context, bool value, WidgetRef ref) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return ConfirmAlertDialog(
-              onConfirm: () => context.pop(true),
+  popInvoked(BuildContext context, bool didPop, WidgetRef ref) {
+    if (!didPop) {
+      showDialog(
+          context: context,
+          builder: (buildContext) {
+            return ConfirmAlertDialog(
+              onConfirm: () => buildContext.pop(true),
               title: "exit".i18n(),
-              content: Text("create_activity_exit_warning".i18n()), );
-        }).then((popped) => popped ?? false ? context.pop() : null);
+              content: Text("create_activity_exit_warning".i18n()),
+            );
+          }).then((popped) => popped ?? false ? context.pop() : null);
+    }
   }
 }

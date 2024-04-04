@@ -20,6 +20,7 @@ class ActivityModel with _$ActivityModel {
       num? activityId,
       required bool registeredInApp,
       required bool registeredInMyShare,
+      required bool registeredInTeams,
       required TransactionType transactionType,
       required Account account}) = _ActivityModel;
 

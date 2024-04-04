@@ -9,7 +9,7 @@ class TeamRepository {
 
   Future<List<TeamModel>> fetchTeams() async {
     try {
-      final res = await _teamApi.fetchTeamRoundsApiRequest();
+      final res = await _teamApi.getTeams();
       return res.map((e) => TeamModel.fromJson(e)).toList();
     } on DioError {
       rethrow;

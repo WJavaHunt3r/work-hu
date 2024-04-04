@@ -40,11 +40,8 @@ class MenteesDataNotifier extends StateNotifier<MenteesState> {
               .fetchUserRounds(userId: mentee.mentee.id, seasonYear: DateTime.now().year)
               .then((userRounds) async {
             await goalRepoProvider.getGoalByUserAndSeason(mentee.mentee.id, DateTime.now().year).then((goal) async {
-              list.add(UserGoalUserRoundModel(
-                  user: mentee.mentee,
-                  goal: goal,
-                  userRound:
-                      userRounds.firstWhere((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0)));
+              userRounds.sort((a, b) => a.round.roundNumber.compareTo(b.round.roundNumber));
+              list.add(UserGoalUserRoundModel(user: mentee.mentee, goal: goal, round: userRounds.last.round));
             });
           });
 

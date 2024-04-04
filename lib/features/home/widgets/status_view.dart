@@ -20,14 +20,10 @@ class StatusView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var currentRound = ref.watch(roundDataProvider).currentRoundNumber;
     return DefaultTabController(
-        length: countItems(teamRounds).toInt() + 1,
-        initialIndex: currentRound == 0 || countItems(teamRounds).toInt() == 0 ? 0 : currentRound.toInt() - 1,
-        child: Column(
-          children: [
-            BaseTabBar(tabs: createTabs(teamRounds)),
-            Expanded(child: TabBarView(clipBehavior: Clip.antiAlias, children: createTabView(teamRounds, ref))),
-          ],
-        ));
+      length: currentRound.toInt() + 1,
+      initialIndex: currentRound == 0 ? 0 : currentRound.toInt() - 1,
+      child: BaseTabView(tabs: createTabs(teamRounds), tabViews: createTabView(teamRounds, ref)),
+    );
   }
 
   num countItems(List<TeamRoundModel> items) {

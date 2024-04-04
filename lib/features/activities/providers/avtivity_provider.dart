@@ -5,6 +5,8 @@ import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/activities/data/api/activity_api.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 import 'package:work_hu/features/activities/data/state/activity_state.dart';
+import 'package:work_hu/features/activity_items/data/repository/activity_items_repository.dart';
+import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
 
 import '../data/repository/activity_repository.dart';
 
@@ -12,18 +14,21 @@ final activityApiProvider = Provider<ActivityApi>((ref) => ActivityApi());
 
 final activityRepoProvider = Provider<ActivityRepository>((ref) => ActivityRepository(ref.read(activityApiProvider)));
 
-final activityDataProvider = StateNotifierProvider.autoDispose<ActivityDataNotifier, ActivityState>(
-    (ref) => ActivityDataNotifier(ref.read(activityRepoProvider), ref.read(userDataProvider.notifier)));
+final activityDataProvider = StateNotifierProvider.autoDispose<ActivityDataNotifier, ActivityState>((ref) =>
+    ActivityDataNotifier(
+        ref.read(activityRepoProvider), ref.read(userDataProvider.notifier), ref.read(activityItemsRepoProvider)));
 
 class ActivityDataNotifier extends StateNotifier<ActivityState> {
   ActivityDataNotifier(
     this.activityRepository,
     this.currentUserProvider,
+    this.activityItemsRepository,
   ) : super(const ActivityState()) {
     getActivities();
   }
 
   final ActivityRepository activityRepository;
+  final ActivityItemsRepository activityItemsRepository;
   final UserDataNotifier currentUserProvider;
 
   Future<void> getActivities(
@@ -78,6 +83,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
   }
 
   Future<void> registerActivity(num id) async {
+    state = state.copyWith(modelState: ModelState.processing);
     var user = currentUserProvider.state!;
     try {
       await activityRepository.registerActivity(id, user.id).then((data) async {
@@ -89,10 +95,22 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
   }
 
   Future<void> putActivity(ActivityModel activity) async {
-    var newActivity = activity.copyWith(registeredInMyShare: true);
+    state = state.copyWith(modelState: ModelState.processing);
     try {
-      await activityRepository.putActivity(newActivity, activity.id!).then((data) async {
+      await activityRepository.putActivity(activity, activity.id!).then((data) async {
         getActivities();
+      });
+    } catch (e) {
+      state = state.copyWith(modelState: ModelState.error);
+    }
+  }
+
+  Future<void> registerActivityInTeams(num id) async {
+    state = state.copyWith(modelState: ModelState.processing, registerState: ModelState.processing);
+    var user = currentUserProvider.state!;
+    try {
+      await activityRepository.registerActivityInTeams(id, user.id).then((data) async {
+        state = state.copyWith(message: data, modelState: ModelState.success, registerState: ModelState.success);
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);

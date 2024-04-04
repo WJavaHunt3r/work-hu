@@ -25,9 +25,9 @@ class TransactionRepository {
     }
   }
 
-  Future<List<TransactionModel>> getTransactions() async {
+  Future<List<TransactionModel>> getTransactions([num? roundId]) async {
     try {
-      final res = await _transactionApi.getTransactions();
+      final res = await _transactionApi.getTransactions(roundId);
       return res.map((e) => TransactionModel.fromJson(e)).toList();
     } on DioError {
       rethrow;

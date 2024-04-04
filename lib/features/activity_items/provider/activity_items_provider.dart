@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:work_hu/app/data/models/account.dart';
+import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/activity_items/data/api/activity_items_api.dart';
@@ -51,7 +53,7 @@ class ActivityItemsDataNotifier extends StateNotifier<ActivityItemsState> {
           points: item.hours * 4,
           transactionType: item.transactionType,
           account: item.account,
-          credit: item.hours * 2000,
+          credit: item.transactionType == TransactionType.DUKA_MUNKA ? item.hours * 1000 : item.hours * 2000,
           hours: item.hours,
           user: item.user));
     }

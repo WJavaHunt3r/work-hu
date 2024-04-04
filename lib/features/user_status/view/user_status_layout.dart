@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/style/app_colors.dart';
@@ -9,6 +10,8 @@ import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
+import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
+import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
 import 'package:work_hu/features/user_status/widgets/base_filter_chip.dart';
@@ -23,8 +26,9 @@ class UserStatusLayout extends ConsumerWidget {
     var currentRoundNumber = ref.read(roundDataProvider).currentRoundNumber;
     var rounds = ref.read(roundDataProvider).rounds;
     var goals = ref.watch(goalDataProvider).goals;
-    var currentRoundGoal =
-        rounds.isEmpty ? 0 : rounds.firstWhere((element) => element.roundNumber == currentRoundNumber).myShareGoal;
+    var currentRound =
+        rounds.isEmpty ? null : rounds.firstWhere((element) => element.roundNumber == currentRoundNumber);
+    var currentRoundGoal = currentRound == null ? 0 : currentRound.myShareGoal;
     return Stack(
       children: [
         Column(
@@ -69,9 +73,9 @@ class UserStatusLayout extends ConsumerWidget {
                 itemCount: users.length,
                 itemBuilder: (BuildContext context, int index) {
                   var current = users[index];
-                  var currentUserGoal = goals.where((g) => g.user.id == current.id).isEmpty
+                  var currentUserGoal = goals.where((g) => g.user!.id == current.id).isEmpty
                       ? null
-                      : goals.firstWhere((g) => g.user.id == current.id);
+                      : goals.firstWhere((g) => g.user!.id == current.id);
                   var currentGoal = currentUserGoal?.goal ?? 0;
                   var userStatus = current.currentMyShareCredit / currentGoal * 100;
                   var style = TextStyle(color: userStatus >= currentRoundGoal ? AppColors.white : AppColors.primary);
@@ -81,6 +85,16 @@ class UserStatusLayout extends ConsumerWidget {
                       isLast: isLast,
                       index: index,
                       child: ListTile(
+                          onTap: () => showGeneralDialog(
+                              barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                              barrierColor: AppColors.primary,
+                              transitionDuration: const Duration(milliseconds: 200),
+                              context: context,
+                              pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
+                                return MyShareStatusPage(
+                                    userGoalRound: UserGoalUserRoundModel(
+                                        user: current, goal: currentUserGoal!, round: currentRound!));
+                              }),
                           minVerticalPadding: 0,
                           title: Text(
                             current.getFullName(),
@@ -91,7 +105,7 @@ class UserStatusLayout extends ConsumerWidget {
                                   "On Track",
                                   style: TextStyle(color: AppColors.white),
                                 )
-                              : Text("${Utils.creditFormatting(toOnTrack)} to be On track"),
+                              : Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(toOnTrack)])),
                           trailing: Text(
                             "${Utils.percentFormat.format(userStatus)}%",
                             style: style.copyWith(fontSize: 15.sp),
@@ -140,14 +154,14 @@ class UserStatusLayout extends ConsumerWidget {
 
     chips.add(BaseFilterChip(
       isSelected: ref.watch(userStatusDataProvider).selectedOrderType == OrderByType.NAME,
-      title: 'Name',
+      title: "myshare_status_name".i18n(),
       onSelected: (bool selected) => ref
           .watch(userStatusDataProvider.notifier)
           .setSelectedOrderType(selected ? OrderByType.NAME : OrderByType.NONE),
     ));
     chips.add(BaseFilterChip(
       isSelected: ref.watch(userStatusDataProvider).selectedOrderType == OrderByType.STATUS,
-      title: 'Status',
+      title: "myshare_status_status".i18n(),
       onSelected: (bool selected) => ref
           .watch(userStatusDataProvider.notifier)
           .setSelectedOrderType(selected ? OrderByType.STATUS : OrderByType.NONE),
