@@ -38,7 +38,7 @@ class GoalApi {
 
   Future<dynamic> postGoal(GoalModel goal) async {
     try {
-      final res = await _dioClient.dio.post("/goal", data: goal);
+      final res = await _dioClient.dio.post("/goal", data: goal.toJson());
       return res.data;
     } catch (e) {
       rethrow;

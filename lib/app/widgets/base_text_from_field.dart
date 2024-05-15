@@ -9,11 +9,13 @@ class BaseTextFormField extends StatelessWidget {
       this.enabled = true,
       required this.onChanged,
       this.textAlign = TextAlign.right,
-      this.keyBoardType = TextInputType.text});
+      this.keyBoardType = TextInputType.text,
+      this.autofocus = false});
 
   final String initialValue;
   final String labelText;
   final bool enabled;
+  final bool autofocus;
   final TextAlign textAlign;
   final TextInputType keyBoardType;
   final Function(String text) onChanged;
@@ -27,6 +29,7 @@ class BaseTextFormField extends StatelessWidget {
         textAlign: textAlign,
         keyboardType: keyBoardType,
         initialValue: initialValue,
+        autofocus: autofocus,
         decoration: InputDecoration(
             fillColor: enabled ? Colors.white : Colors.transparent,
             labelText: labelText,

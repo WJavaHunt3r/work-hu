@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/login/data/api/login_api.dart';
@@ -52,8 +53,8 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
           } else {
             router.push("/changePassword").then((success) {
               success != null && success as bool
-                  ? _clear("Password changed successfully. Login again", ModelState.error)
-                  : _clear("Failed to change password. Try again!", ModelState.error);
+                  ? _clear("login_password_changed_success".i18n(), ModelState.error)
+                  : _clear("login_password_changed_failed".i18n(), ModelState.error);
             });
           }
         });

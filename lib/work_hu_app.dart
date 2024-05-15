@@ -23,34 +23,39 @@ class WorkHuApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ScreenUtilInit(
-        designSize: const Size(360, 690),
-        minTextAdapt: true,
-        ensureScreenSize: true,
-        splitScreenMode: false,
-        builder: (context, child) {
-          final theme = GlobalTheme();
-          final router = ref.watch(routerProvider);
-          LocalJsonLocalization.delegate.directories = ['lib/I18n'];
-          return MaterialApp.router(
-            scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
-            debugShowCheckedModeBanner: false,
-            title: 'WORK HU',
-            theme: theme.globalTheme,
-            routerConfig: router,
-            supportedLocales: const [
-              Locale('en', 'US'),
-              Locale('hu', 'HU'),
-            ],
-            locale: Locale('hu', 'HU'),
-            localizationsDelegates: [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-              LocalJsonLocalization.delegate,
-            ],
-          );
-        });
+    return FlutterWebFrame(
+      builder: (context) {
+        return ScreenUtilInit(
+            // designSize: const Size(360, 690),
+            minTextAdapt: true,
+            ensureScreenSize: true,
+            splitScreenMode: false,
+            builder: (context, child) {
+              final theme = GlobalTheme();
+              final router = ref.watch(routerProvider);
+              LocalJsonLocalization.delegate.directories = ['lib/I18n'];
+              return MaterialApp.router(
+                scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
+                debugShowCheckedModeBanner: false,
+                title: 'WORK HU',
+                theme: theme.globalTheme,
+                routerConfig: router,
+                supportedLocales: const [
+                  Locale('en', 'US'),
+                  Locale('hu', 'HU'),
+                ],
+                locale: Locale('hu', 'HU'),
+                localizationsDelegates: [
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                  LocalJsonLocalization.delegate,
+                ],
+              );
+            });
+      },
+      maximumSize: const Size(415, 650),
+    );
   }
 }
 

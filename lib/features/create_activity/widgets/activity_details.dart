@@ -31,7 +31,6 @@ class ActivityDetails extends ConsumerWidget {
             textCapitalization: TextCapitalization.sentences,
             controller: ref.watch(createActivityDataProvider.notifier).descriptionController,
             decoration: InputDecoration(labelText: "create_activity_description".i18n()),
-            autofillHints: ["Terem takarítás", "Pipetta"],
             autocorrect: true,
             onTap: () => ref.watch(createActivityDataProvider.notifier).descriptionController.selection = TextSelection(
                 baseOffset: 0,

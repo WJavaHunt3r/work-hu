@@ -98,5 +98,12 @@
   "user_details_reset_password": "Reset password",
   "user_details_email": "Email",
   "user_details_phone_number": "Phone number",
-  "transactions_round": "Round"
+  "transactions_round": "Round",
+  "login_username": "Username",
+  "login_password": "Password",
+  "login_login": "Login",
+  "login_title": "Login",
+  "change_password_form": "Fill in the form",
+  "login_password_changed_success": "Password changed successfully. Login again",
+  "login_password_changed_failed": "Failed to change password. Try again!"
 }

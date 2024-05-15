@@ -62,7 +62,7 @@ class GoalsLayout extends ConsumerWidget {
                               title: Text(current.user!.getFullName()),
                               subtitle: Text("${Utils.creditFormatting(current.user!.currentMyShareCredit)} Ft"),
                               trailing: Text(
-                                "${Utils.creditFormatting(current.goal!)} Ft",
+                                "${Utils.creditFormatting(current.goal)} Ft",
                                 style: TextStyle(fontSize: 18.sp),
                               ),
                             )));
@@ -78,7 +78,7 @@ class GoalsLayout extends ConsumerWidget {
               bottom: 20.sp,
               right: 20.sp,
               child: FloatingActionButton(
-                child: const Icon(Icons.add),
+                heroTag: UniqueKey(),
                 onPressed: () {
                   ref.watch(goalDataProvider.notifier).setSelectedGoal(const GoalModel(goal: 0));
                   showDialog(
@@ -86,12 +86,14 @@ class GoalsLayout extends ConsumerWidget {
                       context: context,
                       builder: (context) => GoalsMaintenance(mode: GoalsMaintenance.CREATE));
                 },
+                child: const Icon(Icons.add),
               ),
             ),
             Positioned(
               bottom: 20.sp,
               left: 20.sp,
               child: FloatingActionButton(
+                heroTag: UniqueKey(),
                 child: const Icon(Icons.upload),
                 onPressed: () {
                   ref.read(goalDataProvider.notifier).uploadGoalsCsv();

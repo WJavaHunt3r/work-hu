@@ -20,7 +20,7 @@ class ChangePasswordLayout extends ConsumerWidget {
           children: [
             Padding(
               padding: EdgeInsets.all(8.sp),
-              child: Text("Fill in the form", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15.sp)),
+              child: Text("change_password_form".i18n(), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15.sp)),
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 4.sp),

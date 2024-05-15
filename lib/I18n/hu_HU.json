@@ -38,6 +38,7 @@
   "admin_users": "Felhasználók",
   "admin_goals": "Célok",
   "admin_transactions": "Tranzakciók",
+  "change_password_form": "Töltsd ki az adatokat",
   "change_password_viewname": "Jelszó módisítás",
   "change_password_username": "Felhasználónév",
   "change_password_old_password": "Régi jelszó",
@@ -58,7 +59,7 @@
   "create_confirm_activity_send_question": "Biztosan elküldöd a munkalapot?",
   "create_activity_count": "Elem: ",
   "create_activity_activity_details": "Munka részletei",
-  "create_activity_description_error" : "Hiányzó munka leírás!",
+  "create_activity_description_error": "Hiányzó munka leírás!",
   "home_server_error": "Szerver nem elérhető",
   "round_number": "%s. Kör",
   "total": "Teljes",
@@ -98,5 +99,11 @@
   "user_details_reset_password": "Jelszó visszaállítás",
   "user_details_email": "Email",
   "user_details_phone_number": "Telefonszám",
-  "transactions_round": "Kör"
+  "transactions_round": "Kör",
+  "login_username": "Felhasználónév",
+  "login_password": "Jelszó",
+  "login_login": "Bejelentkezés",
+  "login_title": "Bejelentkezés",
+  "login_password_changed_success": "Sikeres jelszó módosítás. Jelentkezz be újra",
+  "login_password_changed_failed": "Sikertelen jelszó módosítás. Próbáld újra!"
 }

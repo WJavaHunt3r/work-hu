@@ -10,18 +10,18 @@ import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 
 class GoalsMaintenance extends ConsumerWidget {
-  GoalsMaintenance({required this.mode, super.key});
+  const GoalsMaintenance({required this.mode, super.key});
 
   final String mode;
 
-  final _formKey = GlobalKey<FormState>();
+  static final _formKey = GlobalKey<FormState>();
 
   static const String CREATE = "*CREATE";
   static const String EDIT = "*EDIT";
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final GoalModel goal = ref.watch(goalDataProvider).selectedGoal;
+    final GoalModel goal = ref.read(goalDataProvider).selectedGoal;
     return Dialog.fullscreen(
         child: Scaffold(
       appBar: AppBar(
@@ -42,7 +42,7 @@ class GoalsMaintenance extends ConsumerWidget {
       ),
       body: Form(
           key: _formKey,
-          onPopInvoked: (pop) => ref.watch(goalDataProvider.notifier).setSelectedGoal(const GoalModel(goal: 0)),
+          onPopInvoked: (pop) => ref.read(goalDataProvider.notifier).setSelectedGoal(const GoalModel(goal: 0)),
           child: Padding(
             padding: EdgeInsets.all(8.sp),
             child: Column(
@@ -87,6 +87,7 @@ class GoalsMaintenance extends ConsumerWidget {
                       child: BaseTextFormField(
                         labelText: "goal_maintenance_goal".i18n(),
                         initialValue: goal.goal.toString(),
+                        keyBoardType: TextInputType.number,
                         onChanged: (String text) => text.isNotEmpty
                             ? ref
                                 .watch(goalDataProvider.notifier)
