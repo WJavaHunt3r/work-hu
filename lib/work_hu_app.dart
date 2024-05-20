@@ -44,7 +44,7 @@ class WorkHuApp extends ConsumerWidget {
                   Locale('en', 'US'),
                   Locale('hu', 'HU'),
                 ],
-                locale: Locale('hu', 'HU'),
+                locale: const Locale('hu', 'HU'),
                 localizationsDelegates: [
                   GlobalMaterialLocalizations.delegate,
                   GlobalWidgetsLocalizations.delegate,

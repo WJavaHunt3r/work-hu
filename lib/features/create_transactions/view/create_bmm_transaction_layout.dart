@@ -46,10 +46,10 @@ class CreateBMMTransactionLayout extends ConsumerWidget {
                                 })
                             : ref.read(createTransactionsDataProvider.notifier).sendTransactions(),
                         style: ButtonStyle(
-                          side: MaterialStateBorderSide.resolveWith(
+                          side: WidgetStateBorderSide.resolveWith(
                             (states) => BorderSide(color: AppColors.primary, width: 2.sp),
                           ),
-                          backgroundColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
+                          backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
                         ),
                         child: Text("create_bmm_transaction_send".i18n(),
                             style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800))),

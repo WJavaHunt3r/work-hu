@@ -12,7 +12,7 @@ class LoginRepository {
     try {
       final res = await _loginApi.loginRequest(username, password);
       return res;
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }
@@ -21,7 +21,7 @@ class LoginRepository {
     try {
       final res = await _loginApi.getUser(username);
       return UserModel.fromJson(res);
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }

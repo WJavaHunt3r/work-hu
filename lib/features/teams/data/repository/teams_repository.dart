@@ -11,7 +11,7 @@ class TeamRepository {
     try {
       final res = await _teamApi.getTeams();
       return res.map((e) => TeamModel.fromJson(e)).toList();
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }

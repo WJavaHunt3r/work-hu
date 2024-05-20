@@ -13,9 +13,9 @@ class BaseSearchBar extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: 4.sp),
       child: SearchBar(
-        shadowColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
-        surfaceTintColor: MaterialStateColor.resolveWith((states) => AppColors.white),
-        shape: MaterialStateProperty.resolveWith(
+        shadowColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
+        surfaceTintColor: WidgetStateColor.resolveWith((states) => AppColors.white),
+        shape: WidgetStateProperty.resolveWith(
           (states) => RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
         ),
         hintText: "goals_search".i18n(),

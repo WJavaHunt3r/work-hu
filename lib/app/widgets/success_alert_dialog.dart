@@ -22,12 +22,12 @@ class SuccessAlertDialog extends StatelessWidget {
             content: content ??
                 TextButton(
                     style: ButtonStyle(
-                      side: MaterialStateBorderSide.resolveWith(
+                      side: WidgetStateBorderSide.resolveWith(
                         (states) => BorderSide(color: AppColors.primary, width: 2.sp),
                       ),
-                      backgroundColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
-                      foregroundColor: MaterialStateColor.resolveWith((states) => AppColors.white),
-                      overlayColor: MaterialStateColor.resolveWith((states) => AppColors.primary),
+                      backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
+                      foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
+                      overlayColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
                     ),
                     onPressed: () => context.pop(),
                     child: const Text(

@@ -10,9 +10,13 @@ import 'package:work_hu/features/user_status/data/state/user_status_state.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 
-final userStatusDataProvider = StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>((ref) =>
-    UserStatusDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider), ref.read(userDataProvider.notifier),
-        ref.read(goalRepoProvider)));
+final userStatusDataProvider =
+    StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>(
+        (ref) => UserStatusDataNotifier(
+            ref.read(usersRepoProvider),
+            ref.read(userDataProvider),
+            ref.read(userDataProvider.notifier),
+            ref.read(goalRepoProvider)));
 
 class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   UserStatusDataNotifier(
@@ -32,11 +36,15 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   Future<void> getUsers([TeamModel? team]) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await usersRepository.getUsers(currentUser!.role == Role.ADMIN ? team : currentUser!.team).then((value) {
+      await usersRepository
+          .getUsers(currentUser!.role == Role.ADMIN ? team : currentUser!.team)
+          .then((value) {
         state = state.copyWith(users: value, modelState: ModelState.success);
         orderUsers();
       });
-      await goalRepoProvider.getGoals(DateTime.now().year).then((goals) => state = state.copyWith(goals: goals));
+      await goalRepoProvider
+          .getGoals(DateTime.now().year)
+          .then((goals) => state = state.copyWith(goals: goals));
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
@@ -57,8 +65,10 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
     if (state.selectedOrderType == OrderByType.NAME) {
       sorted.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     } else if (state.selectedOrderType == OrderByType.STATUS) {
-      sorted.sort((a, b) => (a.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == a.id).goal!)
-          .compareTo(b.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == b.id).goal!));
+      sorted.sort((a, b) => (a.currentMyShareCredit /
+              state.goals.firstWhere((g) => g.user?.id == a.id).goal)
+          .compareTo(b.currentMyShareCredit /
+              state.goals.firstWhere((g) => g.user?.id == b.id).goal));
     }
 
     state = state.copyWith(users: sorted);

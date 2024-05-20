@@ -68,7 +68,7 @@
   "goal_maintenance_goal": "Goal",
   "goal_maintenance_user": "User",
   "goals_search": "Search ...",
-  "home_status_freeze": "Status frozen!\n Results shown:",
+  "home_status_freeze": "Status frozen!\n Results shown:\n %s",
   "user_points_title": "My Points",
   "user_points_waiting_for_approval": "Waiting for approval",
   "profile_no_goal": "No goal set",

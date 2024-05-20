@@ -48,10 +48,12 @@ class GlobalTheme {
           border: OutlineInputBorder(gapPadding: 8.sp, borderRadius: BorderRadius.all(Radius.circular(8.sp)))),
       appBarTheme: AppBarTheme(
           titleTextStyle: TextStyle(fontSize: 18.sp, color: AppColors.primary),
-          // This will control the "back" icon
           iconTheme: IconThemeData(color: AppColors.primary, size: 20.sp),
-          elevation: 5.sp,
-          // This will control action icon buttons that locates on the right
+          // elevation: 5.sp,
+          scrolledUnderElevation: 10.sp,
+          // surfaceTintColor: AppColors.white,
+          // foregroundColor: AppColors.backgroundColor,
+          backgroundColor: AppColors.backgroundColor,
           actionsIconTheme: IconThemeData(size: 25.sp, color: AppColors.primary)),
       cardTheme: CardTheme(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
@@ -81,8 +83,8 @@ class GlobalTheme {
           borderRadius: BorderRadius.only(topLeft: Radius.circular(25.sp), topRight: Radius.circular(25.sp)),
         ),
       ),
-      // floatingActionButtonTheme: FloatingActionButtonThemeData(
-      //     shape: const CircleBorder(), extendedPadding: EdgeInsets.all(8.sp), foregroundColor: AppColors.white),
+      floatingActionButtonTheme:
+          const FloatingActionButtonThemeData(foregroundColor: AppColors.white, backgroundColor: AppColors.primary),
       iconTheme: const IconThemeData(color: AppColors.primary),
       // buttonTheme: ButtonThemeData(
       //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)), padding: EdgeInsets.all(12.sp)),
@@ -98,7 +100,8 @@ class GlobalTheme {
       // disabledColor: Colors.white
       );
 
-  static const ColorScheme _customColorScheme = ColorScheme(
+  static final ColorScheme _customColorScheme = ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
       primary: AppColors.primary,
       secondary: AppColors.white,
       surface: AppColors.white,

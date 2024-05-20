@@ -148,13 +148,13 @@ class UserDetails extends ConsumerWidget {
                         ),
                         TextButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateColor.resolveWith((states) => AppColors.primary),
-                              foregroundColor: MaterialStateColor.resolveWith((states) => AppColors.white),
+                              backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
+                              foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
                             ),
                             onPressed: () => ref.watch(usersDataProvider.notifier).resetUserPassword(user.id),
                             child: Text(
                               "user_details_reset_password".i18n(),
-                              style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
                             ))
                       ],
                     ),

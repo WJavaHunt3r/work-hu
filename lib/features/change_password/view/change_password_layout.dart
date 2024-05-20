@@ -66,7 +66,7 @@ class ChangePasswordLayout extends ConsumerWidget {
                       onPressed: () => ref.read(changePasswordDataProvider.notifier).changePassword(),
                       child: Text(
                         "change_password_change_action".i18n(),
-                        style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.white),
+                        style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.white),
                       )),
                 ],
               ),

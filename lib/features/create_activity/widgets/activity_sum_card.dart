@@ -74,13 +74,13 @@ class ActivitySumCard extends ConsumerWidget {
                         );
                       }),
               style: ButtonStyle(
-                padding: MaterialStateProperty.resolveWith(
+                padding: WidgetStateProperty.resolveWith(
                   (states) => EdgeInsets.all(2.sp),
                 ),
-                side: MaterialStateBorderSide.resolveWith(
+                side: WidgetStateBorderSide.resolveWith(
                   (states) => BorderSide(color: AppColors.primary, width: 2.sp),
                 ),
-                backgroundColor: MaterialStateColor.resolveWith((states) => AppColors.primary),
+                backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
               ),
               child: const Text("Send", style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w800)))
         ],

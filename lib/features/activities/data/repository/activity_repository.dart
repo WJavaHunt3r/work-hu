@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:excel/excel.dart';
 import 'package:work_hu/features/activities/data/api/activity_api.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 
@@ -22,7 +21,7 @@ class ActivityRepository {
           createUserId: createUserId,
           employerId: employerId);
       return res.map((e) => ActivityModel.fromJson(e)).toList();
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }

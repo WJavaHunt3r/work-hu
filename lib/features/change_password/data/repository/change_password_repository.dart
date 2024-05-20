@@ -9,7 +9,7 @@ class ChangePasswordRepository {
   Future<String> changePassword(String username, String oldPassword, String newPassword) async {
     try {
       return await _changePasswordApi.changePassword(username, oldPassword, newPassword);
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }

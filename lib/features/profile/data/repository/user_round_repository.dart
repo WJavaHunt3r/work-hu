@@ -11,7 +11,7 @@ class UserRoundRepository {
     try {
       final res = await _userApi.fetchUserRoundsApiRequest(userId, roundId, seasonYear);
       return res.map((e) => UserRoundModel.fromJson(e)).toList();
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }

@@ -12,7 +12,7 @@ class RoundRepository {
     try {
       final res = await _roundApi.getRounds(seasonYear);
       return res.map((e) => RoundModel.fromJson(e)).toList();
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }
@@ -21,7 +21,7 @@ class RoundRepository {
     try {
       final res = await _roundApi.getCurrentRound();
       return RoundModel.fromJson(res);
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }
@@ -30,7 +30,7 @@ class RoundRepository {
     try {
       final res = await _roundApi.getRound(roundId);
       return RoundModel.fromJson(res);
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }

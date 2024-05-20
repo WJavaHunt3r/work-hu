@@ -14,7 +14,7 @@ class ChangePasswordPage extends BasePage {
   }
 
   @override
-  popInvoked(BuildContext context, bool value, WidgetRef ref) {
+  popInvoked(BuildContext context, bool didPop, WidgetRef ref) {
     ref.read(changePasswordDataProvider.notifier).clear(false, true);
   }
 }

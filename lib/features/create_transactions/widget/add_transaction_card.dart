@@ -63,16 +63,16 @@ class AddTransactionCard extends ConsumerWidget {
                         ? () => ref.read(createTransactionsDataProvider.notifier).addTransaction()
                         : null,
                     style: ButtonStyle(
-                      side: MaterialStateBorderSide.resolveWith(
+                      side: WidgetStateBorderSide.resolveWith(
                         (states) {
-                          if (states.contains(MaterialState.disabled)) {
+                          if (states.contains(WidgetState.disabled)) {
                             return BorderSide(color: Colors.grey.shade300, width: 2.sp);
                           }
                           return BorderSide(color: AppColors.primary, width: 2.sp);
                         },
                       ),
-                      backgroundColor: MaterialStateColor.resolveWith((states) {
-                        if (states.contains(MaterialState.disabled)) {
+                      backgroundColor: WidgetStateColor.resolveWith((states) {
+                        if (states.contains(WidgetState.disabled)) {
                           return Colors.grey.shade300;
                         }
                         return AppColors.primary;

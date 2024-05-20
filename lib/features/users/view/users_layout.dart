@@ -60,6 +60,7 @@ class UsersLayout extends ConsumerWidget {
           bottom: 20.sp,
           left: 10.sp,
           child: FloatingActionButton(
+            heroTag: UniqueKey(),
             child: const Icon(Icons.download_outlined),
             onPressed: () {
               ref.read(usersDataProvider.notifier).downloadUserInfo();
@@ -94,7 +95,7 @@ class UserListItem extends ConsumerWidget {
             transitionDuration: const Duration(milliseconds: 200),
             context: context,
             pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
-              return UserDetails();
+              return const UserDetails();
             }).then((value) => ref.watch(usersDataProvider.notifier).getUsers());
       },
     );

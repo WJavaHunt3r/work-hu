@@ -11,7 +11,7 @@ class TeamRoundRepository {
     try {
       final res = await _teamApi.fetchTeamRoundsApiRequest();
       return res.map((e) => TeamRoundModel.fromJson(e)).toList();
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }

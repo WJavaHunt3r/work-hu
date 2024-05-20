@@ -77,13 +77,13 @@ class TransactionSumCard extends ConsumerWidget {
                         );
                       }),
               style: ButtonStyle(
-                padding: MaterialStateProperty.resolveWith(
+                padding: WidgetStateProperty.resolveWith(
                   (states) => EdgeInsets.all(2.sp),
                 ),
-                side: MaterialStateBorderSide.resolveWith(
+                side: WidgetStateBorderSide.resolveWith(
                   (states) => BorderSide(color: AppColors.primary, width: 2.sp),
                 ),
-                backgroundColor: MaterialStateColor.resolveWith((states) => AppColors.primary),
+                backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
               ),
               child: const Text("Send", style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w800)))
         ],
@@ -101,12 +101,12 @@ class TransactionSumCard extends ConsumerWidget {
             actions: [
               TextButton(
                   style: ButtonStyle(
-                    side: MaterialStateBorderSide.resolveWith(
+                    side: WidgetStateBorderSide.resolveWith(
                       (states) => BorderSide(color: AppColors.primary, width: 2.sp),
                     ),
-                    backgroundColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
-                    foregroundColor: MaterialStateColor.resolveWith((states) => AppColors.white),
-                    overlayColor: MaterialStateColor.resolveWith((states) => AppColors.primary),
+                    backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
+                    foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
+                    overlayColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
                   ),
                   onPressed: () => context.pop(),
                   child: const Text(
@@ -115,8 +115,8 @@ class TransactionSumCard extends ConsumerWidget {
                   )),
               TextButton(
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateColor.resolveWith((states) => AppColors.primary),
-                    foregroundColor: MaterialStateColor.resolveWith((states) => AppColors.white),
+                    backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
+                    foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
                   ),
                   onPressed: () {
                     ref.watch(createTransactionsDataProvider.notifier).uploadSamvirkCsv();

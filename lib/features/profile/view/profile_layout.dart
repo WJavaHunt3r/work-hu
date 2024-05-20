@@ -70,13 +70,13 @@ class ProfileLayout extends ConsumerWidget {
                           context.pop();
                         },
                         style: ButtonStyle(
-                          side: MaterialStateBorderSide.resolveWith(
+                          side: WidgetStateBorderSide.resolveWith(
                             (states) => BorderSide(color: AppColors.primary, width: 2.sp),
                           ),
-                          backgroundColor: MaterialStateColor.resolveWith((states) => Colors.transparent),
+                          backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
                         ),
                         child: Text("profile_logout".i18n(),
-                            style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800))),
+                            style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800))),
                   ))
                 ],
               )

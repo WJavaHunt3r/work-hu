@@ -10,7 +10,7 @@ class MentorMenteeRepository {
     try {
       final res = await menteesApi.getMentorMentee(userId);
       return res.map((e) => MentorMenteeModel.fromJson(e)).toList();
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }
@@ -19,7 +19,7 @@ class MentorMenteeRepository {
     try {
       final res = await menteesApi.postMentorMentee(menteesModel, userId);
       return MentorMenteeModel.fromJson(res);
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }
@@ -28,7 +28,7 @@ class MentorMenteeRepository {
     try {
       final res = await menteesApi.deleteMentorMentee(id, userId);
       return res;
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }

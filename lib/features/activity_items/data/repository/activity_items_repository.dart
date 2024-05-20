@@ -13,7 +13,7 @@ class ActivityItemsRepository {
       final res = await _activityApi.getActivities(
           activityId: activityId, userId: userId, registeredInApp: registeredInApp, roundId: roundId);
       return res.map((e) => ActivityItemsModel.fromJson(e)).toList();
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }

@@ -5,9 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/user_provider.dart';
-import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/home/widgets/error_view.dart';
 import 'package:work_hu/features/home/widgets/status_view.dart';
@@ -56,7 +54,7 @@ class HomePage extends BasePage {
                 ? Center(
                     child: Text(
                       "home_status_freeze"
-                          .i18n([Utils.dateToStringWithTime(currentRound.endDateTime.add(Duration(minutes: 1)))]),
+                          .i18n([Utils.dateToStringWithTime(currentRound.endDateTime.add(const Duration(minutes: 1)))]),
                       textAlign: TextAlign.center,
                     ),
                   )

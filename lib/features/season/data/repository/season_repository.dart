@@ -12,7 +12,7 @@ class SeasonRepository {
     try {
       final res = await _seasonApi.getSeasons();
       return res.map((e) => SeasonModel.fromJson(e)).toList();
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }

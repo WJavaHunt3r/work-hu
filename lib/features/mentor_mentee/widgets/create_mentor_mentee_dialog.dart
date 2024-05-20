@@ -17,15 +17,15 @@ class CreateMentorMenteeDialog extends ConsumerWidget {
               ref.read(mentorMenteeDataProvider.notifier).clearCreation();
               context.pop();
             },
-            child: Text("cancel")),
+            child: const Text("cancel")),
         TextButton(
             onPressed: () => ref.watch(mentorMenteeDataProvider.notifier).postMentee().then((value) => context.pop()),
-            child: Text("Create"))
+            child: const Text("Create"))
       ],
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text("Mentor"),
+          const Text("Mentor"),
           WorkDropDownSearchFormField<UserModel>(
             direction: AxisDirection.up,
             controller: ref.read(mentorMenteeDataProvider.notifier).mentorController,
@@ -34,7 +34,7 @@ class CreateMentorMenteeDialog extends ConsumerWidget {
             itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
             suggestionsCallback: (String pattern) => ref.read(mentorMenteeDataProvider.notifier).filterUsers(pattern),
           ),
-          Text("Mentee"),
+          const Text("Mentee"),
           WorkDropDownSearchFormField<UserModel>(
             direction: AxisDirection.up,
             controller: ref.read(mentorMenteeDataProvider.notifier).menteeController,

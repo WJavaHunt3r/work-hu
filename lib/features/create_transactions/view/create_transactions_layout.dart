@@ -30,7 +30,6 @@ class CreateTransactionsLayout extends ConsumerWidget {
   }
 
   List<Widget> enabledWidgets(BuildContext context, WidgetRef ref) {
-    var users = ref.watch(createTransactionsDataProvider).users;
     var items = ref.watch(createTransactionsDataProvider).transactionItems;
     var transactionType = ref.watch(createTransactionsDataProvider).transactionType;
     var account = ref.watch(createTransactionsDataProvider).account;

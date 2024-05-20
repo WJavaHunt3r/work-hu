@@ -49,7 +49,7 @@ class ChangePasswordDataNotifier extends StateNotifier<ChangePasswordState> {
             state.username, Utils.encrypt(state.password), Utils.encrypt(state.newPassword));
         clear(true, true);
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       state = state.copyWith(
           username: "",
           password: "",

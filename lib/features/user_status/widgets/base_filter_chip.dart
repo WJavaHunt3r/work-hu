@@ -21,8 +21,8 @@ class BaseFilterChip extends ConsumerWidget {
         ),
         checkmarkColor: isSelected ? AppColors.white : AppColors.primary,
         selected: isSelected,
-        color: MaterialStateColor.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        color: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return AppColors.primary;
           }
           return Colors.transparent;

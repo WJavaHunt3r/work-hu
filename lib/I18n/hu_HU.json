@@ -69,7 +69,7 @@
   "goal_maintenance_goal": "Cél",
   "goal_maintenance_user": "Felhasználó",
   "goals_search": "Keresés ...",
-  "home_status_freeze": "Státusz lefagyasztva!\n Eredményhírdetés:",
+  "home_status_freeze": "Státusz lefagyasztva!\n Eredményhírdetés:\n %s",
   "user_points_title": "Pontjaim",
   "user_points_waiting_for_approval": "Beírásra vár",
   "profile_no_goal": "Nincs cél beállítva",

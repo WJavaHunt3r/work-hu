@@ -26,7 +26,7 @@ class UserPointsLayout extends ConsumerWidget {
               tabs: createTabs(items),
               tabViews: createTabView(items, activityItems),
             ))
-        : SizedBox();
+        : const SizedBox();
   }
 
   num countItems(List<TransactionItemModel> items) {

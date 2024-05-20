@@ -59,7 +59,7 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
           }
         });
       });
-    } on DioError {
+    } on DioException {
       // if(e.type == DioErrorType.)
       state = state.copyWith(
           username: "", password: "", modelState: ModelState.error, message: "Wrong username or password");

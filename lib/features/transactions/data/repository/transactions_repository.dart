@@ -11,7 +11,7 @@ class TransactionRepository {
     try {
       final res = await _transactionApi.createTransaction(transaction, userId);
       return TransactionModel.fromJson(res);
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }
@@ -20,7 +20,7 @@ class TransactionRepository {
     try {
       final res = await _transactionApi.deleteTransaction(transactionId, userId);
       return res;
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }
@@ -29,7 +29,7 @@ class TransactionRepository {
     try {
       final res = await _transactionApi.getTransactions(roundId);
       return res.map((e) => TransactionModel.fromJson(e)).toList();
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }
