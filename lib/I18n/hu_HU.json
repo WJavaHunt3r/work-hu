@@ -8,6 +8,7 @@
   "cancel": "Mégsem",
   "confirm": "Megerősít",
   "exit": "Kilépés",
+  "delete": "Törlés",
   "activities_submitted": "Beküldve",
   "activities_registered": "Beírva",
   "activities_register_confirm_title": "Munka regisztrálása",
@@ -100,10 +101,16 @@
   "user_details_email": "Email",
   "user_details_phone_number": "Telefonszám",
   "transactions_round": "Kör",
+  "transactions_delete_warning": "Biztosan törli a tranzakciót?",
   "login_username": "Felhasználónév",
   "login_password": "Jelszó",
   "login_login": "Bejelentkezés",
   "login_title": "Bejelentkezés",
   "login_password_changed_success": "Sikeres jelszó módosítás. Jelentkezz be újra",
-  "login_password_changed_failed": "Sikertelen jelszó módosítás. Próbáld újra!"
+  "login_password_changed_failed": "Sikertelen jelszó módosítás. Próbáld újra!",
+  "login_form_empty_username": "Üres felhasználónév",
+  "login_form_empty_password": "Üres jelszó",
+  "login_forgotten_password": "Elfelejtett jelszó",
+  "login_reset_password_question": "Biztosan visszaállítod a jelszót? Az új jelszavadat emailben küldjük el",
+  "login_reset_password_confirm_title": "Jelszó visszaállítása"
 }

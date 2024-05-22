@@ -22,15 +22,10 @@ class CreateActivityLayout extends ConsumerWidget {
             })
         : null);
     return Stack(children: [
-      Column(children: [
-        Expanded(
-            child: SingleChildScrollView(
-          child: Column(
-              children: ref.watch(createActivityDataProvider).description.isEmpty
-                  ? [const CollapsableDetailsLayout()]
-                  : enabledWidgets(context, ref)),
-        ))
-      ]),
+      ListView(
+          children: ref.watch(createActivityDataProvider).description.isEmpty
+              ? [const CollapsableDetailsLayout()]
+              : enabledWidgets(context, ref)),
       ref.watch(createActivityDataProvider).modelState == ModelState.processing
           ? const Center(
               child: CircularProgressIndicator(),

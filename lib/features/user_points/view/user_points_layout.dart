@@ -23,8 +23,8 @@ class UserPointsLayout extends ConsumerWidget {
             length: currentRound.toInt() + 1,
             initialIndex: currentRound == 0 ? 0 : currentRound.toInt() - 1,
             child: BaseTabView(
-              tabs: createTabs(items),
-              tabViews: createTabView(items, activityItems),
+              tabs: createTabs(items, currentRound),
+              tabViews: createTabView(items, activityItems, currentRound),
             ))
         : const SizedBox();
   }
@@ -37,8 +37,8 @@ class UserPointsLayout extends ConsumerWidget {
     return count;
   }
 
-  List<Tab> createTabs(List<TransactionItemModel> items) {
-    var count = countItems(items);
+  List<Tab> createTabs(List<TransactionItemModel> items, num currentRound) {
+    var count = currentRound;
     var list = <Tab>[];
     for (num i = 1; i <= count; i++) {
       list.add(Tab(
@@ -60,8 +60,9 @@ class UserPointsLayout extends ConsumerWidget {
     return list;
   }
 
-  List<Widget> createTabView(List<TransactionItemModel> items, List<ActivityItemsModel> activityItems) {
-    var count = countItems(items);
+  List<Widget> createTabView(
+      List<TransactionItemModel> items, List<ActivityItemsModel> activityItems, num currentRound) {
+    var count = currentRound;
     var list = <Widget>[];
     for (num i = 1; i <= count; i++) {
       List<TransactionItemModel> currentItems = items.where((element) => element.round!.roundNumber == i).toList();

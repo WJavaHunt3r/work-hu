@@ -54,7 +54,7 @@ class WorkHuApp extends ConsumerWidget {
               );
             });
       },
-      maximumSize: const Size(415, 650),
+      maximumSize: const Size(415, 1000),
     );
   }
 }

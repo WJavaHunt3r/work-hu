@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CollapsablePanel extends StatelessWidget {
   const CollapsablePanel({super.key, required this.expansionCallback, required this.panels});
@@ -12,6 +13,7 @@ class CollapsablePanel extends StatelessWidget {
         child: Padding(
       padding: const EdgeInsets.all(8.0),
       child: ExpansionPanelList(
+        materialGapSize: 10.sp,
         expansionCallback: expansionCallback,
         elevation: 0,
         children: panels,

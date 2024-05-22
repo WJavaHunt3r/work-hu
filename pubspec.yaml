@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
   flutter_riverpod: ^2.3.6
   cupertino_icons: ^1.0.2
   syncfusion_flutter_gauges: ^25.1.35

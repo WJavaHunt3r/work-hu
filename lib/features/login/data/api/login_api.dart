@@ -26,4 +26,13 @@ class LoginApi {
       rethrow;
     }
   }
+
+  Future<dynamic> sendNewPassword(String username) async {
+    try {
+      final res = await _dioClient.dio.post("/auth/sendNewPassword", data: {'username': username});
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

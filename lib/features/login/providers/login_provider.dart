@@ -16,8 +16,8 @@ final loginApiProvider = Provider<LoginApi>((ref) => LoginApi());
 
 final loginRepoProvider = Provider<LoginRepository>((ref) => LoginRepository(ref.read(loginApiProvider)));
 
-final loginDataProvider = StateNotifierProvider<LoginDataNotifier, LoginState>(
-    (ref) => LoginDataNotifier(ref.read(loginRepoProvider), ref.read(routerProvider), ref.read(userDataProvider.notifier)));
+final loginDataProvider = StateNotifierProvider<LoginDataNotifier, LoginState>((ref) =>
+    LoginDataNotifier(ref.read(loginRepoProvider), ref.read(routerProvider), ref.read(userDataProvider.notifier)));
 
 class LoginDataNotifier extends StateNotifier<LoginState> {
   LoginDataNotifier(this.loginRepository, this.router, this.userSessionProvider) : super(const LoginState()) {
@@ -45,7 +45,8 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
               await Utils.saveData('password', state.password).then((value) {
                 state = state.copyWith(username: "", password: "", modelState: ModelState.success);
                 if (router.canPop()) {
-                  router.pop();
+                  router.go("/");
+                  // router.pop();
                 }
                 _clear();
               });
@@ -74,5 +75,21 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
     usernameController.clear();
     passwordController.clear();
     state = state.copyWith(username: "", password: "", modelState: modelState ?? ModelState.empty, message: s ?? "");
+  }
+
+  Future<void> reset() async {
+    state = state.copyWith(modelState: ModelState.processing);
+    try {
+      await loginRepository.sendNewPassword(state.username);
+      state = state.copyWith(
+          modelState: ModelState.success, resetState: ModelState.success, message: "Új jelszó emailben elküldve");
+    } on DioException catch (e) {
+      usernameController.text = "";
+      passwordController.text = "";
+      state = state.copyWith(
+          username: "", password: "", modelState: ModelState.error, message: "Nem létező felhasználónév");
+    } catch (e) {
+      state = state.copyWith(modelState: ModelState.error);
+    }
   }
 }

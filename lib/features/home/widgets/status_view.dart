@@ -19,11 +19,14 @@ class StatusView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var currentRound = ref.watch(roundDataProvider).currentRoundNumber;
-    return DefaultTabController(
-      length: currentRound.toInt() + 1,
-      initialIndex: currentRound == 0 ? 0 : currentRound.toInt() - 1,
-      child: BaseTabView(tabs: createTabs(teamRounds), tabViews: createTabView(teamRounds, ref)),
-    );
+    return teamRounds.isNotEmpty
+        ? DefaultTabController(
+            length: currentRound.toInt() + 1,
+            initialIndex: currentRound == 0 ? 0 : currentRound.toInt() - 1,
+            child: BaseTabView(
+                tabs: createTabs(teamRounds, currentRound), tabViews: createTabView(teamRounds, ref, currentRound)),
+          )
+        : const SizedBox();
   }
 
   num countItems(List<TeamRoundModel> items) {
@@ -34,8 +37,8 @@ class StatusView extends ConsumerWidget {
     return count;
   }
 
-  List<Tab> createTabs(List<TeamRoundModel> items) {
-    var count = countItems(items);
+  List<Tab> createTabs(List<TeamRoundModel> items, num currentRound) {
+    var count = currentRound;
     var list = <Tab>[];
     for (num i = 1; i <= count; i++) {
       list.add(Tab(
@@ -62,12 +65,12 @@ class StatusView extends ConsumerWidget {
     return list;
   }
 
-  List<Widget> createTabView(List<TeamRoundModel> items, WidgetRef ref) {
+  List<Widget> createTabView(List<TeamRoundModel> items, WidgetRef ref, num currentRound) {
     var max = 0.0;
     for (var t in teamRounds) {
       if (t.teamPoints > max) max = t.teamPoints;
     }
-    var count = countItems(items);
+    var count = currentRound;
     var list = <Widget>[];
     for (int i = 1; i <= count; i++) {
       var currentRounds = teamRounds.where((element) => element.round.roundNumber == i);

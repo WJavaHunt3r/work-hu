@@ -6,7 +6,7 @@ class DioClient {
   // static const String _baseUrl = "http://192.168.1.167:8990/work-hu/api"; //Home
   // static const String _baseUrl = "http://192.168.195.91:8990/work-hu/api"; //hotspot
   // static const String _baseUrl = "http://10.67.28.59:8990/work-hu/api"; //hotspot
-  // static const String _baseUrl = "http://10.70.0.138:8990/work-hu/api"; //meló
+  // static const String _baseUrl = "http://10.70.0.121:8990/work-hu/api"; //meló
   // static const String _baseUrl = "http://10.10.11.133:8990/work-hu/api"; //Duka
   // static const String _baseUrl = "https://aksjon.bcc-ktk.org/work-hu/api"; //localhost
   // static const String _baseUrl = "http://78.139.43.2:8990/work-hu/api"; //távoli

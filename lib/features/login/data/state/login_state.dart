@@ -9,6 +9,7 @@ abstract class LoginState with _$LoginState {
       {@Default("") String username,
       @Default("") String password,
       @Default(ModelState.empty) ModelState modelState,
+        @Default(ModelState.empty) ModelState resetState,
       @Default("") String message}) = _LoginState;
 
   const LoginState._();

@@ -58,8 +58,8 @@ class TransactionsLayout extends ConsumerWidget {
                           builder: (buildContext) {
                             return ConfirmAlertDialog(
                               onConfirm: () => buildContext.pop(true),
-                              title: "exit".i18n(),
-                              content: Text("create_activity_exit_warning".i18n()),
+                              title: "delete".i18n(),
+                              content: Text("transactions_delete_warning_warning".i18n()),
                             );
                           })
                       .then((confirmed) =>
