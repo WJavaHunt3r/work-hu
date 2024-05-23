@@ -67,6 +67,10 @@ final routerProvider = Provider<GoRouter>((ref) => GoRouter(
           builder: (BuildContext context, GoRouterState state) => const HomePage(),
         ),
         GoRoute(
+          path: '/home',
+          builder: (BuildContext context, GoRouterState state) => const HomePage(),
+        ),
+        GoRoute(
           path: '/login',
           builder: (BuildContext context, GoRouterState state) => const LoginPage(),
         ),

@@ -44,10 +44,7 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
             await Utils.saveData('user', state.username).then((value) async {
               await Utils.saveData('password', state.password).then((value) {
                 state = state.copyWith(username: "", password: "", modelState: ModelState.success);
-                if (router.canPop()) {
-                  router.go("/");
-                  // router.pop();
-                }
+                router.go("/home");
                 _clear();
               });
             });
