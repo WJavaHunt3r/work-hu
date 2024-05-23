@@ -21,7 +21,7 @@ class LoginLayout extends ConsumerWidget {
             context: context,
             builder: (context) {
               return SuccessAlertDialog(title: ref.read(loginDataProvider).message);
-            })
+            }).then((value) => ref.watch(loginDataProvider.notifier).clearResetState())
         : null);
     final loginProvider = ref.read(loginDataProvider.notifier);
     return Stack(

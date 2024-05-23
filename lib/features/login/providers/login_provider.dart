@@ -74,6 +74,10 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
     state = state.copyWith(username: "", password: "", modelState: modelState ?? ModelState.empty, message: s ?? "");
   }
 
+  Future<void> clearResetState() async {
+    state = state.copyWith(resetState: ModelState.empty);
+  }
+
   Future<void> reset() async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
