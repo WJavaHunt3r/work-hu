@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
+import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/work_drop_down_dearch_form_field.dart';
 import 'package:work_hu/features/create_activity/provider/create_activity_provider.dart';
@@ -31,28 +32,19 @@ class ActivityDetails extends ConsumerWidget {
                   )),
             ),
             SizedBox(height: 5.sp),
-            TextField(
+            TextFormField(
               textCapitalization: TextCapitalization.sentences,
               controller: ref.watch(createActivityDataProvider.notifier).descriptionController,
               decoration: InputDecoration(labelText: "create_activity_description".i18n()),
+              validator: (text) {
+                if (text == null || text.isEmpty) {
+                  return 'create_activity_description_error'.i18n();
+                }
+                return null;
+              },
               autocorrect: true,
-              onTap: () => ref.watch(createActivityDataProvider.notifier).descriptionController.selection = TextSelection(
-                  baseOffset: 0,
-                  extentOffset: ref.watch(createActivityDataProvider.notifier).descriptionController.value.text.length),
               textInputAction: TextInputAction.next,
               // onSubmitted: (text) => ref.watch(createActivityDataProvider.notifier).updateDescription(text),
-            ),
-            SizedBox(height: 5.sp),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("create_activity_paid_activity".i18n()),
-                Switch(
-                    activeColor: AppColors.primary,
-                    inactiveTrackColor: AppColors.primary100,
-                    value: ref.watch(createActivityDataProvider).account == Account.MYSHARE,
-                    onChanged: (value) => ref.watch(createActivityDataProvider.notifier).updateAccount(value)),
-              ],
             ),
             SizedBox(height: 5.sp),
             Row(
@@ -68,7 +60,8 @@ class ActivityDetails extends ConsumerWidget {
                 onTap: () {
                   ref.watch(createActivityDataProvider.notifier).employerController.selection = TextSelection(
                       baseOffset: 0,
-                      extentOffset: ref.watch(createActivityDataProvider.notifier).employerController.value.text.length);
+                      extentOffset:
+                          ref.watch(createActivityDataProvider.notifier).employerController.value.text.length);
                 },
                 onSuggestionSelected: (UserModel suggestion) {
                   ref.read(createActivityDataProvider.notifier).updateEmployer(suggestion);
@@ -90,12 +83,36 @@ class ActivityDetails extends ConsumerWidget {
               onSuggestionSelected: (UserModel suggestion) =>
                   ref.read(createActivityDataProvider.notifier).updateResponsible(suggestion),
               itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
-              suggestionsCallback: (String pattern) => ref.read(createActivityDataProvider.notifier).filterUsers(pattern),
+              suggestionsCallback: (String pattern) =>
+                  ref.read(createActivityDataProvider.notifier).filterUsers(pattern),
               controller: ref.watch(createActivityDataProvider.notifier).responsibleController,
-              onTap: () => ref.watch(createActivityDataProvider.notifier).responsibleController.selection = TextSelection(
-                  baseOffset: 0,
-                  extentOffset: ref.watch(createActivityDataProvider.notifier).responsibleController.value.text.length),
+              onTap: () => ref.watch(createActivityDataProvider.notifier).responsibleController.selection =
+                  TextSelection(
+                      baseOffset: 0,
+                      extentOffset:
+                          ref.watch(createActivityDataProvider.notifier).responsibleController.value.text.length),
             ),
+            SizedBox(height: 5.sp),
+            ref.watch(createActivityDataProvider).employer != null &&
+                    ref.watch(createActivityDataProvider).employer!.myShareID == 0
+                ? Padding(
+                    padding: EdgeInsets.only(top: 4.sp, bottom: 4.sp),
+                    child: DropdownButtonFormField(
+                        dropdownColor: AppColors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(8.sp)),
+                        decoration: InputDecoration(
+                            fillColor: Colors.white, labelText: "create_activity_transaction_type".i18n()),
+                        value: ref.watch(createActivityDataProvider).transactionType,
+                        items: [TransactionType.DUKA_MUNKA_2000, TransactionType.DUKA_MUNKA, TransactionType.POINT]
+                            .map((e) => DropdownMenuItem<TransactionType>(
+                                  value: e,
+                                  child: Text(e.name),
+                                ))
+                            .toList(),
+                        onChanged: (value) =>
+                            value != null ? ref.watch(createActivityDataProvider.notifier).updateAccount(value) : null),
+                  )
+                : SizedBox(),
             ref.watch(createActivityDataProvider).description.isEmpty
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,

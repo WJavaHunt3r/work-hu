@@ -22,7 +22,7 @@ class ActivitySumCard extends ConsumerWidget {
     var sum = ref.watch(createActivityDataProvider).sum;
     return Card(
         child: Padding(
-      padding: EdgeInsets.only(left:4.sp, right: 4.sp),
+      padding: EdgeInsets.only(left: 4.sp, right: 4.sp),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -45,7 +45,8 @@ class ActivitySumCard extends ConsumerWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(ref.watch(createActivityDataProvider).account == Account.MYSHARE &&
-                      ref.watch(createActivityDataProvider).transactionType == TransactionType.HOURS
+                      [TransactionType.HOURS, TransactionType.DUKA_MUNKA_2000]
+                          .contains(ref.watch(createActivityDataProvider).transactionType)
                   ? " (${(sum * 2000).toInt()} Ft)"
                   : ref.watch(createActivityDataProvider).account == Account.MYSHARE &&
                           ref.watch(createActivityDataProvider).transactionType == TransactionType.DUKA_MUNKA

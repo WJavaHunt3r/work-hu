@@ -62,8 +62,9 @@ class TransactionsLayout extends ConsumerWidget {
                               content: Text("transactions_delete_warning_warning".i18n()),
                             );
                           })
-                      .then((confirmed) =>
-                          ref.read(transactionsDataProvider.notifier).deleteTransaction(current.id!, index)),
+                      .then((confirmed) => confirmed != null && confirmed
+                          ? ref.read(transactionsDataProvider.notifier).deleteTransaction(current.id!, index)
+                          : null),
                   dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
                   child: ListCard(
                       isLast: transactions.length - 1 == index,

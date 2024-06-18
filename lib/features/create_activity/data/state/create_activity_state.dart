@@ -15,7 +15,7 @@ abstract class CreateActivityState with _$CreateActivityState {
       UserModel? responsible,
       UserModel? employer,
       DateTime? activityDate,
-      @Default(TransactionType.POINT) TransactionType transactionType,
+      @Default(TransactionType.DUKA_MUNKA) TransactionType transactionType,
       @Default(Account.MYSHARE) Account account,
       @Default("") String description,
       @Default(0) num sum,

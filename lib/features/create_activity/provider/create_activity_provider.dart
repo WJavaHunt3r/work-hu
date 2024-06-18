@@ -76,7 +76,6 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
           modelState: ModelState.success,
           users: data,
         );
-        updateAccount(true);
         updateEmployer(
             state.users.firstWhere((element) => element.myShareID == 0, orElse: () => currentUserProvider.state!));
       });
@@ -162,7 +161,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
   updateEmployer(UserModel u) {
     employerController.text = "${u.getFullName()} (${u.getAge()}) ";
     state = state.copyWith(employer: u);
-    updateAccount(state.account == Account.MYSHARE);
+    updateAccount(u.myShareID == 0 ? TransactionType.DUKA_MUNKA : TransactionType.HOURS);
   }
 
   updateResponsible(UserModel u) {
@@ -171,18 +170,9 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
     _updateItems();
   }
 
-  updateAccount(bool isPaid) {
-    if (!isPaid) {
-      updateEmployer(
-          state.users.firstWhere((element) => element.myShareID == 0, orElse: () => currentUserProvider.state!));
-    }
-    var account = isPaid ? Account.MYSHARE : Account.OTHER;
-    var trType = isPaid && state.employer?.myShareID != 0
-        ? TransactionType.HOURS
-        : isPaid && state.employer?.myShareID == 0
-            ? TransactionType.DUKA_MUNKA
-            : TransactionType.POINT;
-    state = state.copyWith(account: account, transactionType: trType);
+  updateAccount(TransactionType transactionTye) {
+    var account = transactionTye == TransactionType.POINT ? Account.OTHER : Account.MYSHARE;
+    state = state.copyWith(account: account, transactionType: transactionTye);
     _updateItems();
   }
 

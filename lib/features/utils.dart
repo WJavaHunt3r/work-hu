@@ -21,7 +21,8 @@ import 'package:work_hu/features/season/data/model/season_model.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 
 class Utils {
-  static const FlutterSecureStorage _storage = FlutterSecureStorage();
+  static const FlutterSecureStorage _storage =
+      FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));
 
   static Future<void> saveData(String key, String value) async {
     try {
@@ -75,7 +76,8 @@ class Utils {
   static String getTransactionTypeText(TransactionType transactionType, [bool long = true]) {
     if (transactionType == TransactionType.POINT) {
       return long ? "base_text_points".i18n() : "base_text_points_short".i18n();
-    } else if (transactionType == TransactionType.HOURS || transactionType == TransactionType.DUKA_MUNKA) {
+    } else if ([TransactionType.HOURS, TransactionType.DUKA_MUNKA, TransactionType.DUKA_MUNKA_2000]
+        .contains(transactionType)) {
       return long ? "base_text_hours".i18n() : "base_text_hours_short".i18n();
     } else if (transactionType == TransactionType.CREDIT) {
       return long ? "base_text_credits".i18n() : "base_text_credits_short".i18n();

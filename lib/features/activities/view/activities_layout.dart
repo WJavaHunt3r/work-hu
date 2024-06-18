@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
+import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/app/widgets/error_alert_dialog.dart';
 import 'package:work_hu/app/widgets/success_alert_dialog.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
@@ -80,7 +82,19 @@ class ActivitiesLayout extends ConsumerWidget {
           var current = currentItems[index];
           return Dismissible(
               key: UniqueKey(),
-              onDismissed: (direction) => ref.watch(activityDataProvider.notifier).deleteActivity(current.id!, index),
+              onDismissed: (direction) => showDialog(
+                      context: context,
+                      builder: (buildContext) {
+                        return ConfirmAlertDialog(
+                          onConfirm: () => buildContext.pop(true),
+                          title: "delete".i18n(),
+                          content: Text("activity_delete_warning".i18n()),
+                        );
+                      })
+                  .then((confirmed) =>
+              confirmed != null && confirmed
+                      ? ref.watch(activityDataProvider.notifier).deleteActivity(current.id!, index) : null)
+                  .then((value) => ref.read(activityDataProvider.notifier).getActivities()),
               dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
               child: ActivityListItem(
                 current: currentItems[index],

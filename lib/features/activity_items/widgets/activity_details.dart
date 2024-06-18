@@ -56,13 +56,7 @@ class ActivityDetails extends StatelessWidget {
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("activity_paid_activity".i18n()),
-            Checkbox(
-              value: activity.account == Account.MYSHARE,
-              onChanged: null,
-            ),
-          ],
+          children: [Text("activity_paid_activity".i18n()), Text(activity.transactionType.name)],
         ),
         Padding(
           padding: EdgeInsets.all(8.sp),
