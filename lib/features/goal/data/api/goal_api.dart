@@ -47,7 +47,7 @@ class GoalApi {
 
   Future<dynamic> putGoal(GoalModel goal, num goalId) async {
     try {
-      final res = await _dioClient.dio.put("/goal", queryParameters: {"userId": goalId}, data: goal);
+      final res = await _dioClient.dio.put("/goal", queryParameters: {"userId": goalId}, data: goal.toJson());
       return res.data;
     } catch (e) {
       rethrow;

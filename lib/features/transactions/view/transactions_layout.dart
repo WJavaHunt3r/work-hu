@@ -59,7 +59,7 @@ class TransactionsLayout extends ConsumerWidget {
                             return ConfirmAlertDialog(
                               onConfirm: () => buildContext.pop(true),
                               title: "delete".i18n(),
-                              content: Text("transactions_delete_warning_warning".i18n()),
+                              content: Text("transactions_delete_warning".i18n()),
                             );
                           })
                       .then((confirmed) => confirmed != null && confirmed
