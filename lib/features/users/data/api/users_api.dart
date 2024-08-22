@@ -12,7 +12,7 @@ class UsersApi {
     try {
       Map<String, dynamic> map = {"listO36": listO36};
       if (teamModel != null) map.addAll({"teamId": teamModel.id});
-      final res = await _dioClient.dio.get("/users", queryParameters: map);
+      final res = await _dioClient.dio.get("/user", queryParameters: map);
       return res.data;
     } catch (e) {
       rethrow;
@@ -21,7 +21,7 @@ class UsersApi {
 
   Future<dynamic> getUserById(num userId) async {
     try {
-      final res = await _dioClient.dio.get("/user", queryParameters: {"userId": userId});
+      final res = await _dioClient.dio.get("/user/$userId");
       return res.data;
     } catch (e) {
       rethrow;
@@ -30,7 +30,7 @@ class UsersApi {
 
   Future<dynamic> getUserByMyShareId(num myShareId) async {
     try {
-      final res = await _dioClient.dio.get("/user", queryParameters: {"myShareId": myShareId});
+      final res = await _dioClient.dio.get("/user/myShare/$myShareId");
       return res.data;
     } catch (e) {
       rethrow;

@@ -21,7 +21,7 @@ class GoalsMaintenance extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final GoalModel goal = ref.read(goalDataProvider).selectedGoal;
+    final GoalModel goal = ref.watch(goalDataProvider).selectedGoal;
     return Dialog.fullscreen(
         child: Scaffold(
       appBar: AppBar(

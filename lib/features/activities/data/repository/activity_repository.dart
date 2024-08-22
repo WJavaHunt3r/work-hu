@@ -12,14 +12,16 @@ class ActivityRepository {
       num? employerId,
       num? createUserId,
       bool? registeredInApp,
-      bool? registeredInMyShare}) async {
+      bool? registeredInMyShare,
+      String? searchText}) async {
     try {
       final res = await _activityApi.getActivities(
           registeredInApp: registeredInApp,
           registeredInMyShare: registeredInMyShare,
           responsibleId: responsibleId,
           createUserId: createUserId,
-          employerId: employerId);
+          employerId: employerId,
+          searchText: searchText);
       return res.map((e) => ActivityModel.fromJson(e)).toList();
     } on DioException {
       rethrow;

@@ -1,11 +1,11 @@
 {
-    "name": "Work HU",
-    "short_name": "Work HU",
+    "name": "DukApp",
+    "short_name": "DukApp",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#173935",
-    "theme_color": "#173935",
-    "description": "See who's leading the local Work competition.",
+    "background_color": "#E3E7E9",
+    "theme_color": "#E3E7E9",
+    "description": "See who's leading the local competition.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
@@ -32,7 +32,7 @@
             "purpose": "maskable"
         }
     ],
-    "author": "",
+    "author": "BCC Ungarn",
     "config": {},
     "createAt": "",
     "homepage": "",

@@ -19,8 +19,7 @@ class TransactionApi {
 
   Future<dynamic> deleteTransaction(num transactionId, num userId) async {
     try {
-      final res = await _dioClient.dio
-          .delete("/transaction", queryParameters: {"transactionId": transactionId, "userId": userId});
+      final res = await _dioClient.dio.delete("/transaction/$transactionId", queryParameters: {"userId": userId});
       return res.data;
     } catch (e) {
       rethrow;
@@ -29,7 +28,7 @@ class TransactionApi {
 
   Future<List<dynamic>> getTransactions([num? roundId]) async {
     try {
-      final res = await _dioClient.dio.get("/transactions", queryParameters: {"roundId": roundId});
+      final res = await _dioClient.dio.get("/transaction", queryParameters: {"roundId": roundId});
       return res.data;
     } catch (e) {
       rethrow;

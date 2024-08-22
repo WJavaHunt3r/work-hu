@@ -7,7 +7,6 @@ class GlobalTheme {
       useMaterial3: true,
       colorScheme: _customColorScheme,
       primaryColor: AppColors.backgroundColor,
-      fontFamily: "Poppins",
       textTheme: TextTheme(
         bodyLarge: TextStyle(
           fontSize: 15.sp,
@@ -24,17 +23,14 @@ class GlobalTheme {
         displayLarge: TextStyle(
           color: AppColors.appGreen,
           fontSize: 15.sp,
-          fontFamily: 'Poppins',
         ),
         displayMedium: TextStyle(
           color: AppColors.appGreen,
           fontSize: 12.sp,
-          fontFamily: 'Poppins',
         ),
         displaySmall: TextStyle(
           color: AppColors.appGreen,
           fontSize: 10.sp,
-          fontFamily: 'Poppins',
         ),
         labelMedium: TextStyle(fontSize: 12.sp),
         labelLarge: TextStyle(fontSize: 15.sp),
@@ -50,7 +46,7 @@ class GlobalTheme {
           titleTextStyle: TextStyle(fontSize: 18.sp, color: AppColors.primary),
           iconTheme: IconThemeData(color: AppColors.primary, size: 20.sp),
           // elevation: 5.sp,
-          scrolledUnderElevation: 10.sp,
+          // scrolledUnderElevation: 10.sp,
           // surfaceTintColor: AppColors.white,
           // foregroundColor: AppColors.backgroundColor,
           backgroundColor: AppColors.backgroundColor,

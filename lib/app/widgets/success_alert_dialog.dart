@@ -26,13 +26,20 @@ class SuccessAlertDialog extends StatelessWidget {
                         (states) => BorderSide(color: AppColors.primary, width: 2.sp),
                       ),
                       backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
-                      foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
+                      foregroundColor: WidgetStateColor.resolveWith((states) {
+                        if (states.contains(WidgetState.focused) ||
+                            states.contains(WidgetState.pressed) ||
+                            states.contains(WidgetState.hovered)) {
+                          return AppColors.white;
+                        }
+                        return AppColors.primary;
+                      }),
                       overlayColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
                     ),
                     onPressed: () => context.pop(),
                     child: const Text(
                       "OK",
-                      style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ))));
   }
 }

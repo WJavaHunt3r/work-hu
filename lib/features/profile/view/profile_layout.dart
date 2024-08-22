@@ -6,10 +6,13 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/user_provider.dart';
-import 'package:work_hu/app/widgets/base_text_from_field.dart';
+import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
+import 'package:work_hu/app/widgets/menu_options_list_tile.dart';
+import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:work_hu/features/profile/widgets/profile_header.dart';
-import 'package:work_hu/features/profile/widgets/tab_view.dart';
+import 'package:work_hu/features/profile/widgets/profile_tab_view.dart';
+import 'package:work_hu/features/users/widgets/user_details.dart';
 
 class ProfileLayout extends ConsumerWidget {
   const ProfileLayout({super.key});
@@ -32,30 +35,37 @@ class ProfileLayout extends ConsumerWidget {
                       : ref.watch(profileDataProvider).modelState == ModelState.processing
                           ? const Center(child: CircularProgressIndicator())
                           : SizedBox(
-                              height: 135.sp * 2,
-                              child: TabView(
-                                user: user,
+                              height: 150.sp,
+                              child: ProfileTabView(
                                 userRounds: ref.watch(profileDataProvider).userRounds,
                               )),
-                  BaseTextFormField(
-                    labelText: "user_details_email".i18n(),
-                    enabled: false,
-                    initialValue: user.email ?? "", onChanged: (String text) {},
-                    // onChanged: (String text) => text.isNotEmpty
-                    //     ? ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(email: text))
-                    //     : null,
-                  ),
-                  BaseTextFormField(
-                    labelText: "user_details_phone_number".i18n(),
-                    enabled: false,
-                    initialValue: user.phoneNumber == null ? "" : user.phoneNumber.toString(),
-                    keyBoardType: TextInputType.number,
-                    onChanged: (String text) {},
-                    // onChanged: (String text) => text.isNotEmpty
-                    //     ? ref
-                    //     .watch(usersDataProvider.notifier)
-                    //     .updateCurrentUser(user.copyWith(phoneNumber: num.tryParse(text) ?? 0))
-                    //     : null,
+                  const Divider(),
+                  Column(
+                    children: [
+                      MenuOptionsListTile(
+                          title: "profile_details_title".i18n(),
+                          onTap: () => showGeneralDialog(
+                              barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                              barrierColor: AppColors.primary,
+                              transitionDuration: const Duration(milliseconds: 200),
+                              context: context,
+                              pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
+                                return UserDetails(
+                                  user: user,
+                                  enabled: false,
+                                );
+                              })),
+                      user.isMentor()
+                          ? MenuOptionsListTile(
+                              title: "profile_mentees_title".i18n(),
+                              onTap: () => ref.read(routerProvider).push("/mentees"))
+                          : SizedBox(),
+                      user.isMentor()
+                          ? MenuOptionsListTile(
+                              title: "profile_activities_title".i18n(),
+                              onTap: () => ref.read(routerProvider).push("/activities"))
+                          : SizedBox(),
+                    ],
                   ),
                 ],
               )),
@@ -66,8 +76,15 @@ class ProfileLayout extends ConsumerWidget {
                     padding: EdgeInsets.only(bottom: 8.sp),
                     child: TextButton(
                         onPressed: () {
-                          ref.read(profileDataProvider.notifier).logout();
-                          context.pop();
+                          showDialog(
+                              context: context,
+                              builder: (context) => ConfirmAlertDialog(
+                                  onConfirm: () {
+                                    ref.read(profileDataProvider.notifier).logout();
+                                    context.pop();
+                                  },
+                                  title: "profile_logout_confirm_title".i18n(),
+                                  content: Text("profile_logout_question".i18n())));
                         },
                         style: ButtonStyle(
                           side: WidgetStateBorderSide.resolveWith(

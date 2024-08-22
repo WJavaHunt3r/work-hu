@@ -10,7 +10,7 @@ class SeasonApi {
 
   Future<List<dynamic>> getSeasons() async {
     try {
-      final res = await _dioClient.dio.get("/seasons");
+      final res = await _dioClient.dio.get("/season");
       return res.data;
     } catch (e) {
       rethrow;

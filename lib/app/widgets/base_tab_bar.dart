@@ -11,7 +11,9 @@ class BaseTabView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.transparent,
         appBar: AppBar(
+            backgroundColor: Colors.transparent,
             automaticallyImplyLeading: false,
             flexibleSpace: Container(
                 padding: EdgeInsets.all(0.5.sp),
@@ -22,12 +24,12 @@ class BaseTabView extends StatelessWidget {
                     unselectedLabelStyle: TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.normal,
-                        fontSize: 14.sp,
+                        fontSize: 12.sp,
                         overflow: TextOverflow.ellipsis),
                     labelStyle: TextStyle(
                         color: AppColors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 18.sp,
+                        fontSize: 16.sp,
                         overflow: TextOverflow.ellipsis),
                     dividerColor: Colors.transparent,
                     labelPadding: EdgeInsets.all(0.sp),

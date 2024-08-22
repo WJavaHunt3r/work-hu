@@ -8,7 +8,7 @@ class TeamRoundApi {
 
   Future<List<dynamic>> fetchTeamRoundsApiRequest() async {
     try {
-      final res = await _dioClient.dio.get("/teamRounds", queryParameters: {"seasonYear": DateTime.now().year});
+      final res = await _dioClient.dio.get("/paceTeamRounds", queryParameters: {"seasonYear": DateTime.now().year});
       return res.data;
     } catch (e) {
       rethrow;

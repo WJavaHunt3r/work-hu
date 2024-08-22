@@ -14,25 +14,24 @@ class ProfileHeader extends ConsumerWidget {
     var spouse = ref.watch(profileDataProvider).spouse;
     return Column(
       children: [
-        user.team == null
-            ? Icon(
-                Icons.person_outline,
-                size: 100.sp,
-              )
-            : SvgPicture.asset(
-                "assets/logos/${user.team!.color}_vacduka.svg",
-                height: 120.sp,
-                fit: BoxFit.contain,
-              ),
+        Icon(
+          Icons.person_outline,
+          size: 80.sp,
+        ),
+        // : SvgPicture.asset(
+        //     "assets/logos/${user.team!.color}_vacduka.svg",
+        //     height: 120.sp,
+        //     fit: BoxFit.contain,
+        //   ),
         Padding(
             padding: EdgeInsets.symmetric(vertical: 12.sp),
             child: spouse == null
                 ? Text(
                     user.getFullName(),
-                    style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.w800),
+                    style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w800),
                   )
                 : Text("${user.getFullName()}\n${spouse.getFullName()}",
-                    style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.w800)))
+                    style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w800)))
       ],
     );
   }

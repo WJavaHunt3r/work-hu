@@ -42,4 +42,13 @@ class CampRepository {
       rethrow;
     }
   }
+
+  Future<String> deleteCamp(num campId) async {
+    try {
+      final res = await _campApi.deleteCamp(campId);
+      return res;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

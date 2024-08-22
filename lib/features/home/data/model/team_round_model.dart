@@ -11,8 +11,9 @@ class TeamRoundModel with _$TeamRoundModel{
     required num id,
     required RoundModel round,
     required TeamModel team,
-    required double teamPoints,
-    required double samvirkPayments
+    required num teamRoundCoins,
+    required num maxTeamRoundCoins,
+    required double teamRoundStatus
   }) = _TeamRoundModel;
 
   factory TeamRoundModel.fromJson(Map<String, dynamic> json) => _$TeamRoundModelFromJson(json);

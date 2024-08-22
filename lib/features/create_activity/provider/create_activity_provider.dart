@@ -18,7 +18,8 @@ import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 import 'package:work_hu/features/utils.dart';
-import 'package:work_hu/work_hu_app.dart';
+
+import '../../../dukapp.dart';
 
 final createActivityDataProvider = StateNotifierProvider.autoDispose<CreateActivityDataNotifier, CreateActivityState>(
     (ref) => CreateActivityDataNotifier(

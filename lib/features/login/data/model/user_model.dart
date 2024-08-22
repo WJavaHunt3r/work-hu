@@ -13,7 +13,7 @@ class UserModel with _$UserModel {
       required String firstname,
       required String lastname,
       required DateTime birthDate,
-      TeamModel? team,
+      TeamModel? paceTeam,
       required Role role,
       required num myShareID,
       required num baseMyShareCredit,
@@ -42,5 +42,13 @@ class UserModel with _$UserModel {
 
   bool isAdmin() {
     return role == Role.ADMIN;
+  }
+
+  bool isTeamLeader() {
+    return role == Role.TEAM_LEADER;
+  }
+
+  bool isUser() {
+    return role == Role.USER;
   }
 }

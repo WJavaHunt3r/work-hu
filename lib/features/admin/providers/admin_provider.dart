@@ -4,10 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/admin/data/state/admin_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
-
-import '../../../work_hu_app.dart';
 
 final adminDataProvider = StateNotifierProvider<AdminDataNotifier, AdminState>(
     (ref) => AdminDataNotifier(ref.read(routerProvider), ref.read(userDataProvider)));

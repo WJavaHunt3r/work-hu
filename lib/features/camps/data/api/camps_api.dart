@@ -10,7 +10,7 @@ class CampsApi {
 
   Future<List<dynamic>> getCamps(num? seasonId) async {
     try {
-      final res = await _dioClient.dio.get("/camps", queryParameters: {"seasonId": seasonId});
+      final res = await _dioClient.dio.get("/camp", queryParameters: {"seasonId": seasonId});
       return res.data;
     } catch (e) {
       rethrow;
@@ -19,7 +19,7 @@ class CampsApi {
 
   Future<dynamic> getCamp(num campId) async {
     try {
-      final res = await _dioClient.dio.get("/camp", queryParameters: {"campId": campId});
+      final res = await _dioClient.dio.get("/camp$campId");
       return res.data;
     } catch (e) {
       rethrow;
@@ -37,7 +37,16 @@ class CampsApi {
 
   Future<dynamic> putCamp(CampModel camp, num campId) async {
     try {
-      final res = await _dioClient.dio.put("/camp", queryParameters: {"campId": campId}, data: camp);
+      final res = await _dioClient.dio.put("/camp/$campId", data: camp);
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> deleteCamp(num campId) async {
+    try {
+      final res = await _dioClient.dio.put("/camp/$campId");
       return res.data;
     } catch (e) {
       rethrow;

@@ -1,4 +1,4 @@
-package com.ktk.work_hu
+package com.ktk.dukapp
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -144,7 +144,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
         } else if (mode == GoalsMaintenance.EDIT) {
           await goalRepository.putGoal(state.selectedGoal, currentUserProvider.state!.id);
         }
-        state = state.copyWith(selectedGoal: const GoalModel(goal: 0));
+        state = state.copyWith(selectedGoal: const GoalModel(goal: 0), modelState: ModelState.success);
       }
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());

@@ -5,13 +5,15 @@ import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/app/widgets/success_alert_dialog.dart';
 import 'package:work_hu/features/login/providers/login_provider.dart';
 
 class LoginLayout extends ConsumerWidget {
-  const LoginLayout({super.key});
+  const LoginLayout({required this.origRoute, super.key});
 
+  final String origRoute;
   static final _formKey = GlobalKey<FormState>();
 
   @override
@@ -23,7 +25,12 @@ class LoginLayout extends ConsumerWidget {
               return SuccessAlertDialog(title: ref.read(loginDataProvider).message);
             }).then((value) => ref.watch(loginDataProvider.notifier).clearResetState())
         : null);
-    final loginProvider = ref.read(loginDataProvider.notifier);
+
+    Future(() => ref.read(loginDataProvider).resetState == ModelState.empty &&
+            ref.read(loginDataProvider).modelState == ModelState.success
+        ? navigateTo(ref, context)
+        : null);
+    final loginProvider = ref.watch(loginDataProvider.notifier);
     return Stack(
       children: [
         SingleChildScrollView(
@@ -31,12 +38,6 @@ class LoginLayout extends ConsumerWidget {
                 key: _formKey,
                 child: AutofillGroup(
                     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Image(
-                    image: const AssetImage("assets/logos/Work_black.png"),
-                    fit: BoxFit.contain,
-                    color: AppColors.primary,
-                    height: 120.sp,
-                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0.sp),
                     child: TextFormField(
@@ -78,8 +79,14 @@ class LoginLayout extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: TextButton(
-                                style: ButtonStyle(
-                                    backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent)),
+                                style: ButtonStyle(backgroundColor: WidgetStateColor.resolveWith((states) {
+                                  if (states.contains(WidgetState.focused) ||
+                                      states.contains(WidgetState.pressed) ||
+                                      states.contains(WidgetState.hovered)) {
+                                    return Colors.grey.shade500.withOpacity(0.3);
+                                  }
+                                  return Colors.transparent;
+                                })),
                                 onPressed: () {
                                   if (ref.watch(loginDataProvider).username.isNotEmpty) {
                                     showDialog(
@@ -91,6 +98,11 @@ class LoginLayout extends ConsumerWidget {
                                             },
                                             title: "login_reset_password_confirm_title".i18n(),
                                             content: Text("login_reset_password_question".i18n())));
+                                  } else {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            SuccessAlertDialog(title: "login_reset_password_username_title".i18n()));
                                   }
                                 },
                                 child: Text(
@@ -136,5 +148,18 @@ class LoginLayout extends ConsumerWidget {
             : const SizedBox()
       ],
     );
+  }
+
+  navigateTo(WidgetRef ref, BuildContext context) {
+    if (ref.read(userDataProvider) == null) {
+      context.push("/changePassword").then((success) {
+        success != null && success as bool
+            ? ref.read(loginDataProvider.notifier).clear("login_password_changed_success".i18n(), ModelState.error)
+            : ref.read(loginDataProvider.notifier).clear("login_password_changed_failed".i18n(), ModelState.error);
+      });
+    } else {
+
+      origRoute.isEmpty ? context.pop() :context.push(origRoute);
+    }
   }
 }

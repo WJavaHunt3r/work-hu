@@ -15,7 +15,8 @@ class RoundModel with _$RoundModel{
     required num samvirkChurchGoal,
     required num roundNumber,
     required SeasonModel season,
-    required DateTime freezeDateTime
+    required DateTime freezeDateTime,
+    required bool activeRound
 }) = _RoundModel;
 
   factory RoundModel.fromJson(Map<String, dynamic> json) => _$RoundModelFromJson(json);

@@ -7,9 +7,9 @@ class UserCampRepository {
 
   UserCampRepository(this._userCampApi);
 
-  Future<List<UserCampModel>> getUserCamps(num seasonId) async {
+  Future<List<UserCampModel>> getUserCamps(num seasonYear, num? userId, num? campId, bool? participates) async {
     try {
-      final res = await _userCampApi.getUserCamps(seasonId);
+      final res = await _userCampApi.getUserCamps(seasonYear, userId, campId, participates);
       return res.map((e) => UserCampModel.fromJson(e)).toList();
     } on DioException {
       rethrow;

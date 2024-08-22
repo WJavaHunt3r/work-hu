@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/activity_items/data/repository/activity_items_repository.dart';
 import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -12,8 +13,6 @@ import 'package:work_hu/features/transaction_items/data/models/transaction_item_
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
 import 'package:work_hu/features/user_points/data/model/user_points_state.dart';
-
-import '../../../work_hu_app.dart';
 
 final userPointsDataProvider = StateNotifierProvider.autoDispose<UserPointsDataNotifier, UserPointsState>((ref) =>
     UserPointsDataNotifier(ref.read(transactionItemsRepoProvider), ref.read(routerProvider), ref.read(userDataProvider),

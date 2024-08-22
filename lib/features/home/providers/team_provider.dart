@@ -41,7 +41,7 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
     try {
       await teamRepository.fetchTeamRounds().then((data) async {
         data.sort((a, b) => a.round.roundNumber.compareTo(b.round.roundNumber));
-        data.sort((prev, next) => next.teamPoints.compareTo(prev.teamPoints));
+        // data.sort((prev, next) => next.teamPoints.compareTo(prev.teamPoints));
         state = state.copyWith(
             teams: data.where((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0).toList(),
             modelState: ModelState.success);
@@ -61,7 +61,7 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
     if (username.isNotEmpty && password.isNotEmpty && user == null) {
       //state = state.copyWith(modelState: ModelState.processing);
       read.state = LoginState(username: username, password: password);
-      await read.login();
+      // await read.login();
       state = state.copyWith(message: read.state.message, modelState: ModelState.success);
     } else {
       if (user == null && username.isNotEmpty) {

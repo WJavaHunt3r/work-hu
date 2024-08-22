@@ -115,7 +115,8 @@ class Utils {
           startDate: DateTime.now(),
           endDate: DateTime.now(),
         ),
-        freezeDateTime: DateTime.now());
+        freezeDateTime: DateTime.now(),
+        activeRound: true);
   }
 
   static String changeSpecChars(String text) {
@@ -293,5 +294,12 @@ class Utils {
         mimeType: MimeType.csv,
       );
     }
+  }
+
+  static String getMonthFromDate(DateTime date, BuildContext context) {
+    var locale = Localizations.localeOf(context);
+    var format = DateFormat("MMMM", locale.countryCode);
+    String formatted = format.format(date);
+    return formatted[0].toUpperCase() + formatted.substring(1);
   }
 }

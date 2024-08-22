@@ -8,7 +8,7 @@ class TransactionItemsApi {
 
   Future<List<dynamic>> getTransactionItems(num? transactionId, num? userId, num? roundId) async {
     try {
-      final res = await _dioClient.dio.get("/transactionItems",
+      final res = await _dioClient.dio.get("/transactionItem",
           queryParameters: {"transactionId": transactionId, "userId": userId, "roundId": roundId});
       return res.data;
     } catch (e) {
@@ -18,7 +18,7 @@ class TransactionItemsApi {
 
   Future<dynamic> sendTransactions(List<Map<String, dynamic>> map) async {
     try {
-      final res = await _dioClient.dio.post("/transactionItems", data: map);
+      final res = await _dioClient.dio.post("/transactionItem/items", data: map);
       return res.data;
     } catch (e) {
       rethrow;
@@ -27,8 +27,8 @@ class TransactionItemsApi {
 
   Future<dynamic> deleteTransactionItem(num transactionItemId, num userId) async {
     try {
-      final res = await _dioClient.dio
-          .delete("/transactionItem", queryParameters: {"transactionItemId": transactionItemId, "userId": userId});
+      final res =
+          await _dioClient.dio.delete("/transactionItem/$transactionItemId", queryParameters: {"userId": userId});
       return res.data;
     } catch (e) {
       rethrow;

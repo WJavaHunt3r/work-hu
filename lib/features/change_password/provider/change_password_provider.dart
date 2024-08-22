@@ -3,12 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/change_password/data/api/change_password_api.dart';
 import 'package:work_hu/features/change_password/data/repository/change_password_repository.dart';
 import 'package:work_hu/features/change_password/data/state/change_password_state.dart';
 import 'package:work_hu/features/utils.dart';
-
-import '../../../work_hu_app.dart';
 
 final changePasswordApiProvider = Provider<ChangePasswordApi>((ref) => ChangePasswordApi());
 

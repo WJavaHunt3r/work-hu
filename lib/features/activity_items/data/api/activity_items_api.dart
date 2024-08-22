@@ -8,13 +8,15 @@ class ActivityItemsApi {
 
   ActivityItemsApi();
 
-  Future<List<dynamic>> getActivities({num? activityId, num? userId, num? roundId, bool? registeredInApp}) async {
+  Future<List<dynamic>> getActivityItems(
+      {num? activityId, num? userId, num? roundId, bool? registeredInApp, String? searchText}) async {
     try {
-      final res = await _dioClient.dio.get("/activityItems", queryParameters: {
+      final res = await _dioClient.dio.get("/activityItem", queryParameters: {
         "activityId": activityId,
         "userId": userId,
         "roundId": roundId,
         "registeredInApp": registeredInApp,
+        "searchText": searchText
       });
       return res.data;
     } catch (e) {
@@ -22,7 +24,7 @@ class ActivityItemsApi {
     }
   }
 
-  Future<dynamic> getActivityItems(num activityItemId) async {
+  Future<dynamic> getActivityItem(num activityItemId) async {
     try {
       final res = await _dioClient.dio.get("/activityItem", queryParameters: {"activityItemId": activityItemId});
       return res.data;
@@ -33,7 +35,7 @@ class ActivityItemsApi {
 
   Future<dynamic> postActivityItems(List<Map<String, dynamic>> activityItems) async {
     try {
-      final res = await _dioClient.dio.post("/activityItems", data: activityItems);
+      final res = await _dioClient.dio.post("/activityItem/items", data: activityItems);
       return res.data;
     } catch (e) {
       rethrow;
@@ -61,8 +63,7 @@ class ActivityItemsApi {
 
   Future<dynamic> deleteActivityItems(num activityItemId, num userId) async {
     try {
-      final res = await _dioClient.dio
-          .delete("/activityItem", queryParameters: {"activityItemId": activityItemId, "userId": userId});
+      final res = await _dioClient.dio.delete("/activityItem/$activityItemId", queryParameters: {"userId": userId});
       return res.data;
     } catch (e) {
       rethrow;

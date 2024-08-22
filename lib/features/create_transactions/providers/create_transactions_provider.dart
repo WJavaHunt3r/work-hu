@@ -11,6 +11,7 @@ import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/create_transactions/data/state/create_transactions_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
@@ -23,8 +24,6 @@ import 'package:work_hu/features/transactions/providers/transactions_provider.da
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 import 'package:work_hu/features/utils.dart';
-
-import '../../../work_hu_app.dart';
 
 final createTransactionsDataProvider =
     StateNotifierProvider.autoDispose<CreateTransactionsDataNotifier, CreateTransactionsState>((ref) =>
@@ -52,6 +51,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     dateController.addListener(_updateDateAndDescription);
     exchangeController.addListener(_updateState);
     valueController.addListener(_updateState);
+    // getUsers();
   }
 
   final UsersRepository usersRepository;
@@ -75,7 +75,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     state = state.copyWith(modelState: ModelState.processing);
     try {
       await usersRepository
-          .getUsers(state.transactionType == TransactionType.BMM_PERFECT_WEEK ? user!.team : null, listO36)
+          .getUsers(state.transactionType == TransactionType.BMM_PERFECT_WEEK ? user!.paceTeam : null, listO36)
           .then((data) {
         state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK
             ? _createTransactionItems(data)
@@ -98,7 +98,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
           .createTransaction(
               TransactionModel(
                 name: state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK
-                    ? "${currentUserProvider.state!.team!.color} csapat tökéletes pontszámai"
+                    ? "${currentUserProvider.state!.paceTeam!.teamName} csapat tökéletes pontszámai"
                     : descriptionController.value.text,
                 account: state.account,
               ),
@@ -153,7 +153,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   void _createTransactionItems(List<UserModel> users) {
     for (UserModel u in users) {
       state = state.copyWith(selectedUser: u);
-      addTransaction(description: "${currentUserProvider.state!.team!.color} csapat tökéletes BMM hét");
+      addTransaction(description: "${currentUserProvider.state!.paceTeam!.teamName} csapat tökéletes BMM hét");
     }
   }
 

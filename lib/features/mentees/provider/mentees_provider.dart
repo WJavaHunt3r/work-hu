@@ -44,9 +44,8 @@ class MenteesDataNotifier extends StateNotifier<MenteesState> {
               list.add(UserGoalUserRoundModel(user: mentee.mentee, goal: goal, round: userRounds.last.round));
             });
           });
-
-          state = state.copyWith(menteesStatus: list, modelState: ModelState.success);
         }
+        state = state.copyWith(menteesStatus: list, modelState: ModelState.success);
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());

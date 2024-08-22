@@ -5,46 +5,42 @@ import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/goal/data/repository/goal_repository.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/features/profile/data/repository/user_round_repository.dart';
+import 'package:work_hu/features/profile/providers/profile_providers.dart';
+import 'package:work_hu/features/rounds/data/repository/round_repository.dart';
+import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/user_status/data/state/user_status_state.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 
-final userStatusDataProvider =
-    StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>(
-        (ref) => UserStatusDataNotifier(
-            ref.read(usersRepoProvider),
-            ref.read(userDataProvider),
-            ref.read(userDataProvider.notifier),
-            ref.read(goalRepoProvider)));
+final userStatusDataProvider = StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>((ref) =>
+    UserStatusDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider), ref.read(goalRepoProvider),
+        ref.read(userRoundsRepoProvider), ref.watch(roundRepoProvider)));
 
 class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   UserStatusDataNotifier(
-    this.usersRepository,
-    this.currentUser,
-    this.read,
-    this.goalRepoProvider,
-  ) : super(const UserStatusState()) {
+      this.usersRepository, this.currentUser, this.goalRepoProvider, this.userRoundRepoProvider, this.roundRepoProvider)
+      : super(const UserStatusState()) {
     getUsers();
   }
 
   final UsersRepository usersRepository;
   final UserModel? currentUser;
   final GoalRepository goalRepoProvider;
-  final UserDataNotifier read;
+  final UserRoundRepository userRoundRepoProvider;
+  final RoundRepository roundRepoProvider;
 
   Future<void> getUsers([TeamModel? team]) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await usersRepository
-          .getUsers(currentUser!.role == Role.ADMIN ? team : currentUser!.team)
-          .then((value) {
-        state = state.copyWith(users: value, modelState: ModelState.success);
-        orderUsers();
-      });
-      await goalRepoProvider
-          .getGoals(DateTime.now().year)
-          .then((goals) => state = state.copyWith(goals: goals));
+      var users = await usersRepository.getUsers(currentUser!.role == Role.ADMIN ? team : currentUser!.paceTeam);
+      var goals = await goalRepoProvider.getGoals(DateTime.now().year);
+      var round = await roundRepoProvider.getCurrentRounds();
+      var userRounds = await userRoundRepoProvider.fetchUserRounds(roundId: round.id);
+      state = state.copyWith(
+          userRounds: userRounds, users: users, goals: goals, currentRound: round, modelState: ModelState.success);
+      orderUsers();
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
@@ -65,10 +61,8 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
     if (state.selectedOrderType == OrderByType.NAME) {
       sorted.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     } else if (state.selectedOrderType == OrderByType.STATUS) {
-      sorted.sort((a, b) => (a.currentMyShareCredit /
-              state.goals.firstWhere((g) => g.user?.id == a.id).goal)
-          .compareTo(b.currentMyShareCredit /
-              state.goals.firstWhere((g) => g.user?.id == b.id).goal));
+      sorted.sort((a, b) => (a.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == a.id).goal)
+          .compareTo(b.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == b.id).goal));
     }
 
     state = state.copyWith(users: sorted);

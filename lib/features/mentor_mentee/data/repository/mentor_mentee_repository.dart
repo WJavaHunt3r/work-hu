@@ -8,7 +8,7 @@ class MentorMenteeRepository {
 
   Future<List<MentorMenteeModel>> getMentorMentee({num? userId}) async {
     try {
-      final res = await menteesApi.getMentorMentee(userId);
+      final res = await menteesApi.getMentorMentees(userId);
       return res.map((e) => MentorMenteeModel.fromJson(e)).toList();
     } on DioException {
       rethrow;

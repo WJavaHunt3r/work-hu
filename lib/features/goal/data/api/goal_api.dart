@@ -10,7 +10,7 @@ class GoalApi {
 
   Future<List<dynamic>> getGoals(num? seasonYear) async {
     try {
-      final res = await _dioClient.dio.get("/goals", queryParameters: {"seasonYear": seasonYear});
+      final res = await _dioClient.dio.get("/goal", queryParameters: {"seasonYear": seasonYear});
       return res.data;
     } catch (e) {
       rethrow;
@@ -19,8 +19,8 @@ class GoalApi {
 
   Future<dynamic> getGoalByUserAndSeasonYear(num userId, num seasonYear) async {
     try {
-      final res =
-          await _dioClient.dio.get("/userSeasonGoal", queryParameters: {"userId": userId, "seasonYear": seasonYear});
+      final res = await _dioClient.dio
+          .get("/goal/userSeasonGoal", queryParameters: {"userId": userId, "seasonYear": seasonYear});
       return res.data;
     } catch (e) {
       rethrow;
@@ -29,7 +29,7 @@ class GoalApi {
 
   Future<dynamic> getGoal(num goalId) async {
     try {
-      final res = await _dioClient.dio.get("/goal", queryParameters: {"goalId": goalId});
+      final res = await _dioClient.dio.get("/goal/$goalId");
       return res.data;
     } catch (e) {
       rethrow;
@@ -45,9 +45,9 @@ class GoalApi {
     }
   }
 
-  Future<dynamic> putGoal(GoalModel goal, num goalId) async {
+  Future<dynamic> putGoal(GoalModel goal, num goalId, num userId) async {
     try {
-      final res = await _dioClient.dio.put("/goal", queryParameters: {"userId": goalId}, data: goal.toJson());
+      final res = await _dioClient.dio.put("/goal/$goalId", data: goal.toJson(), queryParameters: {"userId": userId});
       return res.data;
     } catch (e) {
       rethrow;
@@ -56,7 +56,7 @@ class GoalApi {
 
   Future<dynamic> deleteGoal(num goalId, num userId) async {
     try {
-      final res = await _dioClient.dio.delete("/goal", queryParameters: {"goalId": goalId, "userId": userId});
+      final res = await _dioClient.dio.delete("/goal/$goalId", queryParameters: {"goalId": goalId, "userId": userId});
       return res.data;
     } catch (e) {
       rethrow;

@@ -95,7 +95,7 @@ class UserListItem extends ConsumerWidget {
             transitionDuration: const Duration(milliseconds: 200),
             context: context,
             pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
-              return const UserDetails();
+              return UserDetails(user: user);
             }).then((value) => ref.watch(usersDataProvider.notifier).getUsers());
       },
     );

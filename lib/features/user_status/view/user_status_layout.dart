@@ -12,7 +12,6 @@ import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
-import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
 import 'package:work_hu/features/user_status/widgets/base_filter_chip.dart';
 import 'package:work_hu/features/utils.dart';
@@ -23,11 +22,8 @@ class UserStatusLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var users = ref.watch(userStatusDataProvider).users;
-    var currentRoundNumber = ref.read(roundDataProvider).currentRoundNumber;
-    var rounds = ref.read(roundDataProvider).rounds;
-    var goals = ref.watch(goalDataProvider).goals;
-    var currentRound =
-        rounds.isEmpty ? null : rounds.firstWhere((element) => element.roundNumber == currentRoundNumber);
+    var goals = ref.watch(userStatusDataProvider).goals;
+    var currentRound = ref.watch(userStatusDataProvider).currentRound;
     var currentRoundGoal = currentRound == null ? 0 : currentRound.myShareGoal;
     return Stack(
       children: [
@@ -78,8 +74,15 @@ class UserStatusLayout extends ConsumerWidget {
                       : goals.firstWhere((g) => g.user!.id == current.id);
                   var currentGoal = currentUserGoal?.goal ?? 0;
                   var userStatus = current.currentMyShareCredit / currentGoal * 100;
-                  var style = TextStyle(color: userStatus >= currentRoundGoal ? AppColors.white : AppColors.primary);
+
                   var toOnTrack = currentGoal * currentRoundGoal / 100 - current.currentMyShareCredit;
+                  var userRounds = ref.watch(userStatusDataProvider).userRounds;
+                  var userRound = userRounds.isNotEmpty ? userRounds.firstWhere((e) => e.user.id == current.id) : null;
+                  var style = TextStyle(
+                      color: userStatus >= currentRoundGoal ||
+                              userRound != null && userRound.roundCredits >= userRound.roundMyShareGoal
+                          ? AppColors.white
+                          : AppColors.primary);
                   var isLast = index == users.length - 1;
                   return ListCard(
                       isLast: isLast,
@@ -97,10 +100,11 @@ class UserStatusLayout extends ConsumerWidget {
                               }),
                           minVerticalPadding: 0,
                           title: Text(
-                            current.getFullName(),
+                            "${current.getFullName()} (${userRound?.roundCredits ?? 0} / ${userRound?.roundMyShareGoal ?? 0})",
                             style: style,
                           ),
-                          subtitle: userStatus >= currentRoundGoal
+                          subtitle: userStatus >= currentRoundGoal ||
+                                  userRound != null && userRound.roundCredits >= userRound.roundMyShareGoal
                               ? const Text(
                                   "On Track",
                                   style: TextStyle(color: AppColors.white),
@@ -110,7 +114,11 @@ class UserStatusLayout extends ConsumerWidget {
                             "${Utils.percentFormat.format(userStatus)}%",
                             style: style.copyWith(fontSize: 15.sp),
                           ),
-                          tileColor: userStatus >= currentRoundGoal ? AppColors.primary : AppColors.white,
+                          tileColor: userRound != null && userRound.roundCredits >= userRound.roundMyShareGoal
+                              ? AppColors.primary
+                              : userStatus >= currentRoundGoal
+                                  ? AppColors.primary100
+                                  : AppColors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: index == 0 && isLast
                                   ? BorderRadius.circular(8.sp)
@@ -142,7 +150,7 @@ class UserStatusLayout extends ConsumerWidget {
       bool isSelected = ref.watch(userStatusDataProvider).selectedTeamId == team.id;
       chips.add(BaseFilterChip(
           isSelected: isSelected,
-          title: team.color.toString(),
+          title: team.teamName,
           onSelected: (bool selected) =>
               ref.watch(userStatusDataProvider.notifier).setSelectedFilter(selected ? team : null)));
     }

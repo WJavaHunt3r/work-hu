@@ -48,28 +48,29 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
   }
 
   Future<void> getUserInfoAndUserRounds() async {
-    var user = await Utils.getData('user');
-    await loginRepository.getUser(user).then((data) {
-      read.setUser(data);
-    });
+    var userModel = read.state;
 
-    await userRoundRepoProvider.fetchUserRounds(userId: read.state!.id, seasonYear: DateTime.now().year).then((userRounds) async {
-      userRounds.sort((a, b) => a.round.roundNumber.compareTo(b.round.roundNumber));
-      await goalRepoProvider.getGoalByUserAndSeason(read.state!.id, DateTime.now().year).then((goal) async {
-        if (read.state!.spouseId != null) {
-          await usersRepository.getUserById(read.state!.spouseId!).then((value) => state = state.copyWith(
-              spouse: value,
-              userGoal: goal,
-              userRounds:
-                  userRounds.where((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0).toList()));
-        } else {
-          state = state.copyWith(
-              userGoal: goal,
-              userRounds:
-                  userRounds.where((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0).toList());
-        }
+    if (userModel != null) {
+      await userRoundRepoProvider
+          .fetchUserRounds(userId: userModel.id, seasonYear: DateTime.now().year)
+          .then((userRounds) async {
+        userRounds.sort((a, b) => a.round.roundNumber.compareTo(b.round.roundNumber));
+        await goalRepoProvider.getGoalByUserAndSeason(userModel.id, DateTime.now().year).then((goal) async {
+          if (userModel.spouseId != null) {
+            await usersRepository.getUserById(userModel.spouseId!).then((value) => state = state.copyWith(
+                spouse: value,
+                userGoal: goal,
+                userRounds:
+                    userRounds.where((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0).toList()));
+          } else {
+            state = state.copyWith(
+                userGoal: goal,
+                userRounds:
+                    userRounds.where((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0).toList());
+          }
+        });
       });
-    });
+    }
   }
 
   Future<void> logout() async {
