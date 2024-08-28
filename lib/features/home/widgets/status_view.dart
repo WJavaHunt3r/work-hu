@@ -29,10 +29,7 @@ class StatusView extends ConsumerWidget {
   }
 
   List<Tab> createTabs(List<TeamRoundModel> items, num currentRound, context) {
-    var item = items.firstWhere((e) => e.round.roundNumber == currentRound);
-    var date = item.round.startDateTime;
-
-    String formated = Utils.getMonthFromDate(date, context);
+    String formated = Utils.getMonthFromDate(DateTime.now(), context);
 
     var list = <Tab>[];
     list.add(Tab(
@@ -106,16 +103,13 @@ class StatusView extends ConsumerWidget {
                 linearElementPosition: position,
               ),
             )),
-        Expanded(
-            child: Center(
-                child: Text(
+        Center(
+            child: Text(
           team.team.teamName,
-          style: TextStyle(fontFamily: "Good-Timing", fontSize: 18.sp),
-        ))),
-        const Expanded(
-          child: SizedBox(),
-          flex: 1,
-        )
+          maxLines: 1,
+          style: TextStyle(fontFamily: "Good-Timing", fontSize: 25, overflow: TextOverflow.ellipsis),
+        )),
+        const SizedBox(height: 10,)
       ],
     ));
   }

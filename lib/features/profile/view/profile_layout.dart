@@ -9,6 +9,8 @@ import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/app/widgets/menu_options_list_tile.dart';
 import 'package:work_hu/dukapp.dart';
+import 'package:work_hu/features/goal/data/model/goal_model.dart';
+import 'package:work_hu/features/profile/data/model/user_round_model.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:work_hu/features/profile/widgets/profile_header.dart';
 import 'package:work_hu/features/profile/widgets/profile_tab_view.dart';
@@ -20,7 +22,7 @@ class ProfileLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var user = ref.watch(userDataProvider);
-
+    var userRounds = ref.watch(profileDataProvider).userRounds;
     return user == null
         ? const SizedBox()
         : Column(
@@ -37,8 +39,17 @@ class ProfileLayout extends ConsumerWidget {
                           : SizedBox(
                               height: 150.sp,
                               child: ProfileTabView(
-                                userRounds: ref.watch(profileDataProvider).userRounds,
+                                userRounds: userRounds,
                               )),
+                  Row(
+                    children: [
+                      buildMonthlyCoinWidget("Augusztus", userRounds.isNotEmpty ? userRounds[0].roundCoins : 0),
+                      buildMonthlyCoinWidget("Szeptember", userRounds.length > 1 ? userRounds[1].roundCoins : 0),
+                      buildMonthlyCoinWidget("Október", userRounds.length > 2 ? userRounds[2].roundCoins : 0),
+                      buildMonthlyCoinWidget("November", userRounds.length > 3 ? userRounds[3].roundCoins : 0),
+                      buildMonthlyCoinWidget("December", userRounds.length > 4 ? userRounds[4].roundCoins : 0)
+                    ],
+                  ),
                   const Divider(),
                   Column(
                     children: [
@@ -90,7 +101,7 @@ class ProfileLayout extends ConsumerWidget {
                           side: WidgetStateBorderSide.resolveWith(
                             (states) => BorderSide(color: AppColors.primary, width: 2.sp),
                           ),
-                          backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
+                          backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.backgroundColor),
                         ),
                         child: Text("profile_logout".i18n(),
                             style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800))),
@@ -99,5 +110,33 @@ class ProfileLayout extends ConsumerWidget {
               )
             ],
           );
+  }
+
+  buildMonthlyCoinWidget(String month, num points) {
+    return Expanded(
+        child: SizedBox(
+      height: 100.sp,
+      child: Padding(
+        padding: EdgeInsets.all(4.sp),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              month,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Expanded(
+                child: Image(
+                    image: AssetImage(
+                        "assets/img/${points == 0 ? "PACE_Coin_Blank_Static.png" : "PACE_Coin_Buk_${points}_Spin_540px.gif"}"),
+                    fit: BoxFit.fitWidth))
+          ],
+        ),
+      ),
+    ));
+  }
+
+  isOnTrack(GoalModel? goal, UserRoundModel userRound) {
+    return goal != null && userRound.user.currentMyShareCredit / goal.goal * 100 > userRound.round.myShareGoal;
   }
 }

@@ -25,7 +25,9 @@ class UserPointsDataNotifier extends StateNotifier<UserPointsState> {
     this.currentUser,
     this.roundRepository,
     this.activityItemsRepository,
-  ) : super(const UserPointsState());
+  ) : super(const UserPointsState()) {
+    getTransactionItems();
+  }
 
   final TransactionItemsRepository transactionItemsRepository;
   final GoRouter router;

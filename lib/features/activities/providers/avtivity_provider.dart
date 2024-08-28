@@ -40,7 +40,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
     state = state.copyWith(modelState: ModelState.processing, registerState: ModelState.empty);
     var user = currentUserProvider.state!;
     if (user.role != Role.ADMIN) {
-      createUserId = user.id;
+      employerId = user.id;
     }
     try {
       await activityRepository

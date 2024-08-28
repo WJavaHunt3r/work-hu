@@ -50,8 +50,8 @@ class ActivityApi {
 
   Future<dynamic> registerActivityInTeams(num activityId, num userId) async {
     try {
-      final res =
-          await _dioClient.dio.post("/registerInTeams", queryParameters: {"activityId": activityId, "userId": userId});
+      final res = await _dioClient.dio
+          .post("/activity/$activityId/registerInTeams", queryParameters: {"activityId": activityId, "userId": userId});
       return res.data;
     } catch (e) {
       rethrow;

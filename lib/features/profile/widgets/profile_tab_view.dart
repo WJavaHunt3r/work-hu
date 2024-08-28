@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:localization/localization.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
-import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
+import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:work_hu/features/profile/widgets/profile_grid.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
 class ProfileTabView extends ConsumerWidget {
-  const ProfileTabView({super.key,  required this.userRounds});
+  const ProfileTabView({super.key, required this.userRounds});
 
   final List<UserRoundModel> userRounds;
 
@@ -46,7 +45,11 @@ class ProfileTabView extends ConsumerWidget {
   List<Widget> createTabView(List<UserRoundModel> items, num currentRound) {
     var list = <Widget>[];
     var item = items.firstWhere((e) => e.round.roundNumber == currentRound);
-    list.add(ProfileGrid(userRoundModel: item));
+    list.add(Consumer(
+      builder: (BuildContext context, WidgetRef ref, Widget? child) {
+        return ProfileGrid(userRoundModel: item, goal: ref.watch(profileDataProvider).userGoal);
+      },
+    ));
 
     return list;
   }

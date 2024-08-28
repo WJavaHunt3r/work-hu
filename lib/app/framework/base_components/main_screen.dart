@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/src/consumer.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -22,15 +24,23 @@ abstract class MainScreen extends BasePage {
   @override
   buildBottomNavigationBar(BuildContext context, WidgetRef ref) {
     UserModel? currentUser = ref.watch(userDataProvider);
-    return BottomNavigationBar(
-        items: currentUser == null
-            ? noUserScreens(selectedIndex)
-            : currentUser.isUser()
-                ? userScreens(selectedIndex)
-                : adminScreens(selectedIndex),
-        currentIndex: selectedIndex,
-        selectedFontSize: 16,
-        onTap: (int index) => _onItemTapped(index, ref, currentUser));
+    return Container(
+      decoration: BoxDecoration(
+          color: AppColors.surfaceWhite,
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(24.sp), topRight: Radius.circular(24.sp))),
+      child: BottomNavigationBar(
+          backgroundColor: Colors.transparent,
+          selectedIconTheme: IconThemeData(color: AppColors.primary),
+          elevation: 0,
+          items: currentUser == null
+              ? noUserScreens(selectedIndex)
+              : currentUser.isUser()
+                  ? userScreens(selectedIndex)
+                  : adminScreens(selectedIndex),
+          currentIndex: selectedIndex,
+          selectedFontSize: 16,
+          onTap: (int index) => _onItemTapped(index, ref, currentUser)),
+    );
   }
 
   void _onItemTapped(int index, WidgetRef ref, UserModel? currentUser) {

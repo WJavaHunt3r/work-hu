@@ -16,7 +16,7 @@ class ProfileHeader extends ConsumerWidget {
       children: [
         Icon(
           Icons.person_outline,
-          size: 80.sp,
+          size: 60.sp,
         ),
         // : SvgPicture.asset(
         //     "assets/logos/${user.team!.color}_vacduka.svg",

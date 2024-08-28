@@ -9,9 +9,10 @@ class AppColors {
 
   static const Color errorRed = Color(0xFFC5032B);
 
-  //static const Color surfaceWhite = Color(0xFAf8f9fc);
+  static const Color surfaceWhite = Color(0xFAf8f9fc);
   static const Color white = Colors.white;
   static const Color backgroundColor = Color(0xFFE3E7E9);
+  static const Color backgroundColor100 = Color(0xFFE1E7E9);
 
   static const Color teamBlue = Color(0xFF636BFF);
   static const Color teamRed = Color(0xFFFF404D);

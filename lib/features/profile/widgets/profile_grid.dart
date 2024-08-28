@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/style/app_colors.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
@@ -16,16 +15,16 @@ import 'package:work_hu/features/user_points/provider/user_points_providers.dart
 import 'package:work_hu/features/utils.dart';
 
 class ProfileGrid extends ConsumerWidget {
-  const ProfileGrid({required this.userRoundModel, super.key});
+  const ProfileGrid({required this.userRoundModel, super.key, required this.goal});
 
   final UserRoundModel userRoundModel;
+  final GoalModel? goal;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    UserModel? user = ref.watch(profileDataProvider).userGoal?.user;
-    var goal = ref.watch(profileDataProvider).userGoal;
-    final NumberFormat numberFormat = NumberFormat("#,###");
-    final NumberFormat pointsFormat = NumberFormat("#,###.#");
+    UserModel? user = goal?.user;
+    var isOnTrack = goal != null && user!.currentMyShareCredit / goal!.goal * 100 > userRoundModel.round.myShareGoal;
+    var isMonthlyOnTrack = goal != null && userRoundModel.roundCredits >= userRoundModel.roundMyShareGoal;
     return Column(children: [
       Row(
         children: [
@@ -43,18 +42,17 @@ class ProfileGrid extends ConsumerWidget {
                                 alignment: Alignment.center,
                                 child: goal == null
                                     ? Text("profile_no_goal".i18n())
-                                    : Text("${numberFormat.format(user.currentMyShareCredit / goal.goal * 100)}%",
+                                    : Text(
+                                        "${Utils.creditFormat.format(userRoundModel.user.currentMyShareCredit / goal!.goal * 100)}%",
                                         style: TextStyle(fontSize: 35.sp, fontWeight: FontWeight.w800)),
                               ),
-                              if (goal != null &&
-                                  user.currentMyShareCredit / goal.goal * 100 > userRoundModel.round.myShareGoal)
+                              if (isOnTrack)
                                 Align(
                                     alignment: Alignment.topRight,
                                     child: Image(
                                       image: const AssetImage(
-                                        "assets/icons/profit.png",
+                                        "assets/img/PACE_Coin_Buk_50_Spin_540px.gif",
                                       ),
-                                      color: Colors.orange,
                                       fit: BoxFit.fitWidth,
                                       height: 15.sp,
                                     ))
@@ -64,7 +62,7 @@ class ProfileGrid extends ConsumerWidget {
                               style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600)),
                         ],
                       ),
-                      onTap: () => ref.watch(profileDataProvider).userGoal == null
+                      onTap: () => goal == null
                           ? null
                           : showGeneralDialog(
                               barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
@@ -74,11 +72,9 @@ class ProfileGrid extends ConsumerWidget {
                               pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
                                 return MyShareStatusPage(
                                     userGoalRound: UserGoalUserRoundModel(
-                                        user: user,
-                                        goal: ref.watch(profileDataProvider).userGoal!,
-                                        round: userRoundModel.round));
+                                        user: userRoundModel.user, goal: goal!, round: userRoundModel.round));
                               }))
-                  : SizedBox()),
+                  : const SizedBox()),
           SizedBox(
             width: 12.sp,
           ),
@@ -87,7 +83,7 @@ class ProfileGrid extends ConsumerWidget {
                 height: 100.sp,
                 padding: 10.sp,
                 onTap: () {
-                  ref.watch(userPointsDataProvider.notifier).getTransactionItems();
+                  ref.read(userPointsDataProvider.notifier).getTransactionItems();
                   context.push("/userPoints").then((value) => ref.read(profileDataProvider.notifier).getUserInfo());
                 },
                 child: Column(
@@ -109,14 +105,13 @@ class ProfileGrid extends ConsumerWidget {
                                 )
                               ],
                             )),
-                        if (goal != null && userRoundModel.roundCredits >= userRoundModel.roundMyShareGoal)
+                        if (isMonthlyOnTrack)
                           Align(
                               alignment: Alignment.topRight,
                               child: Image(
                                 image: const AssetImage(
-                                  "assets/icons/profit.png",
+                                  "img/PACE_Coin_Buk_50_Spin_540px.gif",
                                 ),
-                                color: Colors.orange,
                                 fit: BoxFit.fitWidth,
                                 height: 15.sp,
                               ))
@@ -130,46 +125,7 @@ class ProfileGrid extends ConsumerWidget {
                 )),
           ),
         ],
-      ),
-      // Row(
-      //   children: [
-      //     Expanded(
-      //       child: InfoCard(
-      //           height: 100.sp,
-      //           padding: 10.sp,
-      //           onTap: null,
-      //           child: Column(
-      //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //             children: [
-      //               Stack(
-      //                 children: [
-      //                   Align(
-      //                       alignment: Alignment.center,
-      //                       child: Text("${Utils.creditFormatting(userRoundModel.samvirkPayments)} Ft",
-      //                           style: TextStyle(fontSize: 35.sp, fontWeight: FontWeight.w800),
-      //                           textScaler: TextScaler.linear(
-      //                             Utils.textScaleFactor(context),
-      //                           ))),
-      //                   if (userRoundModel.samvirkOnTrackPoints)
-      //                     Align(
-      //                       alignment: Alignment.topRight,
-      //                       child: Image(
-      //                         image: const AssetImage("assets/img/Samvirk_logo.png"),
-      //                         fit: BoxFit.fitWidth,
-      //                         height: 20.sp,
-      //                       ),
-      //                     )
-      //                 ],
-      //               ),
-      //               Text(
-      //                 "profile_samvirk_payments".i18n(),
-      //                 style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600),
-      //               ),
-      //             ],
-      //           )),
-      //     ),
-      //   ],
-      // )
+      )
     ]);
   }
 }

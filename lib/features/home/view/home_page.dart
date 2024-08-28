@@ -25,29 +25,26 @@ class HomePage extends MainScreen {
             element.startDateTime.compareTo(DateTime.now()) < 0 && element.endDateTime.compareTo(DateTime.now()) > 0)
         : null;
     return Stack(children: [
-      Padding(
-        padding: EdgeInsets.only(top: 8.sp),
-        child: Column(
-          children: [
-            currentRound != null &&
-                    currentRound.freezeDateTime.compareTo(DateTime.now()) < 0 &&
-                    currentRound.endDateTime.compareTo(DateTime.now()) >= 0 &&
-                    ref.watch(userDataProvider)?.id != 255
-                ? Center(
-                    child: Text(
-                      "home_status_freeze"
-                          .i18n([Utils.dateToStringWithTime(currentRound.endDateTime.add(const Duration(minutes: 1)))]),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                : Expanded(
-                    child: ref.watch(teamRoundDataProvider).modelState == ModelState.processing
-                        ? const Center(child: CircularProgressIndicator())
-                        : ref.watch(teamRoundDataProvider).modelState == ModelState.error
-                            ? const ErrorView()
-                            : StatusView(teamRounds: ref.watch(teamRoundDataProvider).teams)),
-          ],
-        ),
+      Column(
+        children: [
+          currentRound != null &&
+                  currentRound.freezeDateTime.compareTo(DateTime.now()) < 0 &&
+                  currentRound.endDateTime.compareTo(DateTime.now()) >= 0 &&
+                  ref.watch(userDataProvider)?.id != 255
+              ? Center(
+                  child: Text(
+                    "home_status_freeze"
+                        .i18n([Utils.dateToStringWithTime(currentRound.endDateTime.add(const Duration(minutes: 1)))]),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : Expanded(
+                  child: ref.watch(teamRoundDataProvider).modelState == ModelState.processing
+                      ? const Center(child: CircularProgressIndicator())
+                      : ref.watch(teamRoundDataProvider).modelState == ModelState.error
+                          ? const ErrorView()
+                          : StatusView(teamRounds: ref.watch(teamRoundDataProvider).teams)),
+        ],
       ),
     ]);
   }
