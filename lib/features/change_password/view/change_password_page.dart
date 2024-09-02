@@ -6,15 +6,12 @@ import 'package:work_hu/features/change_password/provider/change_password_provid
 import 'package:work_hu/features/change_password/view/change_password_layout.dart';
 
 class ChangePasswordPage extends BasePage {
-  const ChangePasswordPage({super.key, super.title = "change_password_viewname", super.canPop = false});
+  const ChangePasswordPage({this.username, super.key, super.title = "change_password_viewname"});
+
+  final String? username;
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
-    return const ChangePasswordLayout();
-  }
-
-  @override
-  popInvoked(BuildContext context, bool didPop, WidgetRef ref) {
-    ref.read(changePasswordDataProvider.notifier).clear(false, true);
+    return ChangePasswordLayout();
   }
 }

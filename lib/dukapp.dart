@@ -128,9 +128,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           builder: (BuildContext context, GoRouterState state) => const UserPointsPage(),
         ),
         GoRoute(
-          path: '/changePassword',
-          builder: (BuildContext context, GoRouterState state) => const ChangePasswordPage(),
-        ),
+            path: '/changePassword',
+            builder: (BuildContext context, GoRouterState state) {
+              var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
+              return ChangePasswordPage(username: map?["username"] ?? "");
+            }),
         GoRoute(
           path: '/createActivity',
           builder: (BuildContext context, GoRouterState state) => const CreateActivityPage(),

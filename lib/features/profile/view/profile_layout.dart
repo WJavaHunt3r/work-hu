@@ -41,15 +41,17 @@ class ProfileLayout extends ConsumerWidget {
                               child: ProfileTabView(
                                 userRounds: userRounds,
                               )),
-                  Row(
-                    children: [
-                      buildMonthlyCoinWidget("Augusztus", userRounds.isNotEmpty ? userRounds[0].roundCoins : 0),
-                      buildMonthlyCoinWidget("Szeptember", userRounds.length > 1 ? userRounds[1].roundCoins : 0),
-                      buildMonthlyCoinWidget("Október", userRounds.length > 2 ? userRounds[2].roundCoins : 0),
-                      buildMonthlyCoinWidget("November", userRounds.length > 3 ? userRounds[3].roundCoins : 0),
-                      buildMonthlyCoinWidget("December", userRounds.length > 4 ? userRounds[4].roundCoins : 0)
-                    ],
-                  ),
+                  ref.watch(profileDataProvider).userGoal == null
+                      ? const SizedBox()
+                      : Row(
+                          children: [
+                            buildMonthlyCoinWidget("Aug", userRounds.isNotEmpty ? userRounds[0].roundCoins : 0),
+                            buildMonthlyCoinWidget("Szept", userRounds.length > 1 ? userRounds[1].roundCoins : 0),
+                            buildMonthlyCoinWidget("Okt", userRounds.length > 2 ? userRounds[2].roundCoins : 0),
+                            buildMonthlyCoinWidget("Nov", userRounds.length > 3 ? userRounds[3].roundCoins : 0),
+                            buildMonthlyCoinWidget("Dec", userRounds.length > 4 ? userRounds[4].roundCoins : 0)
+                          ],
+                        ),
                   const Divider(),
                   Column(
                     children: [

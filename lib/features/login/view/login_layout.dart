@@ -8,6 +8,7 @@ import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/app/widgets/success_alert_dialog.dart';
+import 'package:work_hu/features/change_password/provider/change_password_provider.dart';
 import 'package:work_hu/features/login/providers/login_provider.dart';
 
 class LoginLayout extends ConsumerWidget {
@@ -18,18 +19,6 @@ class LoginLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Future(() => ref.read(loginDataProvider).resetState == ModelState.success
-        ? showDialog(
-            context: context,
-            builder: (context) {
-              return SuccessAlertDialog(title: ref.read(loginDataProvider).message);
-            }).then((value) => ref.watch(loginDataProvider.notifier).clearResetState())
-        : null);
-
-    Future(() => ref.read(loginDataProvider).resetState == ModelState.empty &&
-            ref.read(loginDataProvider).modelState == ModelState.success
-        ? navigateTo(ref, context)
-        : null);
     final loginProvider = ref.watch(loginDataProvider.notifier);
     return Stack(
       children: [
@@ -45,7 +34,9 @@ class LoginLayout extends ConsumerWidget {
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(labelText: "login_username".i18n()),
                       onChanged: (text) {
-                        _formKey.currentState!.validate();
+                        if (_formKey.currentState != null) {
+                          _formKey.currentState!.validate();
+                        }
                       },
                       autofillHints: const [AutofillHints.username],
                       validator: (text) {
@@ -60,11 +51,13 @@ class LoginLayout extends ConsumerWidget {
                     controller: loginProvider.passwordController,
                     decoration: InputDecoration(labelText: "login_password".i18n()),
                     obscureText: true,
-                    onFieldSubmitted: (value) => loginProvider.login(),
+                    onFieldSubmitted: (value) => login(loginProvider, ref, context),
                     autofillHints: const [AutofillHints.password],
                     textInputAction: TextInputAction.go,
                     onChanged: (text) {
-                      _formKey.currentState!.validate();
+                      if (_formKey.currentState != null) {
+                        _formKey.currentState!.validate();
+                      }
                     },
                     validator: (text) {
                       if (text == null || text.isEmpty) {
@@ -93,11 +86,20 @@ class LoginLayout extends ConsumerWidget {
                                         context: context,
                                         builder: (context) => ConfirmAlertDialog(
                                             onConfirm: () {
-                                              ref.watch(loginDataProvider.notifier).reset();
+                                              ref.read(loginDataProvider.notifier).reset();
                                               context.pop();
                                             },
                                             title: "login_reset_password_confirm_title".i18n(),
-                                            content: Text("login_reset_password_question".i18n())));
+                                            content: Text("login_reset_password_question".i18n()))).then((value) => ref
+                                                .read(loginDataProvider)
+                                                .resetState ==
+                                            ModelState.success
+                                        ? showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return SuccessAlertDialog(title: ref.read(loginDataProvider).message);
+                                            }).then((value) => ref.read(loginDataProvider.notifier).clearResetState())
+                                        : null);
                                   } else {
                                     showDialog(
                                         context: context,
@@ -119,9 +121,7 @@ class LoginLayout extends ConsumerWidget {
                           Expanded(
                             child: TextButton(
                                 onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    loginProvider.login();
-                                  }
+                                  login(loginProvider, ref, context);
                                 },
                                 child: Text(
                                   "login_login".i18n(),
@@ -152,14 +152,21 @@ class LoginLayout extends ConsumerWidget {
 
   navigateTo(WidgetRef ref, BuildContext context) {
     if (ref.read(userDataProvider) == null) {
-      context.push("/changePassword").then((success) {
+      ref.read(changePasswordDataProvider.notifier).setUsername(ref.read(loginDataProvider).username);
+      context.push("/changePassword", extra: {"username": ref.read(loginDataProvider).username}).then((success) {
         success != null && success as bool
             ? ref.read(loginDataProvider.notifier).clear("login_password_changed_success".i18n(), ModelState.error)
             : ref.read(loginDataProvider.notifier).clear("login_password_changed_failed".i18n(), ModelState.error);
       });
     } else {
+      origRoute.isEmpty ? context.pop() : context.push(origRoute);
+    }
+  }
 
-      origRoute.isEmpty ? context.pop() :context.push(origRoute);
+  void login(LoginDataNotifier loginProvider, WidgetRef ref, BuildContext context) {
+    if (_formKey.currentState!.validate()) {
+      loginProvider.login().then((value) async =>
+          ref.read(loginDataProvider).modelState == ModelState.success ? navigateTo(ref, context) : null);
     }
   }
 }

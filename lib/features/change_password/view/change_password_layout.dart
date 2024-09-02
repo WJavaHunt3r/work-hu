@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
@@ -20,7 +21,8 @@ class ChangePasswordLayout extends ConsumerWidget {
           children: [
             Padding(
               padding: EdgeInsets.all(8.sp),
-              child: Text("change_password_form".i18n(), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15.sp)),
+              child:
+                  Text("change_password_form".i18n(), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15.sp)),
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 4.sp),
@@ -63,7 +65,10 @@ class ChangePasswordLayout extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                      onPressed: () => ref.read(changePasswordDataProvider.notifier).changePassword(),
+                      onPressed: () => ref.read(changePasswordDataProvider.notifier).changePassword().then((value) =>
+                          ref.read(changePasswordDataProvider).modelState == ModelState.success
+                              ? context.pop(true)
+                              : null),
                       child: Text(
                         "change_password_change_action".i18n(),
                         style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.white),

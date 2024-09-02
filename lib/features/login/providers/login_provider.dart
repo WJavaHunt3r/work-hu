@@ -37,12 +37,17 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
     state = state.copyWith(modelState: ModelState.processing);
     try {
       var user = await loginWithSavedData(state.username, state.password);
-      if(user != null){
+
+      if (user != null) {
+        if (user.changedPassword) {
+          await Utils.saveData('user', state.username).then((value) async {
+            await Utils.saveData('password', state.password);
+          });
+        }
         clear("", ModelState.success);
-      } else{
+      } else {
         clear("", ModelState.error);
       }
-
     } on DioException {
       // if(e.type == DioErrorType.)
       state = state.copyWith(
@@ -56,20 +61,16 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
     if (usr.isEmpty || pswd.isEmpty) {
       return null;
     }
+    UserModel? user;
     await loginRepository.login(usr, Utils.encrypt(pswd)).then((data) async {
       await loginRepository.getUser(data['username']).then((userData) async {
         if (userData.changedPassword) {
           userSessionProvider.setUser(userData);
-          await Utils.saveData('user', state.username).then((value) async {
-            await Utils.saveData('password', state.password).then((value) {
-              return userData;
-            });
-          });
         }
-        return null;
+        user = userData;
       });
     });
-    return null;
+    return user;
   }
 
   void _updateState() {
