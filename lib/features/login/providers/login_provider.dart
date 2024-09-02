@@ -36,7 +36,7 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
   Future<void> login() async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      var user = await loginWithSavedData(state.username, state.password);
+      var user = await loginWithSavedData(state.username.trim(), state.password.trim());
 
       if (user != null) {
         if (user.changedPassword) {

@@ -22,7 +22,7 @@ class UserPointsLayout extends ConsumerWidget {
     return items.isNotEmpty
         ? DefaultTabController(
             length: currentRound.toInt() + 1,
-            initialIndex: currentRound == 0 ? 0 : currentRound.toInt() - 1,
+            initialIndex: 0,
             child: BaseTabView(
               tabs: createTabs(items, currentRound, context),
               tabViews: createTabView(items, activityItems, currentRound),

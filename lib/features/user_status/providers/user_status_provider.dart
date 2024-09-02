@@ -34,10 +34,11 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   Future<void> getUsers([TeamModel? team]) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      var users = await usersRepository.getUsers(currentUser!.role == Role.ADMIN ? team : currentUser!.paceTeam);
+      var queryTeam = currentUser!.role == Role.ADMIN ? team : currentUser!.paceTeam;
+      var users = await usersRepository.getUsers(queryTeam);
       var goals = await goalRepoProvider.getGoals(DateTime.now().year);
       var round = await roundRepoProvider.getCurrentRounds();
-      var userRounds = await userRoundRepoProvider.fetchUserRounds(roundId: round.id);
+      var userRounds = await userRoundRepoProvider.fetchUserRounds(roundId: round.id, paceTeam: queryTeam?.id);
       state = state.copyWith(
           userRounds: userRounds, users: users, goals: goals, currentRound: round, modelState: ModelState.success);
       orderUsers();

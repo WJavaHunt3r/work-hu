@@ -8,7 +8,6 @@ import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
-import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
@@ -60,7 +59,8 @@ class UserStatusLayout extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  Text(users.length.toString())
+                  Text(
+                      "${ref.watch(userStatusDataProvider).userRounds.where((e) => e.roundCoins >= 50).length} / ${users.length.toString()}")
                 ],
               ),
             ),

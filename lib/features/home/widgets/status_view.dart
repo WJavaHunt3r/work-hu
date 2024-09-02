@@ -20,7 +20,7 @@ class StatusView extends ConsumerWidget {
     return teamRounds.isNotEmpty && currentRound != 0
         ? DefaultTabController(
             length: 2,
-            initialIndex: currentRound == 0 ? 0 : currentRound.toInt() - 1,
+            initialIndex: 0,
             child: BaseTabView(
                 tabs: createTabs(teamRounds, currentRound, context),
                 tabViews: createTabView(teamRounds, ref, currentRound)),
