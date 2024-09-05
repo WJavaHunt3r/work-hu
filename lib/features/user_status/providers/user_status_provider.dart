@@ -4,6 +4,8 @@ import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/user_provider.dart';
 import 'package:work_hu/features/goal/data/repository/goal_repository.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
+import 'package:work_hu/features/home/data/repository/team_round_repository.dart';
+import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/profile/data/repository/user_round_repository.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
@@ -16,11 +18,11 @@ import 'package:work_hu/features/users/providers/users_providers.dart';
 
 final userStatusDataProvider = StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>((ref) =>
     UserStatusDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider), ref.read(goalRepoProvider),
-        ref.read(userRoundsRepoProvider), ref.watch(roundRepoProvider)));
+        ref.read(userRoundsRepoProvider), ref.watch(roundRepoProvider), ref.watch(teamRepoProvider)));
 
 class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
-  UserStatusDataNotifier(
-      this.usersRepository, this.currentUser, this.goalRepoProvider, this.userRoundRepoProvider, this.roundRepoProvider)
+  UserStatusDataNotifier(this.usersRepository, this.currentUser, this.goalRepoProvider, this.userRoundRepoProvider,
+      this.roundRepoProvider, this.teamRoundRepoProvider)
       : super(const UserStatusState()) {
     getUsers();
   }
@@ -30,21 +32,29 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   final GoalRepository goalRepoProvider;
   final UserRoundRepository userRoundRepoProvider;
   final RoundRepository roundRepoProvider;
+  final TeamRoundRepository teamRoundRepoProvider;
 
   Future<void> getUsers([TeamModel? team]) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
+      if (state.currentRound == null || state.goals.isEmpty) {
+        await getGoalsAndCurrentRound();
+      }
+
       var queryTeam = currentUser!.role == Role.ADMIN ? team : currentUser!.paceTeam;
-      var users = await usersRepository.getUsers(queryTeam);
-      var goals = await goalRepoProvider.getGoals(DateTime.now().year);
-      var round = await roundRepoProvider.getCurrentRounds();
-      var userRounds = await userRoundRepoProvider.fetchUserRounds(roundId: round.id, paceTeam: queryTeam?.id);
-      state = state.copyWith(
-          userRounds: userRounds, users: users, goals: goals, currentRound: round, modelState: ModelState.success);
+      var userRounds =
+          await userRoundRepoProvider.fetchUserRounds(roundId: state.currentRound?.id, paceTeam: queryTeam?.id);
+      state = state.copyWith(userRounds: userRounds, modelState: ModelState.success);
       orderUsers();
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
+  }
+
+  Future<void> getGoalsAndCurrentRound() async {
+    var goals = await goalRepoProvider.getGoals(DateTime.now().year);
+    var round = await roundRepoProvider.getCurrentRounds();
+    state = state.copyWith(goals: goals, currentRound: round);
   }
 
   setSelectedFilter(TeamModel? team) {
@@ -58,15 +68,26 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   }
 
   orderUsers() {
-    var sorted = state.users.toList();
+    var sorted = state.userRounds.toList();
     if (state.selectedOrderType == OrderByType.NAME) {
-      sorted.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
+      sorted.sort((a, b) => (a.user.getFullName()).compareTo(b.user.getFullName()));
     } else if (state.selectedOrderType == OrderByType.STATUS) {
-      sorted.sort((a, b) => (a.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == a.id).goal)
-          .compareTo(b.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == b.id).goal));
+      sorted.sort((a, b) => (a.user.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == a.user.id).goal)
+          .compareTo(b.user.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == b.user.id).goal));
     }
 
-    state = state.copyWith(users: sorted);
+    state = state.copyWith(userRounds: sorted);
+  }
+
+  Future<void> recalculate() async {
+    state = state.copyWith(modelState: ModelState.processing);
+    try {
+      await teamRoundRepoProvider.recalculateTeamRounds();
+      state = state.copyWith(modelState: ModelState.success);
+      getUsers();
+    } catch (e) {
+      state = state.copyWith(modelState: ModelState.error, message: "Hiba lépett fel!");
+    }
   }
 }
 

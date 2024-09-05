@@ -14,4 +14,13 @@ class TeamRoundApi {
       rethrow;
     }
   }
+
+  Future<dynamic> recalculateTeamRounds() async {
+    try {
+      final res = await _dioClient.dio.post("/paceTeamRounds/recalculate");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -15,4 +15,13 @@ class TeamRoundRepository {
       rethrow;
     }
   }
+
+  Future<String> recalculateTeamRounds() async {
+    try {
+      final res = await _teamApi.recalculateTeamRounds();
+      return res;
+    } on DioException {
+      rethrow;
+    }
+  }
 }

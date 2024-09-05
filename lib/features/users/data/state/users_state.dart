@@ -9,7 +9,7 @@ abstract class UsersState with _$UsersState{
   const factory UsersState({
     @Default([]) List<UserModel> users,
     @Default([]) List<UserModel> filtered,
-    UserModel? currentUser,
+    UserModel? selectedUser,
     @Default(ModelState.empty) ModelState modelState,
     @Default("") String message
 }) = _UsersState;

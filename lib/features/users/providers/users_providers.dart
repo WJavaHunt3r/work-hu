@@ -53,22 +53,18 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
     }
   }
 
-  Future<void> saveUser(num userId, UserModel user) async {
+  Future<void> saveUser() async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      var updatedUser = await usersRepository.updateUser(currentUser!.id, user);
-      state = state.copyWith(currentUser: updatedUser, modelState: ModelState.success);
+      var updatedUser = await usersRepository.updateUser(currentUser!.id, state.selectedUser!);
+      state = state.copyWith(selectedUser: updatedUser, modelState: ModelState.success);
     } on DioException catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
   }
 
-  void setSelectedUser(UserModel user) {
-    state = state.copyWith(currentUser: user);
-  }
-
-  void updateCurrentUser(user) {
-    state = state.copyWith(currentUser: user);
+  void updateCurrentUser(UserModel user) {
+    state = state.copyWith(selectedUser: user);
   }
 
   Future<void> filterUsers(String filter) async {

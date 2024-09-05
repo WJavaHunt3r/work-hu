@@ -39,7 +39,7 @@ class UserDetails extends ConsumerWidget {
                   ? [
                       MaterialButton(
                         onPressed: () =>
-                            ref.read(usersDataProvider.notifier).saveUser(user.id, user).then((value) => context.pop()),
+                            ref.read(usersDataProvider.notifier).saveUser().then((value) => context.pop()),
                         child: Text("user_details_save".i18n()),
                       )
                     ]

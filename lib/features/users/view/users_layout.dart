@@ -88,7 +88,7 @@ class UserListItem extends ConsumerWidget {
     return ListTile(
       title: Text(user.getFullName()),
       onTap: () {
-        ref.read(usersDataProvider.notifier).setSelectedUser(user);
+        ref.read(usersDataProvider.notifier).updateCurrentUser(user);
         showGeneralDialog(
             barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
             barrierColor: AppColors.primary,

@@ -48,7 +48,8 @@ class UsersApi {
 
   Future<dynamic> updateUser(num userId, UserModel user) async {
     try {
-      final res = await _dioClient.dio.put("/user", queryParameters: {'userId': userId}, data: user.toJson());
+      final res =
+          await _dioClient.dio.put("/user/${user.id}", queryParameters: {'modifyUserId': userId}, data: user.toJson());
       return res.data;
     } catch (e) {
       rethrow;
