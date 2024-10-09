@@ -14,17 +14,11 @@ class CreateActivityPage extends BasePage {
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
-    return Column(
-      children: [
-        Expanded(
-          child: ref.watch(createActivityDataProvider).modelState == ModelState.processing
-              ? const Center(child: CircularProgressIndicator())
-              : ref.watch(createActivityDataProvider).modelState == ModelState.error
-                  ? Text(ref.watch(createActivityDataProvider).errorMessage)
-                  : const CreateActivityLayout(),
-        )
-      ],
-    );
+    return ref.watch(createActivityDataProvider).modelState == ModelState.processing
+        ? const Center(child: CircularProgressIndicator())
+        : ref.watch(createActivityDataProvider).modelState == ModelState.error
+            ? Text(ref.watch(createActivityDataProvider).errorMessage)
+            : const CreateActivityLayout();
   }
 
   @override

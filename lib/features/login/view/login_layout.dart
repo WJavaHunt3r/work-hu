@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -12,10 +13,11 @@ import 'package:work_hu/features/change_password/provider/change_password_provid
 import 'package:work_hu/features/login/providers/login_provider.dart';
 
 class LoginLayout extends ConsumerWidget {
-  const LoginLayout({required this.origRoute, super.key});
+  LoginLayout({required this.origRoute, super.key});
 
   final String origRoute;
   static final _formKey = GlobalKey<FormState>();
+  final FocusNode passwordNode = FocusNode();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,6 +35,7 @@ class LoginLayout extends ConsumerWidget {
                       controller: loginProvider.usernameController,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(labelText: "login_username".i18n()),
+                      onEditingComplete: () => loginProvider.trimUsername(),
                       onChanged: (text) {
                         if (_formKey.currentState != null) {
                           _formKey.currentState!.validate();
@@ -49,6 +52,7 @@ class LoginLayout extends ConsumerWidget {
                   ),
                   TextFormField(
                     controller: loginProvider.passwordController,
+                    focusNode: passwordNode,
                     decoration: InputDecoration(labelText: "login_password".i18n()),
                     obscureText: true,
                     onFieldSubmitted: (value) => login(loginProvider, ref, context),
@@ -67,6 +71,23 @@ class LoginLayout extends ConsumerWidget {
                     },
                   ),
                   Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0.sp, horizontal: 8.sp),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                                onPressed: () {
+                                  TextInput.finishAutofillContext();
+                                  login(loginProvider, ref, context);
+                                },
+                                child: Text(
+                                  "login_login".i18n(),
+                                  style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.white),
+                                )),
+                          ),
+                        ],
+                      )),
+                  Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0.sp),
                       child: Row(
                         children: [
@@ -76,7 +97,7 @@ class LoginLayout extends ConsumerWidget {
                                   if (states.contains(WidgetState.focused) ||
                                       states.contains(WidgetState.pressed) ||
                                       states.contains(WidgetState.hovered)) {
-                                    return Colors.grey.shade500.withOpacity(0.3);
+                                    return Colors.grey.shade500.withValues(alpha: 0.3);
                                   }
                                   return Colors.transparent;
                                 })),
@@ -91,9 +112,10 @@ class LoginLayout extends ConsumerWidget {
                                             },
                                             title: "login_reset_password_confirm_title".i18n(),
                                             content: Text("login_reset_password_question".i18n()))).then((value) => ref
-                                                .read(loginDataProvider)
-                                                .resetState ==
-                                            ModelState.success
+                                                    .read(loginDataProvider)
+                                                    .resetState ==
+                                                ModelState.success &&
+                                            context.mounted
                                         ? showDialog(
                                             context: context,
                                             builder: (context) {
@@ -110,22 +132,6 @@ class LoginLayout extends ConsumerWidget {
                                 child: Text(
                                   "login_forgotten_password".i18n(),
                                   style: const TextStyle(color: AppColors.primary),
-                                )),
-                          ),
-                        ],
-                      )),
-                  Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0.sp),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextButton(
-                                onPressed: () {
-                                  login(loginProvider, ref, context);
-                                },
-                                child: Text(
-                                  "login_login".i18n(),
-                                  style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.white),
                                 )),
                           ),
                         ],
@@ -159,14 +165,16 @@ class LoginLayout extends ConsumerWidget {
             : ref.read(loginDataProvider.notifier).clear("login_password_changed_failed".i18n(), ModelState.error);
       });
     } else {
-      origRoute.isEmpty ? context.pop() : context.push(origRoute);
+      origRoute.isEmpty ? context.replace("/") : context.push(origRoute);
     }
   }
 
-  void login(LoginDataNotifier loginProvider, WidgetRef ref, BuildContext context) {
+  Future<void> login(LoginDataNotifier loginProvider, WidgetRef ref, BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      loginProvider.login().then((value) async =>
-          ref.read(loginDataProvider).modelState == ModelState.success ? navigateTo(ref, context) : null);
+      await loginProvider.login().then((value) async =>
+          ref.read(loginDataProvider).modelState == ModelState.success && context.mounted
+              ? navigateTo(ref, context)
+              : passwordNode.requestFocus());
     }
   }
 }

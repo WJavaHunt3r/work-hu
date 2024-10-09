@@ -71,9 +71,10 @@ class TransactionsLayout extends ConsumerWidget {
                       index: index,
                       child: ListTile(
                         onTap: () {
-                          ref.watch(transactionItemsDataProvider.notifier).getTransactionItems(current.id!);
-                          context.push("/transactionItems", extra: {"transaction": current}).then(
-                              (value) => ref.watch(transactionsDataProvider.notifier).getTransactions());
+                          ref.watch(transactionItemsDataProvider.notifier).getTransaction(current.id!);
+                          context
+                              .push("/admin/transactions/${current.id}")
+                              .then((value) => ref.watch(transactionsDataProvider.notifier).getTransactions());
                         },
                         leading: Image(
                           image: AssetImage(setLeadingIcon(current)),

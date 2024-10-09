@@ -14,7 +14,8 @@ class ActivityApi {
       num? createUserId,
       bool? registeredInApp,
       bool? registeredInMyShare,
-      String? searchText}) async {
+      String? searchText,
+      String? referenceDate}) async {
     try {
       final res = await _dioClient.dio.get("/activity", queryParameters: {
         "responsibleId": responsibleId,
@@ -22,7 +23,9 @@ class ActivityApi {
         "createUserId": createUserId,
         "registeredInApp": registeredInApp,
         "registeredInMyShare": registeredInMyShare,
-        "searchText": searchText,
+        "referenceDate": referenceDate,
+        "searchText": searchText
+
       });
       return res.data;
     } catch (e) {

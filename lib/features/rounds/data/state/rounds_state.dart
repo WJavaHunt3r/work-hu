@@ -8,9 +8,10 @@ part 'rounds_state.freezed.dart';
 abstract class RoundsState with _$RoundsState {
   const factory RoundsState(
       {@Default(0) num currentRoundNumber,
-        @Default([]) List<RoundModel> rounds,
-        @Default(ModelState.empty) ModelState modelState,
-        @Default("") String message}) = _RoundsState;
+      @Default([]) List<RoundModel> rounds,
+      RoundModel? currentRound,
+      @Default(ModelState.empty) ModelState modelState,
+      @Default("") String message}) = _RoundsState;
 
   const RoundsState._();
 }

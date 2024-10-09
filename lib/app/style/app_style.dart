@@ -54,7 +54,7 @@ class GlobalTheme {
       cardTheme: CardTheme(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
           margin: EdgeInsets.only(top: 8.sp),
-          elevation: 2.sp,
+          elevation: 0.sp,
           surfaceTintColor: AppColors.white,
           color: AppColors.white),
       chipTheme: ChipThemeData(
@@ -62,6 +62,7 @@ class GlobalTheme {
           backgroundColor: Colors.transparent,
           side: const BorderSide(color: AppColors.primary),
           labelStyle: TextStyle(fontSize: 12.sp, color: Colors.black)),
+      expansionTileTheme: ExpansionTileThemeData(tilePadding: EdgeInsets.only()),
       // dialogTheme: DialogTheme(
       //   titleTextStyle: TextStyle(fontSize: 20.sp, color: Colors.black),
       //   contentTextStyle: TextStyle(fontSize: 14.sp, color: Colors.black),
@@ -100,13 +101,13 @@ class GlobalTheme {
       seedColor: AppColors.primary,
       primary: AppColors.primary,
       secondary: AppColors.white,
-      surface: AppColors.white,
-      background: AppColors.backgroundColor,
+      surface: AppColors.backgroundColor,
+      // background: AppColors.backgroundColor,
       error: AppColors.errorRed,
       onPrimary: Colors.white,
       onSecondary: AppColors.primary,
       onSurface: AppColors.primary,
-      onBackground: AppColors.primary,
+      // onBackground: AppColors.primary,
       onError: Colors.redAccent,
       brightness: Brightness.light,
       outline: Colors.transparent);

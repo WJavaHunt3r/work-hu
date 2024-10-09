@@ -14,6 +14,7 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
   // SecurityContext(withTrustedRoots: false);
   await ScreenUtil.ensureScreenSize();
+
   await setupLocator();
   usePathUrlStrategy();
   GoRouter.optionURLReflectsImperativeAPIs = true;

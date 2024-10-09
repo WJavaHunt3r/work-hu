@@ -42,7 +42,9 @@ class WorkDropDownSearchFormField<T> extends StatelessWidget {
         textFieldConfiguration: TextFieldConfiguration(
             scrollPadding: EdgeInsets.only(bottom: 2.sp),
             autofocus: autofocus ?? false,
+            focusNode: focusNode,
             enabled: enabled ?? true,
+            textInputAction: TextInputAction.next,
             controller: controller,
             onTap: onTap),
         onSuggestionSelected: onSuggestionSelected,

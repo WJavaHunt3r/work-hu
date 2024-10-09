@@ -102,4 +102,8 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
       state = state.copyWith(modelState: ModelState.error);
     }
   }
+
+  void trimUsername(){
+    usernameController.text = usernameController.text.trim();
+  }
 }

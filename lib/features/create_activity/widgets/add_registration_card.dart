@@ -26,6 +26,8 @@ class AddRegistrationCard extends ConsumerWidget {
               direction: AxisDirection.up,
               onTap: () => ref.watch(createActivityDataProvider.notifier).updateCollapsed(false),
               controller: ref.read(createActivityDataProvider.notifier).userController,
+              focusNode:  ref.read(createActivityDataProvider.notifier).usersFocusNode,
+              autofocus: true,
               onSuggestionSelected: (UserModel suggestion) =>
                   ref.read(createActivityDataProvider.notifier).updateSelectedUser(suggestion),
               itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),

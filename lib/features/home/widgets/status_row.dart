@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:work_hu/app/style/app_colors.dart';
@@ -25,7 +24,7 @@ class StatusColumn extends StatelessWidget {
     return SfLinearGauge(
         orientation: LinearGaugeOrientation.vertical,
         axisTrackStyle: LinearAxisTrackStyle(
-            thickness: 50.sp,
+            thickness: 50.w,
             borderColor: Colors.grey.shade500,
             color: Colors.transparent,
             edgeStyle: LinearEdgeStyle.bothFlat),
@@ -60,17 +59,17 @@ class StatusColumn extends StatelessWidget {
         ],
         barPointers: [
           LinearBarPointer(
-            thickness: 50.sp,
+            thickness: 50.w,
             color: color,
             edgeStyle: LinearEdgeStyle.bothFlat,
             value: value.toDouble(),
           ),
           LinearBarPointer(
-              thickness: 50.sp,
+              thickness: 50.w,
               color: Colors.transparent,
               enableAnimation: false,
               borderColor: Colors.grey,
-              borderWidth: 0.5.sp,
+              borderWidth: 0.5.w,
               edgeStyle: LinearEdgeStyle.bothFlat,
               value: maximum.toDouble())
         ]);

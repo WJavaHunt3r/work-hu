@@ -33,4 +33,13 @@ class TransactionRepository {
       rethrow;
     }
   }
+
+  Future<TransactionModel> getTransaction(num transactionId) async {
+    try {
+      final res = await _transactionApi.getTransaction(transactionId);
+      return TransactionModel.fromJson(res);
+    } on DioException {
+      rethrow;
+    }
+  }
 }

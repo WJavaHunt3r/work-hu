@@ -51,7 +51,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     dateController.addListener(_updateDateAndDescription);
     exchangeController.addListener(_updateState);
     valueController.addListener(_updateState);
-    // getUsers();
+    getUsers();
   }
 
   final UsersRepository usersRepository;
@@ -169,8 +169,9 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         description: description ?? state.description,
         user: state.selectedUser!,
         createUserId: currentUserProvider.state!.id,
-        round:
-            roundDataNotifier.state.rounds.where((element) => element.season.seasonYear == DateTime.now().year).first,
+        round: roundDataNotifier.state.rounds
+            .where((element) => element.startDateTime.month == state.transactionDate?.month)
+            .first,
         points: state.transactionType != TransactionType.CREDIT && state.transactionType != TransactionType.HOURS
             ? double.tryParse(valueController.value.text) ?? 0
             : 0,

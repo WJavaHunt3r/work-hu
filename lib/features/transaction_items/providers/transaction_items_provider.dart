@@ -10,6 +10,8 @@ import 'package:work_hu/features/transaction_items/data/api/transaction_items_ap
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
 import 'package:work_hu/features/transaction_items/data/state/transaction_items_state.dart';
+import 'package:work_hu/features/transactions/data/repository/transactions_repository.dart';
+import 'package:work_hu/features/transactions/providers/transactions_provider.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 
@@ -20,23 +22,37 @@ final transactionItemsRepoProvider =
 
 final transactionItemsDataProvider =
     StateNotifierProvider.autoDispose<TransactionItemsDataNotifier, TransactionItemsState>((ref) =>
-        TransactionItemsDataNotifier(
-            ref.read(transactionItemsRepoProvider), ref.read(usersRepoProvider), ref.read(userDataProvider.notifier)));
+        TransactionItemsDataNotifier(ref.read(transactionItemsRepoProvider), ref.read(usersRepoProvider),
+            ref.read(userDataProvider.notifier), ref.read(transactionsRepoProvider)));
 
 class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> {
-  TransactionItemsDataNotifier(this.transactionRepository, this.usersRepository, this.currentUserProvider)
+  TransactionItemsDataNotifier(
+      this.transactionItemsRepository, this.usersRepository, this.currentUserProvider, this.transactionsRepository)
       : super(const TransactionItemsState());
 
-  final TransactionItemsRepository transactionRepository;
+  final TransactionItemsRepository transactionItemsRepository;
+  final TransactionRepository transactionsRepository;
   final UsersRepository usersRepository;
   final UserDataNotifier currentUserProvider;
 
   Future<void> getTransactionItems(num transactionId) async {
     state = state.copyWith(modelState: ModelState.processing, transactionItems: []);
     try {
-      await transactionRepository.getTransactionItems(transactionId: transactionId).then((data) async {
+      await transactionItemsRepository.getTransactionItems(transactionId: transactionId).then((data) async {
         data.sort((a, b) => b.user.lastname.compareTo(a.user.lastname));
         state = state.copyWith(transactionItems: data, modelState: ModelState.success);
+      });
+    } catch (e) {
+      state = state.copyWith(modelState: ModelState.error, message: e.toString());
+    }
+  }
+
+  Future<void> getTransaction(num transactionId) async {
+    state = state.copyWith(modelState: ModelState.processing, transactionItems: []);
+    try {
+      await transactionsRepository.getTransaction(transactionId).then((data) async {
+        state = state.copyWith(transaction: data, modelState: ModelState.success);
+        getTransactionItems(transactionId);
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
@@ -46,7 +62,7 @@ class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> 
   Future<void> deleteTransactionItem(num id, int index) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await transactionRepository.deleteTransactionItem(id, currentUserProvider.state!.id).then((data) {
+      await transactionItemsRepository.deleteTransactionItem(id, currentUserProvider.state!.id).then((data) {
         List<TransactionItemModel> items = state.transactionItems.where((element) => element.id != id).toList();
         state = state.copyWith(transactionItems: items, modelState: ModelState.success);
       });

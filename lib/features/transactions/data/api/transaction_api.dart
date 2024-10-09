@@ -34,4 +34,13 @@ class TransactionApi {
       rethrow;
     }
   }
+
+  Future<dynamic> getTransaction(num transactionId) async {
+    try {
+      final res = await _dioClient.dio.get("/transaction/$transactionId");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

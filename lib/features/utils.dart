@@ -96,6 +96,10 @@ class Utils {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day}";
   }
 
+  static String dateToStringUnformatted(DateTime date) {
+    return "${date.year}${date.month < 10 ? "0${date.month}" : date.month}${date.day < 10 ? "0${date.day}" : date.day}";
+  }
+
   static String dateToStringWithTime(DateTime date) {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day} ${date.hour < 10 ? "0${date.hour}" : date.hour}:${date.minute < 10 ? "0${date.minute}" : date.minute}";
   }
@@ -240,7 +244,7 @@ class Utils {
           ? DoubleCellValue(item.hours * 1000)
           : activity.account == Account.MYSHARE && activity.transactionType == TransactionType.HOURS
               ? DoubleCellValue(item.hours * 2000)
-              : const TextCellValue("");
+              : TextCellValue("");
     }
 
     return excel;

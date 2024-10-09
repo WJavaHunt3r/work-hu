@@ -30,9 +30,8 @@ class AdminLayout extends ConsumerWidget {
         createListTile(
             ref: ref,
             title: "admin_bmm_perfect_weeks",
-            route: "createTransaction",
-            enabled: false,
-            extra: {"transactionType": TransactionType.BMM_PERFECT_WEEK, "account": Account.OTHER}),
+            route: "createBmmTransaction",
+            enabled: false),
       ];
 
   List<Widget> adminLeaderScreens(WidgetRef ref) => [
@@ -40,13 +39,11 @@ class AdminLayout extends ConsumerWidget {
         createListTile(
             ref: ref,
             title: "admin_myshare_credits",
-            route: "createTransaction",
-            extra: {"transactionType": TransactionType.CREDIT, "account": Account.MYSHARE}),
+            route: "createTransaction"),
         createListTile(
             ref: ref,
             title: "admin_samvirk_credit",
-            route: "createTransaction",
-            extra: {"transactionType": TransactionType.CREDIT, "account": Account.SAMVIRK}),
+            route: "createSamvirkTransaction"),
         createListTile(ref: ref, title: "admin_users", route: "users"),
         createListTile(ref: ref, title: "admin_goals", route: "goals"),
         createListTile(ref: ref, title: "admin_mentor_mentees", route: "mentorMentees"),

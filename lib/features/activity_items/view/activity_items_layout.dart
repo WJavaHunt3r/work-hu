@@ -96,12 +96,12 @@ class ActivityItemsLayout extends BasePage {
         ));
   }
 
-  @override
-  Widget? createActionButton(BuildContext context, WidgetRef ref) {
-    return FloatingActionButton(
-      heroTag: UniqueKey(),
-      onPressed: () => ref.watch(activityItemsDataProvider.notifier).createActivityXlsx(),
-      child: const Icon(Icons.download),
-    );
-  }
+  // @override
+  // Widget? createActionButton(BuildContext context, WidgetRef ref) {
+  //   return FloatingActionButton(
+  //     heroTag: UniqueKey(),
+  //     onPressed: () => ref.watch(activityItemsDataProvider.notifier).createActivityXlsx(),
+  //     child: const Icon(Icons.download),
+  //   );
+  // }
 }

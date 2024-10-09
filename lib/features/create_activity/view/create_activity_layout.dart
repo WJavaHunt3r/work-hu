@@ -21,23 +21,23 @@ class CreateActivityLayout extends ConsumerWidget {
               return SuccessAlertDialog(title: "create_activity_create_success".i18n());
             })
         : null);
-    return Stack(children: [
-      ListView(
-          children: ref.watch(createActivityDataProvider).description.isEmpty
-              ? [const CollapsableDetailsLayout()]
-              : enabledWidgets(context, ref)),
-      ref.watch(createActivityDataProvider).modelState == ModelState.processing
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : const SizedBox(),
-    ]);
+    return Column(
+      children: [
+        const CollapsableDetailsLayout(),
+        Expanded(
+          child: ListView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              children: ref.watch(createActivityDataProvider).description.isEmpty
+                  ? []
+                  : enabledWidgets(context, ref)),
+        ),
+      ],
+    );
   }
 
   List<Widget> enabledWidgets(BuildContext context, WidgetRef ref) {
     var items = ref.watch(createActivityDataProvider).activityItems;
     return [
-      const CollapsableDetailsLayout(),
       ActivitySumCard(items: items),
       const AddRegistrationCard(),
       const ActivityRegistrationListCard()

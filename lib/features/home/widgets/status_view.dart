@@ -105,11 +105,14 @@ class StatusView extends ConsumerWidget {
             )),
         Center(
             child: Text(
-          team.team.teamName,
-          maxLines: 1,
-          style: TextStyle(fontFamily: "Good-Timing", fontSize: 25, overflow: TextOverflow.ellipsis),
+          team.team.teamName.toLowerCase() == "team samvirk" ? "Shooting    Stars" : "Golden generation",
+          maxLines: 2,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontFamily: "Good-Timing", fontSize: 20.sp, overflow: TextOverflow.ellipsis),
         )),
-        const SizedBox(height: 10,)
+        SizedBox(
+          height: 10.w,
+        )
       ],
     ));
   }

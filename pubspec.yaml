@@ -20,7 +20,7 @@ dependencies:
   get: ^4.6.5
   auto_route: ^7.9.2
   get_it: ^7.2.0
-  flutter_screenutil: ^5.9.0
+  flutter_screenutil: ^5.9.3
   injectable: ^2.4.0
   freezed_annotation: ^2.4.1
   json_annotation: ^4.8.1

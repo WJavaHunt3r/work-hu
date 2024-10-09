@@ -22,8 +22,10 @@ class ActivityDetails extends ConsumerWidget {
         key: _formKey,
         child: Column(
           children: [
-            TextField(
+            TextFormField(
               controller: ref.watch(createActivityDataProvider.notifier).dateController,
+              autofocus: true,
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                   labelText: "create_activity_activity_date".i18n(),
                   suffixIcon: IconButton(

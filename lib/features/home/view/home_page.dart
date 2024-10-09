@@ -53,7 +53,9 @@ class HomePage extends MainScreen {
   Widget? createActionButton(BuildContext context, WidgetRef ref) {
     return ref.watch(userDataProvider)?.isMentor() ?? false
         ? FloatingActionButton(
+            elevation: 0,
             onPressed: () => context.push("/createActivity"),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.sp)),
             child: const Icon(Icons.add),
           )
         : null;

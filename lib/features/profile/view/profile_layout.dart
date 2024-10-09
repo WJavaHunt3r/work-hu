@@ -30,17 +30,16 @@ class ProfileLayout extends ConsumerWidget {
             children: [
               Expanded(
                   child: ListView(
+                    shrinkWrap: true,
                 children: [
                   const ProfileHeader(),
                   ref.watch(profileDataProvider).userGoal == null
                       ? const SizedBox()
                       : ref.watch(profileDataProvider).modelState == ModelState.processing
                           ? const Center(child: CircularProgressIndicator())
-                          : SizedBox(
-                              height: 150.sp,
-                              child: ProfileTabView(
-                                userRounds: userRounds,
-                              )),
+                          : ProfileTabView(
+                            userRounds: userRounds,
+                          ),
                   ref.watch(profileDataProvider).userGoal == null
                       ? const SizedBox()
                       : Row(
@@ -95,6 +94,7 @@ class ProfileLayout extends ConsumerWidget {
                                   onConfirm: () {
                                     ref.read(profileDataProvider.notifier).logout();
                                     context.pop();
+                                    context.replace("/");
                                   },
                                   title: "profile_logout_confirm_title".i18n(),
                                   content: Text("profile_logout_question".i18n())));

@@ -5,15 +5,16 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/title_provider.dart';
 
 abstract class BasePage extends ConsumerWidget {
-  const BasePage(
-      {super.key,
-      required this.title,
-      this.automaticallyImplyLeading,
-      this.canPop = true,
-      this.isListView = false,
-      this.appBarTextStyle,
-      this.centerTitle,
-      this.extendBodyBehindAppBar});
+  const BasePage({
+    super.key,
+    required this.title,
+    this.automaticallyImplyLeading,
+    this.canPop = true,
+    this.isListView = false,
+    this.appBarTextStyle,
+    this.centerTitle,
+    this.extendBodyBehindAppBar,
+  });
 
   final String title;
   final bool? automaticallyImplyLeading;
@@ -27,7 +28,7 @@ abstract class BasePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return PopScope(
         canPop: canPop,
-        onPopInvoked: (didPop) => popInvoked(context, didPop, ref),
+        onPopInvokedWithResult: (didPop, result) => popInvoked(context, didPop, ref),
         child: Scaffold(
             drawer: buildDrawer(context, ref),
             bottomNavigationBar: buildBottomNavigationBar(context, ref),
@@ -45,6 +46,7 @@ abstract class BasePage extends ConsumerWidget {
                     automaticallyImplyLeading: automaticallyImplyLeading ?? true,
                   ),
             floatingActionButton: createActionButton(context, ref),
+            floatingActionButtonLocation: setFloatingActionButtonLocation(ref),
             resizeToAvoidBottomInset: false,
             body: buildBody(context, ref) ??
                 SizedBox.expand(
@@ -63,6 +65,11 @@ abstract class BasePage extends ConsumerWidget {
 
   List<Widget> buildActions(BuildContext context, WidgetRef ref) {
     return [];
+  }
+
+  @protected
+  FloatingActionButtonLocation setFloatingActionButtonLocation(WidgetRef ref){
+    return FloatingActionButtonLocation.centerFloat;
   }
 
   popInvoked(BuildContext context, bool didPop, WidgetRef ref) {}

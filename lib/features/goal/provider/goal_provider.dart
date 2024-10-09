@@ -113,19 +113,20 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
 
   Future<void> deleteGoal(num goalId) async {
     List<GoalModel> origItems = state.goals;
-    List<GoalModel> items = [];
-    for (var a in origItems) {
-      if (a.id != goalId) {
-        items.add(a);
-      }
-    }
+    List<GoalModel> items = [...origItems];
+    items.removeWhere((a) => a.id != goalId);
+    // for (var a in origItems) {
+    //   if (a.id != goalId) {
+    //     items.add(a);
+    //   }
+    // }
     state = state.copyWith(goals: items, modelState: ModelState.processing);
     try {
       await goalRepository
           .deleteGoal(goalId, currentUserProvider.state!.id)
           .then((value) => state = state.copyWith(goals: items, modelState: ModelState.success));
     } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, goals: origItems);
+      state = state.copyWith(modelState: ModelState.error, goals: origItems );
     }
   }
 

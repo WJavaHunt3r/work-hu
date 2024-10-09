@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
+import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/user_points/provider/user_points_providers.dart';
@@ -19,15 +21,17 @@ class UserPointsLayout extends ConsumerWidget {
     var items = ref.watch(userPointsDataProvider).transactionItems;
     var activityItems = ref.watch(userPointsDataProvider).activityItems;
     var currentRound = ref.watch(roundDataProvider).currentRoundNumber;
-    return items.isNotEmpty
-        ? DefaultTabController(
-            length: currentRound.toInt() + 1,
-            initialIndex: 0,
-            child: BaseTabView(
-              tabs: createTabs(items, currentRound, context),
-              tabViews: createTabView(items, activityItems, currentRound),
-            ))
-        : const SizedBox();
+    return ref.watch(userPointsDataProvider).modelState == ModelState.processing
+        ? const Center(child: CircularProgressIndicator())
+        : items.isNotEmpty
+            ? DefaultTabController(
+                length: 2,
+                initialIndex: 0,
+                child: BaseTabView(
+                  tabs: createTabs(items, currentRound, context),
+                  tabViews: createTabView(items, activityItems, currentRound),
+                ))
+            : const SizedBox();
   }
 
   num countItems(List<TransactionItemModel> items) {

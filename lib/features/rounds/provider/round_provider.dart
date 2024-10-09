@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/features/rounds/data/api/round_api.dart';
+import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/rounds/data/repository/round_repository.dart';
 import 'package:work_hu/features/rounds/data/state/rounds_state.dart';
 
@@ -31,9 +32,12 @@ class RoundDataNotifier extends StateNotifier<RoundsState> {
       });
 
       await roundRepository.getCurrentRounds().then(
-          (value) => state = state.copyWith(currentRoundNumber: value.roundNumber, modelState: ModelState.success));
+          (value) => state = state.copyWith(currentRoundNumber: value.roundNumber, currentRound:value, modelState: ModelState.success));
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
   }
+
+  RoundModel getCurrentRound() =>
+      state.rounds.where((element) => element.activeRound && element.roundNumber == state.currentRoundNumber).first;
 }

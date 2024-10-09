@@ -8,8 +8,8 @@ import 'package:work_hu/features/create_transactions/providers/create_transactio
 import 'package:work_hu/features/create_transactions/view/create_bmm_transaction_layout.dart';
 import 'package:work_hu/features/create_transactions/view/create_transactions_layout.dart';
 
-class CreateTransactionPage extends BasePage {
-  const CreateTransactionPage({super.key, super.title = "admin_myshare_credits"});
+class CreateSamvirkTransactionPage extends BasePage {
+  const CreateSamvirkTransactionPage({super.key, super.title = "admin_samvirk_credit"});
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
@@ -17,7 +17,7 @@ class CreateTransactionPage extends BasePage {
       if (ref.read(createTransactionsDataProvider).transactionType == TransactionType.POINT) {
         ref
             .watch(createTransactionsDataProvider.notifier)
-            .setTransactionTypeAndAccount(TransactionType.CREDIT, Account.MYSHARE);
+            .setTransactionTypeAndAccount(TransactionType.CREDIT, Account.SAMVIRK);
       }
     });
 

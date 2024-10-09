@@ -53,21 +53,21 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
 
   Future<void> checkLoginCredentials() async {
     await getTeamRounds();
-    state = state.copyWith(modelState: ModelState.processing);
-    var username = await Utils.getData('user');
-    var password = await Utils.getData('password');
-
-    var user = userSessionProvider.state;
-    if (username.isNotEmpty && password.isNotEmpty && user == null) {
-      //state = state.copyWith(modelState: ModelState.processing);
-      read.state = LoginState(username: username, password: password);
-      // await read.login();
-      state = state.copyWith(message: read.state.message, modelState: ModelState.success);
-    } else {
-      if (user == null && username.isNotEmpty) {
-        await loginRepository.getUser(username).then((value) => userSessionProvider.setUser(value));
-      }
-      state = state.copyWith(modelState: ModelState.success);
-    }
+    // state = state.copyWith(modelState: ModelState.processing);
+    // var username = await Utils.getData('user');
+    // var password = await Utils.getData('password');
+    //
+    // var user = userSessionProvider.state;
+    // if (username.isNotEmpty && password.isNotEmpty && user == null) {
+    //   //state = state.copyWith(modelState: ModelState.processing);
+    //   read.state = LoginState(username: username, password: password);
+    //   // await read.login();
+    //   state = state.copyWith(message: read.state.message, modelState: ModelState.success);
+    // } else {
+    //   if (user == null && username.isNotEmpty) {
+    //     await loginRepository.getUser(username).then((value) => userSessionProvider.setUser(value));
+    //   }
+    //   state = state.copyWith(modelState: ModelState.success);
+    // }
   }
 }
