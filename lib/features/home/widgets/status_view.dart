@@ -5,6 +5,7 @@ import 'package:localization/localization.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
 import 'package:work_hu/features/home/data/model/team_round_model.dart';
+import 'package:work_hu/features/home/widgets/medals_view.dart';
 import 'package:work_hu/features/home/widgets/status_row.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/utils.dart';
@@ -75,7 +76,7 @@ class StatusView extends ConsumerWidget {
       ],
     ));
 
-    list.add(const Center(child: Text("Hamarosan érkezik", style: const TextStyle(fontFamily: "Good-Timing"))));
+    list.add(MedalsView(buk: buk, samvirk: samvirk, rounds: teamRounds));
 
     return list;
   }
@@ -105,7 +106,7 @@ class StatusView extends ConsumerWidget {
             )),
         Center(
             child: Text(
-          team.team.teamName.toLowerCase() == "team samvirk" ? "Shooting    Stars" : "Golden generation",
+          team.team.teamName.toLowerCase() == "team samvirk" ? "Shooting\nStars" : "Golden\ngeneration",
           maxLines: 2,
           textAlign: TextAlign.center,
           style: TextStyle(fontFamily: "Good-Timing", fontSize: 20.sp, overflow: TextOverflow.ellipsis),
