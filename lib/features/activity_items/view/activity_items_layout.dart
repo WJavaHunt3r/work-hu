@@ -13,7 +13,7 @@ import 'package:work_hu/features/activity_items/widgets/activity_details_panel.d
 import 'package:work_hu/features/utils.dart';
 
 class ActivityItemsLayout extends BasePage {
-  const ActivityItemsLayout(
+  ActivityItemsLayout(
       {required this.activityId, super.key, super.title = "activity_items_registrations", super.isListView = true});
 
   final num activityId;
@@ -96,12 +96,12 @@ class ActivityItemsLayout extends BasePage {
         ));
   }
 
-  // @override
-  // Widget? createActionButton(BuildContext context, WidgetRef ref) {
-  //   return FloatingActionButton(
-  //     heroTag: UniqueKey(),
-  //     onPressed: () => ref.watch(activityItemsDataProvider.notifier).createActivityXlsx(),
-  //     child: const Icon(Icons.download),
-  //   );
-  // }
+// @override
+// Widget? createActionButton(BuildContext context, WidgetRef ref) {
+//   return FloatingActionButton(
+//     heroTag: UniqueKey(),
+//     onPressed: () => ref.watch(activityItemsDataProvider.notifier).createActivityXlsx(),
+//     child: const Icon(Icons.download),
+//   );
+// }
 }

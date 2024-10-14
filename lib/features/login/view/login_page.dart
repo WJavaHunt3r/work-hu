@@ -4,7 +4,7 @@ import 'package:work_hu/app/framework/base_components/main_screen.dart';
 import 'package:work_hu/features/login/view/login_layout.dart';
 
 class LoginPage extends MainScreen {
-  const LoginPage(
+  LoginPage(
       {required this.origRoute,
       super.key,
       super.title = "DukApp",

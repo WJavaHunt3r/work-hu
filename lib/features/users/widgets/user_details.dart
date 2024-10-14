@@ -38,8 +38,7 @@ class UserDetails extends ConsumerWidget {
               actions: isEnabled
                   ? [
                       MaterialButton(
-                        onPressed: () =>
-                            ref.read(usersDataProvider.notifier).saveUser().then((value) => context.pop()),
+                        onPressed: () => ref.read(usersDataProvider.notifier).saveUser().then((value) => context.pop()),
                         child: Text("user_details_save".i18n()),
                       )
                     ]
@@ -104,33 +103,29 @@ class UserDetails extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: BaseTextFormField(
-                                enabled: false,
-                                labelText: "user_details_myshare_credit".i18n(),
-                                initialValue: user.currentMyShareCredit.toString(),
-                                keyBoardType: TextInputType.number,
-                                onChanged: (String text) => text.isNotEmpty
-                                    ? ref
-                                        .watch(usersDataProvider.notifier)
-                                        .updateCurrentUser(user.copyWith(currentMyShareCredit: num.tryParse(text) ?? 0))
-                                    : null,
-                              ),
+                                  enabled: false,
+                                  labelText: "user_details_myshare_credit".i18n(),
+                                  initialValue: Utils.creditFormatting(user.currentMyShareCredit),
+                                  keyBoardType: TextInputType.number,
+                                  onChanged: (String text) => {}),
                             ),
                             SizedBox(
                               width: 5.sp,
                             ),
-                            Expanded(
-                              child: BaseTextFormField(
-                                labelText: "user_details_base_myshare_credit".i18n(),
-                                initialValue: user.baseMyShareCredit.toString(),
-                                keyBoardType: TextInputType.number,
-                                enabled: isEnabled,
-                                onChanged: (String text) => text.isNotEmpty
-                                    ? ref
-                                        .watch(usersDataProvider.notifier)
-                                        .updateCurrentUser(user.copyWith(baseMyShareCredit: num.tryParse(text) ?? 0))
-                                    : null,
-                              ),
-                            )
+                            if (currentUser?.isAdmin() ?? false)
+                              Expanded(
+                                child: BaseTextFormField(
+                                  labelText: "user_details_base_myshare_credit".i18n(),
+                                  initialValue: user.baseMyShareCredit.toString(),
+                                  keyBoardType: TextInputType.number,
+                                  enabled: isEnabled,
+                                  onChanged: (String text) => text.isNotEmpty
+                                      ? ref
+                                          .watch(usersDataProvider.notifier)
+                                          .updateCurrentUser(user.copyWith(baseMyShareCredit: num.tryParse(text) ?? 0))
+                                      : null,
+                                ),
+                              )
                           ],
                         ),
                         isEnabled

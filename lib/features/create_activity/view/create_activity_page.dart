@@ -9,7 +9,7 @@ import 'package:work_hu/features/create_activity/provider/create_activity_provid
 import 'package:work_hu/features/create_activity/view/create_activity_layout.dart';
 
 class CreateActivityPage extends BasePage {
-  const CreateActivityPage(
+  CreateActivityPage(
       {super.title = "create_activity_new_activity_viewname", super.key, super.canPop = false, isListView = true});
 
   @override

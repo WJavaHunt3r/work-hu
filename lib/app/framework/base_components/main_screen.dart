@@ -10,7 +10,7 @@ import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 
 abstract class MainScreen extends BasePage {
-  const MainScreen(
+  MainScreen(
       {required this.selectedIndex,
       super.key,
       required super.title,
@@ -18,7 +18,8 @@ abstract class MainScreen extends BasePage {
       super.appBarTextStyle,
       super.extendBodyBehindAppBar,
       super.automaticallyImplyLeading = false,
-      super.centerTitle});
+      super.centerTitle,
+      super.leading});
 
   final int selectedIndex;
 

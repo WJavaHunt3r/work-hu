@@ -12,6 +12,8 @@ import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
+import 'package:work_hu/features/profile/widgets/fra_kare_streak.dart';
+import 'package:work_hu/features/profile/widgets/monthly_coin.dart';
 import 'package:work_hu/features/profile/widgets/profile_header.dart';
 import 'package:work_hu/features/profile/widgets/profile_tab_view.dart';
 import 'package:work_hu/features/users/widgets/user_details.dart';
@@ -30,28 +32,64 @@ class ProfileLayout extends ConsumerWidget {
             children: [
               Expanded(
                   child: ListView(
-                    shrinkWrap: true,
+                shrinkWrap: true,
                 children: [
                   const ProfileHeader(),
-                  ref.watch(profileDataProvider).userGoal == null
+                  ref.watch(profileDataProvider).userGoal == null || ref.watch(profileDataProvider).userRounds.isEmpty
                       ? const SizedBox()
                       : ref.watch(profileDataProvider).modelState == ModelState.processing
                           ? const Center(child: CircularProgressIndicator())
-                          : ProfileTabView(
-                            userRounds: userRounds,
-                          ),
+                          : ProfileTabView(userRounds: userRounds, key: key),
                   ref.watch(profileDataProvider).userGoal == null
                       ? const SizedBox()
-                      : Row(
-                          children: [
-                            buildMonthlyCoinWidget("Aug", userRounds.isNotEmpty ? userRounds[0].roundCoins : 0),
-                            buildMonthlyCoinWidget("Szept", userRounds.length > 1 ? userRounds[1].roundCoins : 0),
-                            buildMonthlyCoinWidget("Okt", userRounds.length > 2 ? userRounds[2].roundCoins : 0),
-                            buildMonthlyCoinWidget("Nov", userRounds.length > 3 ? userRounds[3].roundCoins : 0),
-                            buildMonthlyCoinWidget("Dec", userRounds.length > 4 ? userRounds[4].roundCoins : 0)
-                          ],
+                      : Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.sp),
+                          child: Row(
+                            children: [
+                              MonthlyCoin(
+                                  month: "Aug",
+                                  points: userRounds.isNotEmpty
+                                      ? userRounds
+                                          .firstWhere((e) => e.round.activeRound && e.round.roundNumber == 1,
+                                              orElse: () => userRounds.first.copyWith(roundCoins: 0))
+                                          .roundCoins
+                                      : 0),
+                              MonthlyCoin(
+                                  month: "Szept",
+                                  points: userRounds.isNotEmpty
+                                      ? userRounds
+                                          .firstWhere((e) => e.round.activeRound && e.round.roundNumber == 2,
+                                              orElse: () => userRounds.first.copyWith(roundCoins: 0))
+                                          .roundCoins
+                                      : 0),
+                              MonthlyCoin(
+                                  month: "Okt",
+                                  points: userRounds.isNotEmpty
+                                      ? userRounds
+                                          .firstWhere((e) => e.round.activeRound && e.round.roundNumber == 3,
+                                              orElse: () => userRounds.first.copyWith(roundCoins: 0))
+                                          .roundCoins
+                                      : 0),
+                              MonthlyCoin(
+                                  month: "Nov",
+                                  points: userRounds.isNotEmpty
+                                      ? userRounds
+                                          .firstWhere((e) => e.round.activeRound && e.round.roundNumber == 4,
+                                              orElse: () => userRounds.first.copyWith(roundCoins: 0))
+                                          .roundCoins
+                                      : 0),
+                              MonthlyCoin(
+                                  month: "Dec",
+                                  points: userRounds.isNotEmpty
+                                      ? userRounds
+                                          .firstWhere((e) => e.round.activeRound && e.round.roundNumber == 5,
+                                              orElse: () => userRounds.first.copyWith(roundCoins: 0))
+                                          .roundCoins
+                                      : 0)
+                            ],
+                          ),
                         ),
-                  const Divider(),
+                  ref.watch(profileDataProvider).fraKareWeeks.isEmpty ? const SizedBox() : FraKareStreak(),
                   Column(
                     children: [
                       MenuOptionsListTile(
@@ -71,12 +109,12 @@ class ProfileLayout extends ConsumerWidget {
                           ? MenuOptionsListTile(
                               title: "profile_mentees_title".i18n(),
                               onTap: () => ref.read(routerProvider).push("/mentees"))
-                          : SizedBox(),
+                          : const SizedBox(),
                       user.isMentor()
                           ? MenuOptionsListTile(
                               title: "profile_activities_title".i18n(),
                               onTap: () => ref.read(routerProvider).push("/activities"))
-                          : SizedBox(),
+                          : const SizedBox(),
                     ],
                   ),
                 ],
@@ -112,30 +150,6 @@ class ProfileLayout extends ConsumerWidget {
               )
             ],
           );
-  }
-
-  buildMonthlyCoinWidget(String month, num points) {
-    return Expanded(
-        child: SizedBox(
-      height: 100.sp,
-      child: Padding(
-        padding: EdgeInsets.all(4.sp),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              month,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Expanded(
-                child: Image(
-                    image: AssetImage(
-                        "assets/img/${points == 0 ? "PACE_Coin_Blank_Static.png" : "PACE_Coin_Buk_${points}_Spin_540px.gif"}"),
-                    fit: BoxFit.fitWidth))
-          ],
-        ),
-      ),
-    ));
   }
 
   isOnTrack(GoalModel? goal, UserRoundModel userRound) {

@@ -12,27 +12,15 @@ class ProfileHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var user = ref.watch(userDataProvider)!;
     var spouse = ref.watch(profileDataProvider).spouse;
-    return Column(
-      children: [
-        Icon(
-          Icons.person_outline,
-          size: 60.sp,
-        ),
-        // : SvgPicture.asset(
-        //     "assets/logos/${user.team!.color}_vacduka.svg",
-        //     height: 120.sp,
-        //     fit: BoxFit.contain,
-        //   ),
-        Padding(
-            padding: EdgeInsets.symmetric(vertical: 12.sp),
-            child: spouse == null
-                ? Text(
-                    user.getFullName(),
-                    style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w800),
-                  )
-                : Text("${user.getFullName()}\n${spouse.getFullName()}",
-                    style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w800)))
-      ],
-    );
+    return Padding(
+        padding: EdgeInsets.only(bottom: 8.sp),
+        child: spouse == null
+            ? Text(
+                user.getFullName(),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w800),
+              )
+            : Text("${user.getFullName()}\n${spouse.getFullName()}",
+                textAlign: TextAlign.center, style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w800)));
   }
 }

@@ -41,6 +41,7 @@ dependencies:
   localization: ^2.1.1
   http_parser: ^4.0.2
   flutter_svg: ^2.0.10+1
+  info_widget: ^1.0.0
 
 dev_dependencies:
   flutter_test:

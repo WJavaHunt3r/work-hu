@@ -13,10 +13,14 @@ import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
 class HomePage extends MainScreen {
-  const HomePage({super.key, super.title = "PACE", super.centerTitle = true})
+  HomePage(
+      {super.key,
+      super.title = "",
+      // super.centerTitle = true,
+      super.extendBodyBehindAppBar = true})
       : super(
-            selectedIndex: 0,
-            appBarTextStyle: const TextStyle(fontFamily: "Good-Timing", fontWeight: FontWeight.bold, fontSize: 35));
+          selectedIndex: 0,
+        );
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {

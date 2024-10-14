@@ -16,50 +16,38 @@ class ProfileTabView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var currentRound = ref.watch(roundDataProvider).currentRoundNumber;
-    return userRounds.isEmpty || currentRound == 0
-        ? const SizedBox()
-        : DefaultTabController(
-            length: 1, //currentRound.toInt() + 1,
-            initialIndex: 0, // currentRound == 0 ? 0 : currentRound.toInt() - 1,
-            child: Column(
-              children: [
-                TabBar(
-                    unselectedLabelStyle: TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.normal,
-                        fontSize: 12.sp,
-                        overflow: TextOverflow.ellipsis),
-                    labelStyle: TextStyle(
-                        color: AppColors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16.sp,
-                        overflow: TextOverflow.ellipsis),
-                    dividerColor: Colors.transparent,
-                    labelPadding: EdgeInsets.all(0.sp),
-                    splashBorderRadius: BorderRadius.all(Radius.circular(30.sp)),
-                    padding: EdgeInsets.all(0.sp),
-                    indicator: ShapeDecoration(
-                      color: AppColors.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.sp)),
-                    ),
-                    tabs: [createTabs(userRounds, currentRound, context)]),
-                createTabView(userRounds, currentRound),
-              ],
-            ));
-  }
-
-  Tab createTabs(List<UserRoundModel> items, num currentRound, BuildContext context) {
-    var item = items.firstWhere((e) => e.round.roundNumber == currentRound);
+    if (currentRound == 0) return SizedBox();
+    var item = userRounds.firstWhere((e) => e.round.roundNumber == currentRound);
     var date = item.round.startDateTime;
 
     String formatted = Utils.getMonthFromDate(date, context);
-    return Tab(
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [Text(formatted)],
-      ),
-    );
+    return userRounds.isEmpty || currentRound == 0
+        ? const SizedBox()
+        : Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 12.sp),
+                      padding: EdgeInsets.symmetric(vertical: 6.sp),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(25.sp), color: AppColors.primary),
+                      child: Text(
+                        formatted,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: AppColors.white, fontSize: 22.sp),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Consumer(
+                builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                  return ProfileGrid(userRoundModel: item, goal: ref.watch(profileDataProvider).userGoal);
+                },
+              )
+            ],
+          );
   }
 
   Consumer createTabView(List<UserRoundModel> items, num currentRound) {

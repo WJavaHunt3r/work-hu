@@ -8,6 +8,8 @@ import 'package:work_hu/features/login/providers/login_provider.dart';
 import 'package:work_hu/features/profile/data/api/user_round_api.dart';
 import 'package:work_hu/features/profile/data/repository/user_round_repository.dart';
 import 'package:work_hu/features/profile/data/state/profile_state.dart';
+import 'package:work_hu/features/user_fra_kare_week/data/repository/user_fra_kare_week_repository.dart';
+import 'package:work_hu/features/user_fra_kare_week/provider/user_fra_kare_week_provider.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 import 'package:work_hu/features/utils.dart';
@@ -18,25 +20,32 @@ final userRoundsRepoProvider =
     Provider<UserRoundRepository>((ref) => UserRoundRepository(ref.read(userRoundsApiProvider)));
 
 final profileDataProvider = StateNotifierProvider.autoDispose<ProfileDataNotifier, ProfileState>((ref) =>
-    ProfileDataNotifier(ref.read(loginRepoProvider), ref.read(userDataProvider.notifier),
-        ref.read(userRoundsRepoProvider), ref.read(goalRepoProvider), ref.read(usersRepoProvider)));
+    ProfileDataNotifier(
+        ref.read(loginRepoProvider),
+        ref.read(userDataProvider.notifier),
+        ref.read(userRoundsRepoProvider),
+        ref.read(goalRepoProvider),
+        ref.read(usersRepoProvider),
+        ref.read(userFraKareWeekRepoProvider)));
 
 class ProfileDataNotifier extends StateNotifier<ProfileState> {
   ProfileDataNotifier(
     this.loginRepository,
-    this.read,
+    this.currentUser,
     this.userRoundRepoProvider,
     this.goalRepoProvider,
     this.usersRepository,
+    this.userFraKareWeekRepo,
   ) : super(const ProfileState()) {
     getUserInfo();
   }
 
-  final UserDataNotifier read;
+  final UserDataNotifier currentUser;
   final LoginRepository loginRepository;
   final UserRoundRepository userRoundRepoProvider;
   final GoalRepository goalRepoProvider;
   final UsersRepository usersRepository;
+  final UserFraKareWeekRepository userFraKareWeekRepo;
 
   Future<void> getUserInfo() async {
     state = state.copyWith(modelState: ModelState.processing);
@@ -48,9 +57,18 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
   }
 
   Future<void> getUserInfoAndUserRounds() async {
-    var userModel = read.state;
+    var userModel = currentUser.state;
 
     if (userModel != null) {
+      await userFraKareWeekRepo.getFraKareWeeks(userId: userModel.id).then((data) {
+        data.sort((a, b) => b.fraKareWeek.weekNumber.compareTo(a.fraKareWeek.weekNumber));
+        state = state.copyWith(fraKareWeeks: data);
+      });
+      await loginRepository.getUser(userModel.id).then((userData) async {
+        if (userData.changedPassword) {
+          currentUser.setUser(userData);
+        }
+      });
       await userRoundRepoProvider
           .fetchUserRounds(userId: userModel.id, seasonYear: DateTime.now().year)
           .then((userRounds) async {
@@ -77,14 +95,14 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
     await Utils.saveData("user", "");
     await Utils.saveData("password", "");
 
-    read.setUser(null);
+    currentUser.setUser(null);
   }
 
   Future<void> getUserGoal() async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
       await goalRepoProvider
-          .getGoalByUserAndSeason(read.state!.id, DateTime.now().year)
+          .getGoalByUserAndSeason(currentUser.state!.id, DateTime.now().year)
           .then((goal) => state = state.copyWith(userGoal: goal, modelState: ModelState.success));
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);

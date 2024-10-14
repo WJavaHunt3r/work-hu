@@ -47,10 +47,10 @@ class UserPointsDataNotifier extends StateNotifier<UserPointsState> {
           });
         }
         transactionItems.sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
-        var activityItems =
-            await activityItemsRepository.getActivityItems(registeredInApp: false, userId: currentUser!.id);
-        state = state.copyWith(
-            activityItems: activityItems, transactionItems: transactionItems, modelState: ModelState.success);
+
+        await activityItemsRepository.getActivityItems(registeredInApp: false, userId: currentUser!.id).then(
+            (acItems) => state = state.copyWith(
+                activityItems: acItems, transactionItems: transactionItems, modelState: ModelState.success));
       });
     } on DioException catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());

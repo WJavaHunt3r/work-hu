@@ -16,9 +16,18 @@ class LoginRepository {
     }
   }
 
-  Future<UserModel> getUser(String username) async {
+  Future<UserModel> getUserByUsername(String username) async {
     try {
-      final res = await _loginApi.getUser(username);
+      final res = await _loginApi.getUserByUsername(username);
+      return UserModel.fromJson(res);
+    } on DioException {
+      rethrow;
+    }
+  }
+
+  Future<UserModel> getUser(num id) async {
+    try {
+      final res = await _loginApi.getUser(id);
       return UserModel.fromJson(res);
     } on DioException {
       rethrow;

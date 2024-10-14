@@ -4,7 +4,7 @@ import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/features/mentor_mentee/view/mentor_mentee_layout.dart';
 
 class MentorMenteesPage extends BasePage {
-  const MentorMenteesPage({super.key, super.title = "admin_mentor_mentees"});
+  MentorMenteesPage({super.key, super.title = "admin_mentor_mentees"});
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {

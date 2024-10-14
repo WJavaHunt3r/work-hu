@@ -4,7 +4,7 @@ import 'package:work_hu/app/framework/base_components/main_screen.dart';
 import 'package:work_hu/features/admin/view/admin_layout.dart';
 
 class AdminPage extends MainScreen {
-  const AdminPage(
+  AdminPage(
       {super.key,
       super.title = "Admin",
       super.isListView = true,

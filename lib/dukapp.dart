@@ -14,6 +14,7 @@ import 'package:work_hu/features/admin/view/admin_page.dart';
 import 'package:work_hu/features/change_password/view/change_password_page.dart';
 import 'package:work_hu/features/create_activity/view/create_activity_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_transaction_page.dart';
+import 'package:work_hu/features/fra_kare_week/view/fra_kare_week_page.dart';
 import 'package:work_hu/features/goal/view/goal_page.dart';
 import 'package:work_hu/features/home/view/home_page.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -23,16 +24,15 @@ import 'package:work_hu/features/mentees/view/mentees_page.dart';
 import 'package:work_hu/features/mentor_mentee/view/mentor_mentees_page.dart';
 import 'package:work_hu/features/transaction_items/view/transaction_items_page.dart';
 import 'package:work_hu/features/transactions/view/transactions_page.dart';
+import 'package:work_hu/features/user_fra_kare_week/view/user_fra_kare_week_page.dart';
 import 'package:work_hu/features/user_points/view/user_points_page.dart';
 import 'package:work_hu/features/user_status/view/user_status_page.dart';
 import 'package:work_hu/features/users/view/users_page.dart';
-
-import 'features/create_transactions/view/create_bmm_transactions_page.dart';
 import 'features/create_transactions/view/create_samvirk_transactions_page.dart';
 import 'features/profile/view/profile_page.dart';
 
 class DukApp extends ConsumerWidget {
-  const DukApp({super.key});
+  DukApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -70,8 +70,8 @@ class DukApp extends ConsumerWidget {
       theme: theme.globalTheme,
       routerConfig: router,
       supportedLocales: const [
-        Locale('en', 'US'),
-        Locale('hu', 'HU'),
+        const Locale('en', 'US'),
+        const Locale('hu', 'HU'),
       ],
       locale: const Locale('hu', 'HU'),
       localizationsDelegates: [
@@ -91,11 +91,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       routes: <GoRoute>[
         GoRoute(
           path: '/',
-          builder: (BuildContext context, GoRouterState state) => const HomePage(),
+          builder: (BuildContext context, GoRouterState state) => HomePage(),
         ),
         GoRoute(
           path: '/home',
-          builder: (BuildContext context, GoRouterState state) => const HomePage(),
+          builder: (BuildContext context, GoRouterState state) => HomePage(),
         ),
         GoRoute(
           path: '/login',
@@ -104,36 +104,41 @@ final routerProvider = Provider<GoRouter>((ref) {
             return LoginPage(origRoute: map == null ? "" : map["origRoute"] ?? "/");
           },
         ),
-        GoRoute(path: '/profile', builder: (BuildContext context, GoRouterState state) => const ProfilePage(), routes: [
+        GoRoute(path: '/profile', builder: (BuildContext context, GoRouterState state) => ProfilePage(), routes: [
           GoRoute(
             path: 'userPoints',
-            builder: (BuildContext context, GoRouterState state) => const UserPointsPage(),
+            builder: (BuildContext context, GoRouterState state) => UserPointsPage(),
           ),
         ]),
-        GoRoute(path: '/admin', builder: (BuildContext context, GoRouterState state) => const AdminPage(), routes: [
-          GoRoute(path: "activities", builder: (BuildContext context, GoRouterState state) => const ActivitiesPage()),
+        GoRoute(path: '/admin', builder: (BuildContext context, GoRouterState state) => AdminPage(), routes: [
+          GoRoute(path: "activities", builder: (BuildContext context, GoRouterState state) => ActivitiesPage()),
           GoRoute(
               path: "createTransaction",
-              builder: (BuildContext context, GoRouterState state) => const CreateTransactionPage()),
+              builder: (BuildContext context, GoRouterState state) => CreateTransactionPage()),
           GoRoute(
-              path: "createBmmTransaction",
-              builder: (BuildContext context, GoRouterState state) => const CreateBmmTransactionPage()),
+              path: "fraKareWeeks",
+              builder: (BuildContext context, GoRouterState state) => FraKareWeekPage(),
+              routes: [
+                GoRoute(
+                    path: ":id",
+                    builder: (BuildContext context, GoRouterState state) =>
+                        UserFraKareWeekPage(weekNumber: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0))
+              ]),
           GoRoute(
               path: "createSamvirkTransaction",
-              builder: (BuildContext context, GoRouterState state) => const CreateSamvirkTransactionPage()),
-          GoRoute(path: "userStatus", builder: (BuildContext context, GoRouterState state) => const UserStatusPage()),
-          GoRoute(path: "users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
-          GoRoute(path: "goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
-          GoRoute(
-              path: "mentorMentees", builder: (BuildContext context, GoRouterState state) => const MentorMenteesPage()),
+              builder: (BuildContext context, GoRouterState state) => CreateSamvirkTransactionPage()),
+          GoRoute(path: "userStatus", builder: (BuildContext context, GoRouterState state) => UserStatusPage()),
+          GoRoute(path: "users", builder: (BuildContext context, GoRouterState state) => UsersPage()),
+          GoRoute(path: "goals", builder: (BuildContext context, GoRouterState state) => GoalPage()),
+          GoRoute(path: "mentorMentees", builder: (BuildContext context, GoRouterState state) => MentorMenteesPage()),
           GoRoute(
               path: "transactions",
-              builder: (BuildContext context, GoRouterState state) => const TransactionsPage(),
+              builder: (BuildContext context, GoRouterState state) => TransactionsPage(),
               routes: [
                 GoRoute(
                   path: ':id',
                   builder: (BuildContext context, GoRouterState state) {
-                    return const TransactionItemsPage();
+                    return TransactionItemsPage();
                   },
                 ),
               ])
@@ -141,11 +146,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(
             path: '/changePassword',
             builder: (BuildContext context, GoRouterState state) {
-              return const ChangePasswordPage();
+              return ChangePasswordPage();
             }),
         GoRoute(
           path: '/createActivity',
-          builder: (BuildContext context, GoRouterState state) => const CreateActivityPage(),
+          builder: (BuildContext context, GoRouterState state) => CreateActivityPage(),
         ),
         GoRoute(
           path: '/activity/:id',
@@ -156,10 +161,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(
           path: '/mentees',
           builder: (BuildContext context, GoRouterState state) {
-            return const MenteesPage();
+            return MenteesPage();
           },
         ),
-        GoRoute(path: "/activities", builder: (BuildContext context, GoRouterState state) => const ActivitiesPage())
+        GoRoute(path: "/activities", builder: (BuildContext context, GoRouterState state) => ActivitiesPage())
       ],
       redirect: (BuildContext context, GoRouterState state) async {
         UserModel? user = ref.read(userDataProvider);

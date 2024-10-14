@@ -27,23 +27,13 @@ class AdminLayout extends ConsumerWidget {
 
   List<Widget> teamLeaderScreens(WidgetRef ref) => [
         createListTile(ref: ref, title: "admin_myshare_status", route: "userStatus"),
-        createListTile(
-            ref: ref,
-            title: "admin_bmm_perfect_weeks",
-            route: "createBmmTransaction",
-            enabled: false),
+        createListTile(ref: ref, title: "admin_fra_kare_weeks", route: "fraKareWeeks"),
       ];
 
   List<Widget> adminLeaderScreens(WidgetRef ref) => [
         createListTile(ref: ref, title: "admin_activities", route: "activities"),
-        createListTile(
-            ref: ref,
-            title: "admin_myshare_credits",
-            route: "createTransaction"),
-        createListTile(
-            ref: ref,
-            title: "admin_samvirk_credit",
-            route: "createSamvirkTransaction"),
+        createListTile(ref: ref, title: "admin_myshare_credits", route: "createTransaction"),
+        createListTile(ref: ref, title: "admin_samvirk_credit", route: "createSamvirkTransaction"),
         createListTile(ref: ref, title: "admin_users", route: "users"),
         createListTile(ref: ref, title: "admin_goals", route: "goals"),
         createListTile(ref: ref, title: "admin_mentor_mentees", route: "mentorMentees"),

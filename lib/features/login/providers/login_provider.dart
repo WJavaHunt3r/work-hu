@@ -63,7 +63,7 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
     }
     UserModel? user;
     await loginRepository.login(usr, Utils.encrypt(pswd)).then((data) async {
-      await loginRepository.getUser(data['username']).then((userData) async {
+      await loginRepository.getUserByUsername(data['username']).then((userData) async {
         if (userData.changedPassword) {
           userSessionProvider.setUser(userData);
         }

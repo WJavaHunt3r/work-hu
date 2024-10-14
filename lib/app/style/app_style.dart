@@ -44,13 +44,13 @@ class GlobalTheme {
           border: OutlineInputBorder(gapPadding: 8.sp, borderRadius: BorderRadius.all(Radius.circular(8.sp)))),
       appBarTheme: AppBarTheme(
           titleTextStyle: TextStyle(fontSize: 18.sp, color: AppColors.primary),
-          iconTheme: IconThemeData(color: AppColors.primary, size: 20.sp),
+          iconTheme: IconThemeData(color: AppColors.primary, size: 18.sp),
           // elevation: 5.sp,
           // scrolledUnderElevation: 10.sp,
           // surfaceTintColor: AppColors.white,
           // foregroundColor: AppColors.backgroundColor,
           backgroundColor: AppColors.backgroundColor,
-          actionsIconTheme: IconThemeData(size: 25.sp, color: AppColors.primary)),
+          actionsIconTheme: IconThemeData(size: 18.sp, color: AppColors.primary)),
       cardTheme: CardTheme(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
           margin: EdgeInsets.only(top: 8.sp),

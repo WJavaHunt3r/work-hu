@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,6 +26,7 @@ class StatusView extends ConsumerWidget {
             length: 2,
             initialIndex: 0,
             child: BaseTabView(
+                padding: kIsWeb ? 0.sp : 40.sp,
                 tabs: createTabs(teamRounds, currentRound, context),
                 tabViews: createTabView(teamRounds, ref, currentRound)),
           )
@@ -69,10 +73,17 @@ class StatusView extends ConsumerWidget {
     var buk = currentRounds.firstWhere((e) => e.team.teamName == "Team BUK");
     var samvirk = currentRounds.firstWhere((e) => e.team.teamName == "Team Samvirk");
 
-    list.add(Row(
+    list.add(Column(
       children: [
-        _buildStatusGridView(buk, LinearElementPosition.outside),
-        _buildStatusGridView(samvirk, LinearElementPosition.inside)
+        Text("PACE", style: TextStyle(fontFamily: "Good-Timing", fontWeight: FontWeight.bold, fontSize: 35)),
+        Expanded(
+          child: Row(
+            children: [
+              _buildStatusGridView(buk, LinearElementPosition.outside),
+              _buildStatusGridView(samvirk, LinearElementPosition.inside)
+            ],
+          ),
+        ),
       ],
     ));
 
@@ -87,7 +98,7 @@ class StatusView extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          flex: 2,
+          // flex: 2,
           child: Center(
               child: Text(
             "${Utils.percentFormat.format(team.teamRoundStatus * 100)}%",

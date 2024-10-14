@@ -7,7 +7,7 @@ import 'package:work_hu/features/transaction_items/view/transaction_items_layout
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
 
 class TransactionItemsPage extends BasePage {
-  const TransactionItemsPage({super.key, super.title = "Transaction items", super.isListView = true});
+  TransactionItemsPage({super.key, super.title = "Transaction items", super.isListView = true});
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
