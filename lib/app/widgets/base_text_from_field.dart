@@ -31,7 +31,7 @@ class BaseTextFormField extends StatelessWidget {
         initialValue: initialValue,
         autofocus: autofocus,
         decoration: InputDecoration(
-            fillColor: enabled ? Colors.white : Colors.transparent,
+            // fillColor: enabled ? Colors.white : Colors.transparent,
             labelText: labelText,
             labelStyle: TextStyle(fontSize: 15.sp)),
         onChanged: (String text) => onChanged(text),

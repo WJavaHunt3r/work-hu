@@ -10,6 +10,7 @@ abstract class UserPointsState with _$UserPointsState{
   const factory UserPointsState({
     @Default([]) List<TransactionItemModel> transactionItems,
     @Default([]) List<ActivityItemsModel> activityItems,
+    num? userId,
     @Default(ModelState.empty) ModelState modelState,
     @Default("") String message
   }) = _UserPointsState;

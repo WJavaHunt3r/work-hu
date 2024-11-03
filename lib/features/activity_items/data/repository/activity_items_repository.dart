@@ -8,10 +8,14 @@ class ActivityItemsRepository {
   ActivityItemsRepository(this._activityApi);
 
   Future<List<ActivityItemsModel>> getActivityItems(
-      {num? activityId, num? userId, num? roundId, bool? registeredInApp}) async {
+      {num? activityId, num? userId, num? roundId, bool? registeredInApp, String? searchText}) async {
     try {
-      final res = await _activityApi.getActivities(
-          activityId: activityId, userId: userId, registeredInApp: registeredInApp, roundId: roundId);
+      final res = await _activityApi.getActivityItems(
+          activityId: activityId,
+          userId: userId,
+          registeredInApp: registeredInApp,
+          roundId: roundId,
+          searchText: searchText);
       return res.map((e) => ActivityItemsModel.fromJson(e)).toList();
     } on DioException {
       rethrow;
@@ -20,7 +24,7 @@ class ActivityItemsRepository {
 
   Future<ActivityItemsModel> getActivityItem(num activityItemId) async {
     try {
-      final res = await _activityApi.getActivityItems(activityItemId);
+      final res = await _activityApi.getActivityItem(activityItemId);
       return ActivityItemsModel.fromJson(res);
     } catch (e) {
       rethrow;

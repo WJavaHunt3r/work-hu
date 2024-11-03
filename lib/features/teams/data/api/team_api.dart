@@ -8,7 +8,7 @@ class TeamApi {
 
   Future<List<dynamic>> fetchTeamRoundsApiRequest() async {
     try {
-      final res = await _dioClient.dio.get("/teamRounds");
+      final res = await _dioClient.dio.get("/paceTeamRounds");
       return res.data;
     } catch (e) {
       rethrow;
@@ -17,7 +17,7 @@ class TeamApi {
 
   Future<List<dynamic>> getTeams() async {
     try {
-      final res = await _dioClient.dio.get("/teams");
+      final res = await _dioClient.dio.get("/paceTeams");
       return res.data;
     } catch (e) {
       rethrow;

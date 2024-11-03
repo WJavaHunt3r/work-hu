@@ -96,6 +96,10 @@ class Utils {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day}";
   }
 
+  static String dateToStringUnformatted(DateTime date) {
+    return "${date.year}${date.month < 10 ? "0${date.month}" : date.month}${date.day < 10 ? "0${date.day}" : date.day}";
+  }
+
   static String dateToStringWithTime(DateTime date) {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day} ${date.hour < 10 ? "0${date.hour}" : date.hour}:${date.minute < 10 ? "0${date.minute}" : date.minute}";
   }
@@ -115,7 +119,8 @@ class Utils {
           startDate: DateTime.now(),
           endDate: DateTime.now(),
         ),
-        freezeDateTime: DateTime.now());
+        freezeDateTime: DateTime.now(),
+        activeRound: true);
   }
 
   static String changeSpecChars(String text) {
@@ -239,7 +244,7 @@ class Utils {
           ? DoubleCellValue(item.hours * 1000)
           : activity.account == Account.MYSHARE && activity.transactionType == TransactionType.HOURS
               ? DoubleCellValue(item.hours * 2000)
-              : const TextCellValue("");
+              : TextCellValue("");
     }
 
     return excel;
@@ -293,5 +298,12 @@ class Utils {
         mimeType: MimeType.csv,
       );
     }
+  }
+
+  static String getMonthFromDate(DateTime date, BuildContext context) {
+    var locale = Localizations.localeOf(context);
+    var format = DateFormat("MMMM", locale.countryCode);
+    String formatted = format.format(date);
+    return formatted[0].toUpperCase() + formatted.substring(1);
   }
 }

@@ -13,7 +13,7 @@ class ErrorAlertDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
         child: AlertDialog(
-            backgroundColor: AppColors.white,
+            // backgroundColor: AppColors.white,
             title: Text(
               title,
               textAlign: TextAlign.center,

@@ -23,7 +23,7 @@ class AddTransactionCard extends ConsumerWidget {
     var isError = ref.watch(createTransactionsDataProvider).modelState == ModelState.error;
     return InfoCard(
         padding: 8.sp,
-        height: isError ? 200.sp : 120.sp,
+        height: isError ? 210.sp : 130.sp,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -62,22 +62,22 @@ class AddTransactionCard extends ConsumerWidget {
                             ref.watch(createTransactionsDataProvider.notifier).valueController.value.text.isNotEmpty
                         ? () => ref.read(createTransactionsDataProvider.notifier).addTransaction()
                         : null,
-                    style: ButtonStyle(
-                      side: WidgetStateBorderSide.resolveWith(
-                        (states) {
-                          if (states.contains(WidgetState.disabled)) {
-                            return BorderSide(color: Colors.grey.shade300, width: 2.sp);
-                          }
-                          return BorderSide(color: AppColors.primary, width: 2.sp);
-                        },
-                      ),
-                      backgroundColor: WidgetStateColor.resolveWith((states) {
-                        if (states.contains(WidgetState.disabled)) {
-                          return Colors.grey.shade300;
-                        }
-                        return AppColors.primary;
-                      }),
-                    ),
+                    // style: ButtonStyle(
+                    //   side: WidgetStateBorderSide.resolveWith(
+                    //     (states) {
+                    //       if (states.contains(WidgetState.disabled)) {
+                    //         return BorderSide(color: Colors.grey.shade300, width: 2.sp);
+                    //       }
+                    //       return BorderSide(color: AppColors.primary, width: 2.sp);
+                    //     },
+                    //   ),
+                    //   backgroundColor: WidgetStateColor.resolveWith((states) {
+                    //     if (states.contains(WidgetState.disabled)) {
+                    //       return Colors.grey.shade300;
+                    //     }
+                    //     return AppColors.primary;
+                    //   }),
+                    // ),
                     child: const Icon(
                       Icons.add,
                       color: AppColors.white,

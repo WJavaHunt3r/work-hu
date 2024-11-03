@@ -4,13 +4,13 @@ import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/goal/data/api/goal_api.dart';
 import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/goal/data/repository/goal_repository.dart';
 import 'package:work_hu/features/goal/data/state/goal_state.dart';
-import 'package:work_hu/features/goal/widgets/goals_maintenance.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/season/data/repository/season_repository.dart';
 import 'package:work_hu/features/season/provider/season_provider.dart';
@@ -113,12 +113,8 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
 
   Future<void> deleteGoal(num goalId) async {
     List<GoalModel> origItems = state.goals;
-    List<GoalModel> items = [];
-    for (var a in origItems) {
-      if (a.id != goalId) {
-        items.add(a);
-      }
-    }
+    List<GoalModel> items = [...origItems];
+    items.removeWhere((a) => a.id != goalId);
     state = state.copyWith(goals: items, modelState: ModelState.processing);
     try {
       await goalRepository
@@ -134,24 +130,25 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
     state = state.copyWith(selectedGoal: goal);
   }
 
-  Future<void> saveGoal(String mode) async {
+  Future<void> saveGoal() async {
+    var mode = state.mode;
     state = state.copyWith(modelState: ModelState.processing);
     var goal = state.selectedGoal;
     try {
       if (goal.season != null && goal.user != null && goal.goal != 0) {
-        if (mode == GoalsMaintenance.CREATE) {
+        if (mode == MaintenanceMode.create) {
           await goalRepository.postGoal(state.selectedGoal);
-        } else if (mode == GoalsMaintenance.EDIT) {
+        } else if (mode == MaintenanceMode.edit) {
           await goalRepository.putGoal(state.selectedGoal, currentUserProvider.state!.id);
         }
-        state = state.copyWith(selectedGoal: const GoalModel(goal: 0));
+        state = state.copyWith(selectedGoal: const GoalModel(goal: 0), modelState: ModelState.success);
       }
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
   }
 
-  Future<void> setSelectedGoal(GoalModel goal) async {
+  Future<void> presetGoal(GoalModel goal, MaintenanceMode mode) async {
     if (goal.season == null) {
       await seasonRepository
           .getSeasons()
@@ -160,7 +157,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
     } else {
       userController.text = "${goal.user?.getFullName()} (${goal.user?.getAge()})";
     }
-    state = state.copyWith(selectedGoal: goal);
+    state = state.copyWith(selectedGoal: goal, mode: mode);
   }
 
   Future<List<UserModel>> filterUsers(String filter) async {

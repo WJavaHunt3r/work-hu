@@ -34,7 +34,7 @@ class WorkDropDownSearchFormField<T> extends StatelessWidget {
         suggestionsBoxVerticalOffset: 0.h,
         transitionBuilder: (context, suggestionsBox, controller) => suggestionsBox,
         suggestionsBoxDecoration: SuggestionsBoxDecoration(
-            color: Colors.white,
+            // color: Colors.white,
             borderRadius: BorderRadius.circular(8.sp),
             closeSuggestionBoxWhenTapOutside: false,
             offsetX: 2.h,
@@ -42,7 +42,9 @@ class WorkDropDownSearchFormField<T> extends StatelessWidget {
         textFieldConfiguration: TextFieldConfiguration(
             scrollPadding: EdgeInsets.only(bottom: 2.sp),
             autofocus: autofocus ?? false,
+            focusNode: focusNode,
             enabled: enabled ?? true,
+            textInputAction: TextInputAction.next,
             controller: controller,
             onTap: onTap),
         onSuggestionSelected: onSuggestionSelected,

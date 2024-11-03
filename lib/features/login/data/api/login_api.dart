@@ -1,4 +1,3 @@
-
 import 'package:work_hu/api/dio_client.dart';
 import 'package:work_hu/app/locator.dart';
 
@@ -18,9 +17,18 @@ class LoginApi {
     }
   }
 
-  Future<dynamic> getUser(String username) async {
+  Future<dynamic> getUserByUsername(String username) async {
     try {
-      final res = await _dioClient.dio.get("/user", queryParameters: {'username': username});
+      final res = await _dioClient.dio.get("/user/username/$username");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> getUser(num id) async {
+    try {
+      final res = await _dioClient.dio.get("/user/$id");
       return res.data;
     } catch (e) {
       rethrow;

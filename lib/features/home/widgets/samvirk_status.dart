@@ -26,12 +26,7 @@ class SamvirkStatus extends ConsumerWidget {
         ref.watch(teamRoundDataProvider).teams.where((element) => element.round.roundNumber == currentRoundNumber);
     var samvirkStatus = currentTeamRounds.isEmpty
         ? 0.0
-        : ref
-            .watch(teamRoundDataProvider)
-            .teams
-            .where((element) => element.round == currentTeamRounds.first.round)
-            .map((e) => e.samvirkPayments)
-            .reduce((value, element) => value + element);
+        : ref.watch(teamRoundDataProvider).teams.where((element) => element.round == currentTeamRounds.first.round);
     RoundModel? currentRound = currentTeamRounds.isEmpty ? null : currentTeamRounds.first.round;
     var maximum = currentTeamRounds.isEmpty ? 10.0 : currentTeamRounds.first.round.samvirkChurchGoal.toDouble();
     return Padding(
@@ -45,7 +40,8 @@ class SamvirkStatus extends ConsumerWidget {
                   children: [
                     const Text("Samvirk Status:"),
                     Text(
-                      itemCount.toDouble() == 0 ? 0.0.toString() : Utils.creditFormatting(samvirkStatus).toString(),
+                      0.toString(),
+                      //itemCount.toDouble() == 0 ? 0.0.toString() : Utils.creditFormatting(samvirkStatus).toString(),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     )
                   ],
@@ -59,7 +55,7 @@ class SamvirkStatus extends ConsumerWidget {
                           child: SfLinearGauge(
                               orientation: LinearGaugeOrientation.horizontal,
                               axisTrackStyle: LinearAxisTrackStyle(
-                                  thickness: 25.sp, color: AppColors.primary100, edgeStyle: LinearEdgeStyle.bothCurve),
+                                  thickness: 25.sp, color: AppColors.gray100, edgeStyle: LinearEdgeStyle.bothCurve),
                               minimum: 0,
                               maximum: maximum,
                               numberFormat: numberFormat,
@@ -68,11 +64,11 @@ class SamvirkStatus extends ConsumerWidget {
                               markerPointers: null,
                               barPointers: [
                             LinearBarPointer(
-                              thickness: 25.sp,
-                              color: AppColors.primary,
-                              edgeStyle: LinearEdgeStyle.bothCurve,
-                              value: currentTeamRounds.isEmpty ? 0.0 : samvirkStatus,
-                            ),
+                                thickness: 25.sp,
+                                color: AppColors.primary,
+                                edgeStyle: LinearEdgeStyle.bothCurve,
+                                value: 0 //currentTeamRounds.isEmpty ? 0.0 : samvirkStatus,
+                                ),
                           ]))
                     ],
                   ),

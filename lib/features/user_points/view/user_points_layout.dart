@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
@@ -9,24 +10,32 @@ import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/user_points/provider/user_points_providers.dart';
 import 'package:work_hu/features/user_points/widgets/points_list_item.dart';
+import 'package:work_hu/features/utils.dart';
 
 class UserPointsLayout extends ConsumerWidget {
-  const UserPointsLayout({super.key});
+  const UserPointsLayout({super.key, required this.userId});
+
+  final num userId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Future(() => ref.read(userPointsDataProvider).modelState == ModelState.empty
+    //     ? ref.read(userPointsDataProvider.notifier).getTransactionItems()
+    //     : null);
     var items = ref.watch(userPointsDataProvider).transactionItems;
     var activityItems = ref.watch(userPointsDataProvider).activityItems;
     var currentRound = ref.watch(roundDataProvider).currentRoundNumber;
-    return items.isNotEmpty
-        ? DefaultTabController(
-            length: currentRound.toInt() + 1,
-            initialIndex: currentRound == 0 ? 0 : currentRound.toInt() - 1,
-            child: BaseTabView(
-              tabs: createTabs(items, currentRound),
-              tabViews: createTabView(items, activityItems, currentRound),
-            ))
-        : const SizedBox();
+    return ref.watch(userPointsDataProvider).modelState == ModelState.processing
+        ? const Center(child: CircularProgressIndicator())
+        : items.isNotEmpty
+            ? DefaultTabController(
+                length: 2,
+                initialIndex: 0,
+                child: BaseTabView(
+                  tabs: createTabs(items, currentRound, context),
+                  tabViews: createTabView(items, activityItems, currentRound),
+                ))
+            : const SizedBox();
   }
 
   num countItems(List<TransactionItemModel> items) {
@@ -37,19 +46,16 @@ class UserPointsLayout extends ConsumerWidget {
     return count;
   }
 
-  List<Tab> createTabs(List<TransactionItemModel> items, num currentRound) {
-    var count = currentRound;
+  List<Tab> createTabs(List<TransactionItemModel> items, num currentRound, BuildContext context) {
+    String formatted = Utils.getMonthFromDate(DateTime.now(), context);
     var list = <Tab>[];
-    for (num i = 1; i <= count; i++) {
-      list.add(Tab(
-          child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("round_number".i18n([i.toString()]))
-        ],
-      )));
-    }
+    list.add(Tab(
+        child: Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [Text(formatted)],
+    )));
+
     list.add(Tab(
       child: Row(
         mainAxisSize: MainAxisSize.max,
@@ -62,55 +68,59 @@ class UserPointsLayout extends ConsumerWidget {
 
   List<Widget> createTabView(
       List<TransactionItemModel> items, List<ActivityItemsModel> activityItems, num currentRound) {
-    var count = currentRound;
     var list = <Widget>[];
-    for (num i = 1; i <= count; i++) {
-      List<TransactionItemModel> currentItems = items.where((element) => element.round!.roundNumber == i).toList();
-      list.add(
-        BaseListView(
-            itemBuilder: (BuildContext context, int index) {
-              var current = currentItems[index];
-              return PointsListItem(
-                  transactionType: current.transactionType,
-                  value: current.points,
-                  title: current.description,
-                  date: current.transactionDate);
-            },
-            itemCount: currentItems.length,
-            children: [
-              activityItems.isEmpty
-                  ? const SizedBox()
-                  : Text(
-                      "user_points_waiting_for_approval".i18n(),
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
-                    ),
-              Card(
-                margin: EdgeInsets.symmetric(vertical: 8.sp),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
-                child: ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemBuilder: (BuildContext context, int index) {
-                      var current = activityItems[index];
-                      return PointsListItem(
-                          transactionType: current.transactionType,
-                          value: current.hours * 4,
-                          title: current.description,
-                          date: current.activity?.activityDateTime ?? DateTime.now());
-                    },
-                    itemCount: activityItems.length),
-              )
-            ]),
-      );
-    }
+    List<TransactionItemModel> currentItems =
+        items.where((element) => element.round!.roundNumber == currentRound && element.credit > 0).toList();
+    list.add(
+      BaseListView(
+          itemBuilder: (BuildContext context, int index) {
+            var current = currentItems[index];
+            return PointsListItem(
+              value: current.credit,
+              title: current.description,
+              date: current.transactionDate,
+              isLast: index == currentItems.length - 1,
+              index: index,
+            );
+          },
+          itemCount: currentItems.length,
+          children: [
+            activityItems.isEmpty
+                ? const SizedBox()
+                : Text(
+                    "user_points_waiting_for_approval".i18n(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
+                  ),
+            Card(
+              margin: EdgeInsets.symmetric(vertical: 8.sp),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
+              child: ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemBuilder: (BuildContext context, int index) {
+                    var current = activityItems[index];
+                    return PointsListItem(
+                      value: current.hours,
+                      title: current.description,
+                      date: current.activity?.activityDateTime ?? DateTime.now(),
+                      isLast: index == activityItems.length - 1,
+                      index: index,
+                    );
+                  },
+                  itemCount: activityItems.length),
+            )
+          ]),
+    );
+
     list.add(BaseListView(
         itemBuilder: (context, index) {
           var current = items[index];
           return PointsListItem(
-              transactionType: current.transactionType,
-              value: current.points,
+              value: current.credit,
               title: current.description,
-              date: current.transactionDate);
+              date: current.transactionDate,
+              isLast: index == items.length - 1,
+              index: index);
         },
         itemCount: items.length,
         children: const []));

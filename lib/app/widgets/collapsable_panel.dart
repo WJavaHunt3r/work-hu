@@ -13,9 +13,10 @@ class CollapsablePanel extends StatelessWidget {
         child: Padding(
       padding: const EdgeInsets.all(8.0),
       child: ExpansionPanelList(
-        materialGapSize: 10.sp,
+        materialGapSize: 0.sp,
         expansionCallback: expansionCallback,
         elevation: 0,
+        dividerColor: Colors.white,
         children: panels,
       ),
     ));

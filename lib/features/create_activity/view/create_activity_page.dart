@@ -9,22 +9,16 @@ import 'package:work_hu/features/create_activity/provider/create_activity_provid
 import 'package:work_hu/features/create_activity/view/create_activity_layout.dart';
 
 class CreateActivityPage extends BasePage {
-  const CreateActivityPage(
+  CreateActivityPage(
       {super.title = "create_activity_new_activity_viewname", super.key, super.canPop = false, isListView = true});
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
-    return Column(
-      children: [
-        Expanded(
-          child: ref.watch(createActivityDataProvider).modelState == ModelState.processing
-              ? const Center(child: CircularProgressIndicator())
-              : ref.watch(createActivityDataProvider).modelState == ModelState.error
-                  ? Text(ref.watch(createActivityDataProvider).errorMessage)
-                  : const CreateActivityLayout(),
-        )
-      ],
-    );
+    return ref.watch(createActivityDataProvider).modelState == ModelState.processing
+        ? const Center(child: CircularProgressIndicator())
+        : ref.watch(createActivityDataProvider).modelState == ModelState.error
+            ? Text(ref.watch(createActivityDataProvider).errorMessage)
+            : const CreateActivityLayout();
   }
 
   @override
@@ -36,7 +30,7 @@ class CreateActivityPage extends BasePage {
             return ConfirmAlertDialog(
               onConfirm: () => buildContext.pop(true),
               title: "exit".i18n(),
-              content: Text("create_activity_exit_warning".i18n()),
+              content: Text("create_activity_exit_warning".i18n(), textAlign: TextAlign.center),
             );
           }).then((popped) => popped ?? false ? context.pop() : null);
     }

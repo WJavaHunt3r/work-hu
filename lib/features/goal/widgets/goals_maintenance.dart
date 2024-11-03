@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/app/widgets/work_drop_down_dearch_form_field.dart';
 import 'package:work_hu/features/goal/data/model/goal_model.dart';
@@ -10,18 +11,14 @@ import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 
 class GoalsMaintenance extends ConsumerWidget {
-  const GoalsMaintenance({required this.mode, super.key});
-
-  final String mode;
+  const GoalsMaintenance({super.key});
 
   static final _formKey = GlobalKey<FormState>();
 
-  static const String CREATE = "*CREATE";
-  static const String EDIT = "*EDIT";
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final GoalModel goal = ref.read(goalDataProvider).selectedGoal;
+    final mode = ref.watch(goalDataProvider).mode;
+    final GoalModel goal = ref.watch(goalDataProvider).selectedGoal;
     return Dialog.fullscreen(
         child: Scaffold(
       appBar: AppBar(
@@ -30,19 +27,20 @@ class GoalsMaintenance extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          "${mode.toLowerCase().substring(1, mode.length)}_goal".i18n(),
+          "${mode}_goal".i18n(),
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         actions: [
           MaterialButton(
-            onPressed: () => ref.read(goalDataProvider.notifier).saveGoal(mode).then((value) => context.pop()),
+            onPressed: () => ref.read(goalDataProvider.notifier).saveGoal().then((value) => context.pop()),
             child: const Text("Save"),
           )
         ],
       ),
       body: Form(
           key: _formKey,
-          onPopInvoked: (pop) => ref.read(goalDataProvider.notifier).setSelectedGoal(const GoalModel(goal: 0)),
+          onPopInvoked: (pop) =>
+              ref.read(goalDataProvider.notifier).presetGoal(const GoalModel(goal: 0), MaintenanceMode.create),
           child: Padding(
             padding: EdgeInsets.all(8.sp),
             child: Column(

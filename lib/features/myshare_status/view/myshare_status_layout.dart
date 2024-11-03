@@ -41,7 +41,7 @@ class MyShareStatusLayout extends StatelessWidget {
               RangePointer(
                 value: user.currentMyShareCredit.toDouble(),
                 cornerStyle: CornerStyle.bothCurve,
-                color: AppColors.primary,
+                // color: AppColors.primary,
                 width: 15.sp,
               ),
               MarkerPointer(
@@ -57,15 +57,15 @@ class MyShareStatusLayout extends StatelessWidget {
                 children: [
                   Text(
                     "${Utils.percentFormat.format(userStatus)} %",
-                    style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w800, color: AppColors.primary),
+                    style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w800),
                   ),
                   Text(
                     "${Utils.creditFormatting(user.currentMyShareCredit)} Ft",
-                    style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800, color: AppColors.primary),
+                    style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800),
                   ),
                   Text(
                     "myshare_status_goal".i18n([Utils.creditFormatting(userGoal.goal)]),
-                    style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800, color: AppColors.primary),
+                    style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800),
                   ),
                 ],
               ))
@@ -81,7 +81,7 @@ class MyShareStatusLayout extends StatelessWidget {
                 ? "myshare_status_your_ontrack".i18n()
                 : "myshare_status_to_be_ontrack".i18n([toOnTrack.toString()]),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.w800, color: AppColors.primary),
+            style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.w800),
           )),
         ],
       )

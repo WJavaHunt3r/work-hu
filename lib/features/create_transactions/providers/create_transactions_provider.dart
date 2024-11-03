@@ -10,7 +10,8 @@ import 'package:intl/intl.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/create_transactions/data/state/create_transactions_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
@@ -24,12 +25,9 @@ import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 import 'package:work_hu/features/utils.dart';
 
-import '../../../work_hu_app.dart';
-
 final createTransactionsDataProvider =
     StateNotifierProvider.autoDispose<CreateTransactionsDataNotifier, CreateTransactionsState>((ref) =>
         CreateTransactionsDataNotifier(
-            ref.read(routerProvider),
             ref.read(usersRepoProvider),
             ref.read(userDataProvider.notifier),
             ref.read(transactionsRepoProvider),
@@ -37,8 +35,8 @@ final createTransactionsDataProvider =
             ref.read(roundDataProvider.notifier)));
 
 class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsState> {
-  CreateTransactionsDataNotifier(this.router, this.usersRepository, this.currentUserProvider,
-      this.transactionRepository, this.transactionItemsRepository, this.roundDataNotifier)
+  CreateTransactionsDataNotifier(this.usersRepository, this.currentUserProvider, this.transactionRepository,
+      this.transactionItemsRepository, this.roundDataNotifier)
       : super(const CreateTransactionsState()) {
     valueController = TextEditingController(text: "");
     userController = TextEditingController(text: "");
@@ -52,10 +50,10 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     dateController.addListener(_updateDateAndDescription);
     exchangeController.addListener(_updateState);
     valueController.addListener(_updateState);
+    getUsers();
   }
 
   final UsersRepository usersRepository;
-  final GoRouter router;
   final UserDataNotifier currentUserProvider;
   final RoundDataNotifier roundDataNotifier;
   late final TextEditingController valueController;
@@ -75,7 +73,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     state = state.copyWith(modelState: ModelState.processing);
     try {
       await usersRepository
-          .getUsers(state.transactionType == TransactionType.BMM_PERFECT_WEEK ? user!.team : null, listO36)
+          .getUsers(state.transactionType == TransactionType.BMM_PERFECT_WEEK ? user!.paceTeam : null, listO36)
           .then((data) {
         state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK
             ? _createTransactionItems(data)
@@ -98,7 +96,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
           .createTransaction(
               TransactionModel(
                 name: state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK
-                    ? "${currentUserProvider.state!.team!.color} csapat tökéletes pontszámai"
+                    ? "${currentUserProvider.state!.paceTeam!.teamName} csapat tökéletes pontszámai"
                     : descriptionController.value.text,
                 account: state.account,
               ),
@@ -153,7 +151,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   void _createTransactionItems(List<UserModel> users) {
     for (UserModel u in users) {
       state = state.copyWith(selectedUser: u);
-      addTransaction(description: "${currentUserProvider.state!.team!.color} csapat tökéletes BMM hét");
+      addTransaction(description: "${currentUserProvider.state!.paceTeam!.teamName} csapat tökéletes BMM hét");
     }
   }
 
@@ -169,8 +167,9 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         description: description ?? state.description,
         user: state.selectedUser!,
         createUserId: currentUserProvider.state!.id,
-        round:
-            roundDataNotifier.state.rounds.where((element) => element.season.seasonYear == DateTime.now().year).first,
+        round: roundDataNotifier.state.rounds
+            .where((element) => element.startDateTime.month == state.transactionDate?.month)
+            .first,
         points: state.transactionType != TransactionType.CREDIT && state.transactionType != TransactionType.HOURS
             ? double.tryParse(valueController.value.text) ?? 0
             : 0,

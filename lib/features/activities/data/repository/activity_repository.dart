@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:work_hu/features/activities/data/api/activity_api.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
+import 'package:work_hu/features/utils.dart';
 
 class ActivityRepository {
   final ActivityApi _activityApi;
@@ -12,14 +13,18 @@ class ActivityRepository {
       num? employerId,
       num? createUserId,
       bool? registeredInApp,
-      bool? registeredInMyShare}) async {
+      bool? registeredInMyShare,
+      DateTime? referenceDate,
+      String? searchText}) async {
     try {
       final res = await _activityApi.getActivities(
           registeredInApp: registeredInApp,
           registeredInMyShare: registeredInMyShare,
           responsibleId: responsibleId,
           createUserId: createUserId,
-          employerId: employerId);
+          employerId: employerId,
+          referenceDate: referenceDate == null ? "" : Utils.dateToString(referenceDate),
+          searchText: searchText);
       return res.map((e) => ActivityModel.fromJson(e)).toList();
     } on DioException {
       rethrow;

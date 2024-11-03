@@ -1,4 +1,3 @@
-
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 
@@ -14,14 +13,19 @@ class ActivityApi {
       num? employerId,
       num? createUserId,
       bool? registeredInApp,
-      bool? registeredInMyShare}) async {
+      bool? registeredInMyShare,
+      String? searchText,
+      String? referenceDate}) async {
     try {
-      final res = await _dioClient.dio.get("/activities", queryParameters: {
+      final res = await _dioClient.dio.get("/activity", queryParameters: {
         "responsibleId": responsibleId,
         "employerId": employerId,
         "createUserId": createUserId,
         "registeredInApp": registeredInApp,
         "registeredInMyShare": registeredInMyShare,
+        "referenceDate": referenceDate,
+        "searchText": searchText
+
       });
       return res.data;
     } catch (e) {
@@ -31,7 +35,7 @@ class ActivityApi {
 
   Future<dynamic> getActivity(num activityId) async {
     try {
-      final res = await _dioClient.dio.get("/activity", queryParameters: {"activityId": activityId});
+      final res = await _dioClient.dio.get("/activity/$activityId");
       return res.data;
     } catch (e) {
       rethrow;
@@ -40,7 +44,7 @@ class ActivityApi {
 
   Future<dynamic> registerActivity(num activityId, num userId) async {
     try {
-      final res = await _dioClient.dio.post("/register", queryParameters: {"activityId": activityId, "userId": userId});
+      final res = await _dioClient.dio.post("/activity/$activityId/register", queryParameters: {"userId": userId});
       return res.data;
     } catch (e) {
       rethrow;
@@ -49,8 +53,8 @@ class ActivityApi {
 
   Future<dynamic> registerActivityInTeams(num activityId, num userId) async {
     try {
-      final res =
-          await _dioClient.dio.post("/registerInTeams", queryParameters: {"activityId": activityId, "userId": userId});
+      final res = await _dioClient.dio
+          .post("/activity/$activityId/registerInTeams", queryParameters: {"activityId": activityId, "userId": userId});
       return res.data;
     } catch (e) {
       rethrow;
@@ -68,8 +72,7 @@ class ActivityApi {
 
   Future<dynamic> putActivity(ActivityModel activity, num activityId) async {
     try {
-      final res =
-          await _dioClient.dio.put("/activity", queryParameters: {"activityId": activityId}, data: activity.toJson());
+      final res = await _dioClient.dio.put("/activity/$activityId", data: activity.toJson());
       return res.data;
     } catch (e) {
       rethrow;
@@ -78,8 +81,7 @@ class ActivityApi {
 
   Future<dynamic> deleteActivity(num activityId, num userId) async {
     try {
-      final res =
-          await _dioClient.dio.delete("/activity", queryParameters: {"activityId": activityId, "userId": userId});
+      final res = await _dioClient.dio.delete("/activity/$activityId", queryParameters: {"userId": userId});
       return res.data;
     } catch (e) {
       rethrow;

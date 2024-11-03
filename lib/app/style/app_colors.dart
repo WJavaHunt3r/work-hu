@@ -4,14 +4,17 @@ import 'package:flutter/material.dart';
 class AppColors {
   //static const String envId = AppConfig.envId;
   static const Color primary = Color(0xFF173935);
+  static const Color primary100 = Color(0xFF176635);
+  static const Color primary200 = Color(0xFF181d18);
 
-  static const Color primary100 = Color(0x44173935);
+  static const Color gray100 = Color(0x44173935);
 
   static const Color errorRed = Color(0xFFC5032B);
 
-  //static const Color surfaceWhite = Color(0xFAf8f9fc);
+  static const Color surfaceWhite = Color(0xFAf8f9fc);
   static const Color white = Colors.white;
   static const Color backgroundColor = Color(0xFFE3E7E9);
+  static const Color backgroundColor100 = Color(0xFFE1E7E9);
 
   static const Color teamBlue = Color(0xFF636BFF);
   static const Color teamRed = Color(0xFFFF404D);
@@ -36,4 +39,6 @@ class AppColors {
     Colors.blue.shade200,
     Colors.blue.shade300,
   ];
+
+  static var secondaryGray = Colors.grey.shade900;
 }

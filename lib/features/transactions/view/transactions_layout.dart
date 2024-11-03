@@ -6,6 +6,7 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
@@ -59,31 +60,34 @@ class TransactionsLayout extends ConsumerWidget {
                             return ConfirmAlertDialog(
                               onConfirm: () => buildContext.pop(true),
                               title: "delete".i18n(),
-                              content: Text("transactions_delete_warning_warning".i18n()),
+                              content: Text("transactions_delete_warning".i18n(), textAlign: TextAlign.center),
                             );
                           })
                       .then((confirmed) => confirmed != null && confirmed
                           ? ref.read(transactionsDataProvider.notifier).deleteTransaction(current.id!, index)
                           : null),
                   dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
-                  child: ListCard(
+                  child: Card(
+                    margin: const EdgeInsets.all(0),
+                    child: BaseListTile(
                       isLast: transactions.length - 1 == index,
                       index: index,
-                      child: ListTile(
-                        onTap: () {
-                          ref.watch(transactionItemsDataProvider.notifier).getTransactionItems(current.id!);
-                          context.push("/transactionItems", extra: {"transaction": current}).then(
-                              (value) => ref.watch(transactionsDataProvider.notifier).getTransactions());
-                        },
-                        leading: Image(
-                          image: AssetImage(setLeadingIcon(current)),
-                          fit: BoxFit.fitWidth,
-                          width: 15.sp,
-                        ),
-                        title: Text(current.name),
-                        subtitle: Text(dateString),
-                        trailing: Text(current.transactionCount.toString()),
-                      )));
+                      onTap: () {
+                        ref.watch(transactionItemsDataProvider.notifier).getTransaction(current.id!);
+                        context
+                            .push("/admin/transactions/${current.id}")
+                            .then((value) => ref.watch(transactionsDataProvider.notifier).getTransactions());
+                      },
+                      leading: Image(
+                        image: AssetImage(setLeadingIcon(current)),
+                        fit: BoxFit.fitWidth,
+                        width: 15.sp,
+                      ),
+                      title: Text(current.name),
+                      subtitle: Text(dateString),
+                      trailing: Text(current.transactionCount.toString()),
+                    ),
+                  ));
             },
             itemCount: ref.watch(transactionsDataProvider).transactions.length,
             shadowColor: Colors.transparent,

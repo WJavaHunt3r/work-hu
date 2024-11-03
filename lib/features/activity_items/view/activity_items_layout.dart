@@ -5,15 +5,15 @@ import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
 import 'package:work_hu/features/activity_items/widgets/activity_details_panel.dart';
 import 'package:work_hu/features/utils.dart';
 
 class ActivityItemsLayout extends BasePage {
-  const ActivityItemsLayout(
+  ActivityItemsLayout(
       {required this.activityId, super.key, super.title = "activity_items_registrations", super.isListView = true});
 
   final num activityId;
@@ -78,30 +78,29 @@ class ActivityItemsLayout extends BasePage {
     var current = items[index];
     var date = current.activity!.activityDateTime;
     var dateString = Utils.dateToString(date);
-    return ListCard(
-        isLast: items.length - 1 == index,
-        index: index,
-        child: ListTile(
-          onTap: () {},
-          trailing: Text(
-            "${current.hours.toString()} ${Utils.getTransactionTypeText(TransactionType.HOURS, false)}",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
-          ),
-          title: Row(
-            children: [
-              Text(current.user.getFullName(), style: const TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          subtitle: Text(dateString),
-        ));
-  }
-
-  @override
-  Widget? createActionButton(BuildContext context, WidgetRef ref) {
-    return FloatingActionButton(
-      heroTag: UniqueKey(),
-      onPressed: () => ref.watch(activityItemsDataProvider.notifier).createActivityXlsx(),
-      child: const Icon(Icons.download),
+    return BaseListTile(
+      isLast: items.length - 1 == index,
+      index: index,
+      onTap: () {},
+      trailing: Text(
+        "${current.hours.toString()} ${Utils.getTransactionTypeText(TransactionType.HOURS, false)}",
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
+      ),
+      title: Row(
+        children: [
+          Text(current.user.getFullName(), style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+      subtitle: Text(dateString),
     );
   }
+
+// @override
+// Widget? createActionButton(BuildContext context, WidgetRef ref) {
+//   return FloatingActionButton(
+//     heroTag: UniqueKey(),
+//     onPressed: () => ref.watch(activityItemsDataProvider.notifier).createActivityXlsx(),
+//     child: const Icon(Icons.download),
+//   );
+// }
 }

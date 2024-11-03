@@ -21,7 +21,7 @@ class TransactionSumCard extends ConsumerWidget {
     var sum = ref.watch(createTransactionsDataProvider).sum;
     return Card(
         child: Padding(
-      padding: EdgeInsets.all(8.sp),
+      padding: EdgeInsets.only(left: 4.sp, right: 4.sp),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -80,10 +80,6 @@ class TransactionSumCard extends ConsumerWidget {
                 padding: WidgetStateProperty.resolveWith(
                   (states) => EdgeInsets.all(2.sp),
                 ),
-                side: WidgetStateBorderSide.resolveWith(
-                  (states) => BorderSide(color: AppColors.primary, width: 2.sp),
-                ),
-                backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
               ),
               child: const Text("Send", style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w800)))
         ],

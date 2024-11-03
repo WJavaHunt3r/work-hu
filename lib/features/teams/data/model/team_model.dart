@@ -7,9 +7,9 @@ part 'team_model.g.dart';
 class TeamModel with _$TeamModel{
   const factory TeamModel({
     required num id,
-    required num teamLeaderMyShareId,
-    required String color,
-    required double points
+    required num teamLeaderId,
+    required String teamName,
+    required double coins
   }) = _TeamModel;
 
   factory TeamModel.fromJson(Map<String, dynamic> json) => _$TeamModelFromJson(json);

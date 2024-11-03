@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/goal/data/repository/goal_repository.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -44,9 +44,8 @@ class MenteesDataNotifier extends StateNotifier<MenteesState> {
               list.add(UserGoalUserRoundModel(user: mentee.mentee, goal: goal, round: userRounds.last.round));
             });
           });
-
-          state = state.copyWith(menteesStatus: list, modelState: ModelState.success);
         }
+        state = state.copyWith(menteesStatus: list, modelState: ModelState.success);
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());

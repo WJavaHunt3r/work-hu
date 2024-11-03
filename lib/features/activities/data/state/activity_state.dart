@@ -11,6 +11,7 @@ abstract class ActivityState with _$ActivityState {
       @Default(ModelState.empty) ModelState modelState,
       @Default(false) bool isExpanded,
       @Default(ModelState.empty) ModelState registerState,
+      DateTime? referenceDate,
       @Default("") String message}) = _ActivityState;
 
   const ActivityState._();

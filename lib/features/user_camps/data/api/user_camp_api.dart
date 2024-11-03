@@ -8,9 +8,14 @@ class UserCampApi {
 
   UserCampApi();
 
-  Future<List<dynamic>> getUserCamps(num? seasonId) async {
+  Future<List<dynamic>> getUserCamps(num? seasonYear, num? userId, num? campId, bool? participates) async {
     try {
-      final res = await _dioClient.dio.get("/userCamps", queryParameters: {"seasonId": seasonId});
+      final res = await _dioClient.dio.get("/userCamp", queryParameters: {
+        "seasonYear": seasonYear,
+        "userId": userId,
+        "campId": campId,
+        "participates": participates
+      });
       return res.data;
     } catch (e) {
       rethrow;
@@ -19,7 +24,16 @@ class UserCampApi {
 
   Future<dynamic> getUserCamp(num userCampId) async {
     try {
-      final res = await _dioClient.dio.get("/userCamp", queryParameters: {"userCampId": userCampId});
+      final res = await _dioClient.dio.get("/userCamp/$userCampId");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<dynamic>> getUserCampByUserId(num userId) async {
+    try {
+      final res = await _dioClient.dio.get("/userCamp/user/$userId");
       return res.data;
     } catch (e) {
       rethrow;
@@ -37,7 +51,7 @@ class UserCampApi {
 
   Future<dynamic> putUserCamp(UserCampModel userCamp, num userCampId) async {
     try {
-      final res = await _dioClient.dio.put("/userCamp", queryParameters: {"userCampId": userCampId}, data: userCamp);
+      final res = await _dioClient.dio.put("/userCamp/$userCampId", data: userCamp);
       return res.data;
     } catch (e) {
       rethrow;

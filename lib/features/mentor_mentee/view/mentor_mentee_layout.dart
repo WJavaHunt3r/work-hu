@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/mentor_mentee/provider/mentor_mentee_provider.dart';
 import 'package:work_hu/features/mentor_mentee/widgets/create_mentor_mentee_dialog.dart';
 
@@ -22,7 +22,7 @@ class MentorMenteeLayout extends ConsumerWidget {
               child: RefreshIndicator(
                   onRefresh: () async => ref.read(mentorMenteeDataProvider.notifier).getMentorMentee(),
                   child: BaseListView(
-                    cardBackgroundColor: Colors.transparent,
+                      cardBackgroundColor: Colors.transparent,
                       itemBuilder: (context, index) {
                         var current = items[index];
                         return Dismissible(
@@ -30,14 +30,16 @@ class MentorMenteeLayout extends ConsumerWidget {
                             onDismissed: (direction) =>
                                 ref.watch(mentorMenteeDataProvider.notifier).deleteMentee(current.id!),
                             dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
-                            child: ListCard(
-                                isLast: items.length - 1 == index,
-                                index: index,
-                                child: ListTile(
-                                    title: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [Text(current.mentor.getFullName()), Text(current.mentee.getFullName())],
-                                ))));
+                            child: Card(
+                              margin: const EdgeInsets.all(0),
+                              child: BaseListTile(
+                                  isLast: items.length - 1 == index,
+                                  index: index,
+                                  title: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [Text(current.mentor.getFullName()), Text(current.mentee.getFullName())],
+                                  )),
+                            ));
                       },
                       itemCount: items.length,
                       children: const [])),
@@ -51,9 +53,7 @@ class MentorMenteeLayout extends ConsumerWidget {
             child: const Icon(Icons.add),
             onPressed: () {
               showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (context) => const CreateMentorMenteeDialog());
+                  barrierDismissible: false, context: context, builder: (context) => const CreateMentorMenteeDialog());
             },
           ),
         ),

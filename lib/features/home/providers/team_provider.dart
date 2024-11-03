@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/home/data/api/team_round_api.dart';
 import 'package:work_hu/features/home/data/repository/team_round_repository.dart';
 import 'package:work_hu/features/home/data/state/team_round_state.dart';
@@ -41,7 +41,7 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
     try {
       await teamRepository.fetchTeamRounds().then((data) async {
         data.sort((a, b) => a.round.roundNumber.compareTo(b.round.roundNumber));
-        data.sort((prev, next) => next.teamPoints.compareTo(prev.teamPoints));
+        // data.sort((prev, next) => next.teamPoints.compareTo(prev.teamPoints));
         state = state.copyWith(
             teams: data.where((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0).toList(),
             modelState: ModelState.success);
@@ -53,21 +53,21 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
 
   Future<void> checkLoginCredentials() async {
     await getTeamRounds();
-    state = state.copyWith(modelState: ModelState.processing);
-    var username = await Utils.getData('user');
-    var password = await Utils.getData('password');
-
-    var user = userSessionProvider.state;
-    if (username.isNotEmpty && password.isNotEmpty && user == null) {
-      //state = state.copyWith(modelState: ModelState.processing);
-      read.state = LoginState(username: username, password: password);
-      await read.login();
-      state = state.copyWith(message: read.state.message, modelState: ModelState.success);
-    } else {
-      if (user == null && username.isNotEmpty) {
-        await loginRepository.getUser(username).then((value) => userSessionProvider.setUser(value));
-      }
-      state = state.copyWith(modelState: ModelState.success);
-    }
+    // state = state.copyWith(modelState: ModelState.processing);
+    // var username = await Utils.getData('user');
+    // var password = await Utils.getData('password');
+    //
+    // var user = userSessionProvider.state;
+    // if (username.isNotEmpty && password.isNotEmpty && user == null) {
+    //   //state = state.copyWith(modelState: ModelState.processing);
+    //   read.state = LoginState(username: username, password: password);
+    //   // await read.login();
+    //   state = state.copyWith(message: read.state.message, modelState: ModelState.success);
+    // } else {
+    //   if (user == null && username.isNotEmpty) {
+    //     await loginRepository.getUser(username).then((value) => userSessionProvider.setUser(value));
+    //   }
+    //   state = state.copyWith(modelState: ModelState.success);
+    // }
   }
 }

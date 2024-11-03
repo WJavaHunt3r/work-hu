@@ -5,14 +5,12 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/style/app_colors.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/app/widgets/list_card.dart';
-import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
-import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
 import 'package:work_hu/features/user_status/widgets/base_filter_chip.dart';
 import 'package:work_hu/features/utils.dart';
@@ -22,12 +20,9 @@ class UserStatusLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var users = ref.watch(userStatusDataProvider).users;
-    var currentRoundNumber = ref.read(roundDataProvider).currentRoundNumber;
-    var rounds = ref.read(roundDataProvider).rounds;
-    var goals = ref.watch(goalDataProvider).goals;
-    var currentRound =
-        rounds.isEmpty ? null : rounds.firstWhere((element) => element.roundNumber == currentRoundNumber);
+    var userRounds = ref.watch(userStatusDataProvider).userRounds;
+    var goals = ref.watch(userStatusDataProvider).goals;
+    var currentRound = ref.watch(userStatusDataProvider).currentRound;
     var currentRoundGoal = currentRound == null ? 0 : currentRound.myShareGoal;
     return Stack(
       children: [
@@ -47,6 +42,10 @@ class UserStatusLayout extends ConsumerWidget {
                             ),
                           ),
                         ),
+                        MaterialButton(
+                          onPressed: () => ref.watch(userStatusDataProvider.notifier).recalculate(),
+                          child: const Icon(Icons.refresh_outlined),
+                        )
                       ],
                     ),
                   )
@@ -64,63 +63,66 @@ class UserStatusLayout extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  Text(users.length.toString())
+                  Text(
+                      "${ref.watch(userStatusDataProvider).userRounds.where((e) => e.roundCoins >= 50).length} / ${userRounds.length.toString()}")
                 ],
               ),
             ),
             Expanded(
               child: BaseListView(
-                itemCount: users.length,
+                itemCount: userRounds.length,
                 itemBuilder: (BuildContext context, int index) {
-                  var current = users[index];
-                  var currentUserGoal = goals.where((g) => g.user!.id == current.id).isEmpty
+                  var userRound = userRounds[index];
+                  var currentUser = userRound.user;
+                  var currentUserGoal = goals.where((g) => g.user!.id == currentUser.id).isEmpty
                       ? null
-                      : goals.firstWhere((g) => g.user!.id == current.id);
+                      : goals.firstWhere((g) => g.user!.id == currentUser.id);
+
                   var currentGoal = currentUserGoal?.goal ?? 0;
-                  var userStatus = current.currentMyShareCredit / currentGoal * 100;
-                  var style = TextStyle(color: userStatus >= currentRoundGoal ? AppColors.white : AppColors.primary);
-                  var toOnTrack = currentGoal * currentRoundGoal / 100 - current.currentMyShareCredit;
-                  var isLast = index == users.length - 1;
-                  return ListCard(
-                      isLast: isLast,
-                      index: index,
-                      child: ListTile(
-                          onTap: () => showGeneralDialog(
-                              barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-                              barrierColor: AppColors.primary,
-                              transitionDuration: const Duration(milliseconds: 200),
-                              context: context,
-                              pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
-                                return MyShareStatusPage(
-                                    userGoalRound: UserGoalUserRoundModel(
-                                        user: current, goal: currentUserGoal!, round: currentRound!));
-                              }),
-                          minVerticalPadding: 0,
-                          title: Text(
-                            current.getFullName(),
-                            style: style,
-                          ),
-                          subtitle: userStatus >= currentRoundGoal
-                              ? const Text(
-                                  "On Track",
-                                  style: TextStyle(color: AppColors.white),
-                                )
-                              : Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(toOnTrack)])),
-                          trailing: Text(
-                            "${Utils.percentFormat.format(userStatus)}%",
-                            style: style.copyWith(fontSize: 15.sp),
-                          ),
-                          tileColor: userStatus >= currentRoundGoal ? AppColors.primary : AppColors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: index == 0 && isLast
-                                  ? BorderRadius.circular(8.sp)
-                                  : index == 0
-                                      ? BorderRadius.only(
-                                          topLeft: Radius.circular(8.sp), topRight: Radius.circular(8.sp))
-                                      : isLast
-                                          ? BorderRadius.only(
-                                              bottomLeft: Radius.circular(8.sp), bottomRight: Radius.circular(8.sp))
-                                          : BorderRadius.zero)));
+                  var userStatus = currentUser.currentMyShareCredit / currentGoal * 100;
+
+                  var toOnTrack = currentGoal * currentRoundGoal / 100 - currentUser.currentMyShareCredit;
+
+                  var style = TextStyle(
+                      color: userStatus >= currentRoundGoal || userRound.roundCredits >= userRound.roundMyShareGoal
+                          ? AppColors.white
+                          : null);
+
+                  var isLast = index == userRounds.length - 1;
+                  return BaseListTile(
+                    isLast: isLast,
+                    index: index,
+                    onTap: () => showGeneralDialog(
+                        barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                        barrierColor: AppColors.primary,
+                        transitionDuration: const Duration(milliseconds: 200),
+                        context: context,
+                        pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
+                          return MyShareStatusPage(
+                              userGoalRound: UserGoalUserRoundModel(
+                                  user: currentUser, goal: currentUserGoal!, round: currentRound!));
+                        }),
+                    minVerticalPadding: 0,
+                    title: Text(
+                      "${currentUser.getFullName()} (${userRound.roundCredits} / ${userRound.roundMyShareGoal})",
+                      style: style,
+                    ),
+                    subtitle: userStatus >= currentRoundGoal || userRound.roundCredits >= userRound.roundMyShareGoal
+                        ? const Text(
+                            "On Track",
+                            style: TextStyle(color: AppColors.white),
+                          )
+                        : Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(toOnTrack)])),
+                    trailing: Text(
+                      "${Utils.percentFormat.format(userStatus)}%",
+                      style: style.copyWith(fontSize: 15.sp),
+                    ),
+                    tileColor: userRound.roundCredits >= userRound.roundMyShareGoal
+                        ? AppColors.primary
+                        : userStatus >= currentRoundGoal
+                            ? Colors.grey
+                            : null,
+                  );
                 },
                 children: const [],
               ),
@@ -142,7 +144,7 @@ class UserStatusLayout extends ConsumerWidget {
       bool isSelected = ref.watch(userStatusDataProvider).selectedTeamId == team.id;
       chips.add(BaseFilterChip(
           isSelected: isSelected,
-          title: team.color.toString(),
+          title: team.teamName,
           onSelected: (bool selected) =>
               ref.watch(userStatusDataProvider.notifier).setSelectedFilter(selected ? team : null)));
     }

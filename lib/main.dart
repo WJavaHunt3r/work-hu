@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:work_hu/app/locator.dart';
-import 'package:work_hu/work_hu_app.dart';
+import 'package:work_hu/dukapp.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
 void main() async {
@@ -14,10 +14,11 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
   // SecurityContext(withTrustedRoots: false);
   await ScreenUtil.ensureScreenSize();
+
   await setupLocator();
   usePathUrlStrategy();
   GoRouter.optionURLReflectsImperativeAPIs = true;
-  runApp(const ProviderScope(child: OverlaySupport.global(child: WorkHuApp())));
+  runApp(ProviderScope(child: OverlaySupport.global(child: DukApp())));
 }
 
 class MyHttpOverrides extends HttpOverrides {

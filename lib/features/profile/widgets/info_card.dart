@@ -13,11 +13,14 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkResponse(
+        overlayColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
+        radius: 8.sp,
         onTap: onTap,
         child: Card(
           child: Container(
               height: height ?? 120.sp,
               width: width,
+              color: Colors.transparent,
               padding: EdgeInsets.all(padding ?? 20.sp),
               child: Center(child: child)),
         ));

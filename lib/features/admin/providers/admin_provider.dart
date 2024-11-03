@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/admin/data/state/admin_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 
-import '../../../work_hu_app.dart';
-
-final adminDataProvider = StateNotifierProvider<AdminDataNotifier, AdminState>(
-    (ref) => AdminDataNotifier(ref.read(routerProvider), ref.read(userDataProvider)));
+final adminDataProvider =
+    StateNotifierProvider<AdminDataNotifier, AdminState>((ref) => AdminDataNotifier(ref.read(userDataProvider)));
 
 class AdminDataNotifier extends StateNotifier<AdminState> {
   AdminDataNotifier(
-    this.router,
     this.currentUser,
   ) : super(const AdminState()) {
     descriptionController = TextEditingController(text: "");
@@ -24,7 +20,6 @@ class AdminDataNotifier extends StateNotifier<AdminState> {
     dateController.addListener(_updateState);
   }
 
-  final GoRouter router;
   late final TextEditingController descriptionController;
   late final TextEditingController dateController;
   final UserModel? currentUser;
