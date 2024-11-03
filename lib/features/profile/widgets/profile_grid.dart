@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:info_widget/info_widget.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/info_widget.dart';
 import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
-import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:work_hu/features/profile/widgets/info_card.dart';
+import 'package:work_hu/features/user_points/provider/user_points_providers.dart';
 import 'package:work_hu/features/utils.dart';
 
 class ProfileGrid extends ConsumerWidget {
@@ -23,9 +24,10 @@ class ProfileGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     UserModel? user = goal?.user;
-    var isOnTrack = goal != null && user!.currentMyShareCredit / goal!.goal * 100 > userRoundModel.round.myShareGoal;
-    var isMonthlyOnTrack =
-        goal != null && userRoundModel.roundMyShareGoal > 0 && userRoundModel.roundCredits >= userRoundModel.roundMyShareGoal;
+    var isOnTrack = goal != null && user!.currentMyShareCredit / goal!.goal * 100 >= userRoundModel.round.myShareGoal;
+    var isMonthlyOnTrack = goal != null &&
+        userRoundModel.roundMyShareGoal > 0 &&
+        userRoundModel.roundCredits >= userRoundModel.roundMyShareGoal;
     return Row(
       children: [
         Expanded(
@@ -50,15 +52,18 @@ class ProfileGrid extends ConsumerWidget {
                                 alignment: Alignment.topRight,
                                 child: InfoWidget(
                                   infoText: "profile_myshare_status_info".i18n(),
+                                  shadowColor: ref.watch(themeProvider) == ThemeMode.dark ? AppColors.gray100 : null,
                                   iconData: Icons.info_outline,
-                                  iconColor: AppColors.primary,
+                                  iconColor: ref.watch(themeProvider) == ThemeMode.dark
+                                      ? AppColors.primary100
+                                      : AppColors.primary,
                                 )),
                             Align(
                                 alignment: Alignment.topLeft,
                                 child: Image(
                                   image: AssetImage(
                                     isOnTrack
-                                        ? "assets/img/PACE_Coin_Buk_50_Spin_540px.gif"
+                                        ? "assets/img/PACE_Coin_Buk_50a_Static.png"
                                         : "assets/img/PACE_Coin_Blank_Static.png",
                                   ),
                                   fit: BoxFit.fitWidth,
@@ -91,10 +96,8 @@ class ProfileGrid extends ConsumerWidget {
               height: 110.sp,
               padding: 10.sp,
               onTap: () {
-                // ref.read(userPointsDataProvider.notifier).getTransactionItems();
-                context
-                    .push("/profile/userPoints")
-                    .then((value) => ref.read(profileDataProvider.notifier).getUserInfo());
+                ref.read(userPointsDataProvider.notifier).setUserId(user!.id);
+                context.push("/profile/userPoints/${user.id}");
               },
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -115,14 +118,16 @@ class ProfileGrid extends ConsumerWidget {
                           child: InfoWidget(
                             infoText: "profile_monthly_credits_info".i18n(),
                             iconData: Icons.info_outline,
-                            iconColor: AppColors.primary,
+                            shadowColor: ref.watch(themeProvider) == ThemeMode.dark ? AppColors.gray100 : null,
+                            iconColor:
+                                ref.watch(themeProvider) == ThemeMode.dark ? AppColors.primary100 : AppColors.primary,
                           )),
                       Align(
                           alignment: Alignment.topLeft,
                           child: Image(
                             image: AssetImage(
                               isMonthlyOnTrack
-                                  ? "assets/img/PACE_Coin_Buk_50_Spin_540px.gif"
+                                  ? "assets/img/PACE_Coin_Buk_50a_Static.png"
                                   : "assets/img/PACE_Coin_Blank_Static.png",
                             ),
                             fit: BoxFit.fitWidth,

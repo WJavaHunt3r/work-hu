@@ -7,7 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/users/data/api/users_api.dart';
@@ -20,15 +20,14 @@ final usersApiProvider = Provider<UsersApi>((ref) => UsersApi());
 final usersRepoProvider = Provider<UsersRepository>((ref) => UsersRepository(ref.read(usersApiProvider)));
 
 final usersDataProvider = StateNotifierProvider.autoDispose<UsersDataNotifier, UsersState>(
-    (ref) => UsersDataNotifier(ref.read(usersRepoProvider), ref.read(routerProvider), ref.read(userDataProvider)));
+    (ref) => UsersDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider)));
 
 class UsersDataNotifier extends StateNotifier<UsersState> {
-  UsersDataNotifier(this.usersRepository, this.router, this.currentUser) : super(const UsersState()) {
+  UsersDataNotifier(this.usersRepository, this.currentUser) : super(const UsersState()) {
     getUsers();
   }
 
   final UsersRepository usersRepository;
-  final GoRouter router;
   final UserModel? currentUser;
 
   Future<void> getUsers() async {

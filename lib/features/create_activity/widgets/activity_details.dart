@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
+import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/work_drop_down_dearch_form_field.dart';
 import 'package:work_hu/features/create_activity/provider/create_activity_provider.dart';
@@ -100,10 +101,12 @@ class ActivityDetails extends ConsumerWidget {
                 ? Padding(
                     padding: EdgeInsets.only(top: 4.sp, bottom: 4.sp),
                     child: DropdownButtonFormField(
-                        dropdownColor: AppColors.white,
+                        dropdownColor: ref.watch(themeProvider) == ThemeMode.dark
+                            ? AppColors.primary200
+                            : AppColors.backgroundColor,
+                        alignment: AlignmentDirectional.topStart,
                         borderRadius: BorderRadius.all(Radius.circular(8.sp)),
-                        decoration: InputDecoration(
-                            fillColor: Colors.white, labelText: "create_activity_transaction_type".i18n()),
+                        decoration: InputDecoration(labelText: "create_activity_transaction_type".i18n()),
                         value: ref.watch(createActivityDataProvider).transactionType,
                         items: [TransactionType.DUKA_MUNKA_2000, TransactionType.DUKA_MUNKA, TransactionType.POINT]
                             .map((e) => DropdownMenuItem<TransactionType>(
@@ -133,18 +136,19 @@ class ActivityDetails extends ConsumerWidget {
   }
 
   Future<void> _selectDate(BuildContext context, WidgetRef ref) async {
-    await showDatePicker(
+    var date = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(DateTime.now().year - 1),
       lastDate: DateTime(DateTime.now().year + 1),
-    ).then((date) async {
+    );
+    if (date != null && context.mounted) {
       final TimeOfDay? time =
           await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(DateTime.now()));
-      if (date != null && time != null) {
+      if (time != null) {
         var dateTime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
         ref.watch(createActivityDataProvider.notifier).dateController.text = dateTime.toString();
       }
-    });
+    }
   }
 }

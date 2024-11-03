@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/extensions/dark_mode.dart';
 import 'package:work_hu/app/models/role.dart';
+import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
@@ -132,6 +134,8 @@ class UserDetails extends ConsumerWidget {
                             ? Padding(
                                 padding: EdgeInsets.only(top: 4.sp, bottom: 4.sp),
                                 child: DropdownButtonFormField(
+                                    dropdownColor:
+                                    ref.watch(themeProvider) == ThemeMode.dark ? AppColors.primary200 : AppColors.backgroundColor,
                                     decoration: InputDecoration(labelText: "user_details_team".i18n()),
                                     value: ref.watch(teamsDataProvider).teams.isEmpty ? null : user.paceTeam,
                                     items: createTeamsDropDownList(ref),
@@ -150,8 +154,9 @@ class UserDetails extends ConsumerWidget {
                             ? Padding(
                                 padding: EdgeInsets.only(top: 4.sp, bottom: 4.sp),
                                 child: DropdownButtonFormField(
-                                    decoration:
-                                        InputDecoration(fillColor: Colors.white, labelText: "user_details_role".i18n()),
+                                    dropdownColor:
+                                    ref.watch(themeProvider) == ThemeMode.dark ? AppColors.primary200 : AppColors.backgroundColor,
+                                    decoration: InputDecoration(labelText: "user_details_role".i18n(), isDense: true),
                                     value: user.role,
                                     items: Role.values
                                         .map((e) => DropdownMenuItem<Role>(
@@ -169,7 +174,7 @@ class UserDetails extends ConsumerWidget {
                         isEnabled
                             ? TextButton(
                                 style: ButtonStyle(
-                                  backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
+                                  // backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
                                   foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
                                 ),
                                 onPressed: () => ref.watch(usersDataProvider.notifier).resetUserPassword(user.id),

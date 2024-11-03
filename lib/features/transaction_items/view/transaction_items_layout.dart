@@ -5,11 +5,10 @@ import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
-import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
 import 'package:work_hu/features/utils.dart';
 
 class TransactionsLayout extends ConsumerWidget {
@@ -64,8 +63,6 @@ class TransactionsLayout extends ConsumerWidget {
                   ),
                   Expanded(
                       child: BaseListView(
-                          cardBackgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
                           itemCount: transactionItems.length,
                           itemBuilder: (BuildContext context, int index) {
                             var current = transactionItems[index];
@@ -76,15 +73,17 @@ class TransactionsLayout extends ConsumerWidget {
                                     .read(transactionItemsDataProvider.notifier)
                                     .deleteTransactionItem(current.id!, index),
                                 dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
-                                child: ListCard(
-                                    isLast: isLast,
-                                    index: index,
-                                    child: ListTile(
-                                        title: Text(current.user.getFullName()),
-                                        trailing: Text(
-                                          createTrailingText(current),
-                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
-                                        ))));
+                                child: Card(
+                                  margin: const EdgeInsets.all(0),
+                                  child: BaseListTile(
+                                      isLast: isLast,
+                                      index: index,
+                                      title: Text(current.user.getFullName()),
+                                      trailing: Text(
+                                        createTrailingText(current),
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
+                                      )),
+                                ));
                           },
                           children: const []))
                 ]),
@@ -97,7 +96,7 @@ class TransactionsLayout extends ConsumerWidget {
                     onPressed: () => ref.read(transactionItemsDataProvider.notifier).createCreditsCsv(),
                     child: const Icon(Icons.download),
                   )
-                : SizedBox()),
+                : const SizedBox()),
         ref.watch(transactionItemsDataProvider).modelState == ModelState.error
             ? Center(
                 child: Text(

@@ -37,6 +37,15 @@ class UsersApi {
     }
   }
 
+  Future<List<dynamic>> getChildren(num id) async {
+    try {
+      final res = await _dioClient.dio.get("/user/$id/children");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<dynamic> resetPassword(num userID, num changerId) async {
     try {
       final res = await _dioClient.dio.post("/auth/resetPassword", data: {'userId': userID, "changerId": changerId});

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/src/consumer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_search_bar.dart';
 import 'package:work_hu/app/widgets/error_alert_dialog.dart';
@@ -29,9 +31,6 @@ class GoalsLayout extends ConsumerWidget {
         : null);
     return Column(
       children: [
-        BaseSearchBar(
-          onChanged: (text) => ref.watch(goalDataProvider.notifier).filterGoals(text),
-        ),
         Expanded(
           child: Stack(children: [
             RefreshIndicator(
@@ -45,16 +44,17 @@ class GoalsLayout extends ConsumerWidget {
                         key: UniqueKey(),
                         onDismissed: (direction) => ref.read(goalDataProvider.notifier).deleteGoal(current.id!),
                         dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
-                        child: ListCard(
-                            isLast: goals.length - 1 == index,
-                            index: index,
-                            child: ListTile(
+                        child: Card(
+                            margin: const EdgeInsets.all(0),
+                            child: BaseListTile(
+                              isLast: goals.length - 1 == index,
+                              index: index,
                               onTap: () {
-                                ref.watch(goalDataProvider.notifier).setSelectedGoal(current);
+                                ref.watch(goalDataProvider.notifier).presetGoal(current, MaintenanceMode.edit);
                                 showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (context) => const GoalsMaintenance(mode: GoalsMaintenance.EDIT))
+                                        builder: (context) => const GoalsMaintenance())
                                     .then((value) => ref.watch(goalDataProvider.notifier).getGoals(null));
                               },
                               title: Text(current.user!.getFullName()),
@@ -78,11 +78,9 @@ class GoalsLayout extends ConsumerWidget {
               child: FloatingActionButton(
                 heroTag: UniqueKey(),
                 onPressed: () {
-                  ref.watch(goalDataProvider.notifier).setSelectedGoal(const GoalModel(goal: 0));
+                  ref.watch(goalDataProvider.notifier).presetGoal(const GoalModel(goal: 0), MaintenanceMode.create);
                   showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (context) => const GoalsMaintenance(mode: GoalsMaintenance.CREATE));
+                      barrierDismissible: false, context: context, builder: (context) => const GoalsMaintenance());
                 },
                 child: const Icon(Icons.add),
               ),

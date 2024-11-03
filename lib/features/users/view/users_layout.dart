@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:work_hu/app/extensions/dark_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_search_bar.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
@@ -19,9 +21,6 @@ class UsersLayout extends ConsumerWidget {
     return Stack(
       children: [
         Column(children: [
-          BaseSearchBar(
-            onChanged: (text) => ref.watch(usersDataProvider.notifier).filterUsers(text),
-          ),
           Expanded(
             child: Stack(children: [
               RefreshIndicator(
@@ -31,8 +30,11 @@ class UsersLayout extends ConsumerWidget {
                     Expanded(
                       child: BaseListView(
                         itemBuilder: (BuildContext context, int index) {
-                          return ListCard(
-                              isLast: users.length - 1 == index, index: index, child: UserListItem(user: users[index]));
+                          return UserListItem(
+                            user: users[index],
+                            isLast: users.length - 1 == index,
+                            index: index,
+                          );
                         },
                         itemCount: users.length,
                         shadowColor: Colors.transparent,
@@ -76,22 +78,23 @@ class UsersLayout extends ConsumerWidget {
 }
 
 class UserListItem extends ConsumerWidget {
-  const UserListItem({
-    super.key,
-    required this.user,
-  });
+  const UserListItem({super.key, required this.user, required this.isLast, required this.index});
 
   final UserModel user;
+  final bool isLast;
+  final int index;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ListTile(
+    return BaseListTile(
+      isLast: isLast,
+      index: index,
       title: Text(user.getFullName()),
       onTap: () {
         ref.read(usersDataProvider.notifier).updateCurrentUser(user);
         showGeneralDialog(
             barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-            barrierColor: AppColors.primary,
+            barrierColor: context.isDarkMode ? AppColors.primary100 : AppColors.primary,
             transitionDuration: const Duration(milliseconds: 200),
             context: context,
             pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {

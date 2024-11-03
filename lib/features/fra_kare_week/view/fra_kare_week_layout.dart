@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/fra_kare_week/providers/fra_kare_week_provider.dart';
@@ -44,18 +45,17 @@ class FraKareWeekLayout extends ConsumerWidget {
               child: BaseListView(
             itemBuilder: (BuildContext context, int index) {
               var current = fraKareWeeks[index];
-              return ListCard(
+              return BaseListTile(
                   isLast: fraKareWeeks.length - 1 == index,
                   index: index,
-                  child: ListTile(
-                      enabled: !current.locked,
-                      onTap: () {
-                        // ref.watch(userFraKareWeekDataProvider.notifier).getFraKareWeeks(current.weekNumber);
-                        context.push("/admin/fraKareWeeks/${current.weekNumber}");
-                      },
-                      title: Text("fra_kare_week_weekNumber".i18n([current.weekNumber.toString()])),
-                      subtitle: Text(
-                          "${Utils.dateToString(current.weekStartDate)} - ${Utils.dateToString(current.weekEndDate)}")));
+                  enabled: !current.locked,
+                  onTap: () {
+                    // ref.watch(userFraKareWeekDataProvider.notifier).getFraKareWeeks(current.weekNumber);
+                    context.push("/admin/fraKareWeeks/${current.weekNumber}");
+                  },
+                  title: Text("fra_kare_week_weekNumber".i18n([current.weekNumber.toString()])),
+                  subtitle: Text(
+                      "${Utils.dateToString(current.weekStartDate)} - ${Utils.dateToString(current.weekEndDate)}"));
             },
             itemCount: ref.watch(fraKareWeekDataProvider).weeks.length,
             shadowColor: Colors.transparent,

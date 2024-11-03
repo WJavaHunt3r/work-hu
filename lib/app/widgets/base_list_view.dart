@@ -25,8 +25,8 @@ class BaseListView extends StatelessWidget {
     return ListView(physics: physics, shrinkWrap: shrinkWrap ?? false, children: [
       itemCount != 0
           ? Card(
-              shadowColor: shadowColor,
-              color: cardBackgroundColor,
+              shadowColor: Colors.transparent,
+              color: Colors.transparent,
               margin: EdgeInsets.symmetric(vertical: 8.sp),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
               child: ListView.builder(

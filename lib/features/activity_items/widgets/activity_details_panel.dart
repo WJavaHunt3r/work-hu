@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/collapsable_panel.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
@@ -20,8 +21,10 @@ class ActivityDetailsPanel extends ConsumerWidget {
         expansionCallback: (index, isOpen) => ref.watch(activityDataProvider.notifier).updateIsExpanded(isOpen),
         panels: [
           ExpansionPanel(
-              backgroundColor: Colors.white,
-              splashColor: AppColors.backgroundColor,
+              backgroundColor: ref.watch(themeProvider) == ThemeMode.dark
+                  ? AppColors.secondaryGray
+                  : AppColors.white,
+              // splashColor: AppColors.backgroundColor,
               canTapOnHeader: true,
               isExpanded: ref.watch(activityDataProvider).isExpanded,
               headerBuilder: (context, isOpen) {

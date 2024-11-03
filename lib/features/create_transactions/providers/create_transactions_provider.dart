@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/create_transactions/data/state/create_transactions_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -28,7 +28,6 @@ import 'package:work_hu/features/utils.dart';
 final createTransactionsDataProvider =
     StateNotifierProvider.autoDispose<CreateTransactionsDataNotifier, CreateTransactionsState>((ref) =>
         CreateTransactionsDataNotifier(
-            ref.read(routerProvider),
             ref.read(usersRepoProvider),
             ref.read(userDataProvider.notifier),
             ref.read(transactionsRepoProvider),
@@ -36,8 +35,8 @@ final createTransactionsDataProvider =
             ref.read(roundDataProvider.notifier)));
 
 class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsState> {
-  CreateTransactionsDataNotifier(this.router, this.usersRepository, this.currentUserProvider,
-      this.transactionRepository, this.transactionItemsRepository, this.roundDataNotifier)
+  CreateTransactionsDataNotifier(this.usersRepository, this.currentUserProvider, this.transactionRepository,
+      this.transactionItemsRepository, this.roundDataNotifier)
       : super(const CreateTransactionsState()) {
     valueController = TextEditingController(text: "");
     userController = TextEditingController(text: "");
@@ -55,7 +54,6 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   }
 
   final UsersRepository usersRepository;
-  final GoRouter router;
   final UserDataNotifier currentUserProvider;
   final RoundDataNotifier roundDataNotifier;
   late final TextEditingController valueController;

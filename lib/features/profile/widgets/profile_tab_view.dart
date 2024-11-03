@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:work_hu/features/profile/widgets/profile_grid.dart';
@@ -9,9 +10,11 @@ import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
 class ProfileTabView extends ConsumerWidget {
-  const ProfileTabView({super.key, required this.userRounds});
+  const ProfileTabView({super.key, required this.userRounds, this.goal, this.titleText});
 
   final List<UserRoundModel> userRounds;
+  final GoalModel? goal;
+  final String? titleText;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,7 +36,7 @@ class ProfileTabView extends ConsumerWidget {
                       padding: EdgeInsets.symmetric(vertical: 6.sp),
                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(25.sp), color: AppColors.primary),
                       child: Text(
-                        formatted,
+                        titleText?? formatted,
                         textAlign: TextAlign.center,
                         style: TextStyle(color: AppColors.white, fontSize: 22.sp),
                       ),
@@ -43,7 +46,7 @@ class ProfileTabView extends ConsumerWidget {
               ),
               Consumer(
                 builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                  return ProfileGrid(userRoundModel: item, goal: ref.watch(profileDataProvider).userGoal);
+                  return ProfileGrid(userRoundModel: item, goal: goal);
                 },
               )
             ],

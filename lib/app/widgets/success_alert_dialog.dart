@@ -13,11 +13,10 @@ class SuccessAlertDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
         child: AlertDialog(
-            backgroundColor: AppColors.white,
             title: Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             content: content ??
                 TextButton(

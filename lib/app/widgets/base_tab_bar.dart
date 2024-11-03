@@ -21,27 +21,13 @@ class BaseTabView extends StatelessWidget {
               child: Container(
                   padding: EdgeInsets.all(0.5.sp),
                   decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.primary, width: 1.5.sp),
+                      border: Border.all(width: 1.5.sp,color: AppColors.primary,),
                       borderRadius: BorderRadius.all(Radius.circular(30.sp))),
                   child: TabBar(
-                      unselectedLabelStyle: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.normal,
-                          fontSize: 12.sp,
-                          overflow: TextOverflow.ellipsis),
-                      labelStyle: TextStyle(
-                          color: AppColors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.sp,
-                          overflow: TextOverflow.ellipsis),
                       dividerColor: Colors.transparent,
                       labelPadding: EdgeInsets.all(0.sp),
                       splashBorderRadius: BorderRadius.all(Radius.circular(30.sp)),
                       padding: EdgeInsets.all(0.sp),
-                      indicator: ShapeDecoration(
-                        color: AppColors.primary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.sp)),
-                      ),
                       tabs: tabs)),
             )),
         body: TabBarView(clipBehavior: Clip.antiAlias, children: tabViews));

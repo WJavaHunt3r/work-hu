@@ -1,9 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/user_provider.dart';
-import 'package:work_hu/dukapp.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activity_items/data/repository/activity_items_repository.dart';
 import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -14,46 +12,52 @@ import 'package:work_hu/features/transaction_items/data/repository/transaction_i
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
 import 'package:work_hu/features/user_points/data/model/user_points_state.dart';
 
-final userPointsDataProvider = StateNotifierProvider.autoDispose<UserPointsDataNotifier, UserPointsState>((ref) =>
-    UserPointsDataNotifier(ref.read(transactionItemsRepoProvider), ref.read(routerProvider), ref.read(userDataProvider),
-        ref.read(roundRepoProvider), ref.read(activityItemsRepoProvider)));
+final userPointsDataProvider = StateNotifierProvider<UserPointsDataNotifier, UserPointsState>((ref) =>
+    UserPointsDataNotifier(ref.read(transactionItemsRepoProvider), ref.read(userDataProvider),
+        ref.read(roundDataProvider.notifier), ref.read(activityItemsRepoProvider)));
 
 class UserPointsDataNotifier extends StateNotifier<UserPointsState> {
   UserPointsDataNotifier(
     this.transactionItemsRepository,
-    this.router,
     this.currentUser,
     this.roundRepository,
     this.activityItemsRepository,
-  ) : super(const UserPointsState()) {
-    getTransactionItems();
-  }
+  ) : super(const UserPointsState());
 
   final TransactionItemsRepository transactionItemsRepository;
-  final GoRouter router;
   final UserModel? currentUser;
-  final RoundRepository roundRepository;
+  final RoundDataNotifier roundRepository;
   final ActivityItemsRepository activityItemsRepository;
 
   Future<void> getTransactionItems() async {
     state = state.copyWith(modelState: ModelState.processing);
 
     try {
-      await roundRepository.getRounds(DateTime.now().year).then((rounds) async {
+      if (state.userId != null) {
+        var rounds = roundRepository.state.rounds;
         var transactionItems = <TransactionItemModel>[];
         for (var r in rounds) {
-          await transactionItemsRepository.getTransactionItems(userId: currentUser!.id, roundId: r.id).then((items) {
+          await transactionItemsRepository.getTransactionItems(userId: state.userId, roundId: r.id).then((items) async {
             transactionItems.addAll(items);
           });
         }
         transactionItems.sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
 
-        await activityItemsRepository.getActivityItems(registeredInApp: false, userId: currentUser!.id).then(
-            (acItems) => state = state.copyWith(
+        await activityItemsRepository.getActivityItems(registeredInApp: false, userId: state.userId).then(
+            (acItems) async => state = state.copyWith(
                 activityItems: acItems, transactionItems: transactionItems, modelState: ModelState.success));
-      });
+      } else {
+        state = state.copyWith(modelState: ModelState.error, message: "No User set");
+      }
     } on DioException catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
+    } catch (e) {
+      print(e.toString());
     }
+  }
+
+  Future<void> setUserId(num userId) async {
+    state = state.copyWith(userId: userId);
+    await getTransactionItems();
   }
 }

@@ -6,7 +6,7 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/style/app_colors.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
@@ -46,10 +46,14 @@ class UserFraKareWeekLayout extends ConsumerWidget {
               : const SizedBox(),
           Expanded(
               child: BaseListView(
-            itemCount: ref.watch(userFraKareWeekDataProvider).streaks.length,
+            itemCount: streaks.length,
             itemBuilder: (BuildContext context, int index) {
-              var item = ref.watch(userFraKareWeekDataProvider).streaks[index];
-              return SelectionRow(fraKareWeek: item);
+              var item = streaks[index];
+              return SelectionRow(
+                fraKareWeek: item,
+                isLast: index == streaks.length - 1,
+                index: index,
+              );
             },
             children: [],
           )),
@@ -69,7 +73,7 @@ class UserFraKareWeekLayout extends ConsumerWidget {
                               context.pop();
                               ref.read(userFraKareWeekDataProvider.notifier).saveUserFraKareWeeks();
                             },
-                            content: Text("user_fra_fare_week_save_question".i18n()),
+                            content: Text("user_fra_fare_week_save_question".i18n(), textAlign: TextAlign.center),
                           );
                         }),
                     style: ButtonStyle(

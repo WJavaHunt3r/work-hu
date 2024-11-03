@@ -14,7 +14,7 @@ class MenuOptionsListTile extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 2.sp),
       child: ListTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
-        tileColor: enabled ? Colors.white : Colors.grey.shade200,
+        enabled: enabled,
         title: Text(title),
         trailing: const Icon(Icons.arrow_forward_ios_rounded),
         onTap: enabled ? onTap : null,

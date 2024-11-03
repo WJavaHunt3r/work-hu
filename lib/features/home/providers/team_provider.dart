@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/home/data/api/team_round_api.dart';
 import 'package:work_hu/features/home/data/repository/team_round_repository.dart';
 import 'package:work_hu/features/home/data/state/team_round_state.dart';

@@ -55,7 +55,7 @@ class SamvirkStatus extends ConsumerWidget {
                           child: SfLinearGauge(
                               orientation: LinearGaugeOrientation.horizontal,
                               axisTrackStyle: LinearAxisTrackStyle(
-                                  thickness: 25.sp, color: AppColors.primary100, edgeStyle: LinearEdgeStyle.bothCurve),
+                                  thickness: 25.sp, color: AppColors.gray100, edgeStyle: LinearEdgeStyle.bothCurve),
                               minimum: 0,
                               maximum: maximum,
                               numberFormat: numberFormat,

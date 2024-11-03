@@ -5,8 +5,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/app/widgets/success_alert_dialog.dart';
 import 'package:work_hu/features/change_password/provider/change_password_provider.dart';
@@ -22,20 +23,32 @@ class LoginLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loginProvider = ref.watch(loginDataProvider.notifier);
+    var isDark = ref.watch(themeProvider.notifier).isDark();
     return Stack(
       children: [
-        SingleChildScrollView(
-            child: Form(
-                key: _formKey,
-                child: AutofillGroup(
-                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Form(
+            key: _formKey,
+            child: AutofillGroup(
+                child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(
+                  "DukApp",
+                  style: TextStyle(fontFamily: "Good-Timing", fontWeight: FontWeight.bold, fontSize: 40.sp),
+                ),
+                Column(children: [
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0.sp),
                     child: TextFormField(
                       controller: loginProvider.usernameController,
                       textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(labelText: "login_username".i18n()),
-                      onEditingComplete: () => loginProvider.trimUsername(),
+                      decoration: InputDecoration(
+                          labelText: "login_username".i18n(), fillColor: isDark ? AppColors.secondaryGray : null),
+                      onEditingComplete: () {
+                        loginProvider.trimUsername();
+                        passwordNode.requestFocus();
+                      },
                       onChanged: (text) {
                         if (_formKey.currentState != null) {
                           _formKey.currentState!.validate();
@@ -53,7 +66,8 @@ class LoginLayout extends ConsumerWidget {
                   TextFormField(
                     controller: loginProvider.passwordController,
                     focusNode: passwordNode,
-                    decoration: InputDecoration(labelText: "login_password".i18n()),
+                    decoration: InputDecoration(
+                        labelText: "login_password".i18n(), fillColor: isDark ? AppColors.secondaryGray : null),
                     obscureText: true,
                     onFieldSubmitted: (value) => login(loginProvider, ref, context),
                     autofillHints: const [AutofillHints.password],
@@ -70,14 +84,22 @@ class LoginLayout extends ConsumerWidget {
                       return null;
                     },
                   ),
+                  ref.watch(loginDataProvider).modelState == ModelState.error
+                      ? Center(
+                          child: Text(
+                            ref.read(loginDataProvider).message,
+                            style: const TextStyle(color: AppColors.errorRed),
+                          ),
+                        )
+                      : const SizedBox(),
                   Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0.sp, horizontal: 8.sp),
+                      padding: EdgeInsets.symmetric(vertical: 8.0.sp),
                       child: Row(
                         children: [
                           Expanded(
                             child: TextButton(
                                 onPressed: () {
-                                  TextInput.finishAutofillContext();
+                                  // TextInput.finishAutofillContext();
                                   login(loginProvider, ref, context);
                                 },
                                 child: Text(
@@ -93,14 +115,18 @@ class LoginLayout extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: TextButton(
-                                style: ButtonStyle(backgroundColor: WidgetStateColor.resolveWith((states) {
-                                  if (states.contains(WidgetState.focused) ||
-                                      states.contains(WidgetState.pressed) ||
-                                      states.contains(WidgetState.hovered)) {
-                                    return Colors.grey.shade500.withValues(alpha: 0.3);
-                                  }
-                                  return Colors.transparent;
-                                })),
+                                style: ButtonStyle(
+                                    side: WidgetStateProperty.resolveWith((state) => BorderSide.none),
+                                    backgroundColor: WidgetStateColor.resolveWith((states) {
+                                      if (states.contains(WidgetState.focused) ||
+                                          states.contains(WidgetState.pressed) ||
+                                          states.contains(WidgetState.hovered)) {
+                                        return AppColors.secondaryGray;
+                                      }
+                                      return ref.watch(themeProvider) == ThemeMode.dark
+                                          ? Colors.black
+                                          : AppColors.backgroundColor;
+                                    })),
                                 onPressed: () {
                                   if (ref.watch(loginDataProvider).username.isNotEmpty) {
                                     showDialog(
@@ -111,7 +137,8 @@ class LoginLayout extends ConsumerWidget {
                                               context.pop();
                                             },
                                             title: "login_reset_password_confirm_title".i18n(),
-                                            content: Text("login_reset_password_question".i18n()))).then((value) => ref
+                                            content: Text("login_reset_password_question".i18n(),
+                                                textAlign: TextAlign.center))).then((value) => ref
                                                     .read(loginDataProvider)
                                                     .resetState ==
                                                 ModelState.success &&
@@ -136,17 +163,10 @@ class LoginLayout extends ConsumerWidget {
                           ),
                         ],
                       )),
-                  ref.watch(loginDataProvider).modelState == ModelState.error
-                      ? Center(
-                          child: Text(
-                            ref.read(loginDataProvider).message,
-                            style: const TextStyle(color: AppColors.errorRed),
-                          ),
-                        )
-                      : const SizedBox()
-                  //   ],
-                  // ),
-                ])))),
+                ]),
+                SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+              ],
+            ))),
         ref.watch(loginDataProvider).modelState == ModelState.processing
             ? const Center(
                 child: CircularProgressIndicator(),

@@ -3,8 +3,7 @@
     "short_name": "DukApp",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#E3E7E9",
-    "theme_color": "#E3E7E9",
+
     "description": "See who's leading the local competition.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,

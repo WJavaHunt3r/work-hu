@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/src/consumer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/notch_app_bar.dart';
+import 'package:work_hu/app/providers/theme_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
-import 'package:work_hu/app/user_provider.dart';
-import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 
 abstract class MainScreen extends BasePage {
-  MainScreen(
+  const MainScreen(
       {required this.selectedIndex,
       super.key,
       required super.title,
@@ -19,6 +20,7 @@ abstract class MainScreen extends BasePage {
       super.extendBodyBehindAppBar,
       super.automaticallyImplyLeading = false,
       super.centerTitle,
+      super.hasTitleWidget,
       super.leading});
 
   final int selectedIndex;
@@ -26,15 +28,18 @@ abstract class MainScreen extends BasePage {
   @override
   buildBottomNavigationBar(BuildContext context, WidgetRef ref) {
     UserModel? currentUser = ref.watch(userDataProvider);
+    var isDark = ref.watch(themeProvider) == ThemeMode.dark;
     return currentUser != null && currentUser.isUser()
         ? NotchAppBar(selectedIndex)
         : Container(
             decoration: BoxDecoration(
-                color: AppColors.surfaceWhite,
+                color: isDark ? AppColors.secondaryGray : AppColors.white,
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(24.sp), topRight: Radius.circular(24.sp))),
             child: BottomNavigationBar(
                 backgroundColor: Colors.transparent,
-                selectedIconTheme: const IconThemeData(color: AppColors.primary),
+                selectedIconTheme: IconThemeData(color: isDark ? AppColors.primary100 : AppColors.primary),
+                selectedLabelStyle: TextStyle(color: isDark ? AppColors.primary100 : AppColors.primary),
+                selectedItemColor: isDark ? AppColors.primary100 : AppColors.primary,
                 elevation: 0,
                 items: currentUser == null
                     ? noUserScreens()
@@ -43,24 +48,24 @@ abstract class MainScreen extends BasePage {
                         : adminScreens(),
                 currentIndex: selectedIndex,
                 selectedFontSize: 16,
-                onTap: (int index) => _onItemTapped(index, ref, currentUser)),
+                onTap: (int index) => _onItemTapped(index, context, currentUser)),
           );
   }
 
-  void _onItemTapped(int index, WidgetRef ref, UserModel? currentUser) {
+  void _onItemTapped(int index, BuildContext context, UserModel? currentUser) {
     if (index != selectedIndex) {
       if (index == 0) {
-        ref.watch(routerProvider).go("/home");
+        context.go("/home");
       }
       if (index == 1) {
         if (currentUser == null) {
-          ref.watch(routerProvider).go("/login");
+          context.go("/login");
         } else {
-          ref.watch(routerProvider).go("/profile");
+          context.go("/profile");
         }
       }
       if (index == 2) {
-        ref.watch(routerProvider).go("/admin");
+        context.go("/admin");
       }
     }
   }

@@ -18,7 +18,7 @@ class AddRegistrationCard extends ConsumerWidget {
     var isError = ref.watch(createActivityDataProvider).modelState == ModelState.error;
     return InfoCard(
         padding: 4.sp,
-        height: isError ? 150.sp : 110.sp,
+        height: isError ? 150.sp : 120.sp,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -26,7 +26,7 @@ class AddRegistrationCard extends ConsumerWidget {
               direction: AxisDirection.up,
               onTap: () => ref.watch(createActivityDataProvider.notifier).updateCollapsed(false),
               controller: ref.read(createActivityDataProvider.notifier).userController,
-              focusNode:  ref.read(createActivityDataProvider.notifier).usersFocusNode,
+              focusNode: ref.read(createActivityDataProvider.notifier).usersFocusNode,
               autofocus: true,
               onSuggestionSelected: (UserModel suggestion) =>
                   ref.read(createActivityDataProvider.notifier).updateSelectedUser(suggestion),
@@ -56,22 +56,6 @@ class AddRegistrationCard extends ConsumerWidget {
                             ref.watch(createActivityDataProvider.notifier).hoursController.value.text.isNotEmpty
                         ? () => ref.read(createActivityDataProvider.notifier).addRegistration()
                         : null,
-                    style: ButtonStyle(
-                      side: WidgetStateBorderSide.resolveWith(
-                        (states) {
-                          if (states.contains(WidgetState.disabled)) {
-                            return BorderSide(color: Colors.grey.shade300, width: 2.sp);
-                          }
-                          return BorderSide(color: AppColors.primary, width: 2.sp);
-                        },
-                      ),
-                      backgroundColor: WidgetStateColor.resolveWith((states) {
-                        if (states.contains(WidgetState.disabled)) {
-                          return Colors.grey.shade300;
-                        }
-                        return AppColors.primary;
-                      }),
-                    ),
                     child: const Icon(
                       Icons.add,
                       color: AppColors.white,

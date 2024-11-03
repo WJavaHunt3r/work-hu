@@ -18,6 +18,16 @@ class UsersRepository {
     }
   }
 
+  Future<List<UserModel>> getChildren(num id) async {
+    try {
+      final res = await _userApi.getChildren(id);
+      var map = res.map((e) => UserModel.fromJson(e)).toList();
+      return map;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<UserModel> getUserById(num userId) async {
     try {
       final res = await _userApi.getUserById(userId);

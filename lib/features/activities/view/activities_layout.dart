@@ -90,7 +90,7 @@ class ActivitiesLayout extends ConsumerWidget {
                         return ConfirmAlertDialog(
                           onConfirm: () => buildContext.pop(true),
                           title: "delete".i18n(),
-                          content: Text("activity_delete_warning".i18n()),
+                          content: Text("activity_delete_warning".i18n(), textAlign: TextAlign.center),
                         );
                       })
                   .then((confirmed) => confirmed != null && confirmed

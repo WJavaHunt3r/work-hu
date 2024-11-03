@@ -30,7 +30,7 @@ class CreateActivityPage extends BasePage {
             return ConfirmAlertDialog(
               onConfirm: () => buildContext.pop(true),
               title: "exit".i18n(),
-              content: Text("create_activity_exit_warning".i18n()),
+              content: Text("create_activity_exit_warning".i18n(), textAlign: TextAlign.center),
             );
           }).then((popped) => popped ?? false ? context.pop() : null);
     }

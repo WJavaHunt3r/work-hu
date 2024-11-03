@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/user_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/fra_kare_week/data/api/fra_kare_week_api.dart';
 import 'package:work_hu/features/fra_kare_week/data/repository/fra_kare_week_repository.dart';
 import 'package:work_hu/features/fra_kare_week/data/state/fra_kare_week_state.dart';

@@ -34,7 +34,7 @@ class WorkDropDownSearchFormField<T> extends StatelessWidget {
         suggestionsBoxVerticalOffset: 0.h,
         transitionBuilder: (context, suggestionsBox, controller) => suggestionsBox,
         suggestionsBoxDecoration: SuggestionsBoxDecoration(
-            color: Colors.white,
+            // color: Colors.white,
             borderRadius: BorderRadius.circular(8.sp),
             closeSuggestionBoxWhenTapOutside: false,
             offsetX: 2.h,

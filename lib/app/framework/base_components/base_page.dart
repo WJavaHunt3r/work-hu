@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/title_provider.dart';
+import 'package:work_hu/app/widgets/base_search_bar.dart';
 
 abstract class BasePage extends ConsumerWidget {
   const BasePage(
@@ -15,6 +17,8 @@ abstract class BasePage extends ConsumerWidget {
       this.centerTitle,
       this.extendBodyBehindAppBar,
       this.leading,
+      this.hasTitleWidget,
+      this.hasSearchBar = false,
       this.titleArgs = const []});
 
   final String title;
@@ -26,6 +30,8 @@ abstract class BasePage extends ConsumerWidget {
   final bool? extendBodyBehindAppBar;
   final List<String> titleArgs;
   final Widget? leading;
+  final bool hasSearchBar;
+  final bool? hasTitleWidget;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,16 +45,18 @@ abstract class BasePage extends ConsumerWidget {
             appBar: extendBodyBehindAppBar ?? false
                 ? null
                 : AppBar(
-                    backgroundColor: Colors.transparent,
-                    title: Text(
-                      title.isEmpty ? ref.watch(titleDataProvider) : title.i18n(titleArgs),
-                      style: appBarTextStyle ?? const TextStyle(fontWeight: FontWeight.w800),
-                    ),
+                    title: hasTitleWidget ?? false
+                        ? buildTitleWidget(ref)
+                        : (hasSearchBar
+                            ? buildSearchBar(ref)
+                            : Text(
+                                title.isEmpty ? ref.watch(titleDataProvider) : title.i18n(titleArgs),
+                                style: appBarTextStyle ?? const TextStyle(fontWeight: FontWeight.w800),
+                              )),
                     leading: leading,
                     centerTitle: centerTitle ?? false,
                     actions: buildActions(context, ref),
-                    surfaceTintColor: Colors.grey,
-                    automaticallyImplyLeading: automaticallyImplyLeading ?? true,
+                    automaticallyImplyLeading: automaticallyImplyLeading ?? !hasSearchBar,
                   ),
             floatingActionButton: createActionButton(context, ref),
             floatingActionButtonLocation: setFloatingActionButtonLocation(ref),
@@ -59,7 +67,7 @@ abstract class BasePage extends ConsumerWidget {
                       padding: EdgeInsets.only(
                           left: 8.sp,
                           right: 8.sp,
-                          top: isListView
+                          top: isListView || hasSearchBar
                               ? 0
                               : extendBodyBehindAppBar ?? false
                                   ? 0.sp
@@ -96,4 +104,14 @@ abstract class BasePage extends ConsumerWidget {
   }
 
   buildBottomNavigationBar(BuildContext context, WidgetRef ref) {}
+
+  Widget buildSearchBar(WidgetRef ref) {
+    return SizedBox(height: 35.sp, child: BaseSearchBar(onChanged: (text) => searchBarChanged(ref, text)));
+  }
+
+  searchBarChanged(WidgetRef ref, String text) {}
+
+  Widget buildTitleWidget(WidgetRef ref) {
+    return SizedBox();
+  }
 }

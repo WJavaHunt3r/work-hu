@@ -6,7 +6,6 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_tab_bar.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
-import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/user_points/provider/user_points_providers.dart';
@@ -14,10 +13,15 @@ import 'package:work_hu/features/user_points/widgets/points_list_item.dart';
 import 'package:work_hu/features/utils.dart';
 
 class UserPointsLayout extends ConsumerWidget {
-  const UserPointsLayout({super.key});
+  const UserPointsLayout({super.key, required this.userId});
+
+  final num userId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Future(() => ref.read(userPointsDataProvider).modelState == ModelState.empty
+    //     ? ref.read(userPointsDataProvider.notifier).getTransactionItems()
+    //     : null);
     var items = ref.watch(userPointsDataProvider).transactionItems;
     var activityItems = ref.watch(userPointsDataProvider).activityItems;
     var currentRound = ref.watch(roundDataProvider).currentRoundNumber;
@@ -71,7 +75,13 @@ class UserPointsLayout extends ConsumerWidget {
       BaseListView(
           itemBuilder: (BuildContext context, int index) {
             var current = currentItems[index];
-            return PointsListItem(value: current.credit, title: current.description, date: current.transactionDate);
+            return PointsListItem(
+              value: current.credit,
+              title: current.description,
+              date: current.transactionDate,
+              isLast: index == currentItems.length - 1,
+              index: index,
+            );
           },
           itemCount: currentItems.length,
           children: [
@@ -90,9 +100,12 @@ class UserPointsLayout extends ConsumerWidget {
                   itemBuilder: (BuildContext context, int index) {
                     var current = activityItems[index];
                     return PointsListItem(
-                        value: current.hours,
-                        title: current.description,
-                        date: current.activity?.activityDateTime ?? DateTime.now());
+                      value: current.hours,
+                      title: current.description,
+                      date: current.activity?.activityDateTime ?? DateTime.now(),
+                      isLast: index == activityItems.length - 1,
+                      index: index,
+                    );
                   },
                   itemCount: activityItems.length),
             )
@@ -102,7 +115,12 @@ class UserPointsLayout extends ConsumerWidget {
     list.add(BaseListView(
         itemBuilder: (context, index) {
           var current = items[index];
-          return PointsListItem(value: current.credit, title: current.description, date: current.transactionDate);
+          return PointsListItem(
+              value: current.credit,
+              title: current.description,
+              date: current.transactionDate,
+              isLast: index == items.length - 1,
+              index: index);
         },
         itemCount: items.length,
         children: const []));
