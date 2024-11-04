@@ -26,10 +26,12 @@ class BufeDataNotifier extends StateNotifier<BufeState> {
     state = state.copyWith(modelState: ModelState.processing);
     var user = currentUserProvider.state!;
     try {
-      await bufeRepository.getBufeAccount(user.id).then((data) async {
-        state = state.copyWith(account: data, modelState: ModelState.success);
-      });
-      getPayments(user.id);
+      if (user.bufeId != null) {
+        await bufeRepository.getBufeAccount(user.bufeId!).then((data) async {
+          state = state.copyWith(account: data, modelState: ModelState.success);
+        });
+        getPayments(user.bufeId!);
+      }
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
@@ -39,7 +41,7 @@ class BufeDataNotifier extends StateNotifier<BufeState> {
     state = state.copyWith(modelState: ModelState.processing);
     var user = currentUserProvider.state!;
     try {
-      await bufeRepository.getPayments(bufeId: user.id).then((data) async {
+      await bufeRepository.getPayments(bufeId: userId).then((data) async {
         data.sort((a, b) => b.date.compareTo(a.date));
         state = state.copyWith(payments: data, modelState: ModelState.success);
       });
