@@ -9,7 +9,7 @@ part 'bufe_state.freezed.dart';
 abstract class BufeState with _$BufeState {
   const factory BufeState(
       {@Default([]) List<BufePaymentsModel> payments,
-      BufeAccountModel? account,
+      @Default([]) List<BufeAccountModel> accounts,
       @Default(ModelState.empty) ModelState modelState,
       @Default("") String message}) = _BufeState;
 

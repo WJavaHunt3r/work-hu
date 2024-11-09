@@ -139,6 +139,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           }
         }
 
+        if(state.matchedLocation.contains("/login")){
+          return "/profile";
+        }
+
         if ((teamLeaderScreens.contains(state.matchedLocation) ||
                 state.matchedLocation.contains("/admin/fraKareWeeks/")) &&
             user.isTeamLeader()) {

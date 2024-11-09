@@ -5,12 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/change_password/provider/change_password_provider.dart';
 
 class ChangePasswordLayout extends ConsumerWidget {
-  const ChangePasswordLayout({super.key});
+  ChangePasswordLayout({super.key});
 
   static final _formKey = GlobalKey<FormState>();
+  final FocusNode newPasswordNode = FocusNode();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,42 +25,37 @@ class ChangePasswordLayout extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4.sp),
-                      child: TextFormField(
-                        controller: ref.watch(changePasswordDataProvider.notifier).usernameController,
-                        textInputAction: TextInputAction.next,
-                        autofillHints: const [AutofillHints.username],
-                        decoration: InputDecoration(labelText: "change_password_username".i18n()),
-                      ),
+                    // BaseTextFormField(
+                    //   // initialValue: ref.read(changePasswordDataProvider).username,
+                    //   controller: ref.watch(changePasswordDataProvider.notifier).usernameController,
+                    //   textInputAction: TextInputAction.next,
+                    //   autofillHints: const [AutofillHints.username],
+                    //   labelText: "change_password_username".i18n(),
+                    // ),
+                    // BaseTextFormField(
+                    //   // initialValue: ref.read(changePasswordDataProvider).password,
+                    //   obscureText: true,
+                    //   isPasswordField: true,
+                    //   autofillHints: const [AutofillHints.password],
+                    //   controller: ref.watch(changePasswordDataProvider.notifier).passwordController,
+                    //   textInputAction: TextInputAction.next,
+                    //   labelText: "change_password_old_password".i18n(),
+                    // ),
+                    BaseTextFormField(
+                      obscureText: true,
+                      isPasswordField: true,
+                      controller: ref.watch(changePasswordDataProvider.notifier).newPasswordController,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (text) => newPasswordNode.requestFocus(),
+                      labelText: "change_password_new_password".i18n(),
                     ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4.sp),
-                      child: TextFormField(
-                        obscureText: true,
-                        autofillHints: const [AutofillHints.password],
-                        controller: ref.watch(changePasswordDataProvider.notifier).passwordController,
-                        textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(labelText: "change_password_old_password".i18n()),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4.sp),
-                      child: TextFormField(
-                        obscureText: true,
-                        controller: ref.watch(changePasswordDataProvider.notifier).newPasswordController,
-                        textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(labelText: "change_password_new_password".i18n()),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4.sp),
-                      child: TextFormField(
-                        obscureText: true,
-                        controller: ref.watch(changePasswordDataProvider.notifier).newPasswordAgainController,
-                        textInputAction: TextInputAction.go,
-                        decoration: InputDecoration(labelText: "change_password_new_password_again".i18n()),
-                      ),
+                    BaseTextFormField(
+                      obscureText: true,
+                      focusNode: newPasswordNode,
+                      isPasswordField: true,
+                      controller: ref.watch(changePasswordDataProvider.notifier).newPasswordAgainController,
+                      textInputAction: TextInputAction.go,
+                      labelText: "change_password_new_password_again".i18n(),
                     ),
                     Padding(
                       padding: EdgeInsets.only(top: 4.sp),
@@ -66,9 +63,13 @@ class ChangePasswordLayout extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           TextButton(
-                              onPressed: () => ref.read(changePasswordDataProvider.notifier).changePassword().then(
-                                  (value) => ref.read(changePasswordDataProvider).modelState == ModelState.success
-                                      ? context.canPop() ? context.pop(true) : context.push("/login")
+                              onPressed: () => ref
+                                  .read(changePasswordDataProvider.notifier)
+                                  .changePassword()
+                                  .then((value) => ref.read(changePasswordDataProvider).modelState == ModelState.success
+                                      ? context.canPop()
+                                          ? context.pop(true)
+                                          : context.push("/login")
                                       : null),
                               child: Text(
                                 "change_password_change_action".i18n(),

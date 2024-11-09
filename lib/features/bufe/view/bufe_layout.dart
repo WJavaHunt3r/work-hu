@@ -15,16 +15,15 @@ class BufeLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final account = ref.watch(bufeDataProvider).account;
+    final accounts = ref.watch(bufeDataProvider).accounts;
     final items = ref.watch(bufeDataProvider).payments;
     return Stack(children: [
       Column(children: [
-        account == null
-            ? const SizedBox()
-            : AccountBalance(
-                name: account.name,
-                balance: account.balance,
-              ),
+        for (var account in accounts)
+          AccountBalance(
+            name: account.name,
+            balance: account.balance,
+          ),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -60,18 +59,17 @@ class BufeLayout extends ConsumerWidget {
   Widget listItem(List<BufePaymentsModel> items, BuildContext context, int index, WidgetRef ref) {
     var current = items[index];
     var date = current.date;
-    var dateString = Utils.dateToString(date);
     return BaseListTile(
       isLast: items.length - 1 == index,
       index: index,
       onTap: () {},
       trailing: Text(
-        "${Utils.creditFormatting(current.amount)} Ft",
+        "${current.amount} Ft",
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
       ),
       title: Row(
         children: [
-          Text(dateString, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(date, style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );

@@ -6,7 +6,7 @@ class AccountBalance extends StatelessWidget {
   const AccountBalance({super.key, required this.name, required this.balance});
 
   final String name;
-  final num balance;
+  final String balance;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class AccountBalance extends StatelessWidget {
         Padding(
             padding: EdgeInsets.only(bottom: 8.sp),
             child: Text(
-              "${Utils.creditFormatting(balance)} Ft",
+              "${balance.replaceAll(".00", "")} Ft",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w800),
             )),

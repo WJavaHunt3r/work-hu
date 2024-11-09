@@ -8,6 +8,7 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/app/widgets/success_alert_dialog.dart';
 import 'package:work_hu/features/change_password/provider/change_password_provider.dart';
@@ -38,37 +39,35 @@ class LoginLayout extends ConsumerWidget {
                   style: TextStyle(fontFamily: "Good-Timing", fontWeight: FontWeight.bold, fontSize: 40.sp),
                 ),
                 Column(children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0.sp),
-                    child: TextFormField(
-                      controller: loginProvider.usernameController,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                          labelText: "login_username".i18n(), fillColor: isDark ? AppColors.secondaryGray : null),
-                      onEditingComplete: () {
-                        loginProvider.trimUsername();
-                        passwordNode.requestFocus();
-                      },
-                      onChanged: (text) {
-                        if (_formKey.currentState != null) {
-                          _formKey.currentState!.validate();
-                        }
-                      },
-                      autofillHints: const [AutofillHints.username],
-                      validator: (text) {
-                        if (text == null || text.isEmpty) {
-                          return 'login_form_empty_username'.i18n();
-                        }
-                        return null;
-                      },
-                    ),
+                  BaseTextFormField(
+                    controller: loginProvider.usernameController,
+                    textInputAction: TextInputAction.next,
+                    labelText: "login_username".i18n(),
+                    fillColor: isDark ? AppColors.secondaryGray : null,
+                    onFieldSubmitted: (text) {
+                      loginProvider.trimUsername();
+                      passwordNode.requestFocus();
+                    },
+                    onChanged: (text) {
+                      if (_formKey.currentState != null) {
+                        _formKey.currentState!.validate();
+                      }
+                    },
+                    autofillHints: const [AutofillHints.username],
+                    validator: (text) {
+                      if (text == null || text.isEmpty) {
+                        return 'login_form_empty_username'.i18n();
+                      }
+                      return null;
+                    },
                   ),
-                  TextFormField(
+                  BaseTextFormField(
                     controller: loginProvider.passwordController,
                     focusNode: passwordNode,
-                    decoration: InputDecoration(
-                        labelText: "login_password".i18n(), fillColor: isDark ? AppColors.secondaryGray : null),
+                    labelText: "login_password".i18n(),
+                    fillColor: isDark ? AppColors.secondaryGray : null,
                     obscureText: true,
+                    isPasswordField: true,
                     onFieldSubmitted: (value) => login(loginProvider, ref, context),
                     autofillHints: const [AutofillHints.password],
                     textInputAction: TextInputAction.go,
@@ -178,13 +177,16 @@ class LoginLayout extends ConsumerWidget {
 
   navigateTo(WidgetRef ref, BuildContext context) {
     if (ref.read(userDataProvider) == null) {
-      ref.read(changePasswordDataProvider.notifier).setUsername(ref.read(loginDataProvider).username);
-      context.push("/changePassword", extra: {"username": ref.read(loginDataProvider).username}).then((success) {
+      ref
+          .read(changePasswordDataProvider.notifier)
+          .setUsername(ref.read(loginDataProvider).username, ref.read(loginDataProvider).password);
+      context.push("/changePassword").then((success) {
         success != null && success as bool
             ? ref.read(loginDataProvider.notifier).clear("login_password_changed_success".i18n(), ModelState.error)
             : ref.read(loginDataProvider.notifier).clear("login_password_changed_failed".i18n(), ModelState.error);
       });
     } else {
+      ref.read(loginDataProvider.notifier).clear();
       origRoute.isEmpty ? context.replace("/") : context.push(origRoute);
     }
   }
