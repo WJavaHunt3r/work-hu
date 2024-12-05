@@ -7,6 +7,7 @@ import 'package:work_hu/features/activities/view/activities_page.dart';
 import 'package:work_hu/features/activity_items/view/activity_items_layout.dart';
 import 'package:work_hu/features/admin/view/admin_page.dart';
 import 'package:work_hu/features/bufe/view/bufe_page.dart';
+import 'package:work_hu/features/bufe/widgets/order_items.dart';
 import 'package:work_hu/features/change_password/view/change_password_page.dart';
 import 'package:work_hu/features/create_activity/view/create_activity_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_samvirk_transactions_page.dart';
@@ -61,6 +62,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'bufe',
                 builder: (BuildContext context, GoRouterState state) => const BufePage(),
+                routes: [
+                  GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems()),
+                ]
               ),
             ]),
         GoRoute(

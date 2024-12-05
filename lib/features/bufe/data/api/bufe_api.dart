@@ -23,4 +23,22 @@ class BufeApi {
       rethrow;
     }
   }
+
+  Future<List<dynamic>> getOrders({required num bufeId}) async {
+    try {
+      final res = await _dioClient.dio.get("/account/$bufeId/orders");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<dynamic>> getOrderItems({required num bufeId, required num orderId}) async {
+    try {
+      final res = await _dioClient.dio.get("/account/$bufeId/orders/$orderId/items");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

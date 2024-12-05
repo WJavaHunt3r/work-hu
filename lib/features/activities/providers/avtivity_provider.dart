@@ -50,7 +50,19 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
     try {
       await activityRepository
           .getActivities(
-              registeredInApp: registeredInApp,
+          registeredInApp: false,
+          registeredInMyShare: false,
+          responsibleId: responsibleId,
+          createUserId: createUserId,
+          searchText: searchText,
+          employerId: employerId)
+          .then((data) async {
+        data.sort((a, b) => b.activityDateTime.compareTo(a.activityDateTime));
+        state = state.copyWith(activities: data, modelState: ModelState.success);
+      });
+      await activityRepository
+          .getActivities(
+              registeredInApp: true,
               registeredInMyShare: registeredInMyShare,
               responsibleId: responsibleId,
               createUserId: createUserId,
@@ -59,7 +71,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
               employerId: employerId)
           .then((data) async {
         data.sort((a, b) => b.activityDateTime.compareTo(a.activityDateTime));
-        state = state.copyWith(activities: data, modelState: ModelState.success);
+        state = state.copyWith(activities: [... state.activities,... data], modelState: ModelState.success);
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
