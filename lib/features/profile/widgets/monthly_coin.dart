@@ -65,7 +65,7 @@ class _MonthlyCoinsState extends State<MonthlyCoins> with TickerProviderStateMix
                     controller: _controller,
                     autostart: Autostart.loop,
                     onFetchCompleted: () {
-                      _controller.reset();
+                      // _controller.reset();
                       _controller.forward();
                     },
                     image: AssetImage("assets/img/${"PACE_Coin_Buk_${points}_Spin_540px.gif"}"),

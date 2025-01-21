@@ -91,15 +91,13 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
             var user = await usersRepository.getUserByMyShareId(num.tryParse(field[0]) ?? 0);
             if (!state.goals.any((element) => element.user!.id == user.id)) {
               var goal = num.tryParse(field[6]) ?? 0;
-              var status = num.tryParse(field[5]) ?? 0;
+              // var status = num.tryParse(field[5]) ?? 0;
               GoalModel goalModel = GoalModel(
                   goal: goal, user: user, season: seasons.firstWhere((s) => s.seasonYear == DateTime.now().year));
 
-              var newUser = user.copyWith(baseMyShareCredit: status, currentMyShareCredit: status);
+              // var newUser = user.copyWith(baseMyShareCredit: status, currentMyShareCredit: status);
 
-              await goalRepository
-                  .postGoal(goalModel)
-                  .then((value) async => await usersRepository.updateUser(currentUserProvider.state!.id, newUser));
+              await goalRepository.postGoal(goalModel);
             }
           }
           rowNb++;

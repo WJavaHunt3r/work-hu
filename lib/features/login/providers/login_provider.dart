@@ -44,14 +44,14 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
             await Utils.saveData('password', state.password);
           });
         }
-        clear("", ModelState.success);
+        // clear("", ModelState.success);
+        state = state.copyWith(modelState: ModelState.success);
       } else {
         clear("", ModelState.error);
       }
     } on DioException {
       // if(e.type == DioErrorType.)
-      state = state.copyWith(
-          username: "", password: "", modelState: ModelState.error, message: "login_username_password_error".i18n());
+      state = state.copyWith(modelState: ModelState.error, message: "login_username_password_error".i18n());
     }
   }
 
@@ -103,7 +103,7 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
     }
   }
 
-  void trimUsername(){
+  void trimUsername() {
     usernameController.text = usernameController.text.trim();
   }
 }

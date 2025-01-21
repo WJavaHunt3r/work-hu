@@ -6,7 +6,7 @@ part 'bufe_payments_model.g.dart';
 
 @freezed
 class BufePaymentsModel with _$BufePaymentsModel {
-  const factory BufePaymentsModel({required num userid, required num amount, required DateTime date}) =
+  const factory BufePaymentsModel({required num userid, required String amount, required String date}) =
       _BufePaymentsModel;
 
   factory BufePaymentsModel.fromJson(Map<String, dynamic> json) => _$BufePaymentsModelFromJson(json);

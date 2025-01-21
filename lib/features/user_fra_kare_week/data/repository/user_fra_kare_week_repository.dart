@@ -6,9 +6,10 @@ class UserFraKareWeekRepository {
 
   UserFraKareWeekRepository(this._weekApi);
 
-  Future<List<UserFraKareWeekModel>> getFraKareWeeks({num? userId, num? weekNumber, bool? listened, num? teamId}) async {
+  Future<List<UserFraKareWeekModel>> getFraKareWeeks(
+      {num? userId, num? weekNumber, bool? listened, num? teamId, num? year}) async {
     try {
-      final res = await _weekApi.getUserFraKareWeeks(userId, weekNumber, listened, teamId);
+      final res = await _weekApi.getUserFraKareWeeks(userId, weekNumber, listened, teamId, year);
       return res.map((s) => UserFraKareWeekModel.fromJson(s)).toList();
     } catch (e) {
       rethrow;
