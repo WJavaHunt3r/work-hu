@@ -61,7 +61,7 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
     var userModel = currentUser.state;
 
     if (userModel != null) {
-      await userFraKareWeekRepo.getFraKareWeeks(userId: userModel.id).then((data) {
+      await userFraKareWeekRepo.getFraKareWeeks(userId: userModel.id, year: DateTime.now().year).then((data) {
         data.sort((a, b) => b.fraKareWeek.weekNumber.compareTo(a.fraKareWeek.weekNumber));
         state = state.copyWith(fraKareWeeks: data);
       });
