@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/data/models/account.dart';
-import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/menu_options_list_tile.dart';
-import 'package:work_hu/dukapp.dart';
 
 class AdminLayout extends ConsumerWidget {
   const AdminLayout({super.key});

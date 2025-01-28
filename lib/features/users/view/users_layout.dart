@@ -6,8 +6,6 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/app/widgets/base_search_bar.dart';
-import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 import 'package:work_hu/features/users/widgets/user_details.dart';

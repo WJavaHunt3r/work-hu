@@ -5,7 +5,6 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/mentees/provider/mentees_provider.dart';
 import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
@@ -23,39 +22,52 @@ class MenteesLayout extends ConsumerWidget {
           children: [
             Expanded(
               child: RefreshIndicator(
-                  onRefresh: () async => ref.read(menteesDataProvider.notifier).getMentees(),
+                  onRefresh: () async =>
+                      ref.read(menteesDataProvider.notifier).getMentees(),
                   child: BaseListView(
                       cardBackgroundColor: Colors.transparent,
                       itemBuilder: (context, index) {
                         var current = items[index];
-                        var style = TextStyle(color: current.isOnTrack() ? AppColors.white : AppColors.primary);
+                        var style = TextStyle(
+                            color: current.isOnTrack()
+                                ? AppColors.white
+                                : AppColors.primary);
                         var isLast = items.length - 1 == index;
                         return BaseListTile(
                           isLast: isLast,
                           index: index,
                           onTap: () => showGeneralDialog(
-                              barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                              barrierLabel: MaterialLocalizations.of(context)
+                                  .modalBarrierDismissLabel,
                               barrierColor: AppColors.primary,
-                              transitionDuration: const Duration(milliseconds: 200),
+                              transitionDuration:
+                                  const Duration(milliseconds: 200),
                               context: context,
-                              pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
+                              pageBuilder: (BuildContext context,
+                                  Animation animation,
+                                  Animation secondaryAnimation) {
                                 return MyShareStatusPage(
                                     userGoalRound: UserGoalUserRoundModel(
-                                        user: current.user, goal: current.goal, round: current.round));
+                                        userStatus: current.userStatus,
+                                        round: current.round));
                               }),
                           subtitle: Text(
-                            current.isOnTrack() ? "On Track" : current.getRemainingAmount(),
+                            current.isOnTrack()
+                                ? "On Track"
+                                : current.getRemainingAmount(),
                             style: style,
                           ),
                           title: Text(
-                            current.user.getFullName(),
+                            current.userStatus.user.getFullName(),
                             style: style,
                           ),
                           trailing: Text(
                             current.getStatusString(),
                             style: style.copyWith(fontSize: 15.sp),
                           ),
-                          tileColor: current.isOnTrack() ? AppColors.primary : AppColors.white,
+                          tileColor: current.isOnTrack()
+                              ? AppColors.primary
+                              : AppColors.white,
                         );
                       },
                       itemCount: items.length,

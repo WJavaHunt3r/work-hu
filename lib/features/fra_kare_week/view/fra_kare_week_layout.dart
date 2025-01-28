@@ -6,9 +6,7 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/fra_kare_week/providers/fra_kare_week_provider.dart';
-import 'package:work_hu/features/user_fra_kare_week/provider/user_fra_kare_week_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
 class FraKareWeekLayout extends ConsumerWidget {

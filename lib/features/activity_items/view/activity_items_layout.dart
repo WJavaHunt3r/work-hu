@@ -13,7 +13,7 @@ import 'package:work_hu/features/activity_items/widgets/activity_details_panel.d
 import 'package:work_hu/features/utils.dart';
 
 class ActivityItemsLayout extends BasePage {
-  ActivityItemsLayout(
+  const ActivityItemsLayout(
       {required this.activityId, super.key, super.title = "activity_items_registrations", super.isListView = true});
 
   final num activityId;

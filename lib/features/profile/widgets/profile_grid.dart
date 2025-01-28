@@ -13,19 +13,22 @@ import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
 import 'package:work_hu/features/profile/widgets/info_card.dart';
 import 'package:work_hu/features/user_points/provider/user_points_providers.dart';
+import 'package:work_hu/features/user_status/data/model/user_status_model.dart';
 import 'package:work_hu/features/utils.dart';
 
 class ProfileGrid extends ConsumerWidget {
-  const ProfileGrid({required this.userRoundModel, super.key, required this.goal});
+  const ProfileGrid(
+      {required this.userRoundModel, super.key, required this.userStatus});
 
   final UserRoundModel userRoundModel;
-  final GoalModel? goal;
+  final UserStatusModel? userStatus;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    UserModel? user = goal?.user;
-    var isOnTrack = goal != null && user!.currentMyShareCredit / goal!.goal * 100 >= userRoundModel.round.myShareGoal;
-    var isMonthlyOnTrack = goal != null &&
+    UserModel? user = userStatus?.user;
+    var isOnTrack = userStatus != null &&
+        userStatus!.status * 100 >= userRoundModel.round.myShareGoal;
+    var isMonthlyOnTrack = userStatus != null &&
         userRoundModel.roundMyShareGoal > 0 &&
         userRoundModel.roundCredits >= userRoundModel.roundMyShareGoal;
     return Row(
@@ -42,21 +45,28 @@ class ProfileGrid extends ConsumerWidget {
                           children: [
                             Align(
                               alignment: Alignment.center,
-                              child: goal == null
+                              child: userStatus == null
                                   ? Text("profile_no_goal".i18n())
                                   : Text(
-                                      "${Utils.creditFormat.format(userRoundModel.user.currentMyShareCredit / goal!.goal * 100)}%",
-                                      style: TextStyle(fontSize: 35.sp, fontWeight: FontWeight.w800)),
+                                      "${Utils.creditFormat.format(userStatus!.status * 100)}%",
+                                      style: TextStyle(
+                                          fontSize: 35.sp,
+                                          fontWeight: FontWeight.w800)),
                             ),
                             Align(
                                 alignment: Alignment.topRight,
                                 child: InfoWidget(
-                                  infoText: "profile_myshare_status_info".i18n(),
-                                  shadowColor: ref.watch(themeProvider) == ThemeMode.dark ? AppColors.gray100 : null,
+                                  infoText:
+                                      "profile_myshare_status_info".i18n(),
+                                  shadowColor:
+                                      ref.watch(themeProvider) == ThemeMode.dark
+                                          ? AppColors.gray100
+                                          : null,
                                   iconData: Icons.info_outline,
-                                  iconColor: ref.watch(themeProvider) == ThemeMode.dark
-                                      ? AppColors.primary100
-                                      : AppColors.primary,
+                                  iconColor:
+                                      ref.watch(themeProvider) == ThemeMode.dark
+                                          ? AppColors.primary100
+                                          : AppColors.primary,
                                 )),
                             Align(
                                 alignment: Alignment.topLeft,
@@ -72,20 +82,26 @@ class ProfileGrid extends ConsumerWidget {
                           ],
                         ),
                         Text("profile_myshare_status".i18n(),
-                            style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600)),
+                            style: TextStyle(
+                                fontSize: 10.sp, fontWeight: FontWeight.w600)),
                       ],
                     ),
-                    onTap: () => goal == null
+                    onTap: () => userStatus == null
                         ? null
                         : showGeneralDialog(
-                            barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                            barrierLabel: MaterialLocalizations.of(context)
+                                .modalBarrierDismissLabel,
                             barrierColor: AppColors.primary,
-                            transitionDuration: const Duration(milliseconds: 200),
+                            transitionDuration:
+                                const Duration(milliseconds: 200),
                             context: context,
-                            pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
+                            pageBuilder: (BuildContext context,
+                                Animation animation,
+                                Animation secondaryAnimation) {
                               return MyShareStatusPage(
                                   userGoalRound: UserGoalUserRoundModel(
-                                      user: userRoundModel.user, goal: goal!, round: userRoundModel.round));
+                                      userStatus: userStatus!,
+                                      round: userRoundModel.round));
                             }))
                 : const SizedBox()),
         SizedBox(
@@ -109,8 +125,12 @@ class ProfileGrid extends ConsumerWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(Utils.creditFormatting(userRoundModel.roundCredits),
-                                  style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w800)),
+                              Text(
+                                  Utils.creditFormatting(
+                                      userRoundModel.roundCredits),
+                                  style: TextStyle(
+                                      fontSize: 30.sp,
+                                      fontWeight: FontWeight.w800)),
                             ],
                           )),
                       Align(
@@ -118,9 +138,14 @@ class ProfileGrid extends ConsumerWidget {
                           child: InfoWidget(
                             infoText: "profile_monthly_credits_info".i18n(),
                             iconData: Icons.info_outline,
-                            shadowColor: ref.watch(themeProvider) == ThemeMode.dark ? AppColors.gray100 : null,
+                            shadowColor:
+                                ref.watch(themeProvider) == ThemeMode.dark
+                                    ? AppColors.gray100
+                                    : null,
                             iconColor:
-                                ref.watch(themeProvider) == ThemeMode.dark ? AppColors.primary100 : AppColors.primary,
+                                ref.watch(themeProvider) == ThemeMode.dark
+                                    ? AppColors.primary100
+                                    : AppColors.primary,
                           )),
                       Align(
                           alignment: Alignment.topLeft,
@@ -139,11 +164,16 @@ class ProfileGrid extends ConsumerWidget {
                     children: [
                       Text(
                         "profile_monthly_payments".i18n(),
-                        style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            fontSize: 10.sp, fontWeight: FontWeight.w600),
                       ),
                       Text(
-                        "profile_monthly_payments_from".i18n([Utils.creditFormatting(userRoundModel.roundMyShareGoal)]),
-                        style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600),
+                        "profile_monthly_payments_from".i18n([
+                          Utils.creditFormatting(
+                              userRoundModel.roundMyShareGoal)
+                        ]),
+                        style: TextStyle(
+                            fontSize: 10.sp, fontWeight: FontWeight.w600),
                       )
                     ],
                   ),

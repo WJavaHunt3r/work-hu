@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:work_hu/app/data/models/transaction_type.dart';
-import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
 import 'package:work_hu/features/utils.dart';

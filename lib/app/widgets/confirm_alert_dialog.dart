@@ -28,7 +28,7 @@ class ConfirmAlertDialog extends StatelessWidget {
               onPressed: () => context.pop(),
               child: Text(
                 "cancel".i18n(),
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               )),
           TextButton(
               onPressed: onConfirm,

@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +74,7 @@ class StatusView extends ConsumerWidget {
 
     list.add(Column(
       children: [
-        Text("PACE", style: TextStyle(fontFamily: "Good-Timing", fontWeight: FontWeight.bold, fontSize: 35)),
+        const Text("PACE", style: TextStyle(fontFamily: "Good-Timing", fontWeight: FontWeight.bold, fontSize: 35)),
         Expanded(
           child: Row(
             children: [

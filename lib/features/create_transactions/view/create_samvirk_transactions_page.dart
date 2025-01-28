@@ -7,7 +7,7 @@ import 'package:work_hu/features/create_transactions/providers/create_transactio
 import 'package:work_hu/features/create_transactions/view/create_transactions_layout.dart';
 
 class CreateSamvirkTransactionPage extends BasePage {
-  CreateSamvirkTransactionPage({super.key, super.title = "admin_samvirk_credit"});
+  const CreateSamvirkTransactionPage({super.key, super.title = "admin_samvirk_credit"});
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {

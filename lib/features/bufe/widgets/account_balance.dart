@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:work_hu/features/utils.dart';
 
 class AccountBalance extends StatelessWidget {
   const AccountBalance({super.key, required this.name, required this.balance});

@@ -7,7 +7,7 @@ import 'package:work_hu/features/create_transactions/providers/create_transactio
 import 'package:work_hu/features/create_transactions/view/create_transactions_layout.dart';
 
 class CreateTransactionPage extends BasePage {
-  CreateTransactionPage({super.key, super.title = "admin_myshare_credits"});
+  const CreateTransactionPage({super.key, super.title = "admin_myshare_credits"});
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {

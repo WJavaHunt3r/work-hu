@@ -81,7 +81,7 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
             suffixIcon: widget.isPasswordField
                 ? IconButton(
                     onPressed: () => obscuredChanged(),
-                    icon: _isObscured ? Icon(Icons.visibility) : Icon(Icons.visibility_off))
+                    icon: _isObscured ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off))
                 : null),
         onChanged: widget.onChanged != null ? (String text) => widget.onChanged!(text) : null,
         onFieldSubmitted: widget.onFieldSubmitted != null ? (String text) => widget.onFieldSubmitted!(text) : null,

@@ -3,7 +3,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_web_frame/flutter_web_frame.dart';
-import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/providers/router_provider.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
@@ -11,7 +10,7 @@ import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/style/app_style.dart';
 
 class DukApp extends ConsumerWidget {
-  DukApp({super.key});
+  const DukApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,8 +50,8 @@ class DukApp extends ConsumerWidget {
       themeMode: ref.watch(themeProvider),
       routerConfig: router,
       supportedLocales: const [
-        const Locale('en', 'US'),
-        const Locale('hu', 'HU'),
+        Locale('en', 'US'),
+        Locale('hu', 'HU'),
       ],
       locale: const Locale('hu', 'HU'),
       localizationsDelegates: [

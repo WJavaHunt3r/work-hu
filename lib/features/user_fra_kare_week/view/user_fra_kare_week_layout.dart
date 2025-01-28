@@ -55,7 +55,7 @@ class UserFraKareWeekLayout extends ConsumerWidget {
                 index: index,
               );
             },
-            children: [],
+            children: const [],
           )),
           Row(
             children: [

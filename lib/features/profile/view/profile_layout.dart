@@ -38,70 +38,99 @@ class ProfileLayout extends ConsumerWidget {
                 shrinkWrap: true,
                 children: [
                   const ProfileHeader(),
-                  ref.watch(profileDataProvider).userGoal == null || ref.watch(profileDataProvider).userRounds.isEmpty
+                  ref.watch(profileDataProvider).userStatus == null ||
+                          ref.watch(profileDataProvider).userRounds.isEmpty
                       ? const SizedBox()
-                      : ref.watch(profileDataProvider).modelState == ModelState.processing
+                      : ref.watch(profileDataProvider).modelState ==
+                              ModelState.processing
                           ? const Center(child: CircularProgressIndicator())
                           : ProfileTabView(
-                              userRounds: userRounds, key: key, goal: ref.watch(profileDataProvider).userGoal),
-                  ref.watch(profileDataProvider).childrenGoals.isEmpty
-                      ? SizedBox()
+                              userRounds: userRounds,
+                              key: key,
+                              userStatus:
+                                  ref.watch(profileDataProvider).userStatus),
+                  ref.watch(profileDataProvider).childrenStatus.isEmpty
+                      ? const SizedBox()
                       : Column(children: [
-                          for (var child in ref.watch(profileDataProvider).childrenGoals)
+                          for (var child
+                              in ref.watch(profileDataProvider).childrenStatus)
                             Padding(
                               padding: EdgeInsets.only(bottom: 8.sp),
                               child: ProfileTabView(
                                   userRounds: ref
                                       .watch(profileDataProvider)
                                       .childrenUserRounds
-                                      .where((ur) => ur.user.id == child.user!.id)
+                                      .where(
+                                          (ur) => ur.user.id == child.user.id)
                                       .toList(),
                                   key: key,
-                                  titleText: child.user!.getFullName(),
-                                  goal: ref
+                                  titleText: child.user.getFullName(),
+                                  userStatus: ref
                                       .watch(profileDataProvider)
-                                      .childrenGoals
-                                      .firstWhere((g) => g.user!.id == child.user!.id)),
+                                      .childrenStatus
+                                      .firstWhere(
+                                          (g) => g.user.id == child.user.id)),
                             )
                         ]),
-                  ref.watch(profileDataProvider).userGoal == null
+                  ref.watch(profileDataProvider).userStatus == null
                       ? const SizedBox()
                       : MonthlyCoins(roundPoints: roundPoints),
-                  ref.watch(profileDataProvider).fraKareWeeks.isEmpty ? const SizedBox() : FraKareStreak(),
+                  ref.watch(profileDataProvider).fraKareWeeks.isEmpty
+                      ? const SizedBox()
+                      : const FraKareStreak(),
                   Column(
                     children: [
                       if (user.bufeId != null)
                         MenuOptionsListTile(
-                            title: "profile_bufe_title".i18n([user.getFullName()]),
+                            title:
+                                "profile_bufe_title".i18n([user.getFullName()]),
                             onTap: () {
-                              ref.read(bufeDataProvider.notifier).getAccounts(user.bufeId!);
+                              ref
+                                  .read(bufeDataProvider.notifier)
+                                  .getAccounts(user.bufeId!);
                               context.push("/profile/bufe");
                             }),
                       if (ref.watch(profileDataProvider).spouse?.bufeId != null)
                         MenuOptionsListTile(
-                            title: "profile_bufe_title".i18n([ref.watch(profileDataProvider).spouse!.getFullName()]),
-                            onTap: () {
+                            title: "profile_bufe_title".i18n([
                               ref
-                                  .read(bufeDataProvider.notifier)
-                                  .getAccounts(ref.read(profileDataProvider).spouse!.bufeId!);
+                                  .watch(profileDataProvider)
+                                  .spouse!
+                                  .getFullName()
+                            ]),
+                            onTap: () {
+                              ref.read(bufeDataProvider.notifier).getAccounts(
+                                  ref
+                                      .read(profileDataProvider)
+                                      .spouse!
+                                      .bufeId!);
                               context.push("/profile/bufe");
                             }),
                       for (var child in ref.watch(profileDataProvider).children)
                         if (child.bufeId != null)
                           MenuOptionsListTile(
-                              title: "profile_bufe_title".i18n([child.getFullName()]),
+                              title: "profile_bufe_title"
+                                  .i18n([child.getFullName()]),
                               onTap: () {
-                                ref.read(bufeDataProvider.notifier).getAccounts(child.bufeId!);
+                                ref
+                                    .read(bufeDataProvider.notifier)
+                                    .getAccounts(child.bufeId!);
                                 context.push("/profile/bufe");
                               }),
                       MenuOptionsListTile(
                           title: "profile_details_title".i18n(),
                           onTap: () => showGeneralDialog(
-                              barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-                              barrierColor: context.isDarkMode ? AppColors.primary100 : AppColors.primary,
-                              transitionDuration: const Duration(milliseconds: 200),
+                              barrierLabel: MaterialLocalizations.of(context)
+                                  .modalBarrierDismissLabel,
+                              barrierColor: context.isDarkMode
+                                  ? AppColors.primary100
+                                  : AppColors.primary,
+                              transitionDuration:
+                                  const Duration(milliseconds: 200),
                               context: context,
-                              pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
+                              pageBuilder: (BuildContext context,
+                                  Animation animation,
+                                  Animation secondaryAnimation) {
                                 return UserDetails(
                                   user: user,
                                   enabled: false,
@@ -109,11 +138,13 @@ class ProfileLayout extends ConsumerWidget {
                               })),
                       user.isMentor()
                           ? MenuOptionsListTile(
-                              title: "profile_mentees_title".i18n(), onTap: () => context.push("/mentees"))
+                              title: "profile_mentees_title".i18n(),
+                              onTap: () => context.push("/mentees"))
                           : const SizedBox(),
                       user.isMentor()
                           ? MenuOptionsListTile(
-                              title: "profile_activities_title".i18n(), onTap: () => context.push("/activities"))
+                              title: "profile_activities_title".i18n(),
+                              onTap: () => context.push("/activities"))
                           : const SizedBox(),
                     ],
                   ),
@@ -130,7 +161,9 @@ class ProfileLayout extends ConsumerWidget {
                               context: context,
                               builder: (context) => ConfirmAlertDialog(
                                   onConfirm: () {
-                                    ref.read(profileDataProvider.notifier).logout();
+                                    ref
+                                        .read(profileDataProvider.notifier)
+                                        .logout();
                                     context.pop();
                                     context.replace("/");
                                   },
@@ -144,10 +177,15 @@ class ProfileLayout extends ConsumerWidget {
                           // side: WidgetStateBorderSide.resolveWith(
                           //   (states) => BorderSide(color: AppColors.primary, width: 2.sp),
                           // ),
-                          backgroundColor: WidgetStateColor.resolveWith((states) =>
-                              ref.watch(themeProvider) == ThemeMode.dark ? Colors.black : AppColors.backgroundColor),
+                          backgroundColor: WidgetStateColor.resolveWith(
+                              (states) =>
+                                  ref.watch(themeProvider) == ThemeMode.dark
+                                      ? Colors.black
+                                      : AppColors.backgroundColor),
                         ),
-                        child: Text("profile_logout".i18n(), style: const TextStyle(fontWeight: FontWeight.w800))),
+                        child: Text("profile_logout".i18n(),
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w800))),
                   ))
                 ],
               )
@@ -156,6 +194,8 @@ class ProfileLayout extends ConsumerWidget {
   }
 
   isOnTrack(GoalModel? goal, UserRoundModel userRound) {
-    return goal != null && userRound.user.currentMyShareCredit / goal.goal * 100 > userRound.round.myShareGoal;
+    return goal != null &&
+        userRound.user.currentMyShareCredit / goal.goal * 100 >
+            userRound.round.myShareGoal;
   }
 }

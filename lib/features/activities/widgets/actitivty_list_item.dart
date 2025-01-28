@@ -8,7 +8,6 @@ import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
-import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 import 'package:work_hu/features/activities/providers/avtivity_provider.dart';
 import 'package:work_hu/features/utils.dart';

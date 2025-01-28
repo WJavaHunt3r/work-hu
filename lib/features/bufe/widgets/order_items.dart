@@ -48,7 +48,7 @@ class OrderItems extends BasePage {
           ),
         ),
         ref.watch(bufeDataProvider).modelState == ModelState.processing
-            ? CircularProgressIndicator()
+            ? const CircularProgressIndicator()
             : BaseListView(
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
@@ -60,7 +60,7 @@ class OrderItems extends BasePage {
                   );
                 },
                 itemCount: items.length,
-                children: [],
+                children: const [],
               ),
       ],
     );

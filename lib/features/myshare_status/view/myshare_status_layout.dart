@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
-import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/utils.dart';
 
@@ -13,14 +12,15 @@ class MyShareStatusLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var userGoal = userGoalRound.goal;
-    var user = userGoalRound.user;
+    var userStatusModel = userGoalRound.userStatus;
+    var user = userGoalRound.userStatus.user;
 
     var currentRound = userGoalRound.round;
-    var userStatus = user.currentMyShareCredit / userGoal.goal * 100;
+    var userStatus = userStatusModel.status * 100;
     var isOnTrack = userGoalRound.isOnTrack();
-    var toOnTrack =
-        Utils.creditFormatting((userGoal.goal) * (currentRound.myShareGoal) / 100 - user.currentMyShareCredit);
+    var toOnTrack = Utils.creditFormatting(
+        (userStatusModel.goal) * (currentRound.myShareGoal) / 100 -
+            user.currentMyShareCredit);
     return Column(children: [
       Padding(
           padding: EdgeInsets.symmetric(vertical: 12.sp),
@@ -33,8 +33,9 @@ class MyShareStatusLayout extends StatelessWidget {
         axes: [
           RadialAxis(
             minimum: 0,
-            maximum: userGoal.goal.toDouble(),
-            axisLineStyle: AxisLineStyle(thickness: 15.sp, cornerStyle: CornerStyle.bothCurve),
+            maximum: userStatusModel.goal.toDouble(),
+            axisLineStyle: AxisLineStyle(
+                thickness: 15.sp, cornerStyle: CornerStyle.bothCurve),
             showLabels: false,
             showTicks: false,
             pointers: [
@@ -45,7 +46,8 @@ class MyShareStatusLayout extends StatelessWidget {
                 width: 15.sp,
               ),
               MarkerPointer(
-                value: (currentRound.myShareGoal) / 100 * (userGoal.goal),
+                value:
+                    (currentRound.myShareGoal) / 100 * (userStatusModel.goal),
               )
             ],
             annotations: [
@@ -57,15 +59,19 @@ class MyShareStatusLayout extends StatelessWidget {
                 children: [
                   Text(
                     "${Utils.percentFormat.format(userStatus)} %",
-                    style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w800),
+                    style:
+                        TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w800),
                   ),
                   Text(
-                    "${Utils.creditFormatting(user.currentMyShareCredit)} Ft",
-                    style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800),
+                    "${Utils.creditFormatting(userStatusModel.transactions)} Ft",
+                    style:
+                        TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800),
                   ),
                   Text(
-                    "myshare_status_goal".i18n([Utils.creditFormatting(userGoal.goal)]),
-                    style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800),
+                    "myshare_status_goal"
+                        .i18n([Utils.creditFormatting(userStatusModel.goal)]),
+                    style:
+                        TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800),
                   ),
                 ],
               ))

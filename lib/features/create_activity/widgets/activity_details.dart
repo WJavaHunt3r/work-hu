@@ -117,7 +117,7 @@ class ActivityDetails extends ConsumerWidget {
                         onChanged: (value) =>
                             value != null ? ref.watch(createActivityDataProvider.notifier).updateAccount(value) : null),
                   )
-                : SizedBox(),
+                : const SizedBox(),
             ref.watch(createActivityDataProvider).description.isEmpty
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,

@@ -13,7 +13,7 @@ import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
 class HomePage extends MainScreen {
-  HomePage(
+  const HomePage(
       {super.key,
       super.title = "",
       // super.centerTitle = true,

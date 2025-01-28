@@ -1,5 +1,4 @@
 import 'package:work_hu/app/locator.dart';
-import 'package:work_hu/features/user_fra_kare_week/data/model/user_fra_kare_week_model.dart';
 
 import '../../../../api/dio_client.dart';
 

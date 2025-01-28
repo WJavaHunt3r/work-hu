@@ -5,7 +5,6 @@ import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activity_items/data/repository/activity_items_repository.dart';
 import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/rounds/data/repository/round_repository.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';

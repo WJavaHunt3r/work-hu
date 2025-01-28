@@ -20,8 +20,7 @@ class UserStatusLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var userRounds = ref.watch(userStatusDataProvider).userRounds;
-    var goals = ref.watch(userStatusDataProvider).goals;
+    var userStatuses = ref.watch(userStatusDataProvider).userStatuses;
     var currentRound = ref.watch(userStatusDataProvider).currentRound;
     var currentRoundGoal = currentRound == null ? 0 : currentRound.myShareGoal;
     return Stack(
@@ -43,7 +42,9 @@ class UserStatusLayout extends ConsumerWidget {
                           ),
                         ),
                         MaterialButton(
-                          onPressed: () => ref.watch(userStatusDataProvider.notifier).recalculate(),
+                          onPressed: () => ref
+                              .watch(userStatusDataProvider.notifier)
+                              .recalculate(),
                           child: const Icon(Icons.refresh_outlined),
                         )
                       ],
@@ -64,64 +65,64 @@ class UserStatusLayout extends ConsumerWidget {
                     ),
                   ),
                   Text(
-                      "${ref.watch(userStatusDataProvider).userRounds.where((e) => e.roundCoins >= 50).length} / ${userRounds.length.toString()}")
+                      "${ref.watch(userStatusDataProvider).userStatuses.where((e) => e.status * 100 >= (ref.watch(userStatusDataProvider).currentRound?.myShareGoal ?? 0)).length} / ${userStatuses.length.toString()}")
                 ],
               ),
             ),
             Expanded(
               child: BaseListView(
-                itemCount: userRounds.length,
+                itemCount: userStatuses.length,
                 itemBuilder: (BuildContext context, int index) {
-                  var userRound = userRounds[index];
-                  var currentUser = userRound.user;
-                  var currentUserGoal = goals.where((g) => g.user!.id == currentUser.id).isEmpty
-                      ? null
-                      : goals.firstWhere((g) => g.user!.id == currentUser.id);
+                  var currentUserStatus = userStatuses[index];
+                  var currentUser = currentUserStatus.user;
 
-                  var currentGoal = currentUserGoal?.goal ?? 0;
-                  var userStatus = currentUser.currentMyShareCredit / currentGoal * 100;
+                  var currentGoal = currentUserStatus.goal;
+                  var userStatus = currentUserStatus.status * 100;
 
-                  var toOnTrack = currentGoal * currentRoundGoal / 100 - currentUser.currentMyShareCredit;
+                  var toOnTrack = currentGoal * currentRoundGoal / 100 -
+                      currentUserStatus.transactions;
 
                   var style = TextStyle(
-                      color: userStatus >= currentRoundGoal || userRound.roundCredits >= userRound.roundMyShareGoal
+                      color: userStatus >= currentRoundGoal
                           ? AppColors.white
                           : null);
 
-                  var isLast = index == userRounds.length - 1;
+                  var isLast = index == userStatuses.length - 1;
                   return BaseListTile(
                     isLast: isLast,
                     index: index,
                     onTap: () => showGeneralDialog(
-                        barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+                        barrierLabel: MaterialLocalizations.of(context)
+                            .modalBarrierDismissLabel,
                         barrierColor: AppColors.primary,
                         transitionDuration: const Duration(milliseconds: 200),
                         context: context,
-                        pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
+                        pageBuilder: (BuildContext context, Animation animation,
+                            Animation secondaryAnimation) {
                           return MyShareStatusPage(
                               userGoalRound: UserGoalUserRoundModel(
-                                  user: currentUser, goal: currentUserGoal!, round: currentRound!));
+                                  userStatus: currentUserStatus,
+                                  round: currentRound!));
                         }),
                     minVerticalPadding: 0,
                     title: Text(
-                      "${currentUser.getFullName()} (${userRound.roundCredits} / ${userRound.roundMyShareGoal})",
+                      "${currentUser.getFullName()} ",
                       style: style,
                     ),
-                    subtitle: userStatus >= currentRoundGoal || userRound.roundCredits >= userRound.roundMyShareGoal
+                    subtitle: userStatus >= currentRoundGoal
                         ? const Text(
                             "On Track",
                             style: TextStyle(color: AppColors.white),
                           )
-                        : Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(toOnTrack)])),
+                        : Text("myshare_status_to_be_ontrack_short"
+                            .i18n([Utils.creditFormatting(toOnTrack)])),
                     trailing: Text(
                       "${Utils.percentFormat.format(userStatus)}%",
                       style: style.copyWith(fontSize: 15.sp),
                     ),
-                    tileColor: userRound.roundCredits >= userRound.roundMyShareGoal
+                    tileColor: userStatus >= currentRoundGoal
                         ? AppColors.primary
-                        : userStatus >= currentRoundGoal
-                            ? Colors.grey
-                            : null,
+                        : null,
                   );
                 },
                 children: const [],
@@ -140,13 +141,16 @@ class UserStatusLayout extends ConsumerWidget {
 
   List<Widget> createTeamFilterChips(BuildContext context, WidgetRef ref) {
     List<Widget> chips = [];
-    for (var team in ref.watch(teamRoundDataProvider).teams.map((e) => e.team).toSet()) {
-      bool isSelected = ref.watch(userStatusDataProvider).selectedTeamId == team.id;
+    for (var team
+        in ref.watch(teamRoundDataProvider).teams.map((e) => e.team).toSet()) {
+      bool isSelected =
+          ref.watch(userStatusDataProvider).selectedTeamId == team.id;
       chips.add(BaseFilterChip(
           isSelected: isSelected,
           title: team.teamName,
-          onSelected: (bool selected) =>
-              ref.watch(userStatusDataProvider.notifier).setSelectedFilter(selected ? team : null)));
+          onSelected: (bool selected) => ref
+              .watch(userStatusDataProvider.notifier)
+              .setSelectedFilter(selected ? team : null)));
     }
     return chips;
   }
@@ -155,18 +159,21 @@ class UserStatusLayout extends ConsumerWidget {
     List<Widget> chips = [];
 
     chips.add(BaseFilterChip(
-      isSelected: ref.watch(userStatusDataProvider).selectedOrderType == OrderByType.NAME,
+      isSelected: ref.watch(userStatusDataProvider).selectedOrderType ==
+          OrderByType.NAME,
       title: "myshare_status_name".i18n(),
       onSelected: (bool selected) => ref
           .watch(userStatusDataProvider.notifier)
           .setSelectedOrderType(selected ? OrderByType.NAME : OrderByType.NONE),
     ));
     chips.add(BaseFilterChip(
-      isSelected: ref.watch(userStatusDataProvider).selectedOrderType == OrderByType.STATUS,
+      isSelected: ref.watch(userStatusDataProvider).selectedOrderType ==
+          OrderByType.STATUS,
       title: "myshare_status_status".i18n(),
       onSelected: (bool selected) => ref
           .watch(userStatusDataProvider.notifier)
-          .setSelectedOrderType(selected ? OrderByType.STATUS : OrderByType.NONE),
+          .setSelectedOrderType(
+              selected ? OrderByType.STATUS : OrderByType.NONE),
     ));
     return chips;
   }

@@ -9,7 +9,6 @@ import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
-import 'package:work_hu/app/widgets/list_card.dart';
 import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 

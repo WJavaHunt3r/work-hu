@@ -16,20 +16,39 @@ import 'package:work_hu/features/user_status/data/state/user_status_state.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 
-final userStatusDataProvider = StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>((ref) =>
-    UserStatusDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider), ref.read(goalRepoProvider),
-        ref.read(userRoundsRepoProvider), ref.watch(roundRepoProvider), ref.watch(teamRepoProvider)));
+import '../data/api/user_status_api.dart';
+import '../data/repository/user_status_repository.dart';
+
+final userStatusApiProvider = Provider<UserStatusApi>((ref) => UserStatusApi());
+
+final userStatusRepoProvider = Provider<UserStatusRepository>(
+    (ref) => UserStatusRepository(ref.read(userStatusApiProvider)));
+
+final userStatusDataProvider =
+    StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>(
+        (ref) => UserStatusDataNotifier(
+            ref.read(usersRepoProvider),
+            ref.read(userDataProvider),
+            ref.read(userStatusRepoProvider),
+            ref.read(userRoundsRepoProvider),
+            ref.watch(roundRepoProvider),
+            ref.watch(teamRepoProvider)));
 
 class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
-  UserStatusDataNotifier(this.usersRepository, this.currentUser, this.goalRepoProvider, this.userRoundRepoProvider,
-      this.roundRepoProvider, this.teamRoundRepoProvider)
+  UserStatusDataNotifier(
+      this.usersRepository,
+      this.currentUser,
+      this.userStatusRepoProvider,
+      this.userRoundRepoProvider,
+      this.roundRepoProvider,
+      this.teamRoundRepoProvider)
       : super(const UserStatusState()) {
     getUsers();
   }
 
   final UsersRepository usersRepository;
   final UserModel? currentUser;
-  final GoalRepository goalRepoProvider;
+  final UserStatusRepository userStatusRepoProvider;
   final UserRoundRepository userRoundRepoProvider;
   final RoundRepository roundRepoProvider;
   final TeamRoundRepository teamRoundRepoProvider;
@@ -37,24 +56,31 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   Future<void> getUsers([TeamModel? team]) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      if (state.currentRound == null || state.goals.isEmpty) {
-        await getGoalsAndCurrentRound();
+      if (state.currentRound == null || state.userStatuses.isEmpty) {
+        await getUserStatusesAndCurrentRound();
       }
 
-      var queryTeam = currentUser!.role == Role.ADMIN ? team : currentUser!.paceTeam;
-      var userRounds =
-          await userRoundRepoProvider.fetchUserRounds(roundId: state.currentRound?.id, paceTeam: queryTeam?.id);
-      state = state.copyWith(userRounds: userRounds, modelState: ModelState.success);
+      var queryTeam =
+          currentUser!.role == Role.ADMIN ? team : currentUser!.paceTeam;
+      // var userRounds = await userRoundRepoProvider.fetchUserRounds(
+      //     roundId: state.currentRound?.id, paceTeam: queryTeam?.id);
+      // state = state.copyWith(
+      //     userRounds: userRounds, modelState: ModelState.success);
       orderUsers();
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
   }
 
-  Future<void> getGoalsAndCurrentRound() async {
-    var goals = await goalRepoProvider.getGoals(DateTime.now().year);
+  Future<void> getUserStatusesAndCurrentRound() async {
+    var userStatuses = await userStatusRepoProvider.getUserStatuses(
+        DateTime.now().year,
+        state.selectedTeamId == 0 ? null : state.selectedTeamId);
     var round = await roundRepoProvider.getCurrentRounds();
-    state = state.copyWith(goals: goals, currentRound: round);
+    state = state.copyWith(
+        userStatuses: userStatuses,
+        currentRound: round,
+        modelState: ModelState.success);
   }
 
   setSelectedFilter(TeamModel? team) {
@@ -68,15 +94,15 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   }
 
   orderUsers() {
-    var sorted = state.userRounds.toList();
+    var sorted = state.userStatuses.toList();
     if (state.selectedOrderType == OrderByType.NAME) {
-      sorted.sort((a, b) => (a.user.getFullName()).compareTo(b.user.getFullName()));
+      sorted.sort(
+          (a, b) => (a.user.getFullName()).compareTo(b.user.getFullName()));
     } else if (state.selectedOrderType == OrderByType.STATUS) {
-      sorted.sort((a, b) => (a.user.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == a.user.id).goal)
-          .compareTo(b.user.currentMyShareCredit / state.goals.firstWhere((g) => g.user?.id == b.user.id).goal));
+      sorted.sort((a, b) => (a.status.compareTo(b.status)));
     }
 
-    state = state.copyWith(userRounds: sorted);
+    state = state.copyWith(userStatuses: sorted);
   }
 
   Future<void> recalculate() async {
@@ -86,7 +112,8 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
       state = state.copyWith(modelState: ModelState.success);
       getUsers();
     } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: "Hiba lépett fel!");
+      state = state.copyWith(
+          modelState: ModelState.error, message: "Hiba lépett fel!");
     }
   }
 }

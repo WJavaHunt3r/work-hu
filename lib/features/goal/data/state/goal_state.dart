@@ -2,7 +2,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/features/goal/data/model/goal_model.dart';
-import 'package:work_hu/features/goal/widgets/goals_maintenance.dart';
 
 part 'goal_state.freezed.dart';
 

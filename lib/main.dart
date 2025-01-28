@@ -18,7 +18,7 @@ void main() async {
   await setupLocator();
   usePathUrlStrategy();
   GoRouter.optionURLReflectsImperativeAPIs = true;
-  runApp(ProviderScope(child: OverlaySupport.global(child: DukApp())));
+  runApp(const ProviderScope(child: OverlaySupport.global(child: DukApp())));
 }
 
 class MyHttpOverrides extends HttpOverrides {

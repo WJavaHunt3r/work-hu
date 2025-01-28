@@ -1,11 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
-import 'package:work_hu/dukapp.dart';
 import 'package:work_hu/features/login/data/api/login_api.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/login/data/repository/login_repository.dart';
@@ -93,7 +91,7 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
       await loginRepository.sendNewPassword(state.username);
       state = state.copyWith(
           modelState: ModelState.success, resetState: ModelState.success, message: "Új jelszó emailben elküldve");
-    } on DioException catch (e) {
+    } on DioException {
       usernameController.text = "";
       passwordController.text = "";
       state = state.copyWith(

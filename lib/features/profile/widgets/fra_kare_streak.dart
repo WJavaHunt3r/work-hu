@@ -5,6 +5,8 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
 
 class FraKareStreak extends ConsumerWidget {
+  const FraKareStreak({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
