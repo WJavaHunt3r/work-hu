@@ -8,13 +8,15 @@ import 'package:work_hu/features/login/data/repository/login_repository.dart';
 import 'package:work_hu/features/login/providers/login_provider.dart';
 import 'package:work_hu/features/profile/data/repository/user_round_repository.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
+import 'package:work_hu/features/teams/data/repository/teams_repository.dart';
+import 'package:work_hu/features/teams/provider/teams_provider.dart';
 
 final teamApiProvider = Provider<TeamRoundApi>((ref) => TeamRoundApi());
 
 final teamRepoProvider = Provider<TeamRoundRepository>((ref) => TeamRoundRepository(ref.read(teamApiProvider)));
 
 final teamRoundDataProvider = StateNotifierProvider.autoDispose<TeamRoundDataNotifier, TeamRoundState>((ref) =>
-    TeamRoundDataNotifier(ref.read(teamRepoProvider), ref.read(loginDataProvider.notifier), ref.read(loginRepoProvider),
+    TeamRoundDataNotifier(ref.read(teamsRepoProvider), ref.read(loginDataProvider.notifier), ref.read(loginRepoProvider),
         ref.read(userDataProvider.notifier), ref.read(userRoundsRepoProvider)));
 
 class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
@@ -28,7 +30,7 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
     checkLoginCredentials();
   }
 
-  final TeamRoundRepository teamRepository;
+  final TeamRepository teamRepository;
   final LoginDataNotifier read;
   final LoginRepository loginRepository;
   final UserDataNotifier userSessionProvider;
@@ -37,11 +39,10 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
   Future<void> getTeamRounds() async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await teamRepository.fetchTeamRounds().then((data) async {
-        data.sort((a, b) => a.round.roundNumber.compareTo(b.round.roundNumber));
+      await teamRepository.fetchTeams().then((data) async {
         // data.sort((prev, next) => next.teamPoints.compareTo(prev.teamPoints));
         state = state.copyWith(
-            teams: data.where((element) => element.round.startDateTime.compareTo(DateTime.now()) < 0).toList(),
+            teams: data,
             modelState: ModelState.success);
       });
     } catch (e) {

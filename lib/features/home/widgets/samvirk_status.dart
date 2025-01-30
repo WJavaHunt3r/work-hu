@@ -22,13 +22,13 @@ class SamvirkStatus extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var currentTeamRounds =
-        ref.watch(teamRoundDataProvider).teams.where((element) => element.round.roundNumber == currentRoundNumber);
-    var samvirkStatus = currentTeamRounds.isEmpty
-        ? 0.0
-        : ref.watch(teamRoundDataProvider).teams.where((element) => element.round == currentTeamRounds.first.round);
-    RoundModel? currentRound = currentTeamRounds.isEmpty ? null : currentTeamRounds.first.round;
-    var maximum = currentTeamRounds.isEmpty ? 10.0 : currentTeamRounds.first.round.samvirkChurchGoal.toDouble();
+    // var currentTeamRounds =
+    //     ref.watch(teamRoundDataProvider).teams.where((element) => element.round.roundNumber == currentRoundNumber);
+    // var samvirkStatus = currentTeamRounds.isEmpty
+    //     ? 0.0
+    //     : ref.watch(teamRoundDataProvider).teams.where((element) => element.round == currentTeamRounds.first.round);
+    // RoundModel? currentRound = currentTeamRounds.isEmpty ? null : currentTeamRounds.first.round;
+    var maximum = 10.0  ;//currentTeamRounds.isEmpty ? 10.0 : currentTeamRounds.first.round.samvirkChurchGoal.toDouble();
     return Padding(
         padding: EdgeInsets.only(bottom: 8.sp),
         child: Card(
@@ -80,8 +80,8 @@ class SamvirkStatus extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(currentRound != null ? Utils.dateToString(currentRound.startDateTime) : ""),
-                    Text(currentRound != null ? Utils.dateToString(currentRound.endDateTime) : ""),
+                    // Text(currentRound != null ? Utils.dateToString(currentRound.startDateTime) : ""),
+                    // Text(currentRound != null ? Utils.dateToString(currentRound.endDateTime) : ""),
                   ],
                 )
               ])),

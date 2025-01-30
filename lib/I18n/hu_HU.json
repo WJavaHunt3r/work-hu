@@ -91,7 +91,7 @@
   "user_points_waiting_for_approval": "Beírásra vár",
   "profile_no_goal": "Nincs cél beállítva",
   "profile_myshare_status": "MyShare Státusz",
-  "profile_points": "Pontok",
+  "profile_points": "Pontjaid",
   "profile_samvirk_payments": "Samvirk befizetések",
   "profile_title": "Fiókom",
   "profile_logout": "Kijelentkezés",
@@ -147,6 +147,7 @@
   "login_reset_password_username_title": "Hiányzó felhasználónév",
   "login_username_password_error": "Hibás felhasználónév vagy jelszó",
   "home_medals": "Érmek",
+  "home_pace_2": "PACE 2.0",
   "mentees_title": "Mentoráltak",
   "user_fra_fare_week_save_question": "Biztosan mented a módosításokat?",
   "user_fra_fare_week_save": "Mentés"

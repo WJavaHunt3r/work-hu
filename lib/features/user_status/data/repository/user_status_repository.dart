@@ -1,6 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:work_hu/features/user_camps/data/api/user_camp_api.dart';
-import 'package:work_hu/features/user_camps/data/model/user_camp_model.dart';
 
 import '../api/user_status_api.dart';
 import '../model/user_status_model.dart';

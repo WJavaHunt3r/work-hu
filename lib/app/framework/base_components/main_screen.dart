@@ -110,7 +110,7 @@ abstract class MainScreen extends BasePage {
     UserModel? currentUser = ref.watch(userDataProvider);
 
     return currentUser != null && !currentUser.isUser()
-        ? FloatingActionButtonLocation.centerFloat
+        ? FloatingActionButtonLocation.endFloat
         : FloatingActionButtonLocation.centerDocked;
   }
 }

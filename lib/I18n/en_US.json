@@ -144,5 +144,6 @@
   "login_reset_password_username_title": "Missing username",
   "login_username_password_error": "Wrong username or password",
   "home_medals": "Medals",
-  "mentees_title": "Mentees"
+  "mentees_title": "Mentees",
+  "home_pace_2": "PACE 2.0"
 }

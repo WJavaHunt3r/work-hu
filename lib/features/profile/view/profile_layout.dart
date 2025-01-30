@@ -26,7 +26,7 @@ class ProfileLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var user = ref.watch(userDataProvider);
-    var userRounds = ref.watch(profileDataProvider).userRounds;
+    var currentUserRound = ref.watch(profileDataProvider).currentUserRound;
     var roundPoints = ref.watch(profileDataProvider).roundPoints;
     return user == null
         ? const SizedBox()
@@ -39,16 +39,17 @@ class ProfileLayout extends ConsumerWidget {
                 children: [
                   const ProfileHeader(),
                   ref.watch(profileDataProvider).userStatus == null ||
-                          ref.watch(profileDataProvider).userRounds.isEmpty
+                          ref.watch(profileDataProvider).currentUserRound ==
+                              null
                       ? const SizedBox()
                       : ref.watch(profileDataProvider).modelState ==
                               ModelState.processing
                           ? const Center(child: CircularProgressIndicator())
                           : ProfileTabView(
-                              userRounds: userRounds,
+                              userRound: currentUserRound!,
                               key: key,
                               userStatus:
-                                  ref.watch(profileDataProvider).userStatus),
+                                  ref.watch(profileDataProvider).userStatus!),
                   ref.watch(profileDataProvider).childrenStatus.isEmpty
                       ? const SizedBox()
                       : Column(children: [
@@ -57,12 +58,12 @@ class ProfileLayout extends ConsumerWidget {
                             Padding(
                               padding: EdgeInsets.only(bottom: 8.sp),
                               child: ProfileTabView(
-                                  userRounds: ref
+                                  userRound: ref
                                       .watch(profileDataProvider)
                                       .childrenUserRounds
                                       .where(
                                           (ur) => ur.user.id == child.user.id)
-                                      .toList(),
+                                      .first,
                                   key: key,
                                   titleText: child.user.getFullName(),
                                   userStatus: ref
@@ -72,9 +73,9 @@ class ProfileLayout extends ConsumerWidget {
                                           (g) => g.user.id == child.user.id)),
                             )
                         ]),
-                  ref.watch(profileDataProvider).userStatus == null
-                      ? const SizedBox()
-                      : MonthlyCoins(roundPoints: roundPoints),
+                  SizedBox(
+                    height: 4.sp,
+                  ),
                   ref.watch(profileDataProvider).fraKareWeeks.isEmpty
                       ? const SizedBox()
                       : const FraKareStreak(),
@@ -191,11 +192,5 @@ class ProfileLayout extends ConsumerWidget {
               )
             ],
           );
-  }
-
-  isOnTrack(GoalModel? goal, UserRoundModel userRound) {
-    return goal != null &&
-        userRound.user.currentMyShareCredit / goal.goal * 100 >
-            userRound.round.myShareGoal;
   }
 }

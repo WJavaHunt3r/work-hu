@@ -6,6 +6,7 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/main_screen.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/home/widgets/error_view.dart';
 import 'package:work_hu/features/home/widgets/status_view.dart';
@@ -13,20 +14,19 @@ import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
 class HomePage extends MainScreen {
-  const HomePage(
-      {super.key,
-      super.title = "",
-      // super.centerTitle = true,
-      super.extendBodyBehindAppBar = true})
+  HomePage({super.key, super.title = "home_pace_2", super.centerTitle = true})
       : super(
-          selectedIndex: 0,
-        );
+            selectedIndex: 0,
+            appBarTextStyle: TextStyle(
+                fontSize: 22.sp,
+                fontFamily: "Good-Timing"));
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
     var currentRound = ref.watch(roundDataProvider).rounds.isNotEmpty
         ? ref.watch(roundDataProvider).rounds.firstWhere((element) =>
-            element.startDateTime.compareTo(DateTime.now()) < 0 && element.endDateTime.compareTo(DateTime.now()) > 0)
+            element.startDateTime.compareTo(DateTime.now()) < 0 &&
+            element.endDateTime.compareTo(DateTime.now()) > 0)
         : null;
     return Stack(children: [
       Column(
@@ -37,17 +37,22 @@ class HomePage extends MainScreen {
                   ref.watch(userDataProvider)?.id != 255
               ? Center(
                   child: Text(
-                    "home_status_freeze"
-                        .i18n([Utils.dateToStringWithTime(currentRound.endDateTime.add(const Duration(minutes: 1)))]),
+                    "home_status_freeze".i18n([
+                      Utils.dateToStringWithTime(currentRound.endDateTime
+                          .add(const Duration(minutes: 1)))
+                    ]),
                     textAlign: TextAlign.center,
                   ),
                 )
               : Expanded(
-                  child: ref.watch(teamRoundDataProvider).modelState == ModelState.processing
+                  child: ref.watch(teamRoundDataProvider).modelState ==
+                          ModelState.processing
                       ? const Center(child: CircularProgressIndicator())
-                      : ref.watch(teamRoundDataProvider).modelState == ModelState.error
+                      : ref.watch(teamRoundDataProvider).modelState ==
+                              ModelState.error
                           ? const ErrorView()
-                          : StatusView(teamRounds: ref.watch(teamRoundDataProvider).teams)),
+                          : StatusView(
+                              teams: ref.watch(teamRoundDataProvider).teams)),
         ],
       ),
     ]);
@@ -59,7 +64,8 @@ class HomePage extends MainScreen {
         ? FloatingActionButton(
             elevation: 0,
             onPressed: () => context.push("/createActivity"),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.sp)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25.sp)),
             child: const Icon(Icons.add),
           )
         : null;

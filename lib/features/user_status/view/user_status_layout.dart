@@ -42,9 +42,13 @@ class UserStatusLayout extends ConsumerWidget {
                           ),
                         ),
                         MaterialButton(
-                          onPressed: () => ref
-                              .watch(userStatusDataProvider.notifier)
-                              .recalculate(),
+                          onPressed:
+                              ref.watch(userStatusDataProvider).modelState !=
+                                      ModelState.processing
+                                  ? () => ref
+                                      .watch(userStatusDataProvider.notifier)
+                                      .recalculate()
+                                  : null,
                           child: const Icon(Icons.refresh_outlined),
                         )
                       ],
@@ -106,10 +110,10 @@ class UserStatusLayout extends ConsumerWidget {
                         }),
                     minVerticalPadding: 0,
                     title: Text(
-                      "${currentUser.getFullName()} ",
+                      currentUser.getFullName(),
                       style: style,
                     ),
-                    subtitle: userStatus >= currentRoundGoal
+                    subtitle: currentUserStatus.onTrack
                         ? const Text(
                             "On Track",
                             style: TextStyle(color: AppColors.white),
@@ -120,9 +124,8 @@ class UserStatusLayout extends ConsumerWidget {
                       "${Utils.percentFormat.format(userStatus)}%",
                       style: style.copyWith(fontSize: 15.sp),
                     ),
-                    tileColor: userStatus >= currentRoundGoal
-                        ? AppColors.primary
-                        : null,
+                    tileColor:
+                        currentUserStatus.onTrack ? AppColors.primary : null,
                   );
                 },
                 children: const [],
@@ -141,8 +144,7 @@ class UserStatusLayout extends ConsumerWidget {
 
   List<Widget> createTeamFilterChips(BuildContext context, WidgetRef ref) {
     List<Widget> chips = [];
-    for (var team
-        in ref.watch(teamRoundDataProvider).teams.map((e) => e.team).toSet()) {
+    for (var team in ref.watch(teamRoundDataProvider).teams.toSet()) {
       bool isSelected =
           ref.watch(userStatusDataProvider).selectedTeamId == team.id;
       chips.add(BaseFilterChip(

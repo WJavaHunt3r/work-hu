@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
 import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/user_status/data/model/user_status_model.dart';

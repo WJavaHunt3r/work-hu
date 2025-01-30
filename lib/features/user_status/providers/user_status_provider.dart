@@ -2,8 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
-import 'package:work_hu/features/goal/data/repository/goal_repository.dart';
-import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/home/data/repository/team_round_repository.dart';
 import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -56,12 +54,13 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   Future<void> getUsers([TeamModel? team]) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      if (state.currentRound == null || state.userStatuses.isEmpty) {
-        await getUserStatusesAndCurrentRound();
-      }
-
       var queryTeam =
-          currentUser!.role == Role.ADMIN ? team : currentUser!.paceTeam;
+      currentUser!.role == Role.ADMIN ? team : currentUser!.paceTeam;
+      // if (state.currentRound == null) {
+        await getUserStatusesAndCurrentRound(queryTeam?.id);
+      // }
+
+
       // var userRounds = await userRoundRepoProvider.fetchUserRounds(
       //     roundId: state.currentRound?.id, paceTeam: queryTeam?.id);
       // state = state.copyWith(
@@ -70,12 +69,13 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
+    state = state.copyWith(modelState: ModelState.success);
   }
 
-  Future<void> getUserStatusesAndCurrentRound() async {
+  Future<void> getUserStatusesAndCurrentRound(num? queryTeamId) async {
     var userStatuses = await userStatusRepoProvider.getUserStatuses(
         DateTime.now().year,
-        state.selectedTeamId == 0 ? null : state.selectedTeamId);
+        queryTeamId);
     var round = await roundRepoProvider.getCurrentRounds();
     state = state.copyWith(
         userStatuses: userStatuses,

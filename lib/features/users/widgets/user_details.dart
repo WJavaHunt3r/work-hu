@@ -106,7 +106,7 @@ class UserDetails extends ConsumerWidget {
                               child: BaseTextFormField(
                                   enabled: false,
                                   labelText: "user_details_myshare_credit".i18n(),
-                                  initialValue: Utils.creditFormatting(user.currentMyShareCredit),
+                                  initialValue: Utils.creditFormatting(0),
                                   keyBoardType: TextInputType.number,
                                   onChanged: (String text) => {}),
                             ),

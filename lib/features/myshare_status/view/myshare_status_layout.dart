@@ -5,6 +5,8 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/utils.dart';
 
+import '../../../app/style/app_colors.dart';
+
 class MyShareStatusLayout extends StatelessWidget {
   const MyShareStatusLayout({super.key, required this.userGoalRound});
 
@@ -17,10 +19,10 @@ class MyShareStatusLayout extends StatelessWidget {
 
     var currentRound = userGoalRound.round;
     var userStatus = userStatusModel.status * 100;
-    var isOnTrack = userGoalRound.isOnTrack();
+    var isOnTrack = userStatusModel.onTrack;
     var toOnTrack = Utils.creditFormatting(
         (userStatusModel.goal) * (currentRound.myShareGoal) / 100 -
-            user.currentMyShareCredit);
+            userStatusModel.transactions);
     return Column(children: [
       Padding(
           padding: EdgeInsets.symmetric(vertical: 12.sp),
@@ -40,12 +42,12 @@ class MyShareStatusLayout extends StatelessWidget {
             showTicks: false,
             pointers: [
               RangePointer(
-                value: user.currentMyShareCredit.toDouble(),
+                value: userStatusModel.transactions.toDouble(),
                 cornerStyle: CornerStyle.bothCurve,
-                // color: AppColors.primary,
                 width: 15.sp,
               ),
               MarkerPointer(
+                color: AppColors.teamOrange,
                 value:
                     (currentRound.myShareGoal) / 100 * (userStatusModel.goal),
               )

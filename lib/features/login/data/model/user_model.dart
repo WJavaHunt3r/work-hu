@@ -22,10 +22,12 @@ class UserModel with _$UserModel {
       num? familyId,
       num? spouseId,
       num? phoneNumber,
-        num? bufeId,
+      num? bufeId,
+      required num points,
       String? email}) = _UserModel;
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
 
   const UserModel._();
 

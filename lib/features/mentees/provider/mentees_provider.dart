@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
-import 'package:work_hu/features/goal/data/repository/goal_repository.dart';
-import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/mentees/data/state/mentees_state.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';

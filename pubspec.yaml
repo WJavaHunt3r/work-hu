@@ -14,7 +14,7 @@ dependencies:
     sdk: flutter
   flutter_riverpod: ^2.3.6
   cupertino_icons: ^1.0.2
-  syncfusion_flutter_gauges: ^25.1.35
+  syncfusion_flutter_gauges: ^28.1.35
   dio: ^5.4.1
   overlay_support: ^2.0.0
   get: ^4.6.5
@@ -43,6 +43,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   info_widget: ^1.0.0
   gif: ^2.3.0
+  syncfusion_flutter_charts: ^28.1.33
 
 dev_dependencies:
   flutter_test:

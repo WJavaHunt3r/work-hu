@@ -99,7 +99,7 @@ class UserFraKareWeekLayout extends ConsumerWidget {
 
   List<Widget> createTeamFilterChips(BuildContext context, WidgetRef ref) {
     List<Widget> chips = [];
-    for (var team in ref.watch(teamRoundDataProvider).teams.map((e) => e.team).toSet()) {
+    for (var team in ref.watch(teamRoundDataProvider).teams.toSet()) {
       bool isSelected = ref.watch(userFraKareWeekDataProvider).selectedTeamId == team.id;
       chips.add(BaseFilterChip(
           isSelected: isSelected,

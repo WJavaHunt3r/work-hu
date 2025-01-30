@@ -3,6 +3,7 @@ import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/season/data/model/season_model.dart';
 
 part 'user_status_model.freezed.dart';
+
 part 'user_status_model.g.dart';
 
 @freezed
@@ -14,7 +15,9 @@ class UserStatusModel with _$UserStatusModel {
       required num status,
       required num transactions,
       required num transition,
+      required bool onTrack,
       required SeasonModel season}) = _UserStatusModel;
 
-  factory UserStatusModel.fromJson(Map<String, dynamic> json) => _$UserStatusModelFromJson(json);
+  factory UserStatusModel.fromJson(Map<String, dynamic> json) =>
+      _$UserStatusModelFromJson(json);
 }
