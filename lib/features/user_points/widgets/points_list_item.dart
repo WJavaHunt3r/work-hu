@@ -28,10 +28,11 @@ class PointsListItem extends StatelessWidget {
         style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w800),
       ),
       trailing: Text(
-        Utils.creditFormatting(value),
+        "${Utils.creditFormatting(value)} p",
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
       ),
-      subtitle: Text("${date.month < 10 ? "0${date.month}" : date.month}.${date.day < 10 ? "0${date.day}" : date.day}",
+      subtitle: Text(
+          "${date.month < 10 ? "0${date.month}" : date.month}.${date.day < 10 ? "0${date.day}" : date.day}",
           style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500)),
       isLast: isLast,
       index: index,

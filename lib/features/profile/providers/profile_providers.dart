@@ -18,19 +18,16 @@ import 'package:work_hu/features/utils.dart';
 
 final userRoundsApiProvider = Provider<UserRoundApi>((ref) => UserRoundApi());
 
-final userRoundsRepoProvider = Provider<UserRoundRepository>(
-    (ref) => UserRoundRepository(ref.read(userRoundsApiProvider)));
+final userRoundsRepoProvider = Provider<UserRoundRepository>((ref) => UserRoundRepository(ref.read(userRoundsApiProvider)));
 
-final profileDataProvider =
-    StateNotifierProvider.autoDispose<ProfileDataNotifier, ProfileState>(
-        (ref) => ProfileDataNotifier(
-            ref.read(loginRepoProvider),
-            ref.read(userDataProvider.notifier),
-            ref.read(userRoundsRepoProvider),
-            ref.read(userStatusRepoProvider),
-            ref.read(usersRepoProvider),
-            ref.read(userFraKareWeekRepoProvider),
-            ref.read(roundDataProvider.notifier)));
+final profileDataProvider = StateNotifierProvider.autoDispose<ProfileDataNotifier, ProfileState>((ref) => ProfileDataNotifier(
+    ref.read(loginRepoProvider),
+    ref.read(userDataProvider.notifier),
+    ref.read(userRoundsRepoProvider),
+    ref.read(userStatusRepoProvider),
+    ref.read(usersRepoProvider),
+    ref.read(userFraKareWeekRepoProvider),
+    ref.read(roundDataProvider.notifier)));
 
 class ProfileDataNotifier extends StateNotifier<ProfileState> {
   ProfileDataNotifier(
@@ -56,8 +53,7 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
   Future<void> getUserInfo() async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await getUserInfoAndUserRounds().then(
-          (value) => state = state.copyWith(modelState: ModelState.success));
+      await getUserInfoAndUserRounds().then((value) => state = state.copyWith(modelState: ModelState.success));
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
@@ -67,11 +63,8 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
     var userModel = currentUser.state;
 
     if (userModel != null) {
-      await userFraKareWeekRepo
-          .getFraKareWeeks(userId: userModel.id, year: DateTime.now().year)
-          .then((data) {
-        data.sort((a, b) =>
-            b.fraKareWeek.weekNumber.compareTo(a.fraKareWeek.weekNumber));
+      await userFraKareWeekRepo.getFraKareWeeks(userId: userModel.id, year: DateTime.now().year).then((data) {
+        data.sort((a, b) => b.fraKareWeek.weekNumber.compareTo(a.fraKareWeek.weekNumber));
         state = state.copyWith(fraKareWeeks: data);
       });
       await loginRepository.getUser(userModel.id).then((userData) async {
@@ -80,48 +73,29 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
         }
       });
       if (userModel.spouseId != null) {
-        await usersRepository
-            .getUserById(userModel.spouseId!)
-            .then((value) => state = state.copyWith(spouse: value));
+        await usersRepository.getUserById(userModel.spouseId!).then((value) => state = state.copyWith(spouse: value));
       }
       userRoundRepoProvider
-          .fetchUserRounds(
-              userId: userModel.id,
-              seasonYear: DateTime.now().year,
-              roundId: roundDataNotifier.getCurrentRound().id)
+          .fetchUserRounds(userId: userModel.id, seasonYear: DateTime.now().year, roundId: roundDataNotifier.getCurrentRound().id)
           .then((userRounds) async {
         if (userRounds.isNotEmpty && userRounds.length == 1) {
-          await userStatusRepoProvider
-              .getUserStatusByUserId(userModel.id, DateTime.now().year)
-              .then((userStatus) async {
-            state = state.copyWith(
-                userStatus: userStatus, currentUserRound: userRounds.first);
+          await userStatusRepoProvider.getUserStatusByUserId(userModel.id, DateTime.now().year).then((userStatus) async {
+            state = state.copyWith(userStatus: userStatus, currentUserRound: userRounds.first);
           });
         }
       });
 
       usersRepository.getChildren(userModel.id).then((children) async {
-        state = state.copyWith(
-            children: children, childrenUserRounds: [], childrenStatus: []);
+        state = state.copyWith(children: children, childrenUserRounds: [], childrenStatus: []);
         for (var child in children) {
           await userRoundRepoProvider
-              .fetchUserRounds(
-                  userId: child.id,
-                  seasonYear: DateTime.now().year,
-                  roundId: roundDataNotifier.getCurrentRound().id)
+              .fetchUserRounds(userId: child.id, seasonYear: DateTime.now().year, roundId: roundDataNotifier.getCurrentRound().id)
               .then((userRounds) async {
             if (userRounds.isNotEmpty && userRounds.length == 1) {
-              await userStatusRepoProvider
-                  .getUserStatusByUserId(child.id, DateTime.now().year)
-                  .then((status) async {
-                var childrenRounds = <UserRoundModel>[
-                  ...state.childrenUserRounds,
-                  ...userRounds
-                ];
+              await userStatusRepoProvider.getUserStatusByUserId(child.id, DateTime.now().year).then((status) async {
+                var childrenRounds = <UserRoundModel>[...state.childrenUserRounds, ...userRounds];
                 var childrenStatuses = [...state.childrenStatus, status];
-                state = state.copyWith(
-                    childrenStatus: childrenStatuses,
-                    childrenUserRounds: childrenRounds);
+                state = state.copyWith(childrenStatus: childrenStatuses, childrenUserRounds: childrenRounds);
               });
             }
           });
@@ -142,8 +116,7 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
     try {
       await userStatusRepoProvider
           .getUserStatusByUserId(currentUser.state!.id, DateTime.now().year)
-          .then((userStatus) => state = state.copyWith(
-              userStatus: userStatus, modelState: ModelState.success));
+          .then((userStatus) => state = state.copyWith(userStatus: userStatus, modelState: ModelState.success));
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }

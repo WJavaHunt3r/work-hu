@@ -10,6 +10,7 @@ import 'package:work_hu/features/bufe/view/bufe_page.dart';
 import 'package:work_hu/features/bufe/widgets/order_items.dart';
 import 'package:work_hu/features/change_password/view/change_password_page.dart';
 import 'package:work_hu/features/create_activity/view/create_activity_page.dart';
+import 'package:work_hu/features/create_transactions/view/create_point_transactions_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_samvirk_transactions_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_transaction_page.dart';
 import 'package:work_hu/features/fra_kare_week/view/fra_kare_week_page.dart';
@@ -59,13 +60,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                   userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
                 )),
               ),
-              GoRoute(
-                path: 'bufe',
-                builder: (BuildContext context, GoRouterState state) => const BufePage(),
-                routes: [
-                  GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems()),
-                ]
-              ),
+              GoRoute(path: 'bufe', builder: (BuildContext context, GoRouterState state) => const BufePage(), routes: [
+                GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems()),
+              ]),
             ]),
         GoRoute(
             path: '/admin',
@@ -87,11 +84,13 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                   path: "createSamvirkTransaction",
                   builder: (BuildContext context, GoRouterState state) => const CreateSamvirkTransactionPage()),
+              GoRoute(
+                  path: "createPointsTransaction",
+                  builder: (BuildContext context, GoRouterState state) => const CreatePointsTransactionPage()),
               GoRoute(path: "userStatus", builder: (BuildContext context, GoRouterState state) => const UserStatusPage()),
               GoRoute(path: "users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
               GoRoute(path: "goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
-              GoRoute(
-                  path: "mentorMentees", builder: (BuildContext context, GoRouterState state) => const MentorMenteesPage()),
+              GoRoute(path: "mentorMentees", builder: (BuildContext context, GoRouterState state) => const MentorMenteesPage()),
               GoRoute(
                   path: "transactions",
                   builder: (BuildContext context, GoRouterState state) => const TransactionsPage(),
@@ -143,12 +142,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           }
         }
 
-        if(state.matchedLocation.contains("/login")){
+        if (state.matchedLocation.contains("/login")) {
           return "/profile";
         }
 
-        if ((teamLeaderScreens.contains(state.matchedLocation) ||
-                state.matchedLocation.contains("/admin/fraKareWeeks/")) &&
+        if ((teamLeaderScreens.contains(state.matchedLocation) || state.matchedLocation.contains("/admin/fraKareWeeks/")) &&
             user.isTeamLeader()) {
           return state.matchedLocation;
         }

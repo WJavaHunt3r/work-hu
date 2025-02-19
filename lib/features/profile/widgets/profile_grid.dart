@@ -40,9 +40,9 @@ class ProfileGrid extends ConsumerWidget {
                         Align(
                           alignment: Alignment.center,
                           child: Text(
-                              "${Utils.creditFormat.format(userStatus.status * 100)}%",
+                              "${Utils.percentFormat.format(userStatus.status * 100)}%",
                               style: TextStyle(
-                                  fontSize: 35.sp,
+                                  fontSize: 30.sp,
                                   fontWeight: FontWeight.w800)),
                         ),
                         Align(
@@ -72,7 +72,8 @@ class ProfileGrid extends ConsumerWidget {
                         //     ))
                       ],
                     ),
-                    Text("profile_myshare_status".i18n(),
+                    Text("profile_myshare_status".i18n([userRoundModel.round.myShareGoal.toString()]),
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 10.sp, fontWeight: FontWeight.w600)),
                   ],

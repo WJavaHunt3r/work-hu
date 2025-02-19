@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/features/transaction_items/data/api/transaction_items_api.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 
@@ -7,9 +8,17 @@ class TransactionItemsRepository {
 
   TransactionItemsRepository(this._transactionItemsApi);
 
-  Future<List<TransactionItemModel>> getTransactionItems({num? transactionId, num? userId, num? roundId}) async {
+  Future<List<TransactionItemModel>> getTransactionItems(
+      {num? transactionId,
+      num? userId,
+      num? roundId,
+      num? seasonYear,
+      DateTime? startDate,
+      DateTime? endDate,
+      TransactionType? transactionType}) async {
     try {
-      final res = await _transactionItemsApi.getTransactionItems(transactionId, userId, roundId);
+      final res = await _transactionItemsApi.getTransactionItems(
+          transactionId, userId, roundId, seasonYear, startDate, endDate, transactionType);
       return res.map((e) => TransactionItemModel.fromJson(e)).toList();
     } on DioException {
       rethrow;

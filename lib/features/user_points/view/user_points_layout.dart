@@ -66,17 +66,16 @@ class UserPointsLayout extends ConsumerWidget {
     return list;
   }
 
-  List<Widget> createTabView(
-      List<TransactionItemModel> items, List<ActivityItemsModel> activityItems, num currentRound) {
+  List<Widget> createTabView(List<TransactionItemModel> items, List<ActivityItemsModel> activityItems, num currentRound) {
     var list = <Widget>[];
     List<TransactionItemModel> currentItems =
-        items.where((element) => element.round!.roundNumber == currentRound && element.credit > 0).toList();
+        items.where((element) => element.transactionDate.month == DateTime.now().month).toList();
     list.add(
       BaseListView(
           itemBuilder: (BuildContext context, int index) {
             var current = currentItems[index];
             return PointsListItem(
-              value: current.credit,
+              value: current.points,
               title: current.description,
               date: current.transactionDate,
               isLast: index == currentItems.length - 1,
@@ -116,7 +115,7 @@ class UserPointsLayout extends ConsumerWidget {
         itemBuilder: (context, index) {
           var current = items[index];
           return PointsListItem(
-              value: current.credit,
+              value: current.points,
               title: current.description,
               date: current.transactionDate,
               isLast: index == items.length - 1,

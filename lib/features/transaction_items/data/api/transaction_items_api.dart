@@ -1,4 +1,5 @@
 import 'package:work_hu/api/dio_client.dart';
+import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/locator.dart';
 
 class TransactionItemsApi {
@@ -6,10 +7,18 @@ class TransactionItemsApi {
 
   TransactionItemsApi();
 
-  Future<List<dynamic>> getTransactionItems(num? transactionId, num? userId, num? roundId) async {
+  Future<List<dynamic>> getTransactionItems(num? transactionId, num? userId, num? roundId, num? seasonYear, DateTime? startDate,
+      DateTime? endDate, TransactionType? transactionType) async {
     try {
-      final res = await _dioClient.dio.get("/transactionItem",
-          queryParameters: {"transactionId": transactionId, "userId": userId, "roundId": roundId});
+      final res = await _dioClient.dio.get("/transactionItem", queryParameters: {
+        "transactionId": transactionId,
+        "userId": userId,
+        "roundId": roundId,
+        "seasonYear": seasonYear,
+        "startDate": startDate,
+        "endDate": endDate,
+        "transactionType": transactionType
+      });
       return res.data;
     } catch (e) {
       rethrow;
@@ -27,8 +36,7 @@ class TransactionItemsApi {
 
   Future<dynamic> deleteTransactionItem(num transactionItemId, num userId) async {
     try {
-      final res =
-          await _dioClient.dio.delete("/transactionItem/$transactionItemId", queryParameters: {"userId": userId});
+      final res = await _dioClient.dio.delete("/transactionItem/$transactionItemId", queryParameters: {"userId": userId});
       return res.data;
     } catch (e) {
       rethrow;

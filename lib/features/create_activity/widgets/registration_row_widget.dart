@@ -24,6 +24,7 @@ class RegistrationRowWidget extends ConsumerWidget {
         onDismissed: (direction) => ref.read(createActivityDataProvider.notifier).deleteRegistration(index.toInt()),
         dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
         child: Card(
+          margin: const EdgeInsets.all(0),
           child: BaseListTile(
             isLast: isLast,
             index: index.toInt(),

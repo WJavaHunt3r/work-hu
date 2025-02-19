@@ -26,12 +26,14 @@ class AdminLayout extends ConsumerWidget {
   List<Widget> teamLeaderScreens(BuildContext context) => [
         createListTile(context: context, title: "admin_myshare_status", route: "userStatus"),
         createListTile(context: context, title: "admin_fra_kare_weeks", route: "fraKareWeeks"),
+        createListTile(context: context, title: "admin_statistics", route: "statistics", enabled: false),
       ];
 
   List<Widget> adminLeaderScreens(BuildContext context) => [
         createListTile(context: context, title: "admin_activities", route: "activities"),
         createListTile(context: context, title: "admin_myshare_credits", route: "createTransaction"),
         createListTile(context: context, title: "admin_samvirk_credit", route: "createSamvirkTransaction"),
+        createListTile(context: context, title: "admin_points", route: "createPointsTransaction"),
         createListTile(context: context, title: "admin_users", route: "users"),
         createListTile(context: context, title: "admin_goals", route: "goals"),
         createListTile(context: context, title: "admin_mentor_mentees", route: "mentorMentees"),
