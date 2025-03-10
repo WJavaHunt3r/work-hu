@@ -4,6 +4,7 @@ import 'package:work_hu/features/bufe/data/model/bufe_account_model.dart';
 import 'package:work_hu/features/bufe/data/model/bufe_order_items_model.dart';
 import 'package:work_hu/features/bufe/data/model/bufe_orders_model.dart';
 import 'package:work_hu/features/bufe/data/model/bufe_payments_model.dart';
+import 'package:work_hu/features/bufe/data/model/checkout_model.dart';
 
 class BufeRepository {
   final BufeApi _bufeApi;
@@ -38,10 +39,20 @@ class BufeRepository {
     }
   }
 
-  Future<List<BufeOrderItemsModel>> getOrderItems({required num bufeId,required num orderId}) async {
+  Future<List<BufeOrderItemsModel>> getOrderItems({required num bufeId, required num orderId}) async {
     try {
       final res = await _bufeApi.getOrderItems(bufeId: bufeId, orderId: orderId);
       return res.map((e) => BufeOrderItemsModel.fromJson(e)).toList();
+    } on DioException {
+      rethrow;
+    }
+  }
+
+  Future<CheckoutModel> createCheckout(
+      {required num amount, required String checkoutReference, required String description}) async {
+    try {
+      final res = await _bufeApi.createCheckout(amount: amount, checkoutReference: checkoutReference, description: description);
+      return CheckoutModel.fromJson(res);
     } on DioException {
       rethrow;
     }

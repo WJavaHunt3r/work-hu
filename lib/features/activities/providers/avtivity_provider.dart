@@ -46,6 +46,8 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
     var user = currentUserProvider.state!;
     if (user.role != Role.ADMIN) {
       employerId = user.id;
+      responsibleId=user.id;
+      createUserId=user.id;
     }
     try {
       await activityRepository

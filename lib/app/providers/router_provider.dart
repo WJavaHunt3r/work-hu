@@ -8,11 +8,13 @@ import 'package:work_hu/features/activity_items/view/activity_items_layout.dart'
 import 'package:work_hu/features/admin/view/admin_page.dart';
 import 'package:work_hu/features/bufe/view/bufe_page.dart';
 import 'package:work_hu/features/bufe/widgets/order_items.dart';
+import 'package:work_hu/features/bufe_card_fill/view/payment_page.dart';
 import 'package:work_hu/features/change_password/view/change_password_page.dart';
 import 'package:work_hu/features/create_activity/view/create_activity_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_point_transactions_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_samvirk_transactions_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_transaction_page.dart';
+import 'package:work_hu/features/donation/view/donation_page.dart';
 import 'package:work_hu/features/fra_kare_week/view/fra_kare_week_page.dart';
 import 'package:work_hu/features/goal/view/goal_page.dart';
 import 'package:work_hu/features/home/view/home_page.dart';
@@ -60,10 +62,18 @@ final routerProvider = Provider<GoRouter>((ref) {
                   userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
                 )),
               ),
-              GoRoute(path: 'bufe', builder: (BuildContext context, GoRouterState state) => const BufePage(), routes: [
-                GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems()),
-              ]),
+              GoRoute(
+                  path: 'bufe',
+                  builder: (BuildContext context, GoRouterState state) => const BufePage(),
+                  routes: [GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems())]),
             ]),
+        GoRoute(
+            path: "/payment/:data",
+            builder: (BuildContext context, GoRouterState state) => BufePaymentPage(
+                key: UniqueKey(), base64Params: state.pathParameters["data"] ?? ""
+                //"eyJjaGVja291dElkIjoiNTZmNzFhNmQtOTBjZi00YzZhLTg1NDMtZjZiMmFjZjQxMmJmIiwiZGVzY3JpcHRpb24iOiJUZXN0IHBheW1lbnQiLCJsb2NhbGUiOiJodS1IVSJ9"
+                )),
+        GoRoute(path: "/donation", builder: (BuildContext context, GoRouterState state) => const DonationPage()),
         GoRoute(
             path: '/admin',
             pageBuilder: (BuildContext context, GoRouterState state) => const NoTransitionPage(child: AdminPage()),

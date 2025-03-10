@@ -19,6 +19,7 @@ class ErrorAlertDialog extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.errorRed, fontWeight: FontWeight.bold),
             ),
+            actionsAlignment: MainAxisAlignment.center,
             actions: [
               TextButton(
                   style: ButtonStyle(
@@ -26,13 +27,20 @@ class ErrorAlertDialog extends StatelessWidget {
                       (states) => BorderSide(color: AppColors.errorRed, width: 2.sp),
                     ),
                     backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
-                    foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
-                    overlayColor: WidgetStateColor.resolveWith((states) => AppColors.errorRed),
+                    foregroundColor: WidgetStateColor.resolveWith((states) {
+                      if (states.contains(WidgetState.hovered) || states.contains(WidgetState.pressed) ) {
+                        return Colors.white;
+                      }
+                      return AppColors.errorRed;
+                    }),
+                    overlayColor: WidgetStateColor.resolveWith((states) {
+                      return AppColors.errorRed;
+                    }),
                   ),
                   onPressed: () => context.pop(),
                   child: const Text(
                     "OK",
-                    style: TextStyle(color: AppColors.errorRed, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ))
             ],
             content: content));

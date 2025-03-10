@@ -96,6 +96,12 @@ class GlobalTheme {
       textButtonTheme: TextButtonThemeData(
           style: ButtonStyle(
               padding: WidgetStateProperty.resolveWith((states) => EdgeInsets.all(10.sp)),
+              foregroundColor: WidgetStateColor.resolveWith((states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return Colors.grey;
+                }
+                return AppColors.white;
+              }),
               backgroundColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.disabled)) {
                   return Colors.grey.shade300;
@@ -111,9 +117,6 @@ class GlobalTheme {
                 },
               ),
               shape: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.disabled)) {
-                  return RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp));
-                }
                 return RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp));
               }))),
       progressIndicatorTheme: const ProgressIndicatorThemeData(color: AppColors.primary),
@@ -333,24 +336,27 @@ class GlobalTheme {
       textButtonTheme: TextButtonThemeData(
           style: ButtonStyle(
               padding: WidgetStateProperty.resolveWith((states) => EdgeInsets.all(10.sp)),
+              foregroundColor: WidgetStateColor.resolveWith((states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return Colors.grey;
+                }
+                return AppColors.white;
+              }),
               backgroundColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.disabled)) {
-                  return Colors.grey.shade600;
+                  return Colors.grey.shade300;
                 }
-                return AppColors.primary100;
+                return AppColors.primary;
               }),
               side: WidgetStateBorderSide.resolveWith(
-                (states) {
+                    (states) {
                   if (states.contains(WidgetState.disabled)) {
-                    return BorderSide(color: Colors.grey.shade600, width: 2.sp);
+                    return BorderSide(color: Colors.grey.shade300, width: 2.sp);
                   }
-                  return BorderSide(color: AppColors.primary100, width: 2.sp);
+                  return BorderSide(color: AppColors.primary, width: 2.sp);
                 },
               ),
               shape: WidgetStateProperty.resolveWith((states) {
-                if (states.contains(WidgetState.disabled)) {
-                  return RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp));
-                }
                 return RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp));
               }))),
       progressIndicatorTheme: const ProgressIndicatorThemeData(color: AppColors.white),

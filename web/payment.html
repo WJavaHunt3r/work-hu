@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SumUp Payment</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: transparent;
+            flex-direction: column;
+        }
+
+
+        #container {
+
+            padding: 10px;
+            margin: 20px;
+            background: white;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        #container .h2 {
+            color: #000110;
+        }
+
+        #or {
+            margin: 0 10px;
+            /* Space between the lines */
+            white-space: nowrap;
+        }
+
+        .blur-background {
+            filter: blur(5px);
+            pointer-events: none;
+        }
+
+        .line-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .line {
+            flex-grow: 1;
+            /* Makes the lines expand */
+            border: none;
+            height: 1px;
+            background-color: #ccc;
+            /* Light gray line */
+        }
+    </style>
+    <script>
+        var sumupCard;
+        function getParamsFromPath() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const encodedData = urlParams.get('data');
+
+            if (!encodedData) return {};
+            try {
+                return JSON.parse(atob(encodedData));
+            } catch (e) {
+                console.error("Invalid Base64 encoding", e);
+                return {};
+            }
+        }
+
+        function sendMessageToFlutter(status) {
+            window.parent.postMessage(status, "*"); // Send message to Flutter WebView
+        }
+
+
+        function startGoogelPay() {
+            const paymentsClient = new google.payments.api.PaymentsClient({
+                environment: 'TEST',
+            });
+
+            const paymentDataRequest = {
+                apiVersion: 2,
+                apiVersionMinor: 0
+            };
+
+            const isReadyToPayRequest = Object.assign({}, paymentDataRequest);
+
+            const tokenizationSpecification = {
+                type: 'PAYMENT_GATEWAY',
+                parameters: {
+                    gateway: 'sumup',
+                    gatewayMerchantId: 'MDH9XQEK',
+                },
+            };
+
+            const baseCardPaymentMethod = {
+                type: 'CARD',
+                parameters: {
+                    allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
+                    allowedCardNetworks: ['MASTERCARD', 'VISA'],
+                }
+            };
+
+            const cardPaymentMethod = Object.assign(
+                { tokenizationSpecification: tokenizationSpecification },
+                baseCardPaymentMethod
+            );
+
+            isReadyToPayRequest.allowedPaymentMethods = [baseCardPaymentMethod];
+
+            paymentsClient.isReadyToPay(isReadyToPayRequest)
+                .then(function (response) {
+                    if (response.result) {
+                        paymentDataRequest.transactionInfo = {
+                            totalPriceStatus: 'FINAL',
+                            totalPriceLabel: locale === 'hu_HU' ? 'Fizetendő' : 'Total',
+                            totalPrice: amount,
+                            currencyCode: 'HUF',
+                            countryCode: 'HU'
+                        }
+                        paymentDataRequest.merchantInfo = {
+                            merchantId: 'BCR2DN4T777JR3KQ',
+                            merchantName: 'Keresztény Testvéri Közösség',
+                        }
+                        paymentDataRequest.allowedPaymentMethods = [cardPaymentMethod];
+                        const button =
+                            paymentsClient.createButton({
+                                onClick: function () {
+                                    paymentDataRequest.transactionInfo = {
+                                        totalPriceStatus: 'FINAL',
+                                        totalPriceLabel: locale === 'hu_HU' ? 'Fizetendő' : 'Total',
+                                        totalPrice: amount + ".00",
+                                        currencyCode: 'HUF',
+                                        countryCode: 'HU'
+                                    }
+                                    paymentsClient.loadPaymentData(paymentDataRequest).then(function (paymentData) {
+                                        paymentData.paymentMethodData.tokenizationData.token = JSON.parse(paymentData.paymentMethodData.tokenizationData.token);
+                                        paymentToken = paymentData.paymentMethodData.tokenizationData.token;
+
+                                        processPayment(paymentData);
+                                    }).catch(function (err) {
+                                        sendMessageToFlutter('FAILED');
+                                    });
+                                },
+
+                                allowedPaymentMethods: [baseCardPaymentMethod],
+                            }); // same payment methods as for the loadPaymentData() API call
+                        document.getElementById('google-pay').appendChild(button);
+                    }
+                })
+                .catch(function (err) {
+                    // show error in developer console for debugging
+                    console.error(err);
+                });
+        }
+
+        async function processPayment(paymentData) {
+            const params = getParamsFromPath();
+
+            const checkoutId = params.checkoutId;
+            const url = `https://api.sumup.com/v0.1/checkouts/${checkoutId}`;
+
+            // Payload Data
+            const payload = {
+                "payment_type": "google_pay",
+                "id": checkoutId,
+                "amount": amount,
+                "currency": "HUF",
+                "google_pay": paymentData
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: "PUT",
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("✅ Payment update successful:", data);
+                    if (data.status === "PAID") {
+                        sendMessageToFlutter('SUCCESS');
+                    } else if (data.status !== 'SUCCESSFUL') {
+                        sendMessageToFlutter('SUCCESS');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    sendMessageToFlutter('FAILED');
+                    console.error(`❌ Failed to update payment. Status Code: ${response.status}`, errorText);
+                }
+            } catch (error) {
+                sendMessageToFlutter('ERROR');
+                console.error("❌ Error updating payment:", error);
+            }
+        }
+
+        var locale = 'en';
+        var amount = '0';
+
+        window.addEventListener("message", (event) => {
+
+                mount(event.data);
+
+        });
+
+         function mount (data) {
+
+                const params = data;
+                console.log(data);
+
+                const checkoutId = params.checkoutId;
+                const description = params.description || 'Sample one-time payment';
+                locale = params.locale || 'en';
+                amount = params.amount || '0.00';
+
+                if (!checkoutId) {
+                    return;
+                }
+
+                const cardContainer = document.getElementById("sumup-card");
+                cardContainer.innerHTML = "";
+                const titleContainer = document.getElementById("choose_payment");
+                titleContainer.innerText = locale === 'hu-HU' ? 'Válassz fizetési módot' : 'Choose payment type';
+
+                const orContainer = document.getElementById("or");
+                orContainer.innerText = locale === 'hu-HU' ? 'Vagy' : 'Or';
+
+                try {
+
+                    if (!sumupCard) {
+                        sumupCard = SumUpCard.mount({
+                            id: 'sumup-card',
+                            checkoutId: checkoutId,
+                            description: description,
+                            showEmail: true,
+                            showFooter: false,
+                            locale: locale,
+                            google_pay: { merchantId: 'BCR2DN4T777JR3KQ', merchantName: 'Keresztény Testvéri Közösség' },
+                            onResponse: function (type, body) {
+
+                                if (body.status === "PAID") {
+                                    sendMessageToFlutter('SUCCESS', locale === 'hu-HU' ? 'Kártya' : 'Card');
+                                } else if (type === 'fail' || type === 'error' || (type === 'success' && body.status !== 'SUCCESSFUL')) {
+                                    sendMessageToFlutter('FAILED');
+                                }
+                            },
+                        });
+                    } else {
+                        sumupCard = SumUpCard.update({
+                            checkoutId: checkoutId,
+                            description: description,
+                        });
+                    }
+
+                } catch (e) {
+                    console.error("Mount failed", e);
+                    sendMessageToFlutter('ERROR');
+                }
+
+            }
+
+    </script>
+</head>
+
+<body>
+<div id="container">
+    <h2 id="choose_payment"></h2>
+    <div id="google-pay"></div>
+
+    <div class="line-container">
+        <hr class="line">
+        <h3 id="or">OR</h3>
+        <hr class="line">
+    </div>
+
+    <div id="sumup-card"></div>
+</div>
+
+<script type="text/javascript" src="https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js"></script>
+<script async src="https://pay.google.com/gp/p/js/pay.js" onload="startGoogelPay()">
+</script>
+</body>
+
+</html>

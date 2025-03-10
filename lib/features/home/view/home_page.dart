@@ -15,18 +15,13 @@ import 'package:work_hu/features/utils.dart';
 
 class HomePage extends MainScreen {
   HomePage({super.key, super.title = "home_pace_2", super.centerTitle = true})
-      : super(
-            selectedIndex: 0,
-            appBarTextStyle: TextStyle(
-                fontSize: 22.sp,
-                fontFamily: "Good-Timing"));
+      : super(selectedIndex: 0, appBarTextStyle: TextStyle(fontSize: 22.sp, fontFamily: "Good-Timing"));
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
     var currentRound = ref.watch(roundDataProvider).rounds.isNotEmpty
-        ? ref.watch(roundDataProvider).rounds.firstWhere((element) =>
-            element.startDateTime.compareTo(DateTime.now()) < 0 &&
-            element.endDateTime.compareTo(DateTime.now()) > 0)
+        ? ref.watch(roundDataProvider).rounds.firstWhere(
+            (element) => element.startDateTime.compareTo(DateTime.now()) < 0 && element.endDateTime.compareTo(DateTime.now()) > 0)
         : null;
     return Stack(children: [
       Column(
@@ -37,22 +32,35 @@ class HomePage extends MainScreen {
                   ref.watch(userDataProvider)?.id != 255
               ? Center(
                   child: Text(
-                    "home_status_freeze".i18n([
-                      Utils.dateToStringWithTime(currentRound.endDateTime
-                          .add(const Duration(minutes: 1)))
-                    ]),
+                    "home_status_freeze"
+                        .i18n([Utils.dateToStringWithTime(currentRound.endDateTime.add(const Duration(minutes: 1)))]),
                     textAlign: TextAlign.center,
                   ),
                 )
               : Expanded(
-                  child: ref.watch(teamRoundDataProvider).modelState ==
-                          ModelState.processing
+                  child: ref.watch(teamRoundDataProvider).modelState == ModelState.processing
                       ? const Center(child: CircularProgressIndicator())
-                      : ref.watch(teamRoundDataProvider).modelState ==
-                              ModelState.error
+                      : ref.watch(teamRoundDataProvider).modelState == ModelState.error
                           ? const ErrorView()
-                          : StatusView(
-                              teams: ref.watch(teamRoundDataProvider).teams)),
+                          : StatusView(teams: ref.watch(teamRoundDataProvider).teams)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Card(
+                  margin: EdgeInsets.only(bottom: 32.sp, top: 8.sp),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Text("Ungdomsstenve Ungarn 2025 "),
+                        TextButton(
+                            onPressed: () => context.push("/donation"),
+                            child: Text("home_donation_button".i18n(), style: TextStyle(color: Colors.white))),
+                      ],
+                    ),
+                  ))
+            ],
+          )
         ],
       ),
     ]);
@@ -64,8 +72,7 @@ class HomePage extends MainScreen {
         ? FloatingActionButton(
             elevation: 0,
             onPressed: () => context.push("/createActivity"),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.sp)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.sp)),
             child: const Icon(Icons.add),
           )
         : null;
