@@ -41,7 +41,6 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
           ),
           Expanded(
             child: HtmlElementView(
-              key: UniqueKey(),
               viewType: 'sumup-iframe-${paymentData['checkoutId']}',
             ),
           ),
@@ -88,8 +87,6 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
 
   @override
   void initState() {
-    super.initState();
-
     String sumupUrl = "https://pay-dukapp.netlify.app/?data=${widget.base64Params}";
     Map<String, dynamic> paymentData = jsonDecode(utf8.decode(base64.decode(widget.base64Params)));
 
@@ -119,7 +116,9 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
         }
       }
     });
+    super.initState();
   }
+
 
   Future<PaymentState?> showPaymentState(BuildContext context, PaymentState state) async {
     return await showModalBottomSheet<PaymentState>(
@@ -204,5 +203,11 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
             ],
           );
         });
+  }
+
+  @override
+  void dispose() {
+
+    super.dispose();
   }
 }
