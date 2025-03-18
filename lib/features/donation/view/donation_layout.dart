@@ -3,176 +3,120 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/models/payment_state.dart';
-import 'package:work_hu/app/providers/theme_provider.dart';
-import 'package:work_hu/app/widgets/error_alert_dialog.dart';
-import 'package:work_hu/app/widgets/success_alert_dialog.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
+import 'package:work_hu/app/widgets/base_list_view.dart';
+import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
+import 'package:work_hu/features/donation/data/model/donation_model.dart';
 import 'package:work_hu/features/donation/providers/donation_provider.dart';
-import 'package:work_hu/features/donation/widgets/number_pin.dart';
+import 'package:work_hu/features/donation/widgets/donation_maintenance.dart';
+import 'package:work_hu/features/utils.dart';
 
-class DonationLayout extends ConsumerWidget {
-  const DonationLayout({super.key});
+class DonationsLayout extends ConsumerStatefulWidget {
+  const DonationsLayout({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    var enabled = ref.watch(donationDataProvider).amount > 0;
+  ConsumerState<ConsumerStatefulWidget> createState() => _DonationsState();
+}
+
+class _DonationsState extends ConsumerState<DonationsLayout> {
+  @override
+  void initState() {
+    super.initState();
+    // Use a post-frame callback to ensure the widget is fully mounted.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(donationDataProvider.notifier).getDonations(null);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var donations = ref.watch(donationDataProvider).donations;
     return Stack(
       children: [
-        Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
+        RefreshIndicator(
+          onRefresh: () async => ref.read(donationDataProvider.notifier).getDonations(null),
+          child: Column(children: [
             Expanded(
-              flex: 4,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      textAlign: TextAlign.center,
-                      enabled: false,
-                      // readOnly: ref.watch(donationDataProvider).id != null,
-                      controller: ref.watch(donationDataProvider.notifier).amountController,
-                      keyboardType: TextInputType.number,
-                      style: TextStyle(
-                          fontSize: 40.sp, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleMedium?.color),
-                      decoration: InputDecoration(
-                          suffixText: "Ft",
-                          suffixStyle: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold),
-                          hintText: "0",
-                          filled: false,
-                          border: const OutlineInputBorder(borderSide: BorderSide.none)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-                flex: 6,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        NumberPin(enabled: true, showBorder: true, child: pinText("1"), onTap: () => addNumber("1", ref)),
-                        NumberPin(enabled: true, showBorder: true, child: pinText("2"), onTap: () => addNumber("2", ref)),
-                        NumberPin(enabled: true, showBorder: true, child: pinText("3  "), onTap: () => addNumber("3", ref))
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        NumberPin(enabled: true, showBorder: true, child: pinText("4"), onTap: () => addNumber("4", ref)),
-                        NumberPin(enabled: true, showBorder: true, child: pinText("5"), onTap: () => addNumber("5", ref)),
-                        NumberPin(enabled: true, showBorder: true, child: pinText("6"), onTap: () => addNumber("6", ref))
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        NumberPin(enabled: true, showBorder: true, child: pinText("7"), onTap: () => addNumber("7", ref)),
-                        NumberPin(enabled: true, showBorder: true, child: pinText("8"), onTap: () => addNumber("8", ref)),
-                        NumberPin(enabled: true, showBorder: true, child: pinText("9"), onTap: () => addNumber("9", ref))
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        NumberPin(
-                            enabled: enabled,
-                            showBorder: false,
-                            child: pinText(
-                              "00",
-                              color: enabled ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
-                            ),
-                            onTap: () => addNumber("00", ref)),
-                        NumberPin(
-                            enabled: enabled,
-                            showBorder: true,
-                            child: pinText("0", color: enabled ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey),
-                            onTap: () => addNumber("0", ref)),
-                        NumberPin(
-                            enabled: enabled,
-                            showBorder: false,
-                            child: Icon(
-                              Icons.backspace,
-                              color: enabled ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
-                            ),
-                            onTap: () => removeNumber(ref))
-                      ],
-                    )
-                  ],
-                )),
-            ref.watch(donationDataProvider).id == null
-                ? Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 30.sp, vertical: 20.sp),
-                          child: TextButton(
-                            onPressed: ref.watch(donationDataProvider).amount > 0
-                                ? () => ref
-                                    .watch(donationDataProvider.notifier)
-                                    .createCheckout(UniqueKey().toString(), "Ungdoms stevne 2025")
-                                : null,
-                            child: Text("donate_button".i18n()),
-                          ),
+                child: BaseListView(
+              itemBuilder: (BuildContext context, int index) {
+                var current = donations[index];
+                var date = current.startDateTime!;
+                var dateString = Utils.dateToString(date);
+                var endDateString = Utils.dateToString(current.endDateTime!);
+                return Dismissible(
+                    key: UniqueKey(),
+                    onDismissed: (direction) => showDialog(
+                            context: context,
+                            builder: (buildContext) {
+                              return ConfirmAlertDialog(
+                                onConfirm: () => buildContext.pop(true),
+                                title: "delete".i18n(),
+                                content: Text("donation_delete_warning".i18n(), textAlign: TextAlign.center),
+                              );
+                            })
+                        .then((confirmed) => confirmed != null && confirmed
+                            ? ref.read(donationDataProvider.notifier).deleteDonations(current.id!, index)
+                            : null),
+                    dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
+                    child: Card(
+                      margin: const EdgeInsets.all(0),
+                      child: BaseListTile(
+                        isLast: donations.length - 1 == index,
+                        index: index,
+                        onTap: () {
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) => DonationMaintenance(
+                                    mode: MaintenanceMode.create,
+                                    donation: current,
+                                  )).then((value) => ref.watch(donationDataProvider.notifier).getDonations(null));
+                        },
+                        leading: Icon(
+                          isDonationOpen(current.startDateTime!, current.endDateTime!) ? Icons.lock_open : Icons.lock_outline,
+                          color: isDonationOpen(current.startDateTime!, current.endDateTime!) ? Colors.green : Colors.red,
                         ),
+                        title: Text(current.description.toString()),
+                        subtitle: Text("$dateString - $endDateString"),
                       ),
-                    ],
-                  )
-                : Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 30.sp, vertical: 20.sp),
-                          child: TextButton(
-                              onPressed: () {
-                                context.push("/payment/${ref.watch(donationDataProvider).id}").then((value) {
-                                  value != null && context.mounted
-                                      ? value == PaymentState.success
-                                          ? ref.watch(donationDataProvider.notifier).savePayment()
-                                          : null
-                                      : showDialog(
-                                          context: context, builder: (context) => const ErrorAlertDialog(title: "Error"));
-                                });
-                              },
-                              child: Text(
-                                "donate_proceed".i18n([ref.watch(donationDataProvider).amount.toString()]),
-                                style: const TextStyle(color: Colors.white),
-                              )),
-                        ),
-                      ),
-                    ],
-                  )
-          ],
+                    ));
+              },
+              itemCount: donations.length,
+              shadowColor: Colors.transparent,
+              cardBackgroundColor: Colors.transparent,
+              children: const [],
+            ))
+          ]),
         ),
-        ref.watch(donationDataProvider).modelState == ModelState.processing
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : const SizedBox()
+        Positioned(
+          bottom: 20.sp,
+          right: 20.sp,
+          child: FloatingActionButton(
+            heroTag: UniqueKey(),
+            onPressed: () {
+              showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (context) => DonationMaintenance(
+                        mode: MaintenanceMode.create,
+                        donation: DonationModel(startDateTime: DateTime.now()),
+                      )).then((value) => ref.watch(donationDataProvider.notifier).getDonations(null));
+            },
+            child: const Icon(Icons.add),
+          ),
+        ),
+        if (ref.watch(donationDataProvider).modelState == ModelState.processing)
+          const Dialog(
+            backgroundColor: Colors.transparent,
+            child: Center(child: CircularProgressIndicator()),
+          )
       ],
     );
   }
 
-  void addNumber(String number, WidgetRef ref) {
-    ref.watch(donationDataProvider.notifier).addNumber(number);
-  }
-
-  void removeNumber(WidgetRef ref) {
-    ref.watch(donationDataProvider.notifier).removeLastNumber();
-  }
-
-  Widget pinText(String text, {Color? color}) {
-    return Text(
-      text,
-      style: TextStyle(fontSize: 24.sp, color: color),
-      textAlign: TextAlign.center,
-    );
+  bool isDonationOpen(DateTime startDateTime, DateTime endDateTime) {
+    return DateTime.now().compareTo(endDateTime) <= 0 && DateTime.now().compareTo(startDateTime) >= 0;
   }
 }

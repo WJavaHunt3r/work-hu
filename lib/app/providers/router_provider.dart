@@ -8,12 +8,12 @@ import 'package:work_hu/features/activity_items/view/activity_items_layout.dart'
 import 'package:work_hu/features/admin/view/admin_page.dart';
 import 'package:work_hu/features/bufe/view/bufe_page.dart';
 import 'package:work_hu/features/bufe/widgets/order_items.dart';
-import 'package:work_hu/features/bufe_card_fill/view/payment_page.dart';
 import 'package:work_hu/features/change_password/view/change_password_page.dart';
 import 'package:work_hu/features/create_activity/view/create_activity_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_point_transactions_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_samvirk_transactions_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_transaction_page.dart';
+import 'package:work_hu/features/donate/view/donate_page.dart';
 import 'package:work_hu/features/donation/view/donation_page.dart';
 import 'package:work_hu/features/fra_kare_week/view/fra_kare_week_page.dart';
 import 'package:work_hu/features/goal/view/goal_page.dart';
@@ -23,7 +23,9 @@ import 'package:work_hu/features/login/providers/login_provider.dart';
 import 'package:work_hu/features/login/view/login_page.dart';
 import 'package:work_hu/features/mentees/view/mentees_page.dart';
 import 'package:work_hu/features/mentor_mentee/view/mentor_mentees_page.dart';
+import 'package:work_hu/features/payments/view/payments_page.dart';
 import 'package:work_hu/features/profile/view/profile_page.dart';
+import 'package:work_hu/features/sumup_payment/view/sumup_payment_page.dart';
 import 'package:work_hu/features/transaction_items/view/transaction_items_page.dart';
 import 'package:work_hu/features/transactions/view/transactions_page.dart';
 import 'package:work_hu/features/user_fra_kare_week/view/user_fra_kare_week_page.dart';
@@ -37,13 +39,37 @@ final routerProvider = Provider<GoRouter>((ref) {
       initialLocation: "/",
       routes: <GoRoute>[
         GoRoute(
-          path: '/',
-          pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(child: HomePage()),
-        ),
+            path: '/',
+            pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(child: HomePage()),
+            routes: [
+              GoRoute(
+                  path: "donate/:id",
+                  builder: (BuildContext context, GoRouterState state) => DonatePage(
+                        id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+                      ),
+                  routes: [
+                    GoRoute(
+                        path: "sumup_payment/:checkoutId",
+                        builder: (BuildContext context, GoRouterState state) =>
+                            SumupPaymentPage(base64Params: state.pathParameters["checkoutId"] ?? "0"))
+                  ]),
+            ]),
         GoRoute(
-          path: '/home',
-          pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(child: HomePage()),
-        ),
+            path: '/home',
+            pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(child: HomePage()),
+            routes: [
+              GoRoute(
+                  path: "donate/:id",
+                  builder: (BuildContext context, GoRouterState state) => DonatePage(
+                        id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+                      ),
+                  routes: [
+                    GoRoute(
+                        path: "sumup_payment/:checkoutId",
+                        builder: (BuildContext context, GoRouterState state) =>
+                            SumupPaymentPage(base64Params: state.pathParameters["checkoutId"] ?? "0"))
+                  ]),
+            ]),
         GoRoute(
           path: '/login',
           pageBuilder: (BuildContext context, GoRouterState state) {
@@ -67,13 +93,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   builder: (BuildContext context, GoRouterState state) => const BufePage(),
                   routes: [GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems())]),
             ]),
-        GoRoute(
-            path: "/payment/:data",
-            builder: (BuildContext context, GoRouterState state) => BufePaymentPage(
-                key: UniqueKey(), base64Params: state.pathParameters["data"] ?? ""
-                //"eyJjaGVja291dElkIjoiNTZmNzFhNmQtOTBjZi00YzZhLTg1NDMtZjZiMmFjZjQxMmJmIiwiZGVzY3JpcHRpb24iOiJUZXN0IHBheW1lbnQiLCJsb2NhbGUiOiJodS1IVSJ9"
-                )),
-        GoRoute(path: "/donation", builder: (BuildContext context, GoRouterState state) => const DonationPage()),
+        GoRoute(path: "/donation", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
         GoRoute(
             path: '/admin',
             pageBuilder: (BuildContext context, GoRouterState state) => const NoTransitionPage(child: AdminPage()),
@@ -100,6 +120,16 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(path: "userStatus", builder: (BuildContext context, GoRouterState state) => const UserStatusPage()),
               GoRoute(path: "users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
               GoRoute(path: "goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
+              GoRoute(path: "donations", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
+              GoRoute(
+                  path: "payments",
+                  builder: (BuildContext context, GoRouterState state) {
+                    var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
+                    return PaymentsPage(
+                      donationId: map != null ? map["donationId"] : null,
+                      userId: map != null ? map["userId"] : null,
+                    );
+                  }),
               GoRoute(path: "mentorMentees", builder: (BuildContext context, GoRouterState state) => const MentorMenteesPage()),
               GoRoute(
                   path: "transactions",

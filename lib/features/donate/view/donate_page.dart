@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page.dart';
 
-import 'donation_layout.dart';
+import 'donate_layout.dart';
 
-class DonationsPage extends BasePage{
-  const DonationsPage({super.key, super.title="donations"});
+class DonatePage extends BasePage {
+  const DonatePage({super.key, required this.id, super.title = "donate"});
 
-
+  final num id;
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
-    return DonationsLayout();
+    return DonateLayout(id: id);
   }
-
 }

@@ -52,4 +52,23 @@ class BufeApi {
       rethrow;
     }
   }
+
+  Future<dynamic> deleteCheckout({required String checkoutId}) async {
+    try {
+      final res = await _dioClient.dio.delete("/delete_checkout/$checkoutId");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+
+  // Future<dynamic> uploadBufeAccount(num bufeId) async {
+  //   try {
+  //     final res = await _dioClient.dio.get("/account/$bufeId");
+  //     return res.data;
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
 }

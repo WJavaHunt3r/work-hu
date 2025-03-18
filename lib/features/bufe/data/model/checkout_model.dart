@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:work_hu/app/models/payment_status.dart';
 
 part 'checkout_model.freezed.dart';
+
 part 'checkout_model.g.dart';
 
 @freezed
@@ -16,8 +18,8 @@ class CheckoutModel with _$CheckoutModel {
       required String merchant_name,
       required String merchant_country,
       required String pay_to_email,
-      required String status,
-      required String porpuse,
+      required PaymentStatus status,
+      required String purpose,
       required List<dynamic> transactions}) = _CheckoutModel;
 
   factory CheckoutModel.fromJson(Map<String, dynamic> json) => _$CheckoutModelFromJson(json);

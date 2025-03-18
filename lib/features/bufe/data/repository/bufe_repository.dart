@@ -57,4 +57,13 @@ class BufeRepository {
       rethrow;
     }
   }
+
+  Future<CheckoutModel> deleteCheckout({required String checkoutId}) async {
+    try {
+      final res = await _bufeApi.deleteCheckout(checkoutId: checkoutId);
+      return CheckoutModel.fromJson(res);
+    } on DioException {
+      rethrow;
+    }
+  }
 }

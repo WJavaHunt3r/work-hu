@@ -11,6 +11,7 @@ import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/home/widgets/error_view.dart';
 import 'package:work_hu/features/home/widgets/status_view.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
+import 'package:work_hu/features/teams/provider/teams_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
 class HomePage extends MainScreen {
@@ -46,19 +47,26 @@ class HomePage extends MainScreen {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Card(
-                  margin: EdgeInsets.only(bottom: 32.sp, top: 8.sp),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        Text("Ungdomsstenve Ungarn 2025 "),
-                        TextButton(
-                            onPressed: () => context.push("/donation"),
-                            child: Text("home_donation_button".i18n(), style: TextStyle(color: Colors.white))),
-                      ],
-                    ),
-                  ))
+              for (var donation in ref.watch(teamRoundDataProvider).donations)
+                SizedBox(
+                  width: 200.sp,
+                  child: Card(
+                      margin: EdgeInsets.only(bottom: 32.sp, top: 8.sp),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 4.sp, left: 4.sp, right: 4.sp),
+                              child: Text(donation.description.toString()),
+                            ),
+                            TextButton(
+                                onPressed: () => context.push("/donate/${donation.id}"),
+                                child: Text("home_donation_button".i18n(), style: const TextStyle(color: Colors.white))),
+                          ],
+                        ),
+                      )),
+                )
             ],
           )
         ],

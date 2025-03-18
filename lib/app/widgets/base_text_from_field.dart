@@ -20,7 +20,8 @@ class BaseTextFormField extends StatefulWidget {
       this.validator,
       this.fillColor,
       this.onFieldSubmitted,
-      this.isPasswordField = false});
+      this.isPasswordField = false,
+      this.suffix});
 
   final String? initialValue;
   final String labelText;
@@ -39,6 +40,7 @@ class BaseTextFormField extends StatefulWidget {
   final String? Function(String?)? validator;
   final Function(String text)? onChanged;
   final Function(String text)? onFieldSubmitted;
+  final Widget? suffix;
 
   @override
   State<StatefulWidget> createState() => _BaseTextFormFieldState();
@@ -82,7 +84,7 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
                 ? IconButton(
                     onPressed: () => obscuredChanged(),
                     icon: _isObscured ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off))
-                : null),
+                : widget.suffix),
         onChanged: widget.onChanged != null ? (String text) => widget.onChanged!(text) : null,
         onFieldSubmitted: widget.onFieldSubmitted != null ? (String text) => widget.onFieldSubmitted!(text) : null,
         validator: widget.validator == null ? null : (String? text) => widget.validator!(text),

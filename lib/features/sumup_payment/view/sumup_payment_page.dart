@@ -7,24 +7,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/models/payment_state.dart';
+import 'package:work_hu/app/models/payment_status.dart';
 import 'package:work_hu/app/widgets/list_separator.dart';
 
-class BufePaymentPage extends StatefulWidget {
+class SumupPaymentPage extends StatefulWidget {
   final String base64Params;
 
-  const BufePaymentPage({required this.base64Params, super.key});
+  const SumupPaymentPage({required this.base64Params, super.key});
 
   @override
-  SumUpPaymentPageState createState() => SumUpPaymentPageState();
+  SunupPaymentPageState createState() => SunupPaymentPageState();
 }
 
-class SumUpPaymentPageState extends State<BufePaymentPage> {
+class SunupPaymentPageState extends State<SumupPaymentPage> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> paymentData = jsonDecode(utf8.decode(base64.decode(widget.base64Params)));
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false, title: Center(child: Text("payment".i18n()))),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(automaticallyImplyLeading: false, title: Center(child: Text("sumup_payment".i18n()))),
       body: Column(
         children: [
           Card(
@@ -52,12 +53,12 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
                   child: TextButton(
                     onPressed: () {
                       try {
-                        showPaymentState(context, PaymentState.canceled).then((value) => context.mounted && context.canPop()
-                            ? context.pop(PaymentState.canceled)
+                        showPaymentState(context, PaymentStatus.EXPIRED).then((value) => context.mounted && context.canPop()
+                            ? context.pop(value)
                             : context.pushReplacement("/"));
                       } catch (e) {
                         log(e.toString());
-                        context.pushReplacement("/");
+                        context.canPop() ? context.pop(PaymentStatus.EXPIRED) : context.pushReplacement("/");
                       }
                     },
                     child: Text("cancel_payment".i18n()),
@@ -93,7 +94,7 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
     // String sumupUrl = "http://localhost:8800/?data=${widget.base64Params}";
     final iframe = html.IFrameElement()
       ..src = sumupUrl
-      ..allow = 'payment'
+      ..allow = 'sumup_payment'
       ..style.border = 'none'
       ..style.width = '100%'
       ..style.height = '100%'
@@ -107,26 +108,25 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
       final message = (event as html.MessageEvent).data;
       if (message is String) {
         if (message == 'SUCCESS') {
-          showPaymentState(context, PaymentState.success).then((value) async {
-            context.mounted ? context.pop(PaymentState.success) : null;
+          showPaymentState(context, PaymentStatus.PAID).then((value) {
+            context.mounted ? context.pop(PaymentStatus.PAID) : null;
           });
         } else if (message == 'FAILED' || message == 'ERROR') {
-          showPaymentState(context, PaymentState.error)
-              .then((value) => value != null && value == PaymentState.canceled ? null : context.pop(PaymentState.error));
+          showPaymentState(context, PaymentStatus.FAILED)
+              .then((value) => value != null && value == PaymentStatus.PENDING ? null : context.pop(PaymentStatus.FAILED));
         }
       }
     });
     super.initState();
   }
 
-
-  Future<PaymentState?> showPaymentState(BuildContext context, PaymentState state) async {
-    return await showModalBottomSheet<PaymentState>(
+  Future<PaymentStatus?> showPaymentState(BuildContext context, PaymentStatus state, {num? amount, String? cardData}) async {
+    return await showModalBottomSheet<PaymentStatus>(
         context: context,
         isDismissible: false,
-        backgroundColor: state == PaymentState.error
+        backgroundColor: state == PaymentStatus.FAILED
             ? Colors.red.shade300
-            : state == PaymentState.success
+            : state == PaymentStatus.PAID
                 ? Colors.green
                 : Colors.amber,
         enableDrag: false,
@@ -141,9 +141,9 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      state == PaymentState.error
+                      state == PaymentStatus.FAILED
                           ? Icons.cancel
-                          : state == PaymentState.success
+                          : state == PaymentStatus.PAID
                               ? Icons.done_rounded
                               : Icons.cancel,
                       size: 60.sp,
@@ -152,9 +152,9 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          state == PaymentState.success
+                          state == PaymentStatus.PAID
                               ? 'payment_successful'.i18n()
-                              : state == PaymentState.error
+                              : state == PaymentStatus.FAILED
                                   ? 'payment_error'.i18n()
                                   : 'payment_canceled'.i18n(),
                           textAlign: TextAlign.center,
@@ -167,9 +167,9 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
                       children: [
                         Expanded(
                           child: Text(
-                            state == PaymentState.success
-                                ? 'payment_successful_text'.i18n(["Google Pay", "500"])
-                                : state == PaymentState.error
+                            state == PaymentStatus.PAID
+                                ? 'payment_successful_text'.i18n([cardData.toString(), amount.toString()])
+                                : state == PaymentStatus.FAILED
                                     ? 'payment_error_text'.i18n()
                                     : 'payment_canceled_text'.i18n(),
                             textAlign: TextAlign.center,
@@ -191,11 +191,11 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
                       child: TextButton(onPressed: () => modalContext.pop(state), child: Text("ok".i18n())),
                     ),
                   ),
-                  if (state == PaymentState.error)
+                  if (state == PaymentStatus.FAILED)
                     Expanded(
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 12.sp),
-                        child: TextButton(onPressed: () => modalContext.pop(PaymentState.canceled), child: Text("retry".i18n())),
+                        child: TextButton(onPressed: () => modalContext.pop(PaymentStatus.PENDING), child: Text("retry".i18n())),
                       ),
                     )
                 ],
@@ -207,7 +207,6 @@ class SumUpPaymentPageState extends State<BufePaymentPage> {
 
   @override
   void dispose() {
-
     super.dispose();
   }
 }

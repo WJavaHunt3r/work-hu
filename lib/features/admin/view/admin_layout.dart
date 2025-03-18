@@ -38,6 +38,8 @@ class AdminLayout extends ConsumerWidget {
         createListTile(context: context, title: "admin_goals", route: "goals"),
         createListTile(context: context, title: "admin_mentor_mentees", route: "mentorMentees"),
         createListTile(context: context, title: "admin_transactions", route: "transactions"),
+        createListTile(context: context, title: "admin_donations", route: "donations"),
+        createListTile(context: context, title: "admin_payments", route: "payments"),
         createListTile(context: context, title: "admin_camps", route: "camps"),
         createListTile(context: context, title: "admin_camp_registrations", route: "campRegistrations"),
         createListTile(context: context, title: "admin_rounds", route: "rounds"),
