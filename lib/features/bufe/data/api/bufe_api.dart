@@ -45,7 +45,7 @@ class BufeApi {
 
   Future<dynamic> createCheckout({required num amount, required String checkoutReference, required String description}) async {
     try {
-      final res = await _dioClient.dio.get("/create_checkout",
+      final res = await _dioClient.dio.get("/checkouts",
           queryParameters: {"checkout_reference": checkoutReference, "amount": amount, "description": description});
       return res.data;
     } catch (e) {
@@ -55,20 +55,20 @@ class BufeApi {
 
   Future<dynamic> deleteCheckout({required String checkoutId}) async {
     try {
-      final res = await _dioClient.dio.delete("/delete_checkout/$checkoutId");
+      final res = await _dioClient.dio.delete("/checkouts/$checkoutId");
       return res.data;
     } catch (e) {
       rethrow;
     }
   }
 
-
-  // Future<dynamic> uploadBufeAccount(num bufeId) async {
-  //   try {
-  //     final res = await _dioClient.dio.get("/account/$bufeId");
-  //     return res.data;
-  //   } catch (e) {
-  //     rethrow;
-  //   }
-  // }
+  Future<dynamic> createPayment(num bufeId, num amount, String checkoutId, String date, String time) async {
+    try {
+      final res = await _dioClient.dio
+          .post("/account/$bufeId/payments", data: {"amount": amount, "date": date, "time": time, "checkout_id": checkoutId});
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

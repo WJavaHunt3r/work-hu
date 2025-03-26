@@ -49,6 +49,7 @@
   "admin_donations" : "Gyűjtések",
   "admin_payments" : "Fizetések",
   "bufe": "Dukakártya egyenleg",
+  "bufe_sum": "Rendelések összege",
   "bufe_payments": "Legutóbbi befizetések",
   "bufe_orders": "Legutóbbi rendelések",
   "bufe_order_items": "Rendelés tételek %s",
@@ -190,5 +191,9 @@
   "payment_status_failed": "Hiba",
   "payment_status_expired": "Törölt",
   "payment_status_pending": "Várakozik",
-  "payment_status_paid": "Sikeres"
+  "payment_status_paid": "Sikeres",
+  "card_fill": "Kártya feltöltés",
+  "card_fill_button" : "Feltöltés",
+  "card_fill_confirm": "Megerősítés",
+  "card_fill_confirm_text": "Nem vagy On Track MyShareben. Biztos folytatod a feltöltést?"
 }

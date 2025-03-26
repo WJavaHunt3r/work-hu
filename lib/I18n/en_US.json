@@ -47,6 +47,7 @@
   "admin_statistics": "Statistics",
   "admin_donations" : "Donations",
   "admin_payments" : "Payments",
+  "bufe_sum": "Order sum",
   "bufe": "Duka card balance",
   "bufe_payments": "Latest transactions",
   "bufe_orders": "Legutóbbi rendelések",
@@ -185,5 +186,9 @@
   "payment_status_failed": "Failed",
   "payment_status_expired": "Deleted",
   "payment_status_pending": "Pending",
-  "payment_status_paid": "Paid"
+  "payment_status_paid": "Paid",
+  "card_fill": "Upload balance",
+  "card_fill_button" : "Upload",
+  "card_fill_confirm": "Confirm",
+  "card_fill_confirm_text": "You are not On Track in MyShare. Are you sure you want to continue?"
 }

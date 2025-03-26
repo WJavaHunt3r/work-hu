@@ -66,4 +66,13 @@ class BufeRepository {
       rethrow;
     }
   }
+
+  Future<String> createPayment(
+      {required num bufeId, required num amount, required String checkoutId, required String date, required String time}) async {
+    try {
+      return await _bufeApi.createPayment(bufeId, amount, checkoutId, date, time);
+    } on DioException {
+      rethrow;
+    }
+  }
 }

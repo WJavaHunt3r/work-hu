@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/providers/router_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
@@ -11,12 +10,32 @@ import 'package:work_hu/features/bufe/data/model/bufe_payments_model.dart';
 import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
 import 'package:work_hu/features/bufe/widgets/account_balance.dart';
 import 'package:work_hu/features/bufe/widgets/order_list_item.dart';
+import 'package:work_hu/features/profile/widgets/info_card.dart';
+import 'package:work_hu/features/utils.dart';
 
-class BufeLayout extends ConsumerWidget {
-  const BufeLayout({super.key});
+class BufeLayout extends ConsumerStatefulWidget {
+  const BufeLayout({super.key, required this.id, this.onTrack});
+
+  final num id;
+  final bool? onTrack;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return _BufeState();
+  }
+}
+
+class _BufeState extends ConsumerState<BufeLayout> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.watch(bufeDataProvider.notifier).getAccounts(widget.id);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final account = ref.watch(bufeDataProvider).account;
     final payments = ref.watch(bufeDataProvider).payments;
     final orders = ref.watch(bufeDataProvider).orders;
@@ -30,6 +49,30 @@ class BufeLayout extends ConsumerWidget {
                 AccountBalance(
                   name: account?.name ?? "",
                   balance: account?.balance ?? "",
+                  id: account?.id ?? 0,
+                  onTrack: widget.onTrack,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                        child: InfoCard(
+                            height: 110.sp,
+                            padding: 10.sp,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                      "${Utils.creditFormat.format(num.tryParse(account?.sum.substring(0, account.sum.length - 3) ?? "0"))} Ft" ??
+                                          "",
+                                      style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w800)),
+                                ),
+                                Text("bufe_sum".i18n(),
+                                    textAlign: TextAlign.center, style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600)),
+                              ],
+                            )))
+                  ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,

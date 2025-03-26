@@ -42,8 +42,7 @@ class _DonationsState extends ConsumerState<DonationsLayout> {
                 child: BaseListView(
               itemBuilder: (BuildContext context, int index) {
                 var current = donations[index];
-                var date = current.startDateTime!;
-                var dateString = Utils.dateToString(date);
+                var startDateString = Utils.dateToString( current.startDateTime!);
                 var endDateString = Utils.dateToString(current.endDateTime!);
                 return Dismissible(
                     key: UniqueKey(),
@@ -78,8 +77,14 @@ class _DonationsState extends ConsumerState<DonationsLayout> {
                           isDonationOpen(current.startDateTime!, current.endDateTime!) ? Icons.lock_open : Icons.lock_outline,
                           color: isDonationOpen(current.startDateTime!, current.endDateTime!) ? Colors.green : Colors.red,
                         ),
-                        title: Text(current.description.toString()),
-                        subtitle: Text("$dateString - $endDateString"),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(current.description.toString()),
+                            Text(current.sum.toString())
+                          ],
+                        ),
+                        subtitle: Text("$startDateString - $endDateString"),
                       ),
                     ));
               },

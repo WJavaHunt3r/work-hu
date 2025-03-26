@@ -74,15 +74,13 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
       });
       if (userModel.spouseId != null) {
         usersRepository.getUserById(userModel.spouseId!).then((value) async {
-          state = state.copyWith(spouse: value, children: [...state.children, value]);
+          state = state.copyWith(spouse: value);
           await userRoundRepoProvider
               .fetchUserRounds(userId: value.id, seasonYear: DateTime.now().year, roundId: roundDataNotifier.getCurrentRound().id)
               .then((userRounds) async {
             if (userRounds.isNotEmpty && userRounds.length == 1) {
               await userStatusRepoProvider.getUserStatusByUserId(value.id, DateTime.now().year).then((status) async {
-                var childrenRounds = <UserRoundModel>[...state.childrenUserRounds, ...userRounds];
-                var childrenStatuses = [...state.childrenStatus, status];
-                state = state.copyWith(childrenStatus: childrenStatuses, childrenUserRounds: childrenRounds);
+                state = state.copyWith(spouseStatus: status, spouseUserRound: userRounds[0]);
               });
             }
           });

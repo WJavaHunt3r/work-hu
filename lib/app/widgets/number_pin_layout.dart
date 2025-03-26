@@ -9,6 +9,7 @@ class NumberPinLayout extends StatelessWidget {
       {super.key,
       required this.amount,
       this.checkoutId,
+      this.buttonText,
       required this.amountController,
       required this.addNumber,
       required this.createCheckout,
@@ -18,6 +19,7 @@ class NumberPinLayout extends StatelessWidget {
 
   final num amount;
   final String? checkoutId;
+  final String? buttonText;
   final String path;
   final TextEditingController amountController;
   final Function(String) addNumber;
@@ -125,7 +127,7 @@ class NumberPinLayout extends StatelessWidget {
                           padding: EdgeInsets.symmetric(horizontal: 30.sp, vertical: 20.sp),
                           child: TextButton(
                             onPressed: amount > 0 ? () => createCheckout() : null,
-                            child: Text("donate_button".i18n()),
+                            child: Text(buttonText != null ? buttonText!.i18n() : "donate_button".i18n()),
                           ),
                         ),
                       ),

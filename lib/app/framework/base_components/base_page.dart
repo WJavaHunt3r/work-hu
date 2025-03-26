@@ -36,7 +36,7 @@ abstract class BasePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return PopScope(
         canPop: canPop,
-        onPopInvokedWithResult: (didPop, result) => popInvoked(context, didPop, ref),
+        onPopInvokedWithResult: (didPop, result) async => await popInvoked(context, didPop, ref),
         child: Scaffold(
             drawer: buildDrawer(context, ref),
             bottomNavigationBar: buildBottomNavigationBar(context, ref),

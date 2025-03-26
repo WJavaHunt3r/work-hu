@@ -24,6 +24,9 @@ class ConfirmAlertDialog extends StatelessWidget {
           TextButton(
               style: ButtonStyle(
                 backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
+                foregroundColor: WidgetStateColor.resolveWith((states) {
+                  return AppColors.primary;
+                }),
               ),
               onPressed: () => context.pop(),
               child: Text(
@@ -34,7 +37,7 @@ class ConfirmAlertDialog extends StatelessWidget {
               onPressed: onConfirm,
               child: Text(
                 "confirm".i18n(),
-                style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+                //style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
               ))
         ],
         content: content);

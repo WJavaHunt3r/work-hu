@@ -8,6 +8,7 @@ import 'package:work_hu/features/activity_items/view/activity_items_layout.dart'
 import 'package:work_hu/features/admin/view/admin_page.dart';
 import 'package:work_hu/features/bufe/view/bufe_page.dart';
 import 'package:work_hu/features/bufe/widgets/order_items.dart';
+import 'package:work_hu/features/card_fill/view/card_fill_page.dart';
 import 'package:work_hu/features/change_password/view/change_password_page.dart';
 import 'package:work_hu/features/create_activity/view/create_activity_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_point_transactions_page.dart';
@@ -89,9 +90,26 @@ final routerProvider = Provider<GoRouter>((ref) {
                 )),
               ),
               GoRoute(
-                  path: 'bufe',
-                  builder: (BuildContext context, GoRouterState state) => const BufePage(),
-                  routes: [GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems())]),
+                  path: 'bufe/:id',
+                  builder: (BuildContext context, GoRouterState state) {
+                    var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
+                    return BufePage(id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+                      onTrack: map != null ? map["onTrack"] : null,);
+                  },
+                  routes: [
+                    GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems()),
+                    GoRoute(
+                        path: "cardFill",
+                        builder: (BuildContext context, GoRouterState state) {
+                          return CardFillPage(bufeId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
+                        },
+                        routes: [
+                          GoRoute(
+                              path: "sumup_payment/:checkoutId",
+                              builder: (BuildContext context, GoRouterState state) =>
+                                  SumupPaymentPage(base64Params: state.pathParameters["checkoutId"] ?? "0"))
+                        ])
+                  ]),
             ]),
         GoRoute(path: "/donation", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
         GoRoute(

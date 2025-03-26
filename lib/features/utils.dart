@@ -21,8 +21,7 @@ import 'package:work_hu/features/season/data/model/season_model.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 
 class Utils {
-  static const FlutterSecureStorage _storage =
-      FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));
+  static const FlutterSecureStorage _storage = FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));
 
   static Future<void> saveData(String key, String value) async {
     try {
@@ -76,8 +75,7 @@ class Utils {
   static String getTransactionTypeText(TransactionType transactionType, [bool long = true]) {
     if (transactionType == TransactionType.POINT) {
       return long ? "base_text_points".i18n() : "base_text_points_short".i18n();
-    } else if ([TransactionType.HOURS, TransactionType.DUKA_MUNKA, TransactionType.DUKA_MUNKA_2000]
-        .contains(transactionType)) {
+    } else if ([TransactionType.HOURS, TransactionType.DUKA_MUNKA, TransactionType.DUKA_MUNKA_2000].contains(transactionType)) {
       return long ? "base_text_hours".i18n() : "base_text_hours_short".i18n();
     } else if (transactionType == TransactionType.CREDIT) {
       return long ? "base_text_credits".i18n() : "base_text_credits_short".i18n();
@@ -94,6 +92,14 @@ class Utils {
 
   static String dateToString(DateTime date) {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day}";
+  }
+
+  static String dateToStringWithDots(DateTime date) {
+    return "${date.year}.${date.month < 10 ? "0${date.month}" : date.month}.${date.day < 10 ? "0${date.day}" : date.day}";
+  }
+
+  static String dateToTimeString(DateTime date) {
+    return "${date.hour < 10 ? "0${date.hour}" : date.hour}:${date.minute < 10 ? "0${date.minute}" : date.minute}:${date.second < 10 ? "0${date.second}" : date.second}";
   }
 
   static String dateToStringUnformatted(DateTime date) {
@@ -177,20 +183,17 @@ class Utils {
     var employerCell = sheetObject.cell(CellIndex.indexByString('C2'));
     employerCell.value = null;
     employerCell.value = TextCellValue(activity.employer.getFullName());
-    employerCell.cellStyle =
-        (employerCell.cellStyle ?? CellStyle()).copyWith(horizontalAlignVal: HorizontalAlign.Right);
+    employerCell.cellStyle = (employerCell.cellStyle ?? CellStyle()).copyWith(horizontalAlignVal: HorizontalAlign.Right);
 
     var descriptionCell = sheetObject.cell(CellIndex.indexByString('C3'));
     descriptionCell.value = null;
     descriptionCell.value = TextCellValue(activity.description);
-    descriptionCell.cellStyle =
-        (descriptionCell.cellStyle ?? CellStyle()).copyWith(horizontalAlignVal: HorizontalAlign.Right);
+    descriptionCell.cellStyle = (descriptionCell.cellStyle ?? CellStyle()).copyWith(horizontalAlignVal: HorizontalAlign.Right);
 
     var responsibleCell = sheetObject.cell(CellIndex.indexByString('C4'));
     responsibleCell.value = null;
     responsibleCell.value = TextCellValue(activity.responsible.getFullName());
-    responsibleCell.cellStyle =
-        (responsibleCell.cellStyle ?? CellStyle()).copyWith(horizontalAlignVal: HorizontalAlign.Right);
+    responsibleCell.cellStyle = (responsibleCell.cellStyle ?? CellStyle()).copyWith(horizontalAlignVal: HorizontalAlign.Right);
 
     var activityIdCell = sheetObject.cell(CellIndex.indexByString('F1'));
     activityIdCell.value = null;
@@ -251,17 +254,7 @@ class Utils {
   }
 
   static Future<void> createCreditCsv(List<TransactionItemModel> items, DateTime date, String description) async {
-    var headers = [
-      "UserId",
-      "Age",
-      "Name",
-      "LastName",
-      "ClubId",
-      "ClubName",
-      "Amount",
-      "ClubTransactionDate",
-      "Description"
-    ];
+    var headers = ["UserId", "Age", "Name", "LastName", "ClubId", "ClubName", "Amount", "ClubTransactionDate", "Description"];
 
     List<List<dynamic>> list = [];
     list.add(headers);

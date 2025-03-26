@@ -11,7 +11,8 @@ class DonationModel with _$DonationModel {
     DateTime? startDateTime,
     DateTime? endDateTime,
     String? description,
-    String? descriptionNO
+    String? descriptionNO,
+    num? sum
   }) = _DonationModel;
 
   factory DonationModel.fromJson(Map<String, dynamic> json) => _$DonationModelFromJson(json);

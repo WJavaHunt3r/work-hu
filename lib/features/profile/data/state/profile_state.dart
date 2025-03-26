@@ -17,7 +17,9 @@ abstract class ProfileState with _$ProfileState {
     @Default([]) List<UserRoundModel> childrenUserRounds,
     @Default([]) List<UserFraKareWeekModel> fraKareWeeks,
     UserStatusModel? userStatus,
+    UserStatusModel? spouseStatus,
     UserModel? spouse,
+    UserRoundModel? spouseUserRound,
     @Default(ModelState.empty) ModelState modelState,
   }) = _ProfileState;
 
