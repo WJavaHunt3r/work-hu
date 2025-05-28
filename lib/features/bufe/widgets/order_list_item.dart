@@ -8,11 +8,12 @@ import 'package:work_hu/features/bufe/data/model/bufe_orders_model.dart';
 import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
 
 class OrderListItem extends ConsumerWidget {
-  const OrderListItem({super.key, required this.isLast, required this.index, required this.order});
+  const OrderListItem({super.key, required this.isLast, required this.index, required this.order, required this.bufeId});
 
   final bool isLast;
   final int index;
   final BufeOrdersModel order;
+  final num bufeId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,7 +22,7 @@ class OrderListItem extends ConsumerWidget {
       index: index,
       onTap: () {
         ref.watch(bufeDataProvider.notifier).setSelectedOrder(order);
-        context.push("/profile/bufe/orderItems");
+        context.push("/profile/bufe/${bufeId}/orderItems");
       },
       trailing: Text(
         "${order.brutto.replaceAll(".00", "")} Ft",

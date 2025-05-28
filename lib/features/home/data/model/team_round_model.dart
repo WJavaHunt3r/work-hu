@@ -13,7 +13,10 @@ class TeamRoundModel with _$TeamRoundModel{
     required TeamModel team,
     required num teamRoundCoins,
     required num maxTeamRoundCoins,
-    required double teamRoundStatus
+    required double teamRoundStatus,
+    required double teamHours,
+    required double payments,
+    required double onTrack
   }) = _TeamRoundModel;
 
   factory TeamRoundModel.fromJson(Map<String, dynamic> json) => _$TeamRoundModelFromJson(json);

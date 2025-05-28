@@ -30,7 +30,7 @@ final userStatusDataProvider =
             ref.read(userStatusRepoProvider),
             ref.read(userRoundsRepoProvider),
             ref.watch(roundRepoProvider),
-            ref.watch(teamRepoProvider)));
+            ref.watch(teamRoundRepoProvider)));
 
 class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   UserStatusDataNotifier(

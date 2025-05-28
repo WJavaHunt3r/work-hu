@@ -76,7 +76,7 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
         usersRepository.getUserById(userModel.spouseId!).then((value) async {
           state = state.copyWith(spouse: value);
           await userRoundRepoProvider
-              .fetchUserRounds(userId: value.id, seasonYear: DateTime.now().year, roundId: roundDataNotifier.getCurrentRound().id)
+              .fetchUserRounds(userId: value.id, seasonYear: DateTime.now().year, roundId: roundDataNotifier.getCurrentRound()!.id)
               .then((userRounds) async {
             if (userRounds.isNotEmpty && userRounds.length == 1) {
               await userStatusRepoProvider.getUserStatusByUserId(value.id, DateTime.now().year).then((status) async {
@@ -87,7 +87,7 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
         });
       }
       userRoundRepoProvider
-          .fetchUserRounds(userId: userModel.id, seasonYear: DateTime.now().year, roundId: roundDataNotifier.getCurrentRound().id)
+          .fetchUserRounds(userId: userModel.id, seasonYear: DateTime.now().year, roundId: roundDataNotifier.getCurrentRound()!.id)
           .then((userRounds) async {
         if (userRounds.isNotEmpty && userRounds.length == 1) {
           await userStatusRepoProvider.getUserStatusByUserId(userModel.id, DateTime.now().year).then((userStatus) async {
@@ -100,7 +100,7 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
         state = state.copyWith(children: children, childrenUserRounds: [], childrenStatus: []);
         for (var child in children) {
           await userRoundRepoProvider
-              .fetchUserRounds(userId: child.id, seasonYear: DateTime.now().year, roundId: roundDataNotifier.getCurrentRound().id)
+              .fetchUserRounds(userId: child.id, seasonYear: DateTime.now().year, roundId: roundDataNotifier.getCurrentRound()!.id)
               .then((userRounds) async {
             if (userRounds.isNotEmpty && userRounds.length == 1) {
               await userStatusRepoProvider.getUserStatusByUserId(child.id, DateTime.now().year).then((status) async {

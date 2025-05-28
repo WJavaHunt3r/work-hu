@@ -20,6 +20,7 @@ class CheckoutModel with _$CheckoutModel {
       required String pay_to_email,
       required PaymentStatus status,
       required String purpose,
+      required String hosted_checkout_url,
       required List<dynamic> transactions}) = _CheckoutModel;
 
   factory CheckoutModel.fromJson(Map<String, dynamic> json) => _$CheckoutModelFromJson(json);

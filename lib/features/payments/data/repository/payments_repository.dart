@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/models/payment_goal.dart';
 import 'package:work_hu/app/models/payment_status.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/payments/data/api/payments_api.dart';
@@ -9,9 +10,25 @@ class PaymentRepository {
 
   PaymentRepository(this._paymentApi);
 
-  Future<List<PaymentsModel>> getPayments({num? userId, PaymentStatus? status, num? donationId}) async {
+  Future<List<PaymentsModel>> getPayments(
+      {num? userId,
+      PaymentStatus? status,
+      num? donationId,
+      String? checkoutId,
+      String? checkoutReference,
+      DateTime? dateFrom,
+      DateTime? dateTo,
+      PaymentGoal? paymentGoal}) async {
     try {
-      final res = await _paymentApi.getPayments(userId: userId, donationId: donationId, status: status);
+      final res = await _paymentApi.getPayments(
+          userId: userId,
+          donationId: donationId,
+          status: status,
+          checkoutId: checkoutId,
+          checkoutReference: checkoutReference,
+          dateFrom: dateFrom?.toString().replaceAll(" ", "T"),
+          dateTo: dateTo?.toString().replaceAll(" ", "T"),
+          paymentGoal: paymentGoal);
       return res.map((e) => PaymentsModel.fromJson(e)).toList();
     } on DioException {
       rethrow;

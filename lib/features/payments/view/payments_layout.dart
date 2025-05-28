@@ -3,14 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/payment_goal.dart';
 import 'package:work_hu/app/models/payment_status.dart';
-import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/features/payments/providers/payments_provider.dart';
+import 'package:work_hu/features/payments/widgets/payment_filter.dart';
 import 'package:work_hu/features/payments/widgets/payments_maintenance.dart';
 import 'package:work_hu/features/utils.dart';
 
@@ -28,11 +29,16 @@ class PaymentsLayout extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _PaymentsState();
 }
 
-class _PaymentsState extends ConsumerState<PaymentsLayout> {
+class _PaymentsState extends ConsumerState<PaymentsLayout> with SingleTickerProviderStateMixin{
+
+  late AnimationController _controller;
   @override
   void initState() {
     super.initState();
-    // Use a post-frame callback to ensure the widget is fully mounted.
+    _controller = AnimationController(
+      vsync: this, // the SingleTickerProviderStateMixin
+      duration: Duration(seconds: 1),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(paymentDataProvider.notifier).presetFilter(donationId: widget.donationId, userId: widget.userId);
     });
@@ -45,7 +51,15 @@ class _PaymentsState extends ConsumerState<PaymentsLayout> {
       children: [
         RefreshIndicator(
           onRefresh: () async => ref.read(paymentDataProvider.notifier).getPayments(),
-          child: Column(children: [
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            TextButton(
+              onPressed: () => showPaymentFilter(context),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [Icon(Icons.filter_alt_outlined), Text('base_text_filter')],
+              ),
+            ),
             Expanded(
                 child: BaseListView(
               itemBuilder: (BuildContext context, int index) {
@@ -64,7 +78,7 @@ class _PaymentsState extends ConsumerState<PaymentsLayout> {
                               );
                             })
                         .then((confirmed) => confirmed != null && confirmed
-                            ? ref.read(paymentDataProvider.notifier).deletePayments(current.id!, index)
+                            ? ref.read(paymentDataProvider.notifier).deletePayments(current.id!, index, current.checkoutId)
                             : null),
                     dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
                     child: Card(
@@ -77,8 +91,8 @@ class _PaymentsState extends ConsumerState<PaymentsLayout> {
                               barrierDismissible: false,
                               context: context,
                               builder: (context) => PaymentMaintenance(
-                                    payment: current,
-                                  )).then((value) => ref.watch(paymentDataProvider.notifier).getPayments());
+                                    paymentId: current.id!,
+                                  ));
                         },
                         title: Row(
                           mainAxisSize: MainAxisSize.max,
@@ -121,20 +135,6 @@ class _PaymentsState extends ConsumerState<PaymentsLayout> {
   }
 
   Widget getPaymentText(PaymentStatus status) {
-    var textColor = switch (status) {
-      PaymentStatus.FAILED => Colors.red,
-      PaymentStatus.PENDING => Colors.orange,
-      PaymentStatus.PAID => Colors.green,
-      PaymentStatus.EXPIRED => Colors.grey
-    };
-
-    var bgColor = switch (status) {
-      PaymentStatus.FAILED => AppColors.redRowBgColor,
-      PaymentStatus.PENDING => AppColors.yellowRowBgColor,
-      PaymentStatus.PAID => AppColors.greenRowBgColor,
-      PaymentStatus.EXPIRED => AppColors.gray100
-    };
-
     var iconColor = switch (status) {
       PaymentStatus.FAILED => Colors.red,
       PaymentStatus.PENDING => Colors.grey,
@@ -169,5 +169,19 @@ class _PaymentsState extends ConsumerState<PaymentsLayout> {
         ),
       ],
     );
+  }
+
+  Future<dynamic> showPaymentFilter(BuildContext context) async {
+    return await showModalBottomSheet<BasePage>(
+        context: context,
+        isDismissible: false,
+        enableDrag: false,
+        transitionAnimationController: _controller,
+        elevation: 4.sp,
+        isScrollControlled: true,
+        barrierLabel: 'text'.i18n(),
+        builder: (modalContext) {
+          return PaymentFilter();
+        });
   }
 }

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/models/payment_status.dart';
+import 'package:work_hu/app/widgets/list_separator.dart';
 import 'package:work_hu/app/widgets/number_pin.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NumberPinLayout extends StatelessWidget {
   const NumberPinLayout(
@@ -13,9 +16,9 @@ class NumberPinLayout extends StatelessWidget {
       required this.amountController,
       required this.addNumber,
       required this.createCheckout,
-      required this.afterPaymentOccurred,
       required this.path,
-      required this.onRemoveNumber});
+      required this.onRemoveNumber,
+      this.hostedUrl});
 
   final num amount;
   final String? checkoutId;
@@ -24,8 +27,8 @@ class NumberPinLayout extends StatelessWidget {
   final TextEditingController amountController;
   final Function(String) addNumber;
   final Function createCheckout;
-  final Function(dynamic) afterPaymentOccurred;
   final Function onRemoveNumber;
+  final String? hostedUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -141,9 +144,16 @@ class NumberPinLayout extends StatelessWidget {
                           padding: EdgeInsets.symmetric(horizontal: 30.sp, vertical: 20.sp),
                           child: TextButton(
                               onPressed: () {
-                                context.push("/$path/sumup_payment/$checkoutId").then((value) {
-                                  afterPaymentOccurred(value);
-                                });
+                                Uri uri = Uri.parse(hostedUrl.toString());
+                                _launchUrl(uri);
+                                // context.push("/$path/sumup_payment/$checkoutId").then((value) {
+                                //   if (value != null && value is PaymentStatus) {
+                                //     showPaymentState(context, value);
+                                //     value == PaymentStatus.PAID ? paymentSuccessful() : paymentFailure(value);
+                                //   } else {
+                                //     paymentFailure(PaymentStatus.FAILED);
+                                //   }
+                                // });
                               },
                               child: Text(
                                 "donate_proceed".i18n([amount.toString()]),
@@ -165,5 +175,96 @@ class NumberPinLayout extends StatelessWidget {
       style: TextStyle(fontSize: 24.sp, color: color),
       textAlign: TextAlign.center,
     );
+  }
+
+  Future<PaymentStatus?> showPaymentState(BuildContext context, PaymentStatus state, {num? amount, String? cardData}) async {
+    return await showModalBottomSheet<PaymentStatus>(
+        context: context,
+        isDismissible: false,
+        backgroundColor: state == PaymentStatus.FAILED
+            ? Colors.red.shade300
+            : state == PaymentStatus.PAID
+                ? Colors.green
+                : Colors.amber,
+        enableDrag: false,
+        elevation: 4.sp,
+        barrierLabel: 'text'.i18n(),
+        builder: (modalContext) {
+          return Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      state == PaymentStatus.FAILED
+                          ? Icons.cancel
+                          : state == PaymentStatus.PAID
+                              ? Icons.done_rounded
+                              : Icons.cancel,
+                      size: 60.sp,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          state == PaymentStatus.PAID
+                              ? 'payment_successful'.i18n()
+                              : state == PaymentStatus.FAILED
+                                  ? 'payment_error'.i18n()
+                                  : 'payment_canceled'.i18n(),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(modalContext).textTheme.headlineMedium,
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            state == PaymentStatus.PAID
+                                ? 'payment_successful_text'.i18n([cardData.toString(), amount.toString()])
+                                : state == PaymentStatus.FAILED
+                                    ? 'payment_error_text'.i18n()
+                                    : 'payment_canceled_text'.i18n(),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              ListSeparator(padding: 8.sp, height: 1.sp),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 12.sp),
+                      child: TextButton(onPressed: () => modalContext.pop(state), child: Text("ok".i18n())),
+                    ),
+                  ),
+                  if (state == PaymentStatus.FAILED)
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 12.sp),
+                        child: TextButton(onPressed: () => modalContext.pop(PaymentStatus.PENDING), child: Text("retry".i18n())),
+                      ),
+                    )
+                ],
+              )
+            ],
+          );
+        });
+  }
+
+  Future<void> _launchUrl(Uri uri) async {
+    if (!await launchUrl(uri, mode: LaunchMode.inAppWebView, webOnlyWindowName: "_self")) {
+      throw Exception('Could not launch $uri');
+    }
   }
 }

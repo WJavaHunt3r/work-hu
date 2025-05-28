@@ -63,4 +63,13 @@ class UsersRepository {
       rethrow;
     }
   }
+
+  Future<String> setPaceTeams() async {
+    try {
+      final res = await _userApi.setPaceTeams();
+      return res;
+    } on DioException {
+      rethrow;
+    }
+  }
 }

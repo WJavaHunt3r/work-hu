@@ -9,11 +9,13 @@ import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
 
 class AccountBalance extends ConsumerWidget {
-  const AccountBalance({super.key, required this.name, required this.balance, required this.id, this.onTrack});
+  const AccountBalance(
+      {super.key, required this.name, required this.balance, required this.id, this.onTrack, this.userId});
 
   final String name;
   final String balance;
   final num id;
+  final num? userId;
   final bool? onTrack;
 
   @override
@@ -52,16 +54,16 @@ class AccountBalance extends ConsumerWidget {
                               ),
                               onConfirm: () {
                                 context.pop();
-                                context.push("/profile/bufe/$id/cardFill", extra: {"bufeId": id}).then((value) {
-                                  ref.watch(bufeDataProvider.notifier).getAccount(id);
+                                context.push("/profile/bufe/$id/cardFill", extra: {"userId": userId}).then((value) {
+                                  ref.watch(bufeDataProvider.notifier).getAccounts(id);
                                 });
                               },
                               title: "card_fill_confirm".i18n(),
                               content: Text("card_fill_confirm_text".i18n()));
                         });
                   } else {
-                    context.push("/profile/bufe/$id/cardFill", extra: {"bufeId": id}).then((value) {
-                      ref.watch(bufeDataProvider.notifier).getAccount(id);
+                    context.push("/profile/bufe/$id/cardFill", extra: {"userId": userId}).then((value) {
+                      ref.watch(bufeDataProvider.notifier).getAccounts(id);
                     });
                   }
                 },

@@ -9,6 +9,8 @@ import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/style/app_style.dart';
 
+import 'app/providers/localeProvider.dart';
+
 class DukApp extends ConsumerWidget {
   const DukApp({super.key});
 

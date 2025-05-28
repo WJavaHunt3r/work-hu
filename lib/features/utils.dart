@@ -85,6 +85,7 @@ class Utils {
 
   static final NumberFormat creditFormat = NumberFormat("#,###");
   static final NumberFormat percentFormat = NumberFormat.decimalPatternDigits(decimalDigits: 1);
+  static final NumberFormat percentFormat2Digits = NumberFormat.decimalPatternDigits(decimalDigits: 2);
 
   static String creditFormatting(num number) {
     return creditFormat.format(number).replaceAll(",", " ");
@@ -110,24 +111,24 @@ class Utils {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day} ${date.hour < 10 ? "0${date.hour}" : date.hour}:${date.minute < 10 ? "0${date.minute}" : date.minute}";
   }
 
-  static RoundModel createEmptyRound() {
-    return RoundModel(
-        id: 0,
-        roundNumber: 0,
-        samvirkGoal: 0,
-        myShareGoal: 0,
-        samvirkChurchGoal: 0,
-        startDateTime: DateTime.now(),
-        endDateTime: DateTime.now(),
-        season: SeasonModel(
-          id: 0,
-          seasonYear: DateTime.now().year,
-          startDate: DateTime.now(),
-          endDate: DateTime.now(),
-        ),
-        freezeDateTime: DateTime.now(),
-        activeRound: true);
-  }
+  // static RoundModel createEmptyRound() {
+  //   return RoundModel(
+  //       id: 0,
+  //       roundNumber: 0,
+  //       samvirkGoal: 0,
+  //       myShareGoal: 0,
+  //       samvirkChurchGoal: 0,
+  //       startDateTime: DateTime.now(),
+  //       endDateTime: DateTime.now(),
+  //       season: SeasonModel(
+  //         id: 0,
+  //         seasonYear: DateTime.now().year,
+  //         startDate: DateTime.now(),
+  //         endDate: DateTime.now(),
+  //       ),
+  //       freezeDateTime: DateTime.now(),
+  //       activeRound: true);
+  // }
 
   static String changeSpecChars(String text) {
     for (String entry in getEngChar().keys) {

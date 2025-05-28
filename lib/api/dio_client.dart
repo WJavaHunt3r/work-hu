@@ -3,8 +3,8 @@ import 'package:injectable/injectable.dart';
 
 @singleton
 class DioClient {
-  // static const String _baseUrl = "http://192.168.1.173:8990/work-hu/api"; //Home
-  // static const String _baseUrl = "http://192.168.191.57:8990/work-hu/api"; //Márkó
+  // static const String _baseUrl = "http://192.168.1.150:8990/work-hu/api"; //Home
+  // static const String _baseUrl = "http://192.168.1.173:8990/work-hu/api"; //Márkó
   // static const String _baseUrl = "http://192.168.94.91:8990/work-hu/api"; //hotspot
   // static const String _baseUrl = "http://10.67.28.59:8990/work-hu/api"; //hotspot
   // static const String _baseUrl = "http://localhost:8990/work-hu/api"; //meló

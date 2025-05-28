@@ -19,9 +19,9 @@ class MyShareStatusLayout extends StatelessWidget {
 
     var currentRound = userGoalRound.round;
     var userStatus = userStatusModel.status * 100;
-    var isOnTrack = userStatusModel.onTrack;
+    var isOnTrack = userStatus > currentRound.localMyShareGoal!;
     var toOnTrack = Utils.creditFormatting(
-        (userStatusModel.goal) * (currentRound.myShareGoal) / 100 -
+        (userStatusModel.goal) * (currentRound.localMyShareGoal!) / 100 -
             userStatusModel.transactions);
     return Column(children: [
       Padding(
@@ -49,7 +49,7 @@ class MyShareStatusLayout extends StatelessWidget {
               MarkerPointer(
                 color: AppColors.teamOrange,
                 value:
-                    (currentRound.myShareGoal) / 100 * (userStatusModel.goal),
+                    (currentRound.localMyShareGoal ?? currentRound.myShareGoal) / 100 * (userStatusModel.goal),
               )
             ],
             annotations: [

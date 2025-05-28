@@ -103,7 +103,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
     var registration = ActivityItemsModel(
       description: description ?? state.description,
       user: state.selectedUser!,
-      round: roundDataNotifier.getCurrentRound(),
+      round: roundDataNotifier.getCurrentRound()!,
       transactionType: state.transactionType,
       account: state.account,
       hours: double.tryParse(hours) ?? 0,

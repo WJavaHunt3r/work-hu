@@ -136,7 +136,7 @@ class UserDetails extends ConsumerWidget {
                                     dropdownColor:
                                     ref.watch(themeProvider) == ThemeMode.dark ? AppColors.primary200 : AppColors.backgroundColor,
                                     decoration: InputDecoration(labelText: "user_details_team".i18n()),
-                                    value: ref.watch(teamsDataProvider).teams.isEmpty ? null : user.paceTeam,
+                                    value: ref.watch(teamsDataProvider).teams.isEmpty || !ref.watch(teamsDataProvider).teams.contains(user.paceTeam) ? null : user.paceTeam,
                                     items: createTeamsDropDownList(ref),
                                     onChanged: (value) => ref
                                         .watch(usersDataProvider.notifier)

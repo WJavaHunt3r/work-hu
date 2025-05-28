@@ -87,6 +87,7 @@ class _BufeState extends ConsumerState<BufeLayout> {
                       isLast: index == orders.length - 1,
                       index: index,
                       order: orders[index],
+                      bufeId: account!.id
                     );
                   },
                   physics: const NeverScrollableScrollPhysics(),

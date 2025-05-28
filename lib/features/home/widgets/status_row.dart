@@ -1,77 +1,69 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/features/utils.dart';
 
-class StatusColumn extends StatelessWidget {
-  StatusColumn(
-      {super.key,
-      required this.teamName,
-      required this.value,
-      required this.maximum,
-      required this.linearElementPosition});
+class StatusRow extends StatelessWidget {
+  StatusRow({super.key, required this.statName, required this.value, required this.maximum, required this.color});
 
-  final String teamName;
+  final String statName;
   final num value;
   final num maximum;
+  final Color color;
   final NumberFormat numberFormat = NumberFormat("###.#");
-  final LinearElementPosition linearElementPosition;
 
   @override
   Widget build(BuildContext context) {
-    final Color color = teamName == "Team Samvirk" ? AppColors.teamOrange : AppColors.teamBlue;
-    return SfLinearGauge(
-        orientation: LinearGaugeOrientation.vertical,
-        axisTrackStyle: LinearAxisTrackStyle(
-            thickness: 50.w,
-            borderColor: Colors.grey.shade500,
-            color: Colors.transparent,
-            edgeStyle: LinearEdgeStyle.bothFlat),
-        minimum: 0,
-        maximum: maximum.toDouble(),
-        showLabels: false,
-        showTicks: false,
-        markerPointers: [
-          LinearWidgetPointer(
-            offset: 10,
-            markerAlignment: LinearMarkerAlignment.center,
-            position: linearElementPosition,
-            dragBehavior: LinearMarkerDragBehavior.constrained,
-            value: value.toDouble(),
-            child: Text(
-              value.toString(),
-              style: TextStyle(fontFamily: "Good-Timing", fontSize: 16.sp),
+    return Padding(
+      padding: EdgeInsets.only(left: 20.sp, right: 20.sp, bottom: 20.sp),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: 4.sp),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                    child: Text(
+                      statName,
+                      style: TextStyle(fontSize: 14.sp, color: color),
+                    )),
+                Text(value.toString(), style: TextStyle(fontSize: 14.sp, color: color, fontWeight: FontWeight.w500),)
+              ],
             ),
           ),
-          if (value != maximum)
-            LinearWidgetPointer(
-              offset: 10,
-              markerAlignment: LinearMarkerAlignment.center,
-              position: linearElementPosition,
-              dragBehavior: LinearMarkerDragBehavior.constrained,
-              value: maximum.toDouble(),
-              child: Text(
-                maximum.toString(),
-                style: TextStyle(fontFamily: "Good-Timing", fontSize: 12.sp),
+          Row(
+            children: [
+              Expanded(
+                child: SfLinearGauge(
+                    orientation: LinearGaugeOrientation.horizontal,
+                    axisTrackStyle: LinearAxisTrackStyle(
+                        thickness: 8.w,
+                        borderColor: Colors.grey.shade500,
+                        color: color.withAlpha(60),
+                        edgeStyle: LinearEdgeStyle.bothCurve),
+                    minimum: 0,
+                    maximum: max(maximum.toDouble(), 1),
+                    showLabels: false,
+                    showTicks: false,
+                    animateAxis: false,
+                    barPointers: [
+                      LinearBarPointer(
+                        thickness: 8.w,
+                        color: color,
+                        edgeStyle: LinearEdgeStyle.bothCurve,
+                        value: value.toDouble(),
+                      )
+                    ]),
               ),
-            )
-        ],
-        barPointers: [
-          LinearBarPointer(
-            thickness: 50.w,
-            color: color,
-            edgeStyle: LinearEdgeStyle.bothFlat,
-            value: value.toDouble(),
+            ],
           ),
-          LinearBarPointer(
-              thickness: 50.w,
-              color: Colors.transparent,
-              enableAnimation: false,
-              borderColor: Colors.grey,
-              borderWidth: 0.5.w,
-              edgeStyle: LinearEdgeStyle.bothFlat,
-              value: maximum.toDouble())
-        ]);
+        ],
+      ),
+    );
   }
 }

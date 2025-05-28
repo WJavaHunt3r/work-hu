@@ -24,9 +24,10 @@ import 'package:work_hu/features/login/providers/login_provider.dart';
 import 'package:work_hu/features/login/view/login_page.dart';
 import 'package:work_hu/features/mentees/view/mentees_page.dart';
 import 'package:work_hu/features/mentor_mentee/view/mentor_mentees_page.dart';
+import 'package:work_hu/features/payment_success/view/payment_success_page.dart';
 import 'package:work_hu/features/payments/view/payments_page.dart';
 import 'package:work_hu/features/profile/view/profile_page.dart';
-import 'package:work_hu/features/sumup_payment/view/sumup_payment_page.dart';
+import 'package:work_hu/features/rounds/view/rounds_page.dart';
 import 'package:work_hu/features/transaction_items/view/transaction_items_page.dart';
 import 'package:work_hu/features/transactions/view/transactions_page.dart';
 import 'package:work_hu/features/user_fra_kare_week/view/user_fra_kare_week_page.dart';
@@ -50,9 +51,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                       ),
                   routes: [
                     GoRoute(
-                        path: "sumup_payment/:checkoutId",
-                        builder: (BuildContext context, GoRouterState state) =>
-                            SumupPaymentPage(base64Params: state.pathParameters["checkoutId"] ?? "0"))
+                        path: "success/:checkout_reference",
+                        builder: (BuildContext context, GoRouterState state) {
+                          return PaymentSuccessPage(
+                            checkoutReference: state.pathParameters["checkout_reference"],
+                          );
+                        }),
                   ]),
             ]),
         GoRoute(
@@ -66,9 +70,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                       ),
                   routes: [
                     GoRoute(
-                        path: "sumup_payment/:checkoutId",
-                        builder: (BuildContext context, GoRouterState state) =>
-                            SumupPaymentPage(base64Params: state.pathParameters["checkoutId"] ?? "0"))
+                        path: "success/:checkout_reference",
+                        builder: (BuildContext context, GoRouterState state) {
+                          return PaymentSuccessPage(
+                            checkoutReference: state.pathParameters["checkout_reference"],
+                          );
+                        }),
                   ]),
             ]),
         GoRoute(
@@ -93,8 +100,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   path: 'bufe/:id',
                   builder: (BuildContext context, GoRouterState state) {
                     var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
-                    return BufePage(id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-                      onTrack: map != null ? map["onTrack"] : null,);
+                    return BufePage(
+                      id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+                      onTrack: map != null ? map["onTrack"] : null,
+                    );
                   },
                   routes: [
                     GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems()),
@@ -105,9 +114,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                         },
                         routes: [
                           GoRoute(
-                              path: "sumup_payment/:checkoutId",
-                              builder: (BuildContext context, GoRouterState state) =>
-                                  SumupPaymentPage(base64Params: state.pathParameters["checkoutId"] ?? "0"))
+                              path: "success/:checkout_reference",
+                              builder: (BuildContext context, GoRouterState state) {
+                                return PaymentSuccessPage(
+                                    checkoutReference: state.pathParameters["checkout_reference"],
+                                    bufeId: num.tryParse(state.pathParameters["id"] ?? "0"));
+                              }),
                         ])
                   ]),
             ]),
@@ -138,6 +150,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(path: "userStatus", builder: (BuildContext context, GoRouterState state) => const UserStatusPage()),
               GoRoute(path: "users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
               GoRoute(path: "goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
+              GoRoute(path: "rounds", builder: (BuildContext context, GoRouterState state) => const RoundsPage()),
               GoRoute(path: "donations", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
               GoRoute(
                   path: "payments",

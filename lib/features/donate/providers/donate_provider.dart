@@ -45,10 +45,12 @@ class DonateDataNotifier extends StateNotifier<DonateState> {
   Future<void> createCheckout() async {
     try {
       state = state.copyWith(modelState: ModelState.processing);
+      var reference = "donation_${state.donation!.id!}_${UniqueKey().toString().replaceAll("#", "")}";
       var response = await bufeRepository.createCheckout(
           amount: num.parse(amountController.text),
-          checkoutReference: "donation_${state.donation!.id!}_${UniqueKey()}",
-          description: state.donation!.description!);
+          checkoutReference: reference,
+          description: state.donation!.description!,
+          redirectUrl: "donate/${state.donation!.id}/success/$reference");
 
       var payment = PaymentsModel(
           paymentGoal: PaymentGoal.DONATION,
@@ -70,8 +72,12 @@ class DonateDataNotifier extends StateNotifier<DonateState> {
       };
 
       String base64String = base64Encode(utf8.encode(jsonEncode(json)));
-      state =
-          state.copyWith(modelState: ModelState.success, base64: base64String, payment: paymentResponse, checkoutId: response.id);
+      state = state.copyWith(
+          modelState: ModelState.success,
+          hosted_url: response.hosted_checkout_url,
+          base64: base64String,
+          payment: paymentResponse,
+          checkoutId: response.id);
     } on Exception catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
@@ -102,7 +108,7 @@ class DonateDataNotifier extends StateNotifier<DonateState> {
 
       var payment = state.payment!;
       await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.PAID), payment.id!);
-
+      amountController.text = '';
       state = state.copyWith(amount: 0, modelState: ModelState.success, base64: null, checkoutId: null);
     } on DioException catch (e) {
       state = state.copyWith(modelState: ModelState.error);
@@ -112,13 +118,24 @@ class DonateDataNotifier extends StateNotifier<DonateState> {
   Future<void> deleteCheckout(PaymentStatus status) async {
     try {
       state = state.copyWith(modelState: ModelState.processing);
-      await bufeRepository.deleteCheckout(checkoutId: state.checkoutId!).then((value) async {
-        var payment = state.payment!;
-        await paymentRepository.putPayment(payment.copyWith(status: status), payment.id!);
-      });
-      state = state.copyWith(modelState: ModelState.success, base64: null, checkoutId: null);
+      await deleteCheckoutApi(status, state.checkoutId!, state.payment!);
+      amountController.text = '';
+      state = state.copyWith(modelState: ModelState.success, base64: null, checkoutId: null, amount: 0);
     } on DioException catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
+  }
+
+  Future<dynamic> deleteCheckoutApi(PaymentStatus status, String checkoutId, PaymentsModel payment) async {
+    await bufeRepository.deleteCheckout(checkoutId: checkoutId);
+    await paymentRepository.putPayment(payment.copyWith(status: status), payment.id!);
+  }
+
+  @override
+  void dispose() {
+    if (state.checkoutId != null) {
+      deleteCheckoutApi(PaymentStatus.EXPIRED, state.checkoutId!, state.payment!);
+    }
+    super.dispose();
   }
 }

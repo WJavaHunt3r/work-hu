@@ -1,4 +1,5 @@
 import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/models/payment_goal.dart';
 import 'package:work_hu/app/models/payment_status.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/payments/data/model/payments_model.dart';
@@ -11,10 +12,26 @@ class PaymentsApi {
 
   PaymentsApi();
 
-  Future<List<dynamic>> getPayments({num? userId, PaymentStatus? status, num? donationId}) async {
+  Future<List<dynamic>> getPayments(
+      {num? userId,
+      PaymentStatus? status,
+      num? donationId,
+      String? checkoutId,
+      String? checkoutReference,
+      String? dateFrom,
+      String? dateTo,
+      PaymentGoal? paymentGoal}) async {
     try {
-      final res =
-          await _dioClient.dio.get("/payments", queryParameters: {"userId": userId, "donationId": donationId, "status": status});
+      final res = await _dioClient.dio.get("/payments", queryParameters: {
+        "userId": userId,
+        "donationId": donationId,
+        "status": status,
+        "checkoutId": checkoutId,
+        "checkoutReference": checkoutReference,
+        "dateFrom": dateFrom,
+        "dateTo": dateTo,
+        "paymentGoal": paymentGoal
+      });
       return res.data;
     } catch (e) {
       rethrow;

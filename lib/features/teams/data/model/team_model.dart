@@ -12,6 +12,8 @@ class TeamModel with _$TeamModel {
       required String teamName,
       required double coins,
       String? color,
+        String? startColor,
+        String? endColor,
       String? iconAssetPath}) = _TeamModel;
 
   factory TeamModel.fromJson(Map<String, dynamic> json) =>

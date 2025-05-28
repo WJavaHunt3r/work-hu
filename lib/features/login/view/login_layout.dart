@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
@@ -116,11 +117,11 @@ class LoginLayout extends ConsumerWidget {
                                 style: ButtonStyle(
                                     side: WidgetStateProperty.resolveWith((state) => BorderSide.none),
                                     backgroundColor: WidgetStateColor.resolveWith((states) {
-                                      if (states.contains(WidgetState.focused) ||
-                                          states.contains(WidgetState.pressed) ||
-                                          states.contains(WidgetState.hovered)) {
-                                        return AppColors.secondaryGray;
-                                      }
+                                      // if (states.contains(WidgetState.focused) ||
+                                      //     states.contains(WidgetState.pressed) ||
+                                      //     states.contains(WidgetState.hovered)) {
+                                      //   return AppColors.secondaryGray;
+                                      // }
                                       return ref.watch(themeProvider) == ThemeMode.dark
                                           ? Colors.black
                                           : AppColors.backgroundColor;
@@ -135,18 +136,15 @@ class LoginLayout extends ConsumerWidget {
                                               context.pop();
                                             },
                                             title: "login_reset_password_confirm_title".i18n(),
-                                            content: Text("login_reset_password_question".i18n(),
-                                                textAlign: TextAlign.center))).then((value) => ref
-                                                    .read(loginDataProvider)
-                                                    .resetState ==
-                                                ModelState.success &&
-                                            context.mounted
-                                        ? showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return SuccessAlertDialog(title: ref.read(loginDataProvider).message);
-                                            }).then((value) => ref.read(loginDataProvider.notifier).clearResetState())
-                                        : null);
+                                            content:
+                                                Text("login_reset_password_question".i18n(), textAlign: TextAlign.center))).then(
+                                        (value) => ref.read(loginDataProvider).resetState == ModelState.success && context.mounted
+                                            ? showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return SuccessAlertDialog(title: ref.read(loginDataProvider).message);
+                                                }).then((value) => ref.read(loginDataProvider.notifier).clearResetState())
+                                            : null);
                                   } else {
                                     showDialog(
                                         context: context,
@@ -156,6 +154,34 @@ class LoginLayout extends ConsumerWidget {
                                 },
                                 child: Text(
                                   "login_forgotten_password".i18n(),
+                                  style: const TextStyle(color: AppColors.primary),
+                                )),
+                          ),
+                        ],
+                      )),
+                  Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0.sp),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                                style: ButtonStyle(
+                                    side: WidgetStateProperty.resolveWith((state) => BorderSide.none),
+                                    backgroundColor: WidgetStateColor.resolveWith((states) {
+                                      // if (states.contains(WidgetState.focused) ||
+                                      //     states.contains(WidgetState.pressed) ||
+                                      //     states.contains(WidgetState.hovered)) {
+                                      //   return AppColors.secondaryGray;
+                                      // }
+                                      return ref.watch(themeProvider) == ThemeMode.dark
+                                          ? Colors.black
+                                          : AppColors.backgroundColor;
+                                    })),
+                                onPressed: () {
+                                  _launchUrl();
+                                },
+                                child: Text(
+                                  "login_login_guide".i18n(),
                                   style: const TextStyle(color: AppColors.primary),
                                 )),
                           ),
@@ -172,6 +198,13 @@ class LoginLayout extends ConsumerWidget {
             : const SizedBox()
       ],
     );
+  }
+
+  Future<void> _launchUrl() async {
+    var uri = Uri.parse("https://ungarn.brunstad.org/2024/10/dukapp/");
+    if (!await launchUrl(uri, mode: LaunchMode.inAppWebView, webOnlyWindowName: "_blank")) {
+      throw Exception('failed_to_open_uri:'.i18n([uri.toString()]));
+    }
   }
 
   navigateTo(WidgetRef ref, BuildContext context) {

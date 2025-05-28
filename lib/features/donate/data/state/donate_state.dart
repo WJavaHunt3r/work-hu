@@ -13,6 +13,7 @@ abstract class DonateState with _$DonateState {
         String? checkoutId,
         DonationModel? donation,
         PaymentsModel? payment,
+        String? hosted_url,
         @Default(0) num amount,
         @Default(ModelState.empty) ModelState paymentState,
         @Default(ModelState.empty) ModelState modelState,

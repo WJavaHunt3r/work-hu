@@ -11,6 +11,7 @@ part 'team_round_state.freezed.dart';
 abstract class TeamRoundState with _$TeamRoundState {
   const factory TeamRoundState({
     @Default([]) List<TeamModel> teams,
+    @Default([]) List<TeamRoundModel> teamRounds,
     @Default([]) List<DonationModel> donations,
     @Default(ModelState.empty) ModelState modelState,
     @Default("") String message,

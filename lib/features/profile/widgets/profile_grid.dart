@@ -25,7 +25,7 @@ class ProfileGrid extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     UserModel? user = userStatus.user;
-    var isOnTrack = userStatus.status * 100 >= userRoundModel.round.myShareGoal;
+    var isOnTrack = userStatus.status * 100 >= (userRoundModel.round.localMyShareGoal ?? userRoundModel.round.myShareGoal);
     return Row(
       children: [
         Expanded(
@@ -72,7 +72,7 @@ class ProfileGrid extends ConsumerWidget {
                         //     ))
                       ],
                     ),
-                    Text("profile_myshare_status".i18n([userRoundModel.round.myShareGoal.toString()]),
+                    Text("profile_myshare_status".i18n([Utils.percentFormat2Digits.format(userRoundModel.round.localMyShareGoal)]),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 10.sp, fontWeight: FontWeight.w600)),
@@ -114,7 +114,7 @@ class ProfileGrid extends ConsumerWidget {
                             children: [
                               Text(
                                   Utils.creditFormatting(
-                                      user.points),
+                                      userRoundModel.roundCoins),
                                   style: TextStyle(
                                       fontSize: 30.sp,
                                       fontWeight: FontWeight.w800)),

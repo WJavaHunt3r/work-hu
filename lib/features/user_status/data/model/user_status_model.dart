@@ -16,6 +16,7 @@ class UserStatusModel with _$UserStatusModel {
       required num transactions,
       required num transition,
       required bool onTrack,
+        required bool localOnTrack,
       required SeasonModel season}) = _UserStatusModel;
 
   factory UserStatusModel.fromJson(Map<String, dynamic> json) =>

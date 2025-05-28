@@ -35,22 +35,15 @@ class _DonateState extends ConsumerState<DonateLayout> {
     return Stack(
       children: [
         NumberPinLayout(
-            path: "/home/donate/${widget.id}",
-            checkoutId: state.base64,
-            amount: state.amount,
-            amountController: ref.watch(donateDataProvider.notifier).amountController,
-            addNumber: (text) => ref.watch(donateDataProvider.notifier).addNumber(text),
-            createCheckout: () => ref.watch(donateDataProvider.notifier).createCheckout(),
-            afterPaymentOccurred: (dynamic value) {
-              if (value != null && context.mounted) {
-                value == PaymentStatus.PAID
-                    ? ref.read(donateDataProvider.notifier).savePayment()
-                    : deleteCheckout(PaymentStatus.EXPIRED);
-              } else {
-                deleteCheckout(PaymentStatus.FAILED);
-              }
-            },
-            onRemoveNumber: () => ref.watch(donateDataProvider.notifier).removeLastNumber()),
+          path: "/home/donate/${widget.id}",
+          checkoutId: state.base64,
+          amount: state.amount,
+          amountController: ref.watch(donateDataProvider.notifier).amountController,
+          addNumber: (text) => ref.watch(donateDataProvider.notifier).addNumber(text),
+          createCheckout: () => ref.watch(donateDataProvider.notifier).createCheckout(),
+          hostedUrl: state.hosted_url,
+          onRemoveNumber: () => ref.watch(donateDataProvider.notifier).removeLastNumber(),
+        ),
         ref.watch(donateDataProvider).modelState == ModelState.processing
             ? const Center(
                 child: CircularProgressIndicator.adaptive(),

@@ -13,6 +13,7 @@ class CardFillLayout extends ConsumerStatefulWidget {
   const CardFillLayout({super.key, required this.id});
 
   final num id;
+
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
     return _CardFillState();
@@ -35,22 +36,14 @@ class _CardFillState extends ConsumerState<CardFillLayout> {
     return Stack(
       children: [
         NumberPinLayout(
-          buttonText: "card_fill_button",
+            buttonText: "card_fill_button",
             path: "profile/bufe/${widget.id}/cardFill",
             checkoutId: state.base64,
             amount: state.amount,
+            hostedUrl:state.hosted_url,
             amountController: ref.watch(cardFillDataProvider.notifier).amountController,
             addNumber: (text) => ref.watch(cardFillDataProvider.notifier).addNumber(text),
             createCheckout: () => ref.watch(cardFillDataProvider.notifier).createCheckout(),
-            afterPaymentOccurred: (dynamic value) {
-              if (value != null && context.mounted) {
-                value == PaymentStatus.PAID
-                    ? ref.read(cardFillDataProvider.notifier).savePayment()
-                    : deleteCheckout(PaymentStatus.EXPIRED);
-              } else {
-                deleteCheckout(PaymentStatus.FAILED);
-              }
-            },
             onRemoveNumber: () => ref.watch(cardFillDataProvider.notifier).removeLastNumber()),
         ref.watch(cardFillDataProvider).modelState == ModelState.processing
             ? const Center(
@@ -61,9 +54,6 @@ class _CardFillState extends ConsumerState<CardFillLayout> {
     );
   }
 
-  void deleteCheckout(PaymentStatus status) {
-    ref.read(cardFillDataProvider.notifier).deleteCheckout(status);
-  }
 
   void addNumber(String number, WidgetRef ref) {
     ref.watch(cardFillDataProvider.notifier).addNumber(number);

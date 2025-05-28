@@ -55,8 +55,10 @@ class OrderItems extends BasePage {
                   return BaseListTile(
                     isLast: index == items.length - 1,
                     index: index,
-                    title: Text(items[index].name),
-                    trailing: Text("${items[index].price.replaceAll(".00", "")} Ft"),
+                    title: Text("${items[index].name} * ${items[index].amount}"),
+                    trailing: Text("${items[index].brutto} Ft", style: TextStyle(fontSize: 16.sp),),
+                    subtitle: Text("Egység ár: ${items[index].price.replaceAll(".00", "")} Ft"),
+                    // trailing: Text("${items[index].amount} Ft"),
                   );
                 },
                 itemCount: items.length,

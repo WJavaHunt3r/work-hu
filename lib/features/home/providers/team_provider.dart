@@ -9,26 +9,32 @@ import 'package:work_hu/features/home/data/state/team_round_state.dart';
 import 'package:work_hu/features/teams/data/repository/teams_repository.dart';
 import 'package:work_hu/features/teams/provider/teams_provider.dart';
 
-final teamApiProvider = Provider<TeamRoundApi>((ref) => TeamRoundApi());
+final teamRoundApiProvider = Provider<TeamRoundApi>((ref) => TeamRoundApi());
 
-final teamRepoProvider = Provider<TeamRoundRepository>((ref) => TeamRoundRepository(ref.read(teamApiProvider)));
+final teamRoundRepoProvider = Provider<TeamRoundRepository>((ref) => TeamRoundRepository(ref.read(teamRoundApiProvider)));
 
-final teamRoundDataProvider = StateNotifierProvider.autoDispose<TeamRoundDataNotifier, TeamRoundState>(
-    (ref) => TeamRoundDataNotifier(ref.read(teamsRepoProvider), ref.read(donationRepoProvider)));
+final teamRoundDataProvider = StateNotifierProvider.autoDispose<TeamRoundDataNotifier, TeamRoundState>((ref) =>
+    TeamRoundDataNotifier(ref.read(teamsRepoProvider), ref.read(donationRepoProvider), ref.watch(teamRoundRepoProvider)));
 
 class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
-  TeamRoundDataNotifier(this.teamRepository, this.donationRepository) : super(const TeamRoundState()) {
+  TeamRoundDataNotifier(this.teamRepository, this.donationRepository, this.teamRoundRepository) : super(const TeamRoundState()) {
     getTeamRounds().then((value) async => await getDonations());
   }
 
   final TeamRepository teamRepository;
+  final TeamRoundRepository teamRoundRepository;
   final DonationRepository donationRepository;
 
   Future<void> getTeamRounds() async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
       await teamRepository.fetchTeams().then((data) async {
+        data.sort((a, b) => b.coins.compareTo(a.coins));
         state = state.copyWith(teams: data, modelState: ModelState.success);
+      });
+      await teamRoundRepository.fetchTeamRounds().then((data) async {
+        data.sort((a, b) => b.round.roundNumber.compareTo(a.round.roundNumber));
+        state = state.copyWith(teamRounds: data, modelState: ModelState.success);
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);

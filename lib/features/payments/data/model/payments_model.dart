@@ -20,6 +20,7 @@ class PaymentsModel with _$PaymentsModel {
     required PaymentStatus status,
     required PaymentGoal paymentGoal,
     UserModel? user,
+    UserModel? recipient,
     DonationModel? donation
 
   }) = _PaymentsModel;

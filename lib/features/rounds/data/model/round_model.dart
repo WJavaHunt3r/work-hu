@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:work_hu/features/season/data/model/season_model.dart';
+import 'package:work_hu/features/teams/data/model/team_model.dart';
 
 part 'round_model.freezed.dart';
 part 'round_model.g.dart';
@@ -16,7 +17,9 @@ class RoundModel with _$RoundModel{
     required num roundNumber,
     required SeasonModel season,
     required DateTime freezeDateTime,
-    required bool activeRound
+    required bool activeRound,
+    TeamModel? winnerTeam,
+    num? localMyShareGoal
 }) = _RoundModel;
 
   factory RoundModel.fromJson(Map<String, dynamic> json) => _$RoundModelFromJson(json);
