@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/data/models/app_theme_mode.dart';
 import 'package:work_hu/app/extensions/dark_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
@@ -73,10 +74,10 @@ class ProfileLayout extends ConsumerWidget {
                                       .firstWhere((g) => g.user.id == child.user.id)),
                             )
                         ]),
-                  SizedBox(
-                    height: 4.sp,
-                  ),
-                  ref.watch(profileDataProvider).fraKareWeeks.isEmpty ? const SizedBox() : const FraKareStreak(),
+                  // SizedBox(
+                  //   height: 4.sp,
+                  // ),
+                  // ref.watch(profileDataProvider).fraKareWeeks.isEmpty ? const SizedBox() : const FraKareStreak(),
                   Column(
                     children: [
                       if (user.bufeId != null)
@@ -92,7 +93,11 @@ class ProfileLayout extends ConsumerWidget {
                             onTap: () {
                               var id = ref.read(profileDataProvider).spouse!.bufeId!;
                               var status = ref.watch(profileDataProvider).spouseStatus;
-                              context.push("/profile/bufe/$id", extra: {"onTrack": status?.onTrack});
+                              context.push(
+                                  Uri(
+                                      path: "/profile/bufe/$id",
+                                      queryParameters: {"userId": ref.read(profileDataProvider).spouse!.id}).toString(),
+                                  extra: {"onTrack": status?.onTrack});
                             }),
                       for (var child in ref.watch(profileDataProvider).children)
                         if (child.bufeId != null)
@@ -102,9 +107,13 @@ class ProfileLayout extends ConsumerWidget {
                                 var childrenStatuses = ref.watch(profileDataProvider).childrenStatus;
                                 var status = childrenStatuses.where((c) => c.id == child.id);
                                 if (status.length == 1) {
-                                  context.push("/profile/bufe/${child.bufeId!}", extra: {"onTrack": status.first.onTrack});
+                                  context.push(
+                                      Uri(path: "/profile/bufe/${child.bufeId!}", queryParameters: {"userId": child.id})
+                                          .toString(),
+                                      extra: {"onTrack": status.first.onTrack});
                                 } else {
-                                  context.push("/profile/bufe/${child.bufeId!}");
+                                  context.push(Uri(path: "/profile/bufe/${child.bufeId!}", queryParameters: {"userId": child.id})
+                                      .toString());
                                 }
                               }),
                       MenuOptionsListTile(
@@ -167,7 +176,7 @@ class ProfileLayout extends ConsumerWidget {
                             if (states.contains(WidgetState.pressed)) {
                               return AppColors.primary;
                             }
-                            return ref.watch(themeProvider) == ThemeMode.dark ? Colors.black : AppColors.backgroundColor;
+                            return ref.watch(themeProvider) == AppThemeMode.dark ? Colors.black : AppColors.backgroundColor;
                           }),
                         ),
                         child: Text("profile_logout".i18n(), style: const TextStyle(fontWeight: FontWeight.w800))),

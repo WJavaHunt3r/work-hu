@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/framework/base_components/base_page.dart';
@@ -13,7 +11,7 @@ class PaymentFilter extends BasePage {
   Widget buildLayout(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
-        Expanded(
+        const Expanded(
           child: Column(
             children: [
               Row(
@@ -34,7 +32,7 @@ class PaymentFilter extends BasePage {
             Expanded(
                 child: Padding(
               padding: EdgeInsets.all(16.sp),
-              child: TextButton(onPressed: () => (), child: Text("base_text_search")),
+              child: TextButton(onPressed: () => (), child: const Text("base_text_search")),
             ))
           ],
         )

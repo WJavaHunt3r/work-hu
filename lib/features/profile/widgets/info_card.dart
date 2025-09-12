@@ -18,7 +18,7 @@ class InfoCard extends StatelessWidget {
         onTap: onTap,
         child: Card(
           child: Container(
-              height: height ?? 120.sp,
+              height: height,
               width: width,
               color: Colors.transparent,
               padding: EdgeInsets.all(padding ?? 20.sp),

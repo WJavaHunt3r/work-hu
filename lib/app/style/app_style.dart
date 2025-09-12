@@ -54,7 +54,7 @@ class GlobalTheme {
           // foregroundColor: AppColors.backgroundColor,
           // backgroundColor: AppColors.backgroundColor,
           actionsIconTheme: IconThemeData(size: 18.sp, color: AppColors.primary)),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
           margin: EdgeInsets.only(top: 8.sp),
           elevation: 0.sp,
@@ -123,25 +123,23 @@ class GlobalTheme {
       dropdownMenuTheme: DropdownMenuThemeData(
           inputDecorationTheme: InputDecorationTheme(fillColor: Colors.white, labelStyle: TextStyle(fontSize: 15.sp))),
       bottomAppBarTheme: const BottomAppBarTheme(color: Colors.white),
-      tabBarTheme: TabBarTheme(
-        labelStyle: TextStyle(
-            color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 16.sp, overflow: TextOverflow.ellipsis),
-        unselectedLabelStyle: TextStyle(
-            color: AppColors.primary, fontWeight: FontWeight.normal, fontSize: 12.sp, overflow: TextOverflow.ellipsis),
+      tabBarTheme: TabBarThemeData(
+        labelStyle:
+            TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 16.sp, overflow: TextOverflow.ellipsis),
+        unselectedLabelStyle:
+            TextStyle(color: AppColors.primary, fontWeight: FontWeight.normal, fontSize: 12.sp, overflow: TextOverflow.ellipsis),
         indicator: ShapeDecoration(
           color: AppColors.primary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.sp)),
         ),
       ),
-      dialogTheme: DialogTheme(
-        data: DialogThemeData(
-            backgroundColor: AppColors.backgroundColor,
-            titleTextStyle: TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w800,
-              fontSize: 18.sp,
-            )),
-      ),
+      dialogTheme: DialogThemeData(
+          backgroundColor: AppColors.backgroundColor,
+          titleTextStyle: TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w800,
+            fontSize: 18.sp,
+          )),
       searchBarTheme: SearchBarThemeData(
         elevation: WidgetStateProperty.resolveWith((states) => 0),
         shadowColor: WidgetStateColor.resolveWith((states) => Colors.white),
@@ -281,7 +279,7 @@ class GlobalTheme {
           scrolledUnderElevation: 0.sp,
           systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Colors.black),
           actionsIconTheme: IconThemeData(size: 18.sp, color: AppColors.backgroundColor)),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
         margin: EdgeInsets.only(top: 8.sp),
         elevation: 0.sp,
@@ -311,9 +309,9 @@ class GlobalTheme {
       floatingActionButtonTheme:
           const FloatingActionButtonThemeData(foregroundColor: AppColors.white, backgroundColor: AppColors.primary100),
       iconTheme: const IconThemeData(color: AppColors.white),
-      tabBarTheme: TabBarTheme(
-        labelStyle: TextStyle(
-            color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 16.sp, overflow: TextOverflow.ellipsis),
+      tabBarTheme: TabBarThemeData(
+        labelStyle:
+            TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 16.sp, overflow: TextOverflow.ellipsis),
         unselectedLabelStyle: TextStyle(
             // color: AppColors.primary100,
             fontWeight: FontWeight.normal,
@@ -324,14 +322,13 @@ class GlobalTheme {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.sp)),
         ),
       ),
-      dialogTheme: DialogTheme(
-        data: DialogThemeData(
-            // backgroundColor: AppColors.secondaryGray,
-            titleTextStyle: TextStyle(
+      dialogTheme: DialogThemeData(
+        // backgroundColor: AppColors.secondaryGray,
+        titleTextStyle: TextStyle(
           color: AppColors.white,
           fontWeight: FontWeight.w800,
           fontSize: 18.sp,
-        )),
+        ),
       ),
       textButtonTheme: TextButtonThemeData(
           style: ButtonStyle(
@@ -349,7 +346,7 @@ class GlobalTheme {
                 return AppColors.primary;
               }),
               side: WidgetStateBorderSide.resolveWith(
-                    (states) {
+                (states) {
                   if (states.contains(WidgetState.disabled)) {
                     return BorderSide(color: Colors.grey.shade300, width: 2.sp);
                   }

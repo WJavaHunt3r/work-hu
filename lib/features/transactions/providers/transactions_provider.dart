@@ -30,8 +30,8 @@ class TransactionsDataNotifier extends StateNotifier<TransactionsState> {
     state = state.copyWith(modelState: ModelState.processing);
     try {
       await transactionRepository.getTransactions(state.selectedRoundId).then((data) {
-        data.sort((a, b) =>
-            a.createDateTime != null && b.createDateTime != null ? b.createDateTime!.compareTo(a.createDateTime!) : 0);
+        data.sort(
+            (a, b) => a.createDateTime != null && b.createDateTime != null ? b.createDateTime!.compareTo(a.createDateTime!) : 0);
         state = state.copyWith(transactions: data, modelState: ModelState.success);
       });
     } catch (e) {
@@ -59,6 +59,7 @@ class TransactionsDataNotifier extends StateNotifier<TransactionsState> {
     try {
       var rounds = await roundProvider.roundRepository.getRounds();
       var currentRound = await roundProvider.roundRepository.getCurrentRounds();
+      rounds.sort((a, b) => b.roundNumber.compareTo(a.roundNumber));
       state = state.copyWith(rounds: rounds, selectedRoundId: currentRound.id, modelState: ModelState.success);
       await getTransactions();
     } catch (e) {

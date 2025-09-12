@@ -75,7 +75,7 @@ class UserPointsLayout extends ConsumerWidget {
           itemBuilder: (BuildContext context, int index) {
             var current = currentItems[index];
             return PointsListItem(
-              value: current.points,
+              value: current.credit,
               title: current.description,
               date: current.transactionDate,
               isLast: index == currentItems.length - 1,

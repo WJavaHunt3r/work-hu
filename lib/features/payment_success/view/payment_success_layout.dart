@@ -5,16 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:shimmer/shimmer.dart' show Shimmer;
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/models/payment_goal.dart';
 import 'package:work_hu/app/models/payment_status.dart';
 import 'package:work_hu/app/style/app_colors.dart';
-import 'package:work_hu/app/widgets/base_list_item.dart';
-import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/features/payment_success/providers/payment_success_provider.dart';
-import 'package:work_hu/features/payments/providers/payments_provider.dart';
-import 'package:work_hu/features/payments/widgets/payments_maintenance.dart';
-import 'package:work_hu/features/utils.dart';
 
 import '../../../app/widgets/list_separator.dart';
 
@@ -66,10 +59,10 @@ class _PaymentSuccessState extends ConsumerState<PaymentSuccessLayout> {
                             Icons.circle,
                             size: 60.sp,
                           ),
-                          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                             Expanded(child: TextField()),
                           ]),
-                          Row(
+                          const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Expanded(child: TextField()),

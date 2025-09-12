@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
@@ -11,7 +10,6 @@ import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/payments/data/model/payments_model.dart';
 import 'package:work_hu/features/payments/data/repository/payments_repository.dart';
 import 'package:work_hu/features/payments/providers/payments_provider.dart';
-import 'package:work_hu/features/utils.dart';
 
 import '../../bufe/data/repository/bufe_repository.dart';
 import '../../bufe/providers/bufe_provider.dart';
@@ -34,15 +32,17 @@ class CardFillDataNotifier extends StateNotifier<CardFillState> {
     state = state.copyWith(bufeId: bufeId);
   }
 
-  Future<void> createCheckout() async {
+  Future<void> createCheckout(num userId, num bufeId) async {
     try {
-      var desc = "payment_${state.bufeId!}_${UniqueKey().toString().replaceAll('#', "")}";
+      var id = UniqueKey().toString().replaceAll('#', "");
+      var desc = "payment_$id";
       state = state.copyWith(modelState: ModelState.processing);
       var response = await bufeRepository.createCheckout(
           amount: num.parse(amountController.text),
-          checkoutReference: desc,
+          checkoutReference: "$id-userid:$bufeId",
           description: desc,
-          redirectUrl: "profile/bufe/${state.bufeId}/cardFill/success/$desc");
+          redirectUrl: "profile/bufe/${state.bufeId}/cardFill/success/$id-userid:$bufeId",
+          returnUrl: "https://gm.bcc-ktk.org/webhook/payment");
 
       var payment = PaymentsModel(
           paymentGoal: PaymentGoal.BUFE,

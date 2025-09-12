@@ -128,6 +128,7 @@
   "myshare_status_your_ontrack": "You are On Track!",
   "myshare_status_to_be_ontrack": "%s Ft to be On Track",
   "myshare_status_to_be_ontrack_short": "%s Ft to be On Track",
+  "myshare_status_to_be_myshare_ontrack_short": "%s Ft to be On Track (PACE)",
   "myshare_status_goal": "Goal: %s Ft",
   "myshare_status_name": "Name",
   "myshare_status_status": "Status",

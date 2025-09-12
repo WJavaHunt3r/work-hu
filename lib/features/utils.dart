@@ -270,7 +270,7 @@ class Utils {
         3964,
         "BUK Vácduka",
         transaction.credit,
-        '${date.month}/${date.day}/${date.year}',
+        '${date.day}/${date.month}/${date.year}',
         description
       ]);
     }

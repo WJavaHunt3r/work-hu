@@ -28,7 +28,7 @@ class PointsListItem extends StatelessWidget {
         style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w800),
       ),
       trailing: Text(
-        "${Utils.creditFormatting(value)} p",
+        "${Utils.creditFormatting(value)} Ft",
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
       ),
       subtitle: Text(

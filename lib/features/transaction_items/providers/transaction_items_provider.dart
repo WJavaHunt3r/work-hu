@@ -15,15 +15,17 @@ import 'package:work_hu/features/transactions/providers/transactions_provider.da
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 
+import '../../../app/data/models/transaction_type.dart';
+import '../../utils.dart';
+
 final transactionItemsApiProvider = Provider<TransactionItemsApi>((ref) => TransactionItemsApi());
 
 final transactionItemsRepoProvider =
     Provider<TransactionItemsRepository>((ref) => TransactionItemsRepository(ref.read(transactionItemsApiProvider)));
 
-final transactionItemsDataProvider =
-    StateNotifierProvider.autoDispose<TransactionItemsDataNotifier, TransactionItemsState>((ref) =>
-        TransactionItemsDataNotifier(ref.read(transactionItemsRepoProvider), ref.read(usersRepoProvider),
-            ref.read(userDataProvider.notifier), ref.read(transactionsRepoProvider)));
+final transactionItemsDataProvider = StateNotifierProvider.autoDispose<TransactionItemsDataNotifier, TransactionItemsState>(
+    (ref) => TransactionItemsDataNotifier(ref.read(transactionItemsRepoProvider), ref.read(usersRepoProvider),
+        ref.read(userDataProvider.notifier), ref.read(transactionsRepoProvider)));
 
 class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> {
   TransactionItemsDataNotifier(
@@ -72,50 +74,31 @@ class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> 
   }
 
   Future<void> createCreditsCsv() async {
-    var headers = [
-      "ACTIVITYID",
-      "HOURREGID",
-      "PERSONID",
-      "LASTNAME",
-      "FIRSTNAME",
-      "AGE",
-      "DATE",
-      "HOURS",
-      "STARTTIME",
-      "ENDTIME",
-      "PAUSE",
-      "CLUBNAME",
-      "CLUBID"
-    ];
-
-    List<List<dynamic>> list = [];
-    list.add(headers);
-    var items = state.transactionItems;
-    for (var transaction in items) {
-      list.add([
-        440104,
-        0,
-        transaction.user.myShareID,
-        transaction.user.lastname,
-        transaction.user.firstname,
-        (DateTime.now().difference(transaction.user.birthDate).inDays / 365).ceil() - 1,
-        '${transaction.transactionDate.day}/${transaction.transactionDate.month}/${transaction.transactionDate.year}',
-        transaction.hours,
-        "10:00",
-        "10:00",
-        0,
-        "BUK Vácduka",
-        3964
-      ]);
+    var list = <TransactionItemModel>[];
+    DateTime date = DateTime.now();
+    String desc = "";
+    for (var item in state.transactionItems) {
+      date = item.transactionDate;
+      desc = item.description;
+      list.add(TransactionItemModel(
+          transactionDate: item.transactionDate,
+          description: item.description,
+          createUserId: item.createUserId,
+          points: item.hours * 4,
+          transactionType: item.transactionType,
+          account: item.account,
+          credit: item.transactionType == TransactionType.DUKA_MUNKA
+              ? item.hours * 1000
+              : item.transactionType == TransactionType.DUKA_MUNKA_2000 || item.transactionType == TransactionType.HOURS
+                  ? item.hours * 2000
+                  : item.transactionType == TransactionType.POINT
+                      ? 0
+                      : item.transactionType == TransactionType.CREDIT
+                          ? item.credit
+                          : 0,
+          hours: item.hours,
+          user: item.user));
     }
-    String csv = const ListToCsvConverter().convert(list);
-    Uint8List bytes = Uint8List.fromList(utf8.encode(csv));
-
-    await FileSaver.instance.saveFile(
-      name: 'document_name',
-      bytes: bytes,
-      ext: 'csv',
-      mimeType: MimeType.csv,
-    );
+    Utils.createCreditCsv(list, date, desc);
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/data/models/app_theme_mode.dart';
 import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/notch_app_bar.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
@@ -28,7 +29,7 @@ abstract class MainScreen extends BasePage {
   @override
   buildBottomNavigationBar(BuildContext context, WidgetRef ref) {
     UserModel? currentUser = ref.watch(userDataProvider);
-    var isDark = ref.watch(themeProvider) == ThemeMode.dark;
+    var isDark = ref.watch(themeProvider) == AppThemeMode.dark;
     return currentUser != null && currentUser.isUser()
         ? NotchAppBar(selectedIndex)
         : Container(

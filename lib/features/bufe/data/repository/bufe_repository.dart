@@ -49,10 +49,18 @@ class BufeRepository {
   }
 
   Future<CheckoutModel> createCheckout(
-      {required num amount, required String checkoutReference, required String description, required String redirectUrl}) async {
+      {required num amount,
+      required String checkoutReference,
+      required String description,
+      required String redirectUrl,
+      String? returnUrl}) async {
     try {
       final res = await _bufeApi.createCheckout(
-          amount: amount, checkoutReference: checkoutReference, description: description, redirectUrl: redirectUrl);
+          returnUrl: returnUrl,
+          amount: amount,
+          checkoutReference: checkoutReference,
+          description: description,
+          redirectUrl: redirectUrl);
       return CheckoutModel.fromJson(res);
     } on DioException {
       rethrow;

@@ -22,19 +22,19 @@ class AccountBalance extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
-        Padding(
-            padding: EdgeInsets.only(bottom: 8.sp),
-            child: Text(
-              name,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w800),
-            )),
+        // Padding(
+        //     padding: EdgeInsets.only(bottom: 8.sp),
+        //     child: Text(
+        //       name,
+        //       textAlign: TextAlign.center,
+        //       style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w800),
+        //     )),
         Padding(
             padding: EdgeInsets.only(bottom: 8.sp),
             child: Text(
               "${balance.replaceAll(".00", "")} Ft",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w800),
+              style: TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w800),
             )),
         Column(
           children: [

@@ -33,7 +33,7 @@ class PaymentMaintenanceState extends ConsumerState<PaymentMaintenance> {
     super.initState();
     // Use a post-frame callback to ensure the widget is fully mounted.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(paymentDataProvider.notifier).setPaymentId(widget.paymentId);
+      ref.read(paymentDataProvider.notifier).getPayment(widget.paymentId);
     });
   }
 
@@ -46,7 +46,7 @@ class PaymentMaintenanceState extends ConsumerState<PaymentMaintenance> {
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () {
-            ref.read(paymentDataProvider.notifier).setPaymentId(null);
+            ref.read(paymentDataProvider.notifier).getPayment(null);
             context.pop();
           },
         ),
@@ -112,7 +112,7 @@ class PaymentMaintenanceState extends ConsumerState<PaymentMaintenance> {
                               )),
                               if (payment.status == PaymentStatus.PENDING)
                                 IconButton(
-                                    onPressed: () => ref.watch(paymentDataProvider.notifier).refreshPayment(),
+                                    onPressed: () => ref.watch(paymentDataProvider.notifier).refreshPayment(payment),
                                     icon: const Icon(Icons.refresh))
                             ],
                           ),

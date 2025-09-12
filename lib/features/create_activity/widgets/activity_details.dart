@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
+import 'package:work_hu/app/data/models/app_theme_mode.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
@@ -101,7 +102,7 @@ class ActivityDetails extends ConsumerWidget {
                 ? Padding(
                     padding: EdgeInsets.only(top: 4.sp, bottom: 4.sp),
                     child: DropdownButtonFormField(
-                        dropdownColor: ref.watch(themeProvider) == ThemeMode.dark
+                        dropdownColor: ref.watch(themeProvider) == AppThemeMode.dark
                             ? AppColors.primary200
                             : AppColors.backgroundColor,
                         alignment: AlignmentDirectional.topStart,

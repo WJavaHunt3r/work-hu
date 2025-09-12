@@ -4,12 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/data/models/app_theme_mode.dart';
 import 'package:work_hu/app/providers/router_provider.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/style/app_style.dart';
-
-import 'app/providers/localeProvider.dart';
 
 class DukApp extends ConsumerWidget {
   const DukApp({super.key});
@@ -43,13 +42,14 @@ class DukApp extends ConsumerWidget {
   buildMaterial(WidgetRef ref) {
     final theme = GlobalTheme();
     final router = ref.watch(routerProvider);
+    final appThemeMode = ref.watch(themeProvider);
     return MaterialApp.router(
       scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
       debugShowCheckedModeBanner: false,
       title: 'DukApp',
       theme: theme.globalTheme,
       darkTheme: theme.globalDarkTheme,
-      themeMode: ref.watch(themeProvider),
+      themeMode: AppThemeMode.getThemeMode(appThemeMode),
       routerConfig: router,
       supportedLocales: const [
         Locale('en', 'US'),

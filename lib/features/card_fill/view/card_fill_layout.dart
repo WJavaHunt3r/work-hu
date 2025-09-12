@@ -10,9 +10,10 @@ import 'package:work_hu/features/card_fill/providers/card_fill_provider.dart';
 import '../data/state/card_fill_state.dart' show CardFillState;
 
 class CardFillLayout extends ConsumerStatefulWidget {
-  const CardFillLayout({super.key, required this.id});
+  const CardFillLayout({super.key, required this.id, required this.userId});
 
   final num id;
+  final num userId;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -43,7 +44,7 @@ class _CardFillState extends ConsumerState<CardFillLayout> {
             hostedUrl:state.hosted_url,
             amountController: ref.watch(cardFillDataProvider.notifier).amountController,
             addNumber: (text) => ref.watch(cardFillDataProvider.notifier).addNumber(text),
-            createCheckout: () => ref.watch(cardFillDataProvider.notifier).createCheckout(),
+            createCheckout: () => ref.watch(cardFillDataProvider.notifier).createCheckout(widget.userId, widget.id),
             onRemoveNumber: () => ref.watch(cardFillDataProvider.notifier).removeLastNumber()),
         ref.watch(cardFillDataProvider).modelState == ModelState.processing
             ? const Center(

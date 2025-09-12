@@ -4,10 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:work_hu/app/data/models/app_theme_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
-import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/app/widgets/success_alert_dialog.dart';
@@ -24,7 +25,7 @@ class LoginLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loginProvider = ref.watch(loginDataProvider.notifier);
-    var isDark = ref.watch(themeProvider.notifier).isDark();
+    var isDark = ref.watch(themeProvider) == AppThemeMode.dark;
     return Stack(
       children: [
         Form(
@@ -122,7 +123,7 @@ class LoginLayout extends ConsumerWidget {
                                       //     states.contains(WidgetState.hovered)) {
                                       //   return AppColors.secondaryGray;
                                       // }
-                                      return ref.watch(themeProvider) == ThemeMode.dark
+                                      return ref.watch(themeProvider) == AppThemeMode.dark
                                           ? Colors.black
                                           : AppColors.backgroundColor;
                                     })),
@@ -173,7 +174,7 @@ class LoginLayout extends ConsumerWidget {
                                       //     states.contains(WidgetState.hovered)) {
                                       //   return AppColors.secondaryGray;
                                       // }
-                                      return ref.watch(themeProvider) == ThemeMode.dark
+                                      return ref.watch(themeProvider) == AppThemeMode.dark
                                           ? Colors.black
                                           : AppColors.backgroundColor;
                                     })),

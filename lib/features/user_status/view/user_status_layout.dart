@@ -23,6 +23,7 @@ class UserStatusLayout extends ConsumerWidget {
     var userStatuses = ref.watch(userStatusDataProvider).userStatuses;
     var currentRound = ref.watch(userStatusDataProvider).currentRound;
     var currentRoundGoal = currentRound == null ? 0 : currentRound.localMyShareGoal ?? 0;
+    var currentMyShareRoundGoal = currentRound == null ? 0 : currentRound.myShareGoal;
     return Stack(
       children: [
         Column(
@@ -64,8 +65,7 @@ class UserStatusLayout extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  Text(
-                      "${userStatuses.where((e) => e.localOnTrack).length} / ${userStatuses.length.toString()}")
+                  Text("${userStatuses.where((e) => e.localOnTrack).length} / ${userStatuses.length.toString()}")
                 ],
               ),
             ),
@@ -80,6 +80,7 @@ class UserStatusLayout extends ConsumerWidget {
                   var userStatus = currentUserStatus.status * 100;
 
                   var toOnTrack = currentGoal * currentRoundGoal / 100 - currentUserStatus.transactions;
+                  var toPaceOnTrack = currentGoal * currentMyShareRoundGoal / 100 - currentUserStatus.transactions;
 
                   var style = TextStyle(color: userStatus >= currentRoundGoal ? AppColors.white : null);
 
@@ -106,7 +107,18 @@ class UserStatusLayout extends ConsumerWidget {
                             "On Track",
                             style: TextStyle(color: AppColors.white),
                           )
-                        : Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(toOnTrack)])),
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(toOnTrack)])),
+                              toPaceOnTrack <= 0
+                                  ? SizedBox()
+                                  : Text("myshare_status_to_be_myshare_ontrack_short".i18n([
+                                          Utils.creditFormatting(toPaceOnTrack)
+                                        ])),
+                            ],
+                          ),
                     trailing: Text(
                       "${Utils.percentFormat.format(userStatus)}%",
                       style: style.copyWith(fontSize: 15.sp),

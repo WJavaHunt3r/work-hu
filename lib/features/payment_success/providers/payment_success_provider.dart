@@ -31,14 +31,14 @@ class PaymentSuccessDataNotifier extends StateNotifier<PaymentSuccessState> {
           var checkout = await bufeRepository.getCheckout(checkoutId: payment.checkoutId);
           if (checkout.status == PaymentStatus.PAID && payment.status != PaymentStatus.PAID) {
             var newPayment = await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.PAID), payment.id!);
-            if (newPayment.paymentGoal == PaymentGoal.BUFE) {
-              await bufeRepository.createPayment(
-                  bufeId: bufeId ?? payment.user!.bufeId!,
-                  amount: payment.amount,
-                  checkoutId: payment.checkoutId,
-                  date: Utils.dateToStringWithDots(DateTime.now()),
-                  time: Utils.dateToTimeString(DateTime.now()));
-            }
+            // if (newPayment.paymentGoal == PaymentGoal.BUFE) {
+            //   await bufeRepository.createPayment(
+            //       bufeId: bufeId ?? payment.user!.bufeId!,
+            //       amount: payment.amount,
+            //       checkoutId: payment.checkoutId,
+            //       date: Utils.dateToStringWithDots(DateTime.now()),
+            //       time: Utils.dateToTimeString(DateTime.now()));
+            // }
             state = state.copyWith(payment: newPayment, modelState: ModelState.success);
           } else if (checkout.status == PaymentStatus.PENDING) {
             var newPayment = await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.EXPIRED), payment.id!);

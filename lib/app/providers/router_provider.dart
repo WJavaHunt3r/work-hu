@@ -46,7 +46,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                   path: "donate/:id",
-                  builder: (BuildContext context, GoRouterState state) => DonatePage(
+                  builder: (BuildContext context, GoRouterState state) =>
+                      DonatePage(
                         id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
                       ),
                   routes: [
@@ -65,7 +66,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                   path: "donate/:id",
-                  builder: (BuildContext context, GoRouterState state) => DonatePage(
+                  builder: (BuildContext context, GoRouterState state) =>
+                      DonatePage(
                         id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
                       ),
                   routes: [
@@ -91,18 +93,20 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: 'userPoints/:id',
-                pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(
-                    child: UserPointsPage(
-                  userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-                )),
+                pageBuilder: (BuildContext context, GoRouterState state) =>
+                    NoTransitionPage(
+                        child: UserPointsPage(
+                          userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+                        )),
               ),
               GoRoute(
                   path: 'bufe/:id',
                   builder: (BuildContext context, GoRouterState state) {
                     var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
+                    final userId = state.uri.queryParameters['userId'] ?? '0';
                     return BufePage(
                       id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-                      onTrack: map != null ? map["onTrack"] : null,
+                      onTrack: map != null ? map["onTrack"] : null, userId: num.tryParse(userId) ?? 0,
                     );
                   },
                   routes: [
@@ -110,7 +114,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                     GoRoute(
                         path: "cardFill",
                         builder: (BuildContext context, GoRouterState state) {
-                          return CardFillPage(bufeId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
+                          final userId = state.uri.queryParameters['userId'] ?? '0';
+                          return CardFillPage(
+                              userId: num.tryParse(userId) ?? 0, bufeId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
                         },
                         routes: [
                           GoRoute(

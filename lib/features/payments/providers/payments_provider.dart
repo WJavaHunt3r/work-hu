@@ -1,15 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/models/payment_goal.dart';
 import 'package:work_hu/app/models/payment_status.dart';
 import 'package:work_hu/features/bufe/data/repository/bufe_repository.dart';
 import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
-import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/payments/data/api/payments_api.dart';
 import 'package:work_hu/features/payments/data/model/payments_model.dart';
 import 'package:work_hu/features/payments/data/repository/payments_repository.dart';
-import 'package:work_hu/features/utils.dart';
 
 import '../data/state/payments_state.dart';
 
@@ -34,7 +31,7 @@ class PaymentDataNotifier extends StateNotifier<PaymentsState> {
               userId: state.userId,
               status: state.status,
               donationId: state.donationId,
-              dateFrom: DateTime.now().subtract(Duration(days: 5)))
+              dateFrom: DateTime.now().subtract(Duration(days: 7)))
           .then((payments) {
         payments.sort((a, b) => b.dateTime.compareTo(a.dateTime));
         state = state.copyWith(payments: payments, modelState: ModelState.success);
@@ -59,22 +56,22 @@ class PaymentDataNotifier extends StateNotifier<PaymentsState> {
     }
   }
 
-  Future<void> refreshPayment() async {
-    var payment = state.selectedPayment!;
+  Future<void> refreshPayments() async {
+    state = state.copyWith(modelState: ModelState.processing);
+    for (var payment in state.payments.where((e) => e.status == PaymentStatus.PENDING)) {
+      await refreshPayment(payment);
+    }
+
+    getPayments();
+  }
+
+  Future<void> refreshPayment(PaymentsModel payment) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
       if (payment.status == PaymentStatus.PENDING) {
         var checkout = await bufeRepository.getCheckout(checkoutId: payment.checkoutId);
         if (checkout.status == PaymentStatus.PAID) {
           var newPayment = await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.PAID), payment.id!);
-          if (newPayment.paymentGoal == PaymentGoal.BUFE) {
-            await bufeRepository.createPayment(
-                bufeId: payment.recipient?.bufeId ?? payment.user!.bufeId!,
-                amount: payment.amount,
-                checkoutId: payment.checkoutId,
-                date: Utils.dateToStringWithDots(DateTime.now()),
-                time: Utils.dateToTimeString(DateTime.now()));
-          }
           state = state.copyWith(selectedPayment: newPayment, modelState: ModelState.success);
         } else if (checkout.status == PaymentStatus.EXPIRED) {
           var newPayment = await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.EXPIRED), payment.id!);
@@ -92,7 +89,7 @@ class PaymentDataNotifier extends StateNotifier<PaymentsState> {
     getPayments();
   }
 
-  Future<void> setPaymentId(num? paymentId) async {
+  Future<void> getPayment(num? paymentId) async {
     if (paymentId != null) {
       state = state.copyWith(modelState: ModelState.processing);
       try {

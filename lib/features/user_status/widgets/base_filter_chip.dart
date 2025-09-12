@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:work_hu/app/data/models/app_theme_mode.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 
@@ -21,7 +22,7 @@ class BaseFilterChip extends ConsumerWidget {
           style: TextStyle(
               color: isSelected
                   ? AppColors.white
-                  : ref.watch(themeProvider) == ThemeMode.dark
+                  : ref.watch(themeProvider) == AppThemeMode.dark
                       ? AppColors.primary100
                       : AppColors.primary),
         ),

@@ -22,7 +22,7 @@ class BufeDataNotifier extends StateNotifier<BufeState> {
 
   final BufeRepository bufeRepository;
 
-  FutureOr<void> getAccounts(num bufeId) async {
+  Future<void> getAccounts(num bufeId) async {
     state = const BufeState(modelState: ModelState.processing);
     try {
       var userAccount = await getAccount(bufeId);

@@ -29,9 +29,9 @@ class PaymentsLayout extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _PaymentsState();
 }
 
-class _PaymentsState extends ConsumerState<PaymentsLayout> with SingleTickerProviderStateMixin{
-
+class _PaymentsState extends ConsumerState<PaymentsLayout> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+
   @override
   void initState() {
     super.initState();
@@ -112,7 +112,11 @@ class _PaymentsState extends ConsumerState<PaymentsLayout> with SingleTickerProv
                         subtitle: Row(
                           children: [
                             getPaymentText(current.status),
-                            Text(" - $dateString ${current.user != null ? "- ${current.user!.getFullName()}" : ""}"),
+                            Expanded(
+                                child: Text(
+                              " - $dateString ${current.user != null ? "- ${current.user!.getFullName()}" : ""}",
+                              overflow: TextOverflow.ellipsis,
+                            )),
                           ],
                         ),
                       ),

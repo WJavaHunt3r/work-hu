@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/data/models/app_theme_mode.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
@@ -44,6 +45,7 @@ class UserDetails extends ConsumerWidget {
                       )
                     ]
                   : null,
+
             ),
             body: SingleChildScrollView(
               child: Form(
@@ -134,7 +136,7 @@ class UserDetails extends ConsumerWidget {
                                 padding: EdgeInsets.only(top: 4.sp, bottom: 4.sp),
                                 child: DropdownButtonFormField(
                                     dropdownColor:
-                                    ref.watch(themeProvider) == ThemeMode.dark ? AppColors.primary200 : AppColors.backgroundColor,
+                                    ref.watch(themeProvider) == AppThemeMode.dark ? AppColors.primary200 : AppColors.backgroundColor,
                                     decoration: InputDecoration(labelText: "user_details_team".i18n()),
                                     value: ref.watch(teamsDataProvider).teams.isEmpty || !ref.watch(teamsDataProvider).teams.contains(user.paceTeam) ? null : user.paceTeam,
                                     items: createTeamsDropDownList(ref),
@@ -154,7 +156,7 @@ class UserDetails extends ConsumerWidget {
                                 padding: EdgeInsets.only(top: 4.sp, bottom: 4.sp),
                                 child: DropdownButtonFormField(
                                     dropdownColor:
-                                    ref.watch(themeProvider) == ThemeMode.dark ? AppColors.primary200 : AppColors.backgroundColor,
+                                    ref.watch(themeProvider) == AppThemeMode.dark ? AppColors.primary200 : AppColors.backgroundColor,
                                     decoration: InputDecoration(labelText: "user_details_role".i18n(), isDense: true),
                                     value: user.role,
                                     items: Role.values
