@@ -12,8 +12,8 @@ class RoundsPage extends BasePage {
     return RoundsLayout();
   }
 
-  @override
-  List<Widget> buildActions(BuildContext context, WidgetRef ref) {
-    return [IconButton(onPressed: () => ref.read(roundDataProvider.notifier).setPaceTeams(), icon: const Icon(Icons.refresh))];
-  }
+  // @override
+  // List<Widget> buildActions(BuildContext context, WidgetRef ref) {
+  //   return [IconButton(onPressed: () => ref.read(roundDataProvider.notifier).setPaceTeams(), icon: const Icon(Icons.refresh))];
+  // }
 }

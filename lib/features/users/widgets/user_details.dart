@@ -3,12 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/data/models/app_theme_mode.dart';
 import 'package:work_hu/app/models/role.dart';
-import 'package:work_hu/app/providers/theme_provider.dart';
-import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
+import 'package:work_hu/app/widgets/work_drop_down_dearch_form_field.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/teams/provider/teams_provider.dart';
@@ -45,7 +44,6 @@ class UserDetails extends ConsumerWidget {
                       )
                     ]
                   : null,
-
             ),
             body: SingleChildScrollView(
               child: Form(
@@ -132,18 +130,13 @@ class UserDetails extends ConsumerWidget {
                           ],
                         ),
                         isEnabled
-                            ? Padding(
-                                padding: EdgeInsets.only(top: 4.sp, bottom: 4.sp),
-                                child: DropdownButtonFormField(
-                                    dropdownColor:
-                                    ref.watch(themeProvider) == AppThemeMode.dark ? AppColors.primary200 : AppColors.backgroundColor,
-                                    decoration: InputDecoration(labelText: "user_details_team".i18n()),
-                                    value: ref.watch(teamsDataProvider).teams.isEmpty || !ref.watch(teamsDataProvider).teams.contains(user.paceTeam) ? null : user.paceTeam,
-                                    items: createTeamsDropDownList(ref),
-                                    onChanged: (value) => ref
-                                        .watch(usersDataProvider.notifier)
-                                        .updateCurrentUser(user.copyWith(paceTeam: value))),
-                              )
+                            ? WorkDropDownSearchFormField<TeamModel>(
+                                minCharsForSuggestions: 2,
+                                controller: TextEditingController(),
+                                onSuggestionSelected: (value) =>
+                                    ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(paceTeam: value)),
+                                itemBuilder: (context, e) => Text(e.teamName.toString()),
+                                suggestionsCallback: (value) => ref.watch(teamsDataProvider).teams)
                             : BaseTextFormField(
                                 labelText: "user_details_team".i18n(),
                                 initialValue: user.paceTeam?.teamName ?? "",
@@ -155,8 +148,7 @@ class UserDetails extends ConsumerWidget {
                             ? Padding(
                                 padding: EdgeInsets.only(top: 4.sp, bottom: 4.sp),
                                 child: DropdownButtonFormField(
-                                    dropdownColor:
-                                    ref.watch(themeProvider) == AppThemeMode.dark ? AppColors.primary200 : AppColors.backgroundColor,
+                                    dropdownColor: Theme.of(context).colorScheme.secondary,
                                     decoration: InputDecoration(labelText: "user_details_role".i18n(), isDense: true),
                                     value: user.role,
                                     items: Role.values
@@ -166,9 +158,7 @@ class UserDetails extends ConsumerWidget {
                                             ))
                                         .toList(),
                                     onChanged: (value) => value != null
-                                        ? ref
-                                            .watch(usersDataProvider.notifier)
-                                            .updateCurrentUser(user.copyWith(role: value))
+                                        ? ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(role: value))
                                         : null),
                               )
                             : const SizedBox(),

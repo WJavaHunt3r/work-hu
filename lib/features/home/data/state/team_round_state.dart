@@ -4,6 +4,7 @@ import 'package:work_hu/features/donation/data/model/donation_model.dart';
 import 'package:work_hu/features/home/data/model/team_round_model.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
+import 'package:work_hu/features/user_status/data/model/user_status_model.dart';
 
 part 'team_round_state.freezed.dart';
 
@@ -13,6 +14,7 @@ abstract class TeamRoundState with _$TeamRoundState {
     @Default([]) List<TeamModel> teams,
     @Default([]) List<TeamRoundModel> teamRounds,
     @Default([]) List<DonationModel> donations,
+    @Default([]) List<UserStatusModel> users,
     @Default(ModelState.empty) ModelState modelState,
     @Default("") String message,
 }) = _TeamRoundState;

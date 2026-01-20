@@ -27,7 +27,7 @@ class ProfileHeader extends ConsumerWidget {
           user.paceTeam != null
               ? Container(
                   width: 50.sp,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                   child: Image.asset(
                     user.paceTeam!.iconAssetPath.toString(),
                     color: Color(int.parse("0x${user.paceTeam!.color}")),

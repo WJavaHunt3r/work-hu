@@ -51,6 +51,7 @@ abstract class BasePage extends ConsumerWidget {
                             : Text(
                                 title.isEmpty ? ref.watch(titleDataProvider) : title.i18n(titleArgs),
                                 style: appBarTextStyle ?? const TextStyle(fontWeight: FontWeight.w800),
+
                               )),
                     leading: leading,
                     centerTitle: centerTitle ?? false,

@@ -52,7 +52,11 @@ class ActivityItemsDataNotifier extends StateNotifier<ActivityItemsState> {
           points: item.hours * 4,
           transactionType: item.transactionType,
           account: item.account,
-          credit: item.transactionType == TransactionType.DUKA_MUNKA ? item.hours * 1000 : item.hours * 2000,
+          credit: item.transactionType == TransactionType.DUKA_MUNKA
+              ? item.hours * 1000
+              : item.transactionType == TransactionType.DUKA_MUNKA_2000
+                  ? item.hours * 2000
+                  : item.hours * 3000,
           hours: item.hours,
           user: item.user));
     }

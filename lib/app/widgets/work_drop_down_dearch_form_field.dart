@@ -15,7 +15,8 @@ class WorkDropDownSearchFormField<T> extends StatelessWidget {
       required this.itemBuilder,
       required this.suggestionsCallback,
       this.enabled,
-      this.onTap});
+      this.onTap,
+      this.minCharsForSuggestions});
 
   final AxisDirection? direction;
   final bool? autofocus;
@@ -26,6 +27,7 @@ class WorkDropDownSearchFormField<T> extends StatelessWidget {
   final Widget Function(BuildContext, T) itemBuilder;
   final Function()? onTap;
   final FutureOr<Iterable<T>> Function(String) suggestionsCallback;
+  final int? minCharsForSuggestions;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,7 @@ class WorkDropDownSearchFormField<T> extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.sp),
             closeSuggestionBoxWhenTapOutside: false,
             offsetX: 2.h,
-        constraints: BoxConstraints(minHeight: 15.h)),
+            constraints: BoxConstraints(minHeight: 15.h)),
         textFieldConfiguration: TextFieldConfiguration(
             scrollPadding: EdgeInsets.only(bottom: 2.sp),
             autofocus: autofocus ?? false,
@@ -54,7 +56,7 @@ class WorkDropDownSearchFormField<T> extends StatelessWidget {
               title: itemBuilder(context, itemData));
         },
         suggestionsCallback: suggestionsCallback,
-        minCharsForSuggestions: 2,
+        minCharsForSuggestions: minCharsForSuggestions ?? 2,
         displayAllSuggestionWhenTap: false);
   }
 }

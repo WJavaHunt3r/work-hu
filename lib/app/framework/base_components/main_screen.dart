@@ -29,18 +29,17 @@ abstract class MainScreen extends BasePage {
   @override
   buildBottomNavigationBar(BuildContext context, WidgetRef ref) {
     UserModel? currentUser = ref.watch(userDataProvider);
-    var isDark = ref.watch(themeProvider) == AppThemeMode.dark;
     return currentUser != null && currentUser.isUser()
         ? NotchAppBar(selectedIndex)
         : Container(
             decoration: BoxDecoration(
-                color: isDark ? AppColors.secondaryGray : AppColors.white,
+                color: Theme.of(context).cardTheme.color,
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(24.sp), topRight: Radius.circular(24.sp))),
             child: BottomNavigationBar(
                 backgroundColor: Colors.transparent,
-                selectedIconTheme: IconThemeData(color: isDark ? AppColors.primary100 : AppColors.primary),
-                selectedLabelStyle: TextStyle(color: isDark ? AppColors.primary100 : AppColors.primary),
-                selectedItemColor: isDark ? AppColors.primary100 : AppColors.primary,
+                selectedIconTheme: IconThemeData(color: Theme.of(context).colorScheme.primary),
+                selectedLabelStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
+                selectedItemColor: Theme.of(context).colorScheme.primary,
                 elevation: 0,
                 items: currentUser == null
                     ? noUserScreens()
@@ -76,8 +75,7 @@ abstract class MainScreen extends BasePage {
             activeIcon: const Icon(Icons.run_circle_rounded),
             icon: const Icon(Icons.run_circle_outlined),
             label: 'myshare_status_status'.i18n()),
-        BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.login), icon: const Icon(Icons.login), label: 'login_title'.i18n()),
+        BottomNavigationBarItem(activeIcon: const Icon(Icons.login), icon: const Icon(Icons.login), label: 'login_title'.i18n()),
       ];
 
   List<BottomNavigationBarItem> userScreens() => <BottomNavigationBarItem>[
@@ -101,9 +99,7 @@ abstract class MainScreen extends BasePage {
             icon: const Icon(Icons.person_2_outlined),
             label: 'profile_title'.i18n()),
         const BottomNavigationBarItem(
-            activeIcon: Icon(Icons.admin_panel_settings),
-            icon: Icon(Icons.admin_panel_settings_outlined),
-            label: 'Admin')
+            activeIcon: Icon(Icons.admin_panel_settings), icon: Icon(Icons.admin_panel_settings_outlined), label: 'Admin')
       ];
 
   @override

@@ -89,13 +89,15 @@ class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> 
           account: item.account,
           credit: item.transactionType == TransactionType.DUKA_MUNKA
               ? item.hours * 1000
-              : item.transactionType == TransactionType.DUKA_MUNKA_2000 || item.transactionType == TransactionType.HOURS
+              : item.transactionType == TransactionType.DUKA_MUNKA_2000
                   ? item.hours * 2000
-                  : item.transactionType == TransactionType.POINT
-                      ? 0
-                      : item.transactionType == TransactionType.CREDIT
-                          ? item.credit
-                          : 0,
+                  : item.transactionType == TransactionType.HOURS
+                      ? item.hours * 3000
+                      : item.transactionType == TransactionType.POINT
+                          ? 0
+                          : item.transactionType == TransactionType.CREDIT
+                              ? item.credit
+                              : 0,
           hours: item.hours,
           user: item.user));
     }

@@ -8,8 +8,7 @@ class UserStatusRepository {
 
   UserStatusRepository(this._userStatusApi);
 
-  Future<List<UserStatusModel>> getUserStatuses(
-      num seasonYear, num? teamId) async {
+  Future<List<UserStatusModel>> getUserStatuses(num seasonYear, num? teamId) async {
     try {
       final res = await _userStatusApi.getUserStatuses(seasonYear, teamId);
       return res.map((e) => UserStatusModel.fromJson(e)).toList();
@@ -27,12 +26,19 @@ class UserStatusRepository {
     }
   }
 
-  Future<UserStatusModel> getUserStatusByUserId(
-      num userStatusId, num seasonYear) async {
+  Future<UserStatusModel> getUserStatusByUserId(num userStatusId, num seasonYear) async {
     try {
-      final res =
-          await _userStatusApi.getUserStatusByUserId(userStatusId, seasonYear);
+      final res = await _userStatusApi.getUserStatusByUserId(userStatusId, seasonYear);
       return UserStatusModel.fromJson(res);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> setUserStatus(num seasonYear) async {
+    try {
+      final res = await _userStatusApi.setUserStatus(seasonYear);
+      return res;
     } catch (e) {
       rethrow;
     }

@@ -1,12 +1,9 @@
 import 'dart:math' as Math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/data/models/app_theme_mode.dart';
-import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/info_widget.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -14,24 +11,39 @@ import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.d
 import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
 import 'package:work_hu/features/profile/widgets/info_card.dart';
-import 'package:work_hu/features/user_points/provider/user_points_providers.dart';
 import 'package:work_hu/features/user_status/data/model/user_status_model.dart';
 import 'package:work_hu/features/utils.dart';
 
-class ProfileGrid extends ConsumerWidget {
+class ProfileGrid extends StatelessWidget {
   const ProfileGrid({required this.userRoundModel, super.key, required this.userStatus});
 
   final UserRoundModel userRoundModel;
   final UserStatusModel userStatus;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     UserModel? user = userStatus.user;
     var isOnTrack = userStatus.status * 100 >= (userRoundModel.round.localMyShareGoal ?? userRoundModel.round.myShareGoal);
+    var color = isOnTrack
+        ? const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFffd700), // gold
+                Color(0xFFdaa520), // goldenrod
+                Color(0xFFb8860b), // darkgoldenrod
+              ],
+              stops: [0.1, 0.5, 0.9],
+            ),
+          )
+        : null;
     return Row(
       children: [
         Expanded(
             child: InfoCard(
+                decoration: color,
                 height: 110.sp,
                 padding: 10.sp,
                 child: Column(
@@ -48,9 +60,9 @@ class ProfileGrid extends ConsumerWidget {
                             alignment: Alignment.topRight,
                             child: InfoWidget(
                               infoText: "profile_myshare_status_info".i18n(),
-                              shadowColor: ref.watch(themeProvider) == AppThemeMode.dark ? AppColors.gray100 : null,
+                              shadowColor: Theme.of(context).colorScheme.shadow,
                               iconData: Icons.info_outline,
-                              iconColor: ref.watch(themeProvider) == AppThemeMode.dark ? AppColors.primary100 : AppColors.primary,
+                              iconColor: Theme.of(context).colorScheme.primary,
                             )),
                         // Align(
                         //     alignment: Alignment.topLeft,
@@ -87,8 +99,8 @@ class ProfileGrid extends ConsumerWidget {
           child: InfoCard(
               height: 110.sp,
               padding: 10.sp,
+              decoration: color,
               onTap: () {
-                ref.read(userPointsDataProvider.notifier).setUserId(user.id);
                 context.push("/profile/userPoints/${user.id}");
               },
               child: Column(
@@ -110,16 +122,15 @@ class ProfileGrid extends ConsumerWidget {
                           child: InfoWidget(
                             infoText: "profile_monthly_credits_info".i18n(),
                             iconData: Icons.info_outline,
-                            shadowColor: ref.watch(themeProvider) == AppThemeMode.dark ? AppColors.gray100 : null,
-                            iconColor: ref.watch(themeProvider) == AppThemeMode.dark ? AppColors.primary100 : AppColors.primary,
+                            shadowColor: Theme.of(context).colorScheme.shadow,
+                            iconColor: Theme.of(context).colorScheme.primary,
                           )),
                     ],
                   ),
                   Column(
                     children: [
                       Text(
-                        "profile_points"
-                            .i18n([(Math.max(userRoundModel.roundMyShareGoal, 0)).toString()]),
+                        "profile_points".i18n([(Math.max(userRoundModel.roundMyShareGoal, 0)).toString()]),
                         style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600),
                       )
                     ],

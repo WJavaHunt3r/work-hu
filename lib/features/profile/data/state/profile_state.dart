@@ -10,16 +10,11 @@ part 'profile_state.freezed.dart';
 @freezed
 abstract class ProfileState with _$ProfileState {
   const factory ProfileState({
-    UserRoundModel? currentUserRound,
     @Default([]) List<UserModel> children,
-    @Default([]) List<UserStatusModel> childrenStatus,
-    @Default([]) List<num> roundPoints,
-    @Default([]) List<UserRoundModel> childrenUserRounds,
+    @Default([]) List<UserStatusModel> statuses,
+    @Default([]) List<UserRoundModel> userRounds,
     @Default([]) List<UserFraKareWeekModel> fraKareWeeks,
-    UserStatusModel? userStatus,
-    UserStatusModel? spouseStatus,
     UserModel? spouse,
-    UserRoundModel? spouseUserRound,
     @Default(ModelState.empty) ModelState modelState,
   }) = _ProfileState;
 

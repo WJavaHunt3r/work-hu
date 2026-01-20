@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:work_hu/app/extensions/dark_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -92,7 +90,7 @@ class UserListItem extends ConsumerWidget {
         ref.read(usersDataProvider.notifier).updateCurrentUser(user);
         showGeneralDialog(
             barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-            barrierColor: context.isDarkMode ? AppColors.primary100 : AppColors.primary,
+            barrierColor: Theme.of(context).colorScheme.primary,
             transitionDuration: const Duration(milliseconds: 200),
             context: context,
             pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {

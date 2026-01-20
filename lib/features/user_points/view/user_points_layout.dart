@@ -12,13 +12,28 @@ import 'package:work_hu/features/user_points/provider/user_points_providers.dart
 import 'package:work_hu/features/user_points/widgets/points_list_item.dart';
 import 'package:work_hu/features/utils.dart';
 
-class UserPointsLayout extends ConsumerWidget {
+class UserPointsLayout extends ConsumerStatefulWidget {
   const UserPointsLayout({super.key, required this.userId});
 
   final num userId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return UserPointsLayoutState();
+  }
+}
+
+class UserPointsLayoutState extends ConsumerState<UserPointsLayout> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(userPointsDataProvider.notifier).setUserId(widget.userId);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Future(() => ref.read(userPointsDataProvider).modelState == ModelState.empty
     //     ? ref.read(userPointsDataProvider.notifier).getTransactionItems()
     //     : null);
@@ -115,7 +130,7 @@ class UserPointsLayout extends ConsumerWidget {
         itemBuilder: (context, index) {
           var current = items[index];
           return PointsListItem(
-              value: current.points,
+              value: current.credit,
               title: current.description,
               date: current.transactionDate,
               isLast: index == items.length - 1,

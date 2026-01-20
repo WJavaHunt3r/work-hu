@@ -20,7 +20,9 @@ class AddTransactionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var isError = ref.watch(createTransactionsDataProvider).modelState == ModelState.error;
+    var isError = ref
+        .watch(createTransactionsDataProvider)
+        .modelState == ModelState.error;
     return InfoCard(
         padding: 8.sp,
         height: isError ? 210.sp : 130.sp,
@@ -28,9 +30,13 @@ class AddTransactionCard extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             WorkDropDownSearchFormField<UserModel>(
-              // focusNode: ref.watch(createTransactionsDataProvider.notifier).usersFocusNode,
+              focusNode: ref
+                  .watch(createTransactionsDataProvider.notifier)
+                  .usersFocusNode,
               direction: AxisDirection.up,
-              controller: ref.read(createTransactionsDataProvider.notifier).userController,
+              controller: ref
+                  .read(createTransactionsDataProvider.notifier)
+                  .userController,
               autofocus: true,
               onSuggestionSelected: (UserModel suggestion) =>
                   ref.read(createTransactionsDataProvider.notifier).updateSelectedUser(suggestion),
@@ -45,21 +51,41 @@ class AddTransactionCard extends ConsumerWidget {
                 SizedBox(
                     width: 150.sp,
                     child: TextField(
-                      controller: ref.read(createTransactionsDataProvider.notifier).valueController,
+                      controller: ref
+                          .read(createTransactionsDataProvider.notifier)
+                          .valueController,
                       keyboardType: TextInputType.number,
-                      focusNode: ref.read(createTransactionsDataProvider.notifier).valueFocusNode,
+                      focusNode: ref
+                          .read(createTransactionsDataProvider.notifier)
+                          .valueFocusNode,
                       textInputAction: TextInputAction.send,
-                      onSubmitted: ref.watch(createTransactionsDataProvider).selectedUser != null &&
-                              ref.watch(createTransactionsDataProvider.notifier).valueController.value.text.isNotEmpty
+                      onSubmitted: ref
+                          .watch(createTransactionsDataProvider)
+                          .selectedUser != null &&
+                          ref
+                              .watch(createTransactionsDataProvider.notifier)
+                              .valueController
+                              .value
+                              .text
+                              .isNotEmpty
                           ? (text) => ref.read(createTransactionsDataProvider.notifier).addTransaction()
                           : null,
                       decoration: InputDecoration(
                           labelText:
-                              Utils.getTransactionTypeText(ref.watch(createTransactionsDataProvider).transactionType)),
+                          Utils.getTransactionTypeText(ref
+                              .watch(createTransactionsDataProvider)
+                              .transactionType)),
                     )),
                 TextButton(
-                    onPressed: ref.watch(createTransactionsDataProvider).selectedUser != null &&
-                            ref.watch(createTransactionsDataProvider.notifier).valueController.value.text.isNotEmpty
+                    onPressed: ref
+                        .watch(createTransactionsDataProvider)
+                        .selectedUser != null &&
+                        ref
+                            .watch(createTransactionsDataProvider.notifier)
+                            .valueController
+                            .value
+                            .text
+                            .isNotEmpty
                         ? () => ref.read(createTransactionsDataProvider.notifier).addTransaction()
                         : null,
                     // style: ButtonStyle(
@@ -86,12 +112,14 @@ class AddTransactionCard extends ConsumerWidget {
             ),
             isError
                 ? Padding(
-                    padding: EdgeInsets.only(top: 8.sp, left: 8.sp, right: 8.sp),
-                    child: Text(
-                      ref.watch(createTransactionsDataProvider).message,
-                      style: const TextStyle(color: AppColors.errorRed),
-                    ),
-                  )
+              padding: EdgeInsets.only(top: 8.sp, left: 8.sp, right: 8.sp),
+              child: Text(
+                ref
+                    .watch(createTransactionsDataProvider)
+                    .message,
+                style: const TextStyle(color: AppColors.errorRed),
+              ),
+            )
                 : const SizedBox(),
           ],
         ));

@@ -45,13 +45,14 @@ class ActivitySumCard extends ConsumerWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(ref.watch(createActivityDataProvider).account == Account.MYSHARE &&
-                      [TransactionType.HOURS, TransactionType.DUKA_MUNKA_2000]
-                          .contains(ref.watch(createActivityDataProvider).transactionType)
-                  ? " (${(sum * 2000).toInt()} Ft)"
-                  : ref.watch(createActivityDataProvider).account == Account.MYSHARE &&
-                          ref.watch(createActivityDataProvider).transactionType == TransactionType.DUKA_MUNKA
-                      ? " (${(sum * 1000).toInt()} Ft)"
-                      : "")
+                      TransactionType.HOURS == (ref.watch(createActivityDataProvider).transactionType)
+                  ? " (${(sum * 3000).toInt()} Ft)"
+                  : TransactionType.DUKA_MUNKA_2000 == (ref.watch(createActivityDataProvider).transactionType)
+                      ? " (${(sum * 2000).toInt()} Ft)"
+                      : ref.watch(createActivityDataProvider).account == Account.MYSHARE &&
+                              ref.watch(createActivityDataProvider).transactionType == TransactionType.DUKA_MUNKA
+                          ? " (${(sum * 1000).toInt()} Ft)"
+                          : "")
             ],
           ),
           TextButton(

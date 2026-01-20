@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:work_hu/features/home/providers/team_provider.dart';
+import 'package:work_hu/features/home/providers/home_provider.dart';
 
 class ErrorView extends ConsumerWidget {
   const ErrorView({super.key});
@@ -16,7 +16,7 @@ class ErrorView extends ConsumerWidget {
           clipBehavior: Clip.antiAlias,
           elevation: 0,
           child: InkResponse(
-              onTap: () => ref.read(teamRoundDataProvider.notifier).getTeamRounds(),
+              onTap: () => ref.read(homeDataProvider.notifier).getTeamRounds(),
               child: Image(
                 image: const AssetImage("assets/img/server_error.jpg"),
                 fit: BoxFit.contain,

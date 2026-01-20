@@ -51,8 +51,6 @@ class GlobalTheme {
           scrolledUnderElevation: 0.sp,
           systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: AppColors.backgroundColor),
           color: AppColors.backgroundColor,
-          // foregroundColor: AppColors.backgroundColor,
-          // backgroundColor: AppColors.backgroundColor,
           actionsIconTheme: IconThemeData(size: 18.sp, color: AppColors.primary)),
       cardTheme: CardThemeData(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
@@ -122,7 +120,7 @@ class GlobalTheme {
       progressIndicatorTheme: const ProgressIndicatorThemeData(color: AppColors.primary),
       dropdownMenuTheme: DropdownMenuThemeData(
           inputDecorationTheme: InputDecorationTheme(fillColor: Colors.white, labelStyle: TextStyle(fontSize: 15.sp))),
-      bottomAppBarTheme: const BottomAppBarTheme(color: Colors.white),
+      bottomAppBarTheme: const BottomAppBarThemeData(color: Colors.white),
       tabBarTheme: TabBarThemeData(
         labelStyle:
             TextStyle(color: AppColors.white, fontWeight: FontWeight.bold, fontSize: 16.sp, overflow: TextOverflow.ellipsis),

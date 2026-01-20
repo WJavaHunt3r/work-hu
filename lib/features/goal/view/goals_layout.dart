@@ -1,32 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/src/consumer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/error_alert_dialog.dart';
+import 'package:work_hu/app/widgets/loading_screen.dart';
 import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/goal/widgets/goals_maintenance.dart';
 import 'package:work_hu/features/utils.dart';
 
-class GoalsLayout extends ConsumerWidget {
+class GoalsLayout extends ConsumerStatefulWidget {
   const GoalsLayout({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => GoalsLayoutState();
+}
+
+class GoalsLayoutState extends ConsumerState<GoalsLayout> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(goalDataProvider.notifier).getGoals(DateTime.now().year));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     var goals = ref.watch(goalDataProvider).filtered;
-    Future(() => ref.read(goalDataProvider).modelState == ModelState.error
-        ? showDialog(
-            context: context,
-            builder: (context) {
-              return ErrorAlertDialog(
-                content: SingleChildScrollView(child: Text(ref.read(goalDataProvider).message)),
-                title: 'Error',
-              );
-            }).then((value) => ref.watch(goalDataProvider.notifier).getGoals(DateTime.now().year))
-        : null);
+    ref.listen(goalDataProvider, (prev, next) {
+      next.modelState.isError
+          ? showDialog(
+              context: context,
+              builder: (context) {
+                return ErrorAlertDialog(
+                  content: SingleChildScrollView(child: Text(ref.read(goalDataProvider).message)),
+                  title: 'Error',
+                );
+              }).then((v) => ref.read(goalDataProvider.notifier).getGoals(DateTime.now().year))
+          : null;
+
+      if (next.modelState.isProcessing) {
+        LoadingScreen.instance().show(context: context);
+      } else {
+        LoadingScreen.instance().hide();
+      }
+    });
+
     return Column(
       children: [
         Expanded(
@@ -77,8 +98,7 @@ class GoalsLayout extends ConsumerWidget {
                 heroTag: UniqueKey(),
                 onPressed: () {
                   ref.watch(goalDataProvider.notifier).presetGoal(const GoalModel(goal: 0), MaintenanceMode.create);
-                  showDialog(
-                      barrierDismissible: false, context: context, builder: (context) => const GoalsMaintenance());
+                  showDialog(barrierDismissible: false, context: context, builder: (context) => const GoalsMaintenance());
                 },
                 child: const Icon(Icons.add),
               ),
@@ -94,9 +114,6 @@ class GoalsLayout extends ConsumerWidget {
                 },
               ),
             ),
-            ref.watch(goalDataProvider).modelState == ModelState.processing
-                ? const Center(child: CircularProgressIndicator())
-                : const SizedBox()
           ]),
         ),
       ],

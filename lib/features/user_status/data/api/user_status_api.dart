@@ -35,4 +35,14 @@ class UserStatusApi {
       rethrow;
     }
   }
+
+  Future<dynamic> setUserStatus(num seasonYear) async {
+    try {
+      final res = await _dioClient.dio.post("/userStatus/setUserStatus",
+          queryParameters: {"seasonYear": seasonYear});
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

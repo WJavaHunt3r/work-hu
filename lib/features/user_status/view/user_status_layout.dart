@@ -4,11 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/role.dart';
-import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/features/home/providers/team_provider.dart';
+import 'package:work_hu/features/home/providers/home_provider.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
@@ -42,12 +42,6 @@ class UserStatusLayout extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        MaterialButton(
-                          onPressed: ref.watch(userStatusDataProvider).modelState != ModelState.processing
-                              ? () => ref.watch(userStatusDataProvider.notifier).recalculate()
-                              : null,
-                          child: const Icon(Icons.refresh_outlined),
-                        )
                       ],
                     ),
                   )
@@ -74,7 +68,6 @@ class UserStatusLayout extends ConsumerWidget {
                 itemCount: userStatuses.length,
                 itemBuilder: (BuildContext context, int index) {
                   var currentUserStatus = userStatuses[index];
-                  var currentUser = currentUserStatus.user;
 
                   var currentGoal = currentUserStatus.goal;
                   var userStatus = currentUserStatus.status * 100;
@@ -99,7 +92,7 @@ class UserStatusLayout extends ConsumerWidget {
                         }),
                     minVerticalPadding: 0,
                     title: Text(
-                      currentUser.getFullName(),
+                      currentUserStatus.user.getFullName(),
                       style: style,
                     ),
                     subtitle: currentUserStatus.localOnTrack
@@ -114,9 +107,8 @@ class UserStatusLayout extends ConsumerWidget {
                               Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(toOnTrack)])),
                               toPaceOnTrack <= 0
                                   ? SizedBox()
-                                  : Text("myshare_status_to_be_myshare_ontrack_short".i18n([
-                                          Utils.creditFormatting(toPaceOnTrack)
-                                        ])),
+                                  : Text(
+                                      "myshare_status_to_be_myshare_ontrack_short".i18n([Utils.creditFormatting(toPaceOnTrack)])),
                             ],
                           ),
                     trailing: Text(
@@ -142,7 +134,7 @@ class UserStatusLayout extends ConsumerWidget {
 
   List<Widget> createTeamFilterChips(BuildContext context, WidgetRef ref) {
     List<Widget> chips = [];
-    for (var team in ref.watch(teamRoundDataProvider).teams.toSet()) {
+    for (var team in ref.watch(homeDataProvider).teams.toSet()) {
       bool isSelected = ref.watch(userStatusDataProvider).selectedTeamId == team.id;
       chips.add(BaseFilterChip(
           isSelected: isSelected,

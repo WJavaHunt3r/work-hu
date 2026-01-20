@@ -3,7 +3,7 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/home/data/repository/team_round_repository.dart';
-import 'package:work_hu/features/home/providers/team_provider.dart';
+import 'package:work_hu/features/home/providers/home_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/profile/data/repository/user_round_repository.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
@@ -19,27 +19,15 @@ import '../data/repository/user_status_repository.dart';
 
 final userStatusApiProvider = Provider<UserStatusApi>((ref) => UserStatusApi());
 
-final userStatusRepoProvider = Provider<UserStatusRepository>(
-    (ref) => UserStatusRepository(ref.read(userStatusApiProvider)));
+final userStatusRepoProvider = Provider<UserStatusRepository>((ref) => UserStatusRepository(ref.read(userStatusApiProvider)));
 
-final userStatusDataProvider =
-    StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>(
-        (ref) => UserStatusDataNotifier(
-            ref.read(usersRepoProvider),
-            ref.read(userDataProvider),
-            ref.read(userStatusRepoProvider),
-            ref.read(userRoundsRepoProvider),
-            ref.watch(roundRepoProvider),
-            ref.watch(teamRoundRepoProvider)));
+final userStatusDataProvider = StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>((ref) =>
+    UserStatusDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider), ref.read(userStatusRepoProvider),
+        ref.read(userRoundsRepoProvider), ref.watch(roundRepoProvider), ref.watch(teamRoundRepoProvider)));
 
 class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
-  UserStatusDataNotifier(
-      this.usersRepository,
-      this.currentUser,
-      this.userStatusRepoProvider,
-      this.userRoundRepoProvider,
-      this.roundRepoProvider,
-      this.teamRoundRepoProvider)
+  UserStatusDataNotifier(this.usersRepository, this.currentUser, this.userStatusRepoProvider, this.userRoundRepoProvider,
+      this.roundRepoProvider, this.teamRoundRepoProvider)
       : super(const UserStatusState()) {
     getUsers();
   }
@@ -54,12 +42,10 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   Future<void> getUsers([TeamModel? team]) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      var queryTeam =
-      currentUser!.role == Role.ADMIN ? team : currentUser!.paceTeam;
+      var queryTeam = currentUser!.role == Role.ADMIN ? team : currentUser!.paceTeam;
       // if (state.currentRound == null) {
-        await getUserStatusesAndCurrentRound(queryTeam?.id);
+      await getUserStatusesAndCurrentRound(queryTeam?.id);
       // }
-
 
       // var userRounds = await userRoundRepoProvider.fetchUserRounds(
       //     roundId: state.currentRound?.id, paceTeam: queryTeam?.id);
@@ -73,14 +59,9 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   }
 
   Future<void> getUserStatusesAndCurrentRound(num? queryTeamId) async {
-    var userStatuses = await userStatusRepoProvider.getUserStatuses(
-        DateTime.now().year,
-        queryTeamId);
+    var userStatuses = await userStatusRepoProvider.getUserStatuses(DateTime.now().year, queryTeamId);
     var round = await roundRepoProvider.getCurrentRounds();
-    state = state.copyWith(
-        userStatuses: userStatuses,
-        currentRound: round,
-        modelState: ModelState.success);
+    state = state.copyWith(userStatuses: userStatuses, currentRound: round, modelState: ModelState.success);
   }
 
   setSelectedFilter(TeamModel? team) {
@@ -96,8 +77,7 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   orderUsers() {
     var sorted = state.userStatuses.toList();
     if (state.selectedOrderType == OrderByType.NAME) {
-      sorted.sort(
-          (a, b) => (a.user.getFullName()).compareTo(b.user.getFullName()));
+      sorted.sort((a, b) => (a.user.getFullName()).compareTo(b.user.getFullName()));
     } else if (state.selectedOrderType == OrderByType.STATUS) {
       sorted.sort((a, b) => (a.status.compareTo(b.status)));
     }
@@ -112,8 +92,18 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
       state = state.copyWith(modelState: ModelState.success);
       getUsers();
     } catch (e) {
-      state = state.copyWith(
-          modelState: ModelState.error, message: "Hiba lépett fel!");
+      state = state.copyWith(modelState: ModelState.error, message: "Hiba lépett fel!");
+    }
+  }
+
+  Future<void> setUserStatus() async {
+    state = state.copyWith(modelState: ModelState.processing);
+    try {
+      await userStatusRepoProvider.setUserStatus(DateTime.now().year);
+      state = state.copyWith(modelState: ModelState.success);
+      getUsers();
+    } catch (e) {
+      state = state.copyWith(modelState: ModelState.error, message: "Hiba lépett fel!");
     }
   }
 }

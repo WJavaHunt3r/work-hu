@@ -21,7 +21,7 @@ class PaymentSuccessDataNotifier extends StateNotifier<PaymentSuccessState> {
 
   Future<void> refreshPayment({String? checkoutReference, num? bufeId}) async {
     state = state.copyWith(modelState: ModelState.processing);
-    if (checkoutReference != null && bufeId != null) {
+    if (checkoutReference != null) {
       try {
         var payments = await paymentRepository.getPayments(checkoutReference: checkoutReference);
         if (payments.length != 1) {

@@ -23,10 +23,7 @@ final goalApiProvider = Provider<GoalApi>((ref) => GoalApi());
 final goalRepoProvider = Provider<GoalRepository>((ref) => GoalRepository(ref.read(goalApiProvider)));
 
 final goalDataProvider = StateNotifierProvider<GoalDataNotifier, GoalState>((ref) => GoalDataNotifier(
-    ref.read(goalRepoProvider),
-    ref.read(usersRepoProvider),
-    ref.read(seasonRepoProvider),
-    ref.read(userDataProvider.notifier)));
+    ref.read(goalRepoProvider), ref.read(usersRepoProvider), ref.read(seasonRepoProvider), ref.read(userDataProvider.notifier)));
 
 class GoalDataNotifier extends StateNotifier<GoalState> {
   GoalDataNotifier(
@@ -35,7 +32,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
     this.seasonRepository,
     this.currentUserProvider,
   ) : super(const GoalState()) {
-    getGoals(DateTime.now().year);
+    // getGoals(DateTime.now().year);
 
     userController = TextEditingController(text: "");
   }
@@ -84,23 +81,26 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
         final input = utf8.decode(file.bytes!);
         final fields = const CsvToListConverter().convert(input);
         var seasons = await seasonRepository.getSeasons();
+        var goals = [];
         var rowNb = 0;
         for (var row in fields) {
           if (rowNb != 0) {
-            var field = row[0].split(";");
-            var user = await usersRepository.getUserByMyShareId(num.tryParse(field[0]) ?? 0);
-            if (!state.goals.any((element) => element.user!.id == user.id)) {
-              var goal = num.tryParse(field[6]) ?? 0;
-              // var status = num.tryParse(field[5]) ?? 0;
-              GoalModel goalModel = GoalModel(
-                  goal: goal, user: user, season: seasons.firstWhere((s) => s.seasonYear == DateTime.now().year));
-
-              // var newUser = user.copyWith(baseMyShareCredit: status, currentMyShareCredit: status);
-
-              await goalRepository.postGoal(goalModel);
-            }
+            try {
+              var user = await usersRepository.getUserByMyShareId(row[0]);
+              if (!state.goals.any((element) => element.user!.id == user.id)) {
+                var goal = row[6];
+                if (goal != 0) {
+                  GoalModel goalModel =
+                      GoalModel(goal: goal, user: user, season: seasons.firstWhere((s) => s.seasonYear == DateTime.now().year));
+                  goals.add(goalModel);
+                }
+              }
+            } catch (e) {}
           }
           rowNb++;
+        }
+        for (var goal in goals) {
+          await goalRepository.postGoal(goal);
         }
       }
       state = state.copyWith(modelState: ModelState.success);

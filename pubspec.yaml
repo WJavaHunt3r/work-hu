@@ -2,7 +2,7 @@ name: work_hu
 description: See the status of the competition. Follow your MyShare status and much more.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.4+4
+version: 1.0.5+5
 
 environment:
   sdk: '>=3.0.6 <4.0.0'

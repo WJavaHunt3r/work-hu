@@ -7,8 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/features/home/data/model/team_round_model.dart';
-import 'package:work_hu/features/home/providers/team_provider.dart';
-import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/utils.dart';
 
 class SamvirkStatus extends ConsumerWidget {
@@ -28,7 +26,7 @@ class SamvirkStatus extends ConsumerWidget {
     //     ? 0.0
     //     : ref.watch(teamRoundDataProvider).teams.where((element) => element.round == currentTeamRounds.first.round);
     // RoundModel? currentRound = currentTeamRounds.isEmpty ? null : currentTeamRounds.first.round;
-    var maximum = 10.0  ;//currentTeamRounds.isEmpty ? 10.0 : currentTeamRounds.first.round.samvirkChurchGoal.toDouble();
+    var maximum = 10.0; //currentTeamRounds.isEmpty ? 10.0 : currentTeamRounds.first.round.samvirkChurchGoal.toDouble();
     return Padding(
         padding: EdgeInsets.only(bottom: 8.sp),
         child: Card(

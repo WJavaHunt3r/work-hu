@@ -216,7 +216,9 @@ class Utils {
         ? items.map((e) => (e.hours * 1000).toInt()).reduce((value, element) => value + element)
         : activity.account == Account.OTHER && activity.transactionType == TransactionType.POINT
             ? 0
-            : items.map((e) => (e.hours * 2000).toInt()).reduce((value, element) => value + element);
+            : activity.account == Account.MYSHARE && activity.transactionType == TransactionType.HOURS
+                ? items.map((e) => (e.hours * 3000).toInt()).reduce((value, element) => value + element)
+                : items.map((e) => (e.hours * 2000).toInt()).reduce((value, element) => value + element);
     sumCreditsCell.value = null;
     sumCreditsCell.value = IntCellValue(sumCredits);
 
@@ -247,8 +249,10 @@ class Utils {
       creditCell.value = activity.account == Account.MYSHARE && activity.transactionType == TransactionType.DUKA_MUNKA
           ? DoubleCellValue(item.hours * 1000)
           : activity.account == Account.MYSHARE && activity.transactionType == TransactionType.HOURS
-              ? DoubleCellValue(item.hours * 2000)
-              : TextCellValue("");
+              ? DoubleCellValue(item.hours * 3000)
+              : activity.account == Account.MYSHARE && activity.transactionType == TransactionType.DUKA_MUNKA_2000
+                  ? DoubleCellValue(item.hours * 2000)
+                  : TextCellValue("");
     }
 
     return excel;

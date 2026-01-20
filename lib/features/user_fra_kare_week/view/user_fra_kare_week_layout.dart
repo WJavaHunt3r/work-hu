@@ -4,15 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/style/app_colors.dart';
-import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
-import 'package:work_hu/features/home/providers/team_provider.dart';
 import 'package:work_hu/features/user_fra_kare_week/provider/user_fra_kare_week_provider.dart';
 import 'package:work_hu/features/user_fra_kare_week/widgets/selection_row.dart';
-import 'package:work_hu/features/user_status/widgets/base_filter_chip.dart';
 
 class UserFraKareWeekLayout extends ConsumerWidget {
   const UserFraKareWeekLayout({super.key});
@@ -23,27 +19,6 @@ class UserFraKareWeekLayout extends ConsumerWidget {
     return Stack(children: [
       Column(
         children: [
-          ref.watch(userDataProvider)!.role == Role.ADMIN
-              ? Padding(
-                  padding: EdgeInsets.symmetric(vertical: 0.sp),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 30.sp,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(children: createTeamFilterChips(context, ref)),
-                              Text("${streaks.where((e) => e.listened).length} / ${streaks.length.toString()}")
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              : const SizedBox(),
           Expanded(
               child: BaseListView(
             itemCount: streaks.length,
@@ -95,18 +70,5 @@ class UserFraKareWeekLayout extends ConsumerWidget {
             )
           : const SizedBox(),
     ]);
-  }
-
-  List<Widget> createTeamFilterChips(BuildContext context, WidgetRef ref) {
-    List<Widget> chips = [];
-    for (var team in ref.watch(teamRoundDataProvider).teams.toSet()) {
-      bool isSelected = ref.watch(userFraKareWeekDataProvider).selectedTeamId == team.id;
-      chips.add(BaseFilterChip(
-          isSelected: isSelected,
-          title: team.teamName,
-          onSelected: (bool selected) =>
-              ref.watch(userFraKareWeekDataProvider.notifier).setSelectedFilter(selected ? team : null)));
-    }
-    return chips;
   }
 }

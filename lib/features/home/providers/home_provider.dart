@@ -6,24 +6,39 @@ import 'package:work_hu/features/donation/providers/donation_provider.dart';
 import 'package:work_hu/features/home/data/api/team_round_api.dart';
 import 'package:work_hu/features/home/data/repository/team_round_repository.dart';
 import 'package:work_hu/features/home/data/state/team_round_state.dart';
+import 'package:work_hu/features/profile/data/repository/user_round_repository.dart';
+import 'package:work_hu/features/profile/providers/profile_providers.dart';
+import 'package:work_hu/features/rounds/data/repository/round_repository.dart';
+import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/teams/data/repository/teams_repository.dart';
 import 'package:work_hu/features/teams/provider/teams_provider.dart';
+import 'package:work_hu/features/user_status/data/repository/user_status_repository.dart';
+import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
 
 final teamRoundApiProvider = Provider<TeamRoundApi>((ref) => TeamRoundApi());
 
 final teamRoundRepoProvider = Provider<TeamRoundRepository>((ref) => TeamRoundRepository(ref.read(teamRoundApiProvider)));
 
-final teamRoundDataProvider = StateNotifierProvider.autoDispose<TeamRoundDataNotifier, TeamRoundState>((ref) =>
-    TeamRoundDataNotifier(ref.read(teamsRepoProvider), ref.read(donationRepoProvider), ref.watch(teamRoundRepoProvider)));
+final homeDataProvider = StateNotifierProvider.autoDispose<HomeDataNotifier, TeamRoundState>((ref) => HomeDataNotifier(
+    ref.read(teamsRepoProvider),
+    ref.read(donationRepoProvider),
+    ref.watch(teamRoundRepoProvider),
+    ref.watch(userStatusRepoProvider),
+    ref.watch(roundDataProvider.notifier)));
 
-class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
-  TeamRoundDataNotifier(this.teamRepository, this.donationRepository, this.teamRoundRepository) : super(const TeamRoundState()) {
-    getTeamRounds().then((value) async => await getDonations());
+class HomeDataNotifier extends StateNotifier<TeamRoundState> {
+  HomeDataNotifier(
+      this.teamRepository, this.donationRepository, this.teamRoundRepository, this.userStatusRepository, this.roundDataNotifier)
+      : super(const TeamRoundState()) {
+    getDonations();
+    getUserStatus();
   }
 
   final TeamRepository teamRepository;
   final TeamRoundRepository teamRoundRepository;
   final DonationRepository donationRepository;
+  final UserStatusRepository userStatusRepository;
+  final RoundDataNotifier roundDataNotifier;
 
   Future<void> getTeamRounds() async {
     state = state.copyWith(modelState: ModelState.processing);
@@ -36,6 +51,19 @@ class TeamRoundDataNotifier extends StateNotifier<TeamRoundState> {
         data.sort((a, b) => b.round.roundNumber.compareTo(a.round.roundNumber));
         state = state.copyWith(teamRounds: data, modelState: ModelState.success);
       });
+    } catch (e) {
+      state = state.copyWith(modelState: ModelState.error);
+    }
+  }
+
+  Future<void> getUserStatus() async {
+    state = state.copyWith(modelState: ModelState.processing);
+    try {
+      await userStatusRepository.getUserStatuses(DateTime.now().year, null).then((data) async {
+        data.sort((a, b) => b.status.compareTo(a.status));
+        state = state.copyWith(users: data, modelState: ModelState.success);
+      });
+
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
