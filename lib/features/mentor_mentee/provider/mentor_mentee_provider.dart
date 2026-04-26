@@ -23,7 +23,7 @@ final mentorMenteeRepoProvider =
 
 final mentorMenteeDataProvider = StateNotifierProvider.autoDispose<MentorMenteeDataNotifier, MentorMenteeState>((ref) =>
     MentorMenteeDataNotifier(ref.read(userRoundsRepoProvider), ref.read(goalRepoProvider), ref.read(usersRepoProvider),
-        ref.read(mentorMenteeRepoProvider), ref.read(userDataProvider)));
+        ref.read(mentorMenteeRepoProvider), ref.read(userDataProvider).user));
 
 class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
   MentorMenteeDataNotifier(

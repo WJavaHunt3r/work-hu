@@ -1,10 +1,7 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/models/payment_goal.dart';
 import 'package:work_hu/app/models/payment_status.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/donation/data/repository/donation_repository.dart';
@@ -19,7 +16,7 @@ import '../../bufe/providers/bufe_provider.dart';
 import '../data/state/donate_state.dart';
 
 final donateDataProvider = StateNotifierProvider.autoDispose<DonateDataNotifier, DonateState>((ref) => DonateDataNotifier(
-    ref.read(bufeRepoProvider), ref.read(donationRepoProvider), ref.read(paymentRepoProvider), ref.read(userDataProvider)));
+    ref.read(bufeRepoProvider), ref.read(donationRepoProvider), ref.read(paymentRepoProvider), ref.read(userDataProvider).user));
 
 class DonateDataNotifier extends StateNotifier<DonateState> {
   DonateDataNotifier(this.bufeRepository, this.donationRepository, this.paymentRepository, this.currentUser)
@@ -46,38 +43,38 @@ class DonateDataNotifier extends StateNotifier<DonateState> {
     try {
       state = state.copyWith(modelState: ModelState.processing);
       var reference = "donation_${state.donation!.id!}_${UniqueKey().toString().replaceAll("#", "")}";
-      var response = await bufeRepository.createCheckout(
-          amount: num.parse(amountController.text),
-          checkoutReference: reference,
-          description: state.donation!.description!,
-          redirectUrl: "donate/${state.donation!.id}/success/$reference");
+      // var response = await bufeRepository.createCheckout(
+      //     amount: num.parse(amountController.text),
+      //     checkoutReference: reference,
+      //     description: state.donation!.description!,
+      //     redirectUrl: "donate/${state.donation!.id}/success/$reference");
+      //
+      // var payment = PaymentsModel(
+      //     paymentGoal: PaymentGoal.DONATION,
+      //     dateTime: DateTime.now(),
+      //     description: response.description,
+      //     amount: response.amount,
+      //     checkoutReference: response.checkout_reference,
+      //     checkoutId: response.id,
+      //     status: response.status,
+      //     donation: state.donation);
+      //
+      // var paymentResponse = await paymentRepository.postPayment(payment);
 
-      var payment = PaymentsModel(
-          paymentGoal: PaymentGoal.DONATION,
-          dateTime: DateTime.now(),
-          description: response.description,
-          amount: response.amount,
-          checkoutReference: response.checkout_reference,
-          checkoutId: response.id,
-          status: response.status,
-          donation: state.donation);
-
-      var paymentResponse = await paymentRepository.postPayment(payment);
-
-      var json = {
-        "checkoutId": response.id,
-        "description": state.donation!.description,
-        "locale": "hu-HU",
-        "amount": state.amount
-      };
-
-      String base64String = base64Encode(utf8.encode(jsonEncode(json)));
-      state = state.copyWith(
-          modelState: ModelState.success,
-          hosted_url: response.hosted_checkout_url,
-          base64: base64String,
-          payment: paymentResponse,
-          checkoutId: response.id);
+      // var json = {
+      //   "checkoutId": response.id,
+      //   "description": state.donation!.description,
+      //   "locale": "hu-HU",
+      //   "amount": state.amount
+      // };
+      //
+      // String base64String = base64Encode(utf8.encode(jsonEncode(json)));
+      // state = state.copyWith(
+      //     modelState: ModelState.success,
+      //     hosted_url: response.hosted_checkout_url,
+      //     base64: base64String,
+      //     payment: paymentResponse,
+      //     checkoutId: response.id);
     } on Exception catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
@@ -127,7 +124,7 @@ class DonateDataNotifier extends StateNotifier<DonateState> {
   }
 
   Future<dynamic> deleteCheckoutApi(PaymentStatus status, String checkoutId, PaymentsModel payment) async {
-    await bufeRepository.deleteCheckout(checkoutId: checkoutId);
+    await bufeRepository.deleteSumupCheckout(checkoutId: checkoutId);
     await paymentRepository.putPayment(payment.copyWith(status: status), payment.id!);
   }
 

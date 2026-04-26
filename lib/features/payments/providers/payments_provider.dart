@@ -47,7 +47,7 @@ class PaymentDataNotifier extends StateNotifier<PaymentsState> {
     items.removeWhere((a) => a.id == paymentId);
     state = state.copyWith(payments: items, modelState: ModelState.processing);
     try {
-      await bufeRepository.deleteCheckout(checkoutId: checkoutId);
+      // await bufeRepository.deleteCheckout(checkoutId: checkoutId);
       await paymentRepository
           .deletePayment(paymentId)
           .then((value) => state = state.copyWith(payments: items, modelState: ModelState.success));
@@ -69,7 +69,7 @@ class PaymentDataNotifier extends StateNotifier<PaymentsState> {
     state = state.copyWith(modelState: ModelState.processing);
     try {
       if (payment.status == PaymentStatus.PENDING) {
-        var checkout = await bufeRepository.getCheckout(checkoutId: payment.checkoutId);
+        var checkout = await bufeRepository.getSumupCheckout(checkoutId: payment.checkoutId);
         if (checkout.status == PaymentStatus.PAID) {
           var newPayment = await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.PAID), payment.id!);
           state = state.copyWith(selectedPayment: newPayment, modelState: ModelState.success);

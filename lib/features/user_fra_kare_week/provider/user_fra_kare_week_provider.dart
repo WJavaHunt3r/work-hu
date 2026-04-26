@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/models/role.dart';
-import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/user_fra_kare_week/data/api/user_fra_kare_week_api.dart';
 import 'package:work_hu/features/user_fra_kare_week/data/model/user_fra_kare_week_model.dart';
@@ -13,29 +11,20 @@ final userFraKareWeekApiProvider = Provider<UserFraKareWeekApi>((ref) => UserFra
 final userFraKareWeekRepoProvider =
     Provider<UserFraKareWeekRepository>((ref) => UserFraKareWeekRepository(ref.read(userFraKareWeekApiProvider)));
 
-final userFraKareWeekDataProvider =
-    StateNotifierProvider.autoDispose<UserFraKareWeekDataNotifier, UserFraKareWeekState>((ref) =>
-        UserFraKareWeekDataNotifier(ref.read(userFraKareWeekRepoProvider), ref.read(userDataProvider.notifier)));
+final userFraKareWeekDataProvider = StateNotifierProvider.autoDispose<UserFraKareWeekDataNotifier, UserFraKareWeekState>(
+    (ref) => UserFraKareWeekDataNotifier(ref.read(userFraKareWeekRepoProvider)));
 
 class UserFraKareWeekDataNotifier extends StateNotifier<UserFraKareWeekState> {
   UserFraKareWeekDataNotifier(
     this.fraKareWeekRepository,
-    this.currentUserProvider,
-  ) : super(const UserFraKareWeekState()) {
-    if (currentUserProvider.state?.role != Role.ADMIN) {
-      state = state.copyWith(selectedTeamId: currentUserProvider.state!.paceTeam!.id);
-    }
-  }
+  ) : super(const UserFraKareWeekState()) {}
 
   final UserFraKareWeekRepository fraKareWeekRepository;
-  final UserDataNotifier currentUserProvider;
 
   Future<void> getFraKareWeeks() async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await fraKareWeekRepository
-          .getFraKareWeeks(weekNumber: state.weekNumber, teamId: state.selectedTeamId)
-          .then((data) async {
+      await fraKareWeekRepository.getFraKareWeeks(weekNumber: state.weekNumber, teamId: state.selectedTeamId).then((data) async {
         state = state.copyWith(streaks: data, modelState: ModelState.success);
       });
     } catch (e) {

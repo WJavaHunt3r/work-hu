@@ -15,4 +15,13 @@ class UserRoundApi {
       rethrow;
     }
   }
+
+  Future<String> recalculate() async {
+    try {
+      final res = await _dioClient.dio.post("/paceUserRound/recalculate");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

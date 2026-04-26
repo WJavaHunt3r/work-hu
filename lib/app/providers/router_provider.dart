@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/view/activities_page.dart';
 import 'package:work_hu/features/activity_items/view/activity_items_layout.dart';
@@ -35,154 +36,154 @@ import 'package:work_hu/features/user_points/view/user_points_page.dart';
 import 'package:work_hu/features/user_status/view/user_status_page.dart';
 import 'package:work_hu/features/users/view/users_page.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final routerProvider = Provider<GoRouter>((ref) {
+  final userNotifier = ref.watch(userDataProvider);
   return GoRouter(
-      navigatorKey: GlobalKey<NavigatorState>(),
+      refreshListenable: userNotifier,
+      navigatorKey: navigatorKey,
       initialLocation: "/",
-      routes: <GoRoute>[
-        GoRoute(
-            path: '/',
-            pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(child: HomePage()),
-            routes: [
-              GoRoute(
-                  path: "donate/:id",
-                  builder: (BuildContext context, GoRouterState state) => DonatePage(
-                        id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-                      ),
-                  routes: [
-                    GoRoute(
-                        path: "success/:checkout_reference",
-                        builder: (BuildContext context, GoRouterState state) {
-                          return PaymentSuccessPage(
-                            checkoutReference: state.pathParameters["checkout_reference"],
-                          );
-                        }),
-                  ]),
-            ]),
-        GoRoute(
-            path: '/home',
-            pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(child: HomePage()),
-            routes: [
-              GoRoute(
-                  path: "donate/:id",
-                  builder: (BuildContext context, GoRouterState state) => DonatePage(
-                        id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-                      ),
-                  routes: [
-                    GoRoute(
-                        path: "success/:checkout_reference",
-                        builder: (BuildContext context, GoRouterState state) {
-                          return PaymentSuccessPage(
-                            checkoutReference: state.pathParameters["checkout_reference"],
-                          );
-                        }),
-                  ]),
-            ]),
-        GoRoute(
-          path: '/login',
-          pageBuilder: (BuildContext context, GoRouterState state) {
-            var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
-            return NoTransitionPage(child: LoginPage(origRoute: map == null ? "" : map["origRoute"] ?? "/"));
+      routes: [
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) {
+            // Return the widget that contains the scaffold with the BottomNavigationBar
+            return ScaffoldWithNestedNavigation(navigationShell: navigationShell);
           },
+          branches: [
+            // The first branch, representing the first tab
+            StatefulShellBranch(
+              routes: [GoRoute(path: '/', builder: (context, state) => HomePage())],
+            ),
+
+            // The second branch, representing the second tab
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/profile',
+                  pageBuilder: (BuildContext context, GoRouterState state) =>
+                      NoTransitionPage(child: userNotifier.user == null ? const LoginPage(origRoute: "") : const ProfilePage()),
+                )
+              ],
+            ),
+
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: '/admin',
+                pageBuilder: (BuildContext context, GoRouterState state) {
+                  return const NoTransitionPage(child: AdminPage());
+                },
+                redirect: (context, state) {
+                  final user = userNotifier.user;
+                  if (user == null || !user.isAdmin()) return '/'; // Send home if not admin
+                  return null;
+                },
+              ),
+            ])
+          ],
         ),
         GoRoute(
-            path: '/profile',
-            pageBuilder: (BuildContext context, GoRouterState state) => const NoTransitionPage(child: ProfilePage()),
+            path: "/donate/:id",
+            builder: (BuildContext context, GoRouterState state) => DonatePage(
+                  id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+                ),
             routes: [
               GoRoute(
-                path: 'userPoints/:id',
-                pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(
-                    child: UserPointsPage(
-                  userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-                )),
-              ),
-              GoRoute(
-                  path: 'bufe/:id',
+                  path: "success/:checkout_reference",
                   builder: (BuildContext context, GoRouterState state) {
-                    var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
-                    final userId = state.uri.queryParameters['userId'] ?? '0';
-                    return BufePage(
-                      id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-                      onTrack: map != null ? map["onTrack"] : null,
-                      userId: num.tryParse(userId) ?? 0,
-                    );
-                  },
-                  routes: [
-                    GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems()),
-                    GoRoute(
-                        path: "cardFill",
-                        builder: (BuildContext context, GoRouterState state) {
-                          final userId = state.uri.queryParameters['userId'] ?? '0';
-                          return CardFillPage(
-                              userId: num.tryParse(userId) ?? 0, bufeId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
-                        },
-                        routes: [
-                          GoRoute(
-                              path: "success/:checkout_reference",
-                              builder: (BuildContext context, GoRouterState state) {
-                                return PaymentSuccessPage(
-                                    checkoutReference: state.pathParameters["checkout_reference"],
-                                    bufeId: num.tryParse(state.pathParameters["id"] ?? "0"));
-                              }),
-                        ])
-                  ]),
-            ]),
-        GoRoute(path: "/donation", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
-        GoRoute(
-            path: '/admin',
-            pageBuilder: (BuildContext context, GoRouterState state) => const NoTransitionPage(child: AdminPage()),
-            routes: [
-              GoRoute(path: "activities", builder: (BuildContext context, GoRouterState state) => const ActivitiesPage()),
-              GoRoute(
-                  path: "createTransaction",
-                  builder: (BuildContext context, GoRouterState state) => const CreateTransactionPage()),
-              GoRoute(
-                  path: "fraKareWeeks",
-                  builder: (BuildContext context, GoRouterState state) => const FraKareWeekPage(),
-                  routes: [
-                    GoRoute(
-                        path: ":id",
-                        builder: (BuildContext context, GoRouterState state) =>
-                            UserFraKareWeekPage(weekNumber: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0))
-                  ]),
-              GoRoute(
-                  path: "createSamvirkTransaction",
-                  builder: (BuildContext context, GoRouterState state) => const CreateSamvirkTransactionPage()),
-              GoRoute(
-                  path: "createPointsTransaction",
-                  builder: (BuildContext context, GoRouterState state) => const CreatePointsTransactionPage()),
-              GoRoute(path: "userStatus", builder: (BuildContext context, GoRouterState state) => const UserStatusPage()),
-              GoRoute(path: "users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
-              GoRoute(path: "goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
-              GoRoute(path: "rounds", builder: (BuildContext context, GoRouterState state) => const RoundsPage()),
-              GoRoute(path: "donations", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
-              GoRoute(
-                  path: "payments",
-                  builder: (BuildContext context, GoRouterState state) {
-                    var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
-                    return PaymentsPage(
-                      donationId: map != null ? map["donationId"] : null,
-                      userId: map != null ? map["userId"] : null,
+                    return PaymentSuccessPage(
+                      checkoutReference: state.pathParameters["checkout_reference"],
                     );
                   }),
-              GoRoute(path: "mentorMentees", builder: (BuildContext context, GoRouterState state) => const MentorMenteesPage()),
-              GoRoute(
-                  path: "transactions",
-                  builder: (BuildContext context, GoRouterState state) => const TransactionsPage(),
-                  routes: [
-                    GoRoute(
-                      path: ':id',
-                      builder: (BuildContext context, GoRouterState state) {
-                        return const TransactionItemsPage();
-                      },
-                    ),
-                  ])
             ]),
+        // GoRoute(
+        //   path: '/profile/bufe/:id/cardFill/success/:checkout_reference',
+        //   builder: (context, state) {
+        //     return PaymentSuccessPage(
+        //       checkoutReference: state.pathParameters["checkout_reference"],
+        //     );
+        //   },
+        // ),
         GoRoute(
-            path: '/changePassword',
+          path: '/profile/userPoints/:id',
+          pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(
+              child: UserPointsPage(
+            userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+          )),
+        ),
+        GoRoute(
+            path: '/profile/changePassword',
             builder: (BuildContext context, GoRouterState state) {
               return const ChangePasswordPage();
             }),
+        GoRoute(
+            path: '/profile/bufe/:id',
+            builder: (BuildContext context, GoRouterState state) {
+              return BufePage(
+                onTrack: true,
+                userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+              );
+            },
+            routes: [
+              GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems()),
+              GoRoute(
+                  path: "cardFill",
+                  builder: (BuildContext context, GoRouterState state) {
+                    return CardFillPage(userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
+                  },
+                  routes: [
+                    GoRoute(
+                        path: "success/:checkout_reference(.*)",
+                        builder: (BuildContext context, GoRouterState state) {
+                          return PaymentSuccessPage(checkoutReference: state.pathParameters["checkout_reference"]);
+                        }),
+                  ])
+            ]),
+        GoRoute(path: "/donation", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
+        GoRoute(path: "/admin/activities", builder: (BuildContext context, GoRouterState state) => const ActivitiesPage()),
+        GoRoute(
+            path: "/admin/createTransaction",
+            builder: (BuildContext context, GoRouterState state) => const CreateTransactionPage()),
+        GoRoute(
+            path: "/admin/fraKareWeeks",
+            builder: (BuildContext context, GoRouterState state) => const FraKareWeekPage(),
+            routes: [
+              GoRoute(
+                  path: ":id",
+                  builder: (BuildContext context, GoRouterState state) =>
+                      UserFraKareWeekPage(weekNumber: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0))
+            ]),
+        GoRoute(
+            path: "/admin/createSamvirkTransaction",
+            builder: (BuildContext context, GoRouterState state) => const CreateSamvirkTransactionPage()),
+        GoRoute(
+            path: "/admin/createPointsTransaction",
+            builder: (BuildContext context, GoRouterState state) => const CreatePointsTransactionPage()),
+        GoRoute(path: "/admin/userStatus", builder: (BuildContext context, GoRouterState state) => const UserStatusPage()),
+        GoRoute(path: "/admin/users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
+        GoRoute(path: "/admin/goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
+        GoRoute(path: "/admin/rounds", builder: (BuildContext context, GoRouterState state) => const RoundsPage()),
+        GoRoute(path: "/admin/donations", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
+        GoRoute(
+            path: "/admin/payments",
+            builder: (BuildContext context, GoRouterState state) {
+              var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
+              return PaymentsPage(
+                donationId: map != null ? map["donationId"] : null,
+                userId: map != null ? map["userId"] : null,
+              );
+            }),
+        GoRoute(path: "/admin/mentorMentees", builder: (BuildContext context, GoRouterState state) => const MentorMenteesPage()),
+        GoRoute(
+            path: "/admin/transactions",
+            builder: (BuildContext context, GoRouterState state) => const TransactionsPage(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                builder: (BuildContext context, GoRouterState state) {
+                  return const TransactionItemsPage();
+                },
+              ),
+            ]),
         GoRoute(
           path: '/createActivity',
           builder: (BuildContext context, GoRouterState state) => const CreateActivityPage(),
@@ -202,7 +203,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(path: "/activities", builder: (BuildContext context, GoRouterState state) => const ActivitiesPage())
       ],
       redirect: (BuildContext context, GoRouterState state) async {
-        UserModel? user = ref.read(userDataProvider);
+        if (state.matchedLocation.contains("/success/")) {
+          return null;
+        }
+        UserModel? user = userNotifier.user;
         try {
           user ??= await ref.read(loginDataProvider.notifier).loginWithSavedData();
         } on DioException {
@@ -211,10 +215,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         if (user == null) {
           if (([...userScreens, ...teamLeaderScreens].contains(state.matchedLocation) ||
               state.matchedLocation.contains("/admin/"))) {
-            return "/login?origRoute=${state.matchedLocation}";
+            return "/profile";
           } else {
             return null;
           }
+        }
+        if (!user.changedPassword) {
+          return "/profile/changePassword";
         }
 
         if (state.matchedLocation.contains("/login")) {
@@ -230,10 +237,94 @@ final routerProvider = Provider<GoRouter>((ref) {
           return "/home";
         }
 
-        return state.matchedLocation;
+        return null;
       });
 });
 
 List<String> teamLeaderScreens = ["/admin", "/admin/userStatus", "/admin/fraKareWeeks", "/admin/fraKareWeeks/"];
 
 List<String> userScreens = ["/profile", "/createActivity", "/userPoints", "/mentees", "/activities"];
+
+class ScaffoldWithNestedNavigation extends ConsumerWidget {
+  const ScaffoldWithNestedNavigation({super.key, required this.navigationShell});
+
+  final StatefulNavigationShell navigationShell;
+
+  void _goBranch(int index) {
+    navigationShell.goBranch(
+      index,
+      // Navigate to the initial location of the branch if switching tabs
+      initialLocation: index == navigationShell.currentIndex,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userDataProvider).user;
+    return Scaffold(
+      body: navigationShell, // The navigation shell contains the page for the current branch
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          // Use theme's card color
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+          // Standard card corner radius
+          boxShadow: [
+            BoxShadow(
+              // The key to a top shadow is a negative y-offset
+              offset: const Offset(0, -5),
+              blurRadius: 10.0, // How soft the shadow is
+              spreadRadius: 0, // How far the shadow extends
+              color: Colors.black.withValues(alpha: 0.15), // Shadow color
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          enableFeedback: false,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          currentIndex: navigationShell.currentIndex,
+          items: user == null
+              ? noUserScreens()
+              : user.isUser()
+                  ? userScreens()
+                  : adminScreens(),
+          onTap: _goBranch,
+        ),
+      ),
+    );
+  }
+
+  List<BottomNavigationBarItem> noUserScreens() => <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.run_circle_rounded),
+            icon: const Icon(Icons.run_circle_outlined),
+            label: 'myshare_status_status'.i18n()),
+        BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.login), icon: const Icon(Icons.login_outlined), label: 'login_title'.i18n()),
+      ];
+
+  List<BottomNavigationBarItem> userScreens() => <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.run_circle_rounded),
+            icon: const Icon(Icons.run_circle_outlined),
+            label: 'myshare_status_status'.i18n()),
+        BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.person_2_rounded),
+            icon: const Icon(Icons.person_2_outlined),
+            label: 'profile_title'.i18n()),
+      ];
+
+  List<BottomNavigationBarItem> adminScreens() => <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.run_circle_rounded),
+            icon: const Icon(Icons.run_circle_outlined),
+            label: 'myshare_status_status'.i18n()),
+        BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.person_2_rounded),
+            icon: const Icon(Icons.person_2_outlined),
+            label: 'profile_title'.i18n()),
+        const BottomNavigationBarItem(
+            activeIcon: Icon(Icons.admin_panel_settings), icon: Icon(Icons.admin_panel_settings_outlined), label: 'Admin')
+      ];
+}

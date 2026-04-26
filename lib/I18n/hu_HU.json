@@ -50,8 +50,8 @@
   "admin_statistics": "Statisztikák",
   "admin_donations" : "Gyűjtések",
   "admin_payments" : "Fizetések",
-  "bufe": "%s Dukakártya egyenlege",
-  "bufe_sum": "Rendelések összege",
+  "bufe": "%s egyenlege",
+  "bufe_sum": "Összes rendelés összege",
   "bufe_payments": "Legutóbbi befizetések",
   "bufe_orders": "Legutóbbi rendelések",
   "bufe_order_items": "Rendelés tételek %s",
@@ -210,5 +210,6 @@
   "card_fill": "Kártya feltöltés",
   "card_fill_button" : "Feltöltés",
   "card_fill_confirm": "Megerősítés",
-  "card_fill_confirm_text": "Nem vagy On Track MyShareben. Biztos folytatod a feltöltést?"
+  "card_fill_confirm_text": "Nem vagy On Track MyShareben. Biztos folytatod a feltöltést?",
+  "bufe_payments_sum": "Legutóbbi 10 befizetés összege"
 }

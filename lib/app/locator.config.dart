@@ -12,6 +12,7 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:work_hu/api/bufe_client.dart' as _i18;
 import 'package:work_hu/api/dio_client.dart' as _i815;
+import 'package:work_hu/app/providers/user_provider.dart' as _i37;
 
 extension GetItInjectableX on _i174.GetIt {
 // initializes the registration of main-scope dependencies inside of GetIt
@@ -26,6 +27,7 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.singleton<_i18.BufeClient>(() => _i18.BufeClient());
     gh.singleton<_i815.DioClient>(() => _i815.DioClient());
+    gh.lazySingleton<_i37.UserProvider>(() => _i37.UserProvider());
     return this;
   }
 }

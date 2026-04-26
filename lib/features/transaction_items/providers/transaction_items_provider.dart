@@ -1,11 +1,7 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'package:csv/csv.dart';
-import 'package:file_saver/file_saver.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/transaction_items/data/api/transaction_items_api.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
@@ -25,17 +21,17 @@ final transactionItemsRepoProvider =
 
 final transactionItemsDataProvider = StateNotifierProvider.autoDispose<TransactionItemsDataNotifier, TransactionItemsState>(
     (ref) => TransactionItemsDataNotifier(ref.read(transactionItemsRepoProvider), ref.read(usersRepoProvider),
-        ref.read(userDataProvider.notifier), ref.read(transactionsRepoProvider)));
+        ref.read(userDataProvider).user, ref.read(transactionsRepoProvider)));
 
 class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> {
   TransactionItemsDataNotifier(
-      this.transactionItemsRepository, this.usersRepository, this.currentUserProvider, this.transactionsRepository)
+      this.transactionItemsRepository, this.usersRepository, this.currentUser, this.transactionsRepository)
       : super(const TransactionItemsState());
 
   final TransactionItemsRepository transactionItemsRepository;
   final TransactionRepository transactionsRepository;
   final UsersRepository usersRepository;
-  final UserDataNotifier currentUserProvider;
+  final UserModel? currentUser;
 
   Future<void> getTransactionItems(num transactionId) async {
     state = state.copyWith(modelState: ModelState.processing, transactionItems: []);
@@ -64,7 +60,7 @@ class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> 
   Future<void> deleteTransactionItem(num id, int index) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await transactionItemsRepository.deleteTransactionItem(id, currentUserProvider.state!.id).then((data) {
+      await transactionItemsRepository.deleteTransactionItem(id, currentUser!.id).then((data) {
         List<TransactionItemModel> items = state.transactionItems.where((element) => element.id != id).toList();
         state = state.copyWith(transactionItems: items, modelState: ModelState.success);
       });

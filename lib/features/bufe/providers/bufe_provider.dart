@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/features/bufe/data/api/bufe_api.dart';
-import 'package:work_hu/features/bufe/data/model/bufe_account_model.dart';
-import 'package:work_hu/features/bufe/data/model/bufe_orders_model.dart';
+import 'package:work_hu/features/bufe/data/model/sumup_transactions.dart';
+import 'package:work_hu/features/bufe/data/model/sumup_user_model.dart';
 import 'package:work_hu/features/bufe/data/repository/bufe_repository.dart';
 import 'package:work_hu/features/bufe/data/state/bufe_state.dart';
 
@@ -22,23 +22,23 @@ class BufeDataNotifier extends StateNotifier<BufeState> {
 
   final BufeRepository bufeRepository;
 
-  Future<void> getAccounts(num bufeId) async {
+  Future<void> getAccounts(num userId) async {
     state = const BufeState(modelState: ModelState.processing);
     try {
-      var userAccount = await getAccount(bufeId);
+      var userAccount = await getAccount(userId);
 
       state = state.copyWith(account: userAccount, modelState: ModelState.success);
 
-      await getPayments(bufeId);
-      await getOrders(bufeId);
+      await getPayments(userId);
+      await getOrders(userId);
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
   }
 
-  Future<BufeAccountModel?> getAccount(num bufeId) async {
+  Future<SumupUserModel?> getAccount(num userId) async {
     try {
-      return await bufeRepository.getBufeAccount(bufeId);
+      return await bufeRepository.getAccount(userId);
     } catch (e) {
       return null;
     }
@@ -47,41 +47,40 @@ class BufeDataNotifier extends StateNotifier<BufeState> {
   FutureOr<void> getPayments(num userId) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await bufeRepository.getPayments(bufeId: userId).then((data) async {
-        data.sort((a, b) => b.date.compareTo(a.date));
-        state = state.copyWith(payments: data, modelState: ModelState.success);
+      await bufeRepository.getPayments(userId: userId).then((data) async {
+        data.topUps.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        state = state.copyWith(payments: data.topUps, modelState: ModelState.success);
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
   }
 
-  FutureOr<void> getOrders(num bufeId) async {
+  FutureOr<void> getOrders(num userId) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await bufeRepository.getOrders(bufeId: bufeId).then((data) async {
-        data.sort((a, b) => b.date.compareTo(a.date));
-        state = state.copyWith(orders: data, modelState: ModelState.success);
+      await bufeRepository.getOrders(userId: userId).then((data) async {
+        data.items.sort((a, b) => b.date.compareTo(a.date));
+        state = state.copyWith(orders: data.items, modelState: ModelState.success);
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }
   }
 
-  FutureOr<void> getOrderItems(num bufeId, num orderId) async {
-    state = state.copyWith(modelState: ModelState.processing);
-    try {
-      await bufeRepository.getOrderItems(bufeId: bufeId, orderId: orderId).then((data) {
-        state = state.copyWith(orderItems: data, modelState: ModelState.success);
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error);
-    }
-  }
+  // FutureOr<void> getOrderItems(num userId, num orderId) async {
+  //   state = state.copyWith(modelState: ModelState.processing);
+  //   try {
+  //     await bufeRepository.getOrderItems(userId: userId, orderId: orderId).then((data) {
+  //       state = state.copyWith(orderItems: data, modelState: ModelState.success);
+  //     });
+  //   } catch (e) {
+  //     state = state.copyWith(modelState: ModelState.error);
+  //   }
+  // }
 
-  void setSelectedOrder(BufeOrdersModel order) {
+  void setSelectedOrder(OrderEntry order) {
     if (state.account == null) return;
-    getOrderItems(state.account!.id, order.orderId);
     state = state.copyWith(selectedOrder: order);
   }
 }

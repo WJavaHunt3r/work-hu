@@ -28,7 +28,7 @@ class UserStatusLayout extends ConsumerWidget {
       children: [
         Column(
           children: [
-            ref.watch(userDataProvider)!.role == Role.ADMIN
+            ref.watch(userDataProvider).user!.role == Role.ADMIN
                 ? Padding(
                     padding: EdgeInsets.symmetric(vertical: 0.sp),
                     child: Row(

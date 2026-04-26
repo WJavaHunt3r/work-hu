@@ -31,7 +31,7 @@ dependencies:
   pointycastle: ^3.1.1
   intl: ^0.20.2
   excel: ^4.0.2
-  file_picker: ^8.0.0+1
+  file_picker: ^10.3.10
   csv: ^6.0.0
   file_saver: ^0.2.8
   drop_down_search_field: ^1.0.4

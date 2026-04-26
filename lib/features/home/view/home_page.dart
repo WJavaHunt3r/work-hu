@@ -3,28 +3,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/framework/base_components/main_screen.dart';
+import 'package:work_hu/app/framework/base_components/base_page.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/home/providers/home_provider.dart';
 import 'package:work_hu/features/home/widgets/error_view.dart';
 import 'package:work_hu/features/home/widgets/pace_3_view.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
-class HomePage extends MainScreen {
+class HomePage extends BasePage {
   HomePage({super.key, super.title = "home_unboxing", super.centerTitle = true})
-      : super(selectedIndex: 0, appBarTextStyle: TextStyle(fontSize: 22.sp, fontFamily: "Good-Timing"));
+      : super(appBarTextStyle: TextStyle(fontSize: 22.sp, fontFamily: "Good-Timing"));
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
-    RoundModel? currentRound;
-    try {
-      currentRound = ref.watch(roundDataProvider).currentRound;
-    } catch (e) {
-      currentRound = null;
-    }
+    RoundModel? currentRound = ref.watch(roundDataProvider).currentRound;
 
     return Stack(children: [
       Column(
@@ -32,8 +28,8 @@ class HomePage extends MainScreen {
           currentRound != null &&
                   currentRound.freezeDateTime.compareTo(DateTime.now()) < 0 &&
                   currentRound.endDateTime.compareTo(DateTime.now()) >= 0 &&
-                  (ref.watch(userDataProvider) == null ||
-                      ref.watch(userDataProvider) != null && ref.watch(userDataProvider)!.isUser())
+                  (ref.watch(userDataProvider).user == null ||
+                      ref.watch(userDataProvider).user != null && ref.watch(userDataProvider).user!.isUser())
               ? Center(
                   child: Text(
                     "home_status_freeze"
@@ -74,7 +70,7 @@ class HomePage extends MainScreen {
 
   @override
   Widget? createActionButton(BuildContext context, WidgetRef ref) {
-    return ref.watch(userDataProvider)?.isMentor() ?? false
+    return ref.watch(userDataProvider).user?.isMentor() ?? false
         ? FloatingActionButton(
             elevation: 0,
             onPressed: () => context.push("/createActivity"),
@@ -82,5 +78,14 @@ class HomePage extends MainScreen {
             child: const Icon(Icons.add),
           )
         : null;
+  }
+
+  @override
+  FloatingActionButtonLocation setFloatingActionButtonLocation(WidgetRef ref) {
+    UserModel? currentUser = ref.watch(userDataProvider).user;
+
+    return currentUser != null && !currentUser.isUser()
+        ? FloatingActionButtonLocation.endFloat
+        : FloatingActionButtonLocation.centerDocked;
   }
 }

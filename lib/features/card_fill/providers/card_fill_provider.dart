@@ -16,7 +16,7 @@ import '../../bufe/providers/bufe_provider.dart';
 import '../data/state/card_fill_state.dart';
 
 final cardFillDataProvider = StateNotifierProvider.autoDispose<CardFillDataNotifier, CardFillState>(
-    (ref) => CardFillDataNotifier(ref.read(bufeRepoProvider), ref.read(paymentRepoProvider), ref.read(userDataProvider)));
+    (ref) => CardFillDataNotifier(ref.read(bufeRepoProvider), ref.read(paymentRepoProvider), ref.read(userDataProvider).user));
 
 class CardFillDataNotifier extends StateNotifier<CardFillState> {
   CardFillDataNotifier(this.bufeRepository, this.paymentRepository, this.currentUser) : super(const CardFillState()) {
@@ -28,48 +28,49 @@ class CardFillDataNotifier extends StateNotifier<CardFillState> {
   final UserModel? currentUser;
   late final TextEditingController amountController;
 
-  void setBufeId(num bufeId) {
-    state = state.copyWith(bufeId: bufeId);
+  void setUserId(num userId) {
+    state = state.copyWith(bufeId: userId);
   }
 
-  Future<void> createCheckout(num userId, num bufeId) async {
+  Future<void> createCheckout(num userId) async {
     try {
       var id = UniqueKey().toString().replaceAll('#', "");
       var desc = "payment_$id";
       state = state.copyWith(modelState: ModelState.processing);
-      var response = await bufeRepository.createCheckout(
+      var response = await bufeRepository.createSumupCheckout(
           amount: num.parse(amountController.text),
-          checkoutReference: "$id-userid:$bufeId",
+          // checkoutReference: "$id-userid:$bufeId",
+          dukappId: 255,
           description: desc,
-          redirectUrl: "profile/bufe/${state.bufeId}/cardFill/success/$id-userid:$bufeId",
-          returnUrl: "https://gm.bcc-ktk.org/webhook/payment");
+          redirectUrl: "http://localhost:60581/profile/bufe/$userId/cardFill/success/{checkout_reference}",
+          returnUrl: "https://fngkzlmhfegroyulcgfc.supabase.co/functions/v1/sumup-webhook");
 
-      var payment = PaymentsModel(
-          paymentGoal: PaymentGoal.BUFE,
-          dateTime: DateTime.now(),
-          description: "Büfé kártya feltöltés",
-          amount: response.amount,
-          checkoutReference: response.checkout_reference,
-          checkoutId: response.id,
-          status: response.status,
-          recipient: currentUser!,
-          user: currentUser!);
-
-      var paymentResponse = await paymentRepository.postPayment(payment);
+      // var payment = PaymentsModel(
+      //     paymentGoal: PaymentGoal.BUFE,
+      //     dateTime: DateTime.now(),
+      //     description: "Büfé kártya feltöltés",
+      //     amount: response.amount,
+      //     checkoutReference: response.checkout_reference,
+      //     checkoutId: response.id,
+      //     recipient: currentUser!,
+      //     user: currentUser!,
+      //     status: PaymentStatus.PENDING);
+      //
+      // var paymentResponse = await paymentRepository.postPayment(payment);
 
       var json = {
         "description": "Büfé kártya feltöltés",
         "locale": "hu-HU",
         "amount": state.amount,
-        "hosted_checkout_url": response.hosted_checkout_url
+        "hosted_checkout_url": response.hosted_url
       };
 
       String base64String = base64Encode(utf8.encode(jsonEncode(json)));
       state = state.copyWith(
           modelState: ModelState.success,
-          hosted_url: response.hosted_checkout_url,
+          hosted_url: response.hosted_url,
           base64: base64String,
-          payment: paymentResponse,
+          // payment: paymentResponse,
           checkoutId: response.id);
     } on Exception catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
@@ -94,16 +95,16 @@ class CardFillDataNotifier extends StateNotifier<CardFillState> {
     }
   }
 
-  Future<dynamic> deleteCheckoutApi(PaymentStatus status, String checkoutId, PaymentsModel payment) async {
-    await bufeRepository.deleteCheckout(checkoutId: checkoutId);
-    await paymentRepository.putPayment(payment.copyWith(status: status), payment.id!);
-  }
-
-  @override
-  void dispose() {
-    if (state.checkoutId != null) {
-      deleteCheckoutApi(PaymentStatus.EXPIRED, state.checkoutId!, state.payment!);
-    }
-    super.dispose();
-  }
+// Future<dynamic> deleteCheckoutApi(PaymentStatus status, String checkoutId, PaymentsModel payment) async {
+//   await bufeRepository.deleteCheckout(checkoutId: checkoutId);
+//   await paymentRepository.putPayment(payment.copyWith(status: status), payment.id!);
+// }
+//
+// @override
+// void dispose() {
+//   if (state.checkoutId != null) {
+//     deleteCheckoutApi(PaymentStatus.EXPIRED, state.checkoutId!, state.payment!);
+//   }
+//   super.dispose();
+// }
 }

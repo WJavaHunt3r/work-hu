@@ -20,7 +20,7 @@ final menteesDataProvider =
             ref.read(userStatusRepoProvider),
             ref.read(usersRepoProvider),
             ref.read(mentorMenteeRepoProvider),
-            ref.read(userDataProvider)));
+            ref.read(userDataProvider).user));
 
 class MenteesDataNotifier extends StateNotifier<MenteesState> {
   MenteesDataNotifier(this.userRoundRepository, this.userStatusRepoProvider,

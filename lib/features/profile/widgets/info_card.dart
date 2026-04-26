@@ -18,8 +18,10 @@ class InfoCard extends StatelessWidget {
         radius: 8.sp,
         onTap: onTap,
         child: Card(
+          elevation: 0,
           child: Container(
-            decoration: decoration,
+              margin: EdgeInsets.zero,
+              decoration: decoration,
               height: height,
               width: width,
               color: decoration == null ? Colors.transparent : null,

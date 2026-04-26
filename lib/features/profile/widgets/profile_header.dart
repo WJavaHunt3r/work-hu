@@ -9,7 +9,7 @@ class ProfileHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var user = ref.watch(userDataProvider)!;
+    var user = ref.watch(userDataProvider).user!;
     var spouse = ref.watch(profileDataProvider).spouse;
     return Padding(
       padding: EdgeInsets.all(8.sp),

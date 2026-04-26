@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/login/data/api/login_api.dart';
@@ -14,11 +15,11 @@ final loginApiProvider = Provider<LoginApi>((ref) => LoginApi());
 
 final loginRepoProvider = Provider<LoginRepository>((ref) => LoginRepository(ref.read(loginApiProvider)));
 
-final loginDataProvider = StateNotifierProvider<LoginDataNotifier, LoginState>(
-    (ref) => LoginDataNotifier(ref.read(loginRepoProvider), ref.read(userDataProvider.notifier)));
+final loginDataProvider =
+    StateNotifierProvider.autoDispose<LoginDataNotifier, LoginState>((ref) => LoginDataNotifier(ref.read(loginRepoProvider)));
 
 class LoginDataNotifier extends StateNotifier<LoginState> {
-  LoginDataNotifier(this.loginRepository, this.userSessionProvider) : super(const LoginState()) {
+  LoginDataNotifier(this.loginRepository) : super(const LoginState()) {
     usernameController = TextEditingController(text: "");
     passwordController = TextEditingController(text: "");
 
@@ -27,9 +28,9 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
   }
 
   final LoginRepository loginRepository;
-  final UserDataNotifier userSessionProvider;
   late final TextEditingController usernameController;
   late final TextEditingController passwordController;
+  final UserProvider userProvider = locator<UserProvider>();
 
   Future<void> login() async {
     state = state.copyWith(modelState: ModelState.processing);
@@ -37,11 +38,11 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
       var user = await loginWithSavedData(state.username.trim(), state.password.trim());
 
       if (user != null) {
-        if (user.changedPassword) {
+        // if (user.changedPassword) {
           await Utils.saveData('user', state.username).then((value) async {
             await Utils.saveData('password', state.password);
           });
-        }
+        // }
         // clear("", ModelState.success);
         state = state.copyWith(modelState: ModelState.success);
       } else {
@@ -60,11 +61,11 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
       return null;
     }
     UserModel? user;
-    await loginRepository.login(usr, Utils.encrypt(pswd)).then((data) async {
+    await loginRepository.login(usr, pswd).then((data) async {
       await loginRepository.getUserByUsername(data['username']).then((userData) async {
-        if (userData.changedPassword) {
-          userSessionProvider.setUser(userData);
-        }
+        // if (userData.changedPassword) {
+          userProvider.setUser(userData);
+        // }
         user = userData;
       });
     });
@@ -89,13 +90,12 @@ class LoginDataNotifier extends StateNotifier<LoginState> {
     state = state.copyWith(modelState: ModelState.processing);
     try {
       await loginRepository.sendNewPassword(state.username);
-      state = state.copyWith(
-          modelState: ModelState.success, resetState: ModelState.success, message: "Új jelszó emailben elküldve");
+      state =
+          state.copyWith(modelState: ModelState.success, resetState: ModelState.success, message: "Új jelszó emailben elküldve");
     } on DioException {
       usernameController.text = "";
       passwordController.text = "";
-      state = state.copyWith(
-          username: "", password: "", modelState: ModelState.error, message: "Nem létező felhasználónév");
+      state = state.copyWith(username: "", password: "", resetState: ModelState.error, message: "Nem létező felhasználónév");
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);
     }

@@ -5,13 +5,12 @@ import 'package:work_hu/features/payment_success/view/payment_success_layout.dar
 import 'package:work_hu/features/payments/view/payments_layout.dart';
 
 class PaymentSuccessPage extends BasePage {
-  const PaymentSuccessPage({super.key,this.checkoutReference, super.title = "payment_success", this.bufeId});
+  const PaymentSuccessPage({super.key,this.checkoutReference, super.title = "payment_success",});
 
   final String? checkoutReference;
-  final num? bufeId;
 
   @override
   Widget buildLayout(BuildContext context, WidgetRef ref) {
-    return PaymentSuccessLayout(checkoutReference: checkoutReference, bufeId: bufeId);
+    return PaymentSuccessLayout(checkoutReference: checkoutReference);
   }
 }

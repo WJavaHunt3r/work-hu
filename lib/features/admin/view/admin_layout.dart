@@ -11,7 +11,7 @@ class AdminLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var user = ref.watch(userDataProvider);
+    var user = ref.watch(userDataProvider).user;
     return ListView(
       children: user == null
           ? []

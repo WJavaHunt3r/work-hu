@@ -39,11 +39,9 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
     this.usersRepository,
     this.userFraKareWeekRepo,
     this.roundDataNotifier,
-  ) : super(const ProfileState()) {
-    getUserInfo();
-  }
+  ) : super(const ProfileState());
 
-  final UserDataNotifier currentUser;
+  final UserProvider currentUser;
   final LoginRepository loginRepository;
   final UserRoundRepository userRoundRepoProvider;
   final UserStatusRepository userStatusRepoProvider;
@@ -61,18 +59,13 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
   }
 
   Future<void> getUserInfoAndUserRounds() async {
-    var userModel = currentUser.state;
+    var userModel = currentUser.user;
 
     if (userModel != null) {
-      await userFraKareWeekRepo.getFraKareWeeks(userId: userModel.id, year: DateTime.now().year).then((data) {
-        data.sort((a, b) => b.fraKareWeek.weekNumber.compareTo(a.fraKareWeek.weekNumber));
-        state = state.copyWith(fraKareWeeks: data);
-      });
-      await loginRepository.getUser(userModel.id).then((userData) async {
-        if (userData.changedPassword) {
-          currentUser.setUser(userData);
-        }
-      });
+      // await userFraKareWeekRepo.getFraKareWeeks(userId: userModel.id, year: DateTime.now().year).then((data) {
+      //   data.sort((a, b) => b.fraKareWeek.weekNumber.compareTo(a.fraKareWeek.weekNumber));
+      //   state = state.copyWith(fraKareWeeks: data);
+      // });
       getUserRound(userModel.id).then((userRounds) async {
         if (userRounds.isNotEmpty && userRounds.length == 1) {
           await getUserStatus(userModel.id).then((userStatus) async {
@@ -118,9 +111,6 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
   }
 
   Future<void> logout() async {
-    await Utils.saveData("user", "");
-    await Utils.saveData("password", "");
-
     currentUser.setUser(null);
   }
 }

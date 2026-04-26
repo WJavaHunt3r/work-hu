@@ -23,7 +23,7 @@ final goalApiProvider = Provider<GoalApi>((ref) => GoalApi());
 final goalRepoProvider = Provider<GoalRepository>((ref) => GoalRepository(ref.read(goalApiProvider)));
 
 final goalDataProvider = StateNotifierProvider<GoalDataNotifier, GoalState>((ref) => GoalDataNotifier(
-    ref.read(goalRepoProvider), ref.read(usersRepoProvider), ref.read(seasonRepoProvider), ref.read(userDataProvider.notifier)));
+    ref.read(goalRepoProvider), ref.read(usersRepoProvider), ref.read(seasonRepoProvider), ref.read(userDataProvider).user));
 
 class GoalDataNotifier extends StateNotifier<GoalState> {
   GoalDataNotifier(
@@ -40,7 +40,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
   final GoalRepository goalRepository;
   final UsersRepository usersRepository;
   final SeasonRepository seasonRepository;
-  final UserDataNotifier currentUserProvider;
+  final UserModel? currentUserProvider;
   late final TextEditingController userController;
 
   Future<void> getGoals(num? seasonYear) async {
@@ -116,7 +116,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
     state = state.copyWith(goals: items, modelState: ModelState.processing);
     try {
       await goalRepository
-          .deleteGoal(goalId, currentUserProvider.state!.id)
+          .deleteGoal(goalId, currentUserProvider!.id)
           .then((value) => state = state.copyWith(goals: items, modelState: ModelState.success));
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error, goals: origItems);
@@ -137,7 +137,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
         if (mode == MaintenanceMode.create) {
           await goalRepository.postGoal(state.selectedGoal);
         } else if (mode == MaintenanceMode.edit) {
-          await goalRepository.putGoal(state.selectedGoal, currentUserProvider.state!.id);
+          await goalRepository.putGoal(state.selectedGoal, currentUserProvider!.id);
         }
         state = state.copyWith(selectedGoal: const GoalModel(goal: 0), modelState: ModelState.success);
       }

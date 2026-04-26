@@ -2,20 +2,9 @@ import 'package:flutter/material.dart';
 
 class InfoWidget extends StatelessWidget {
   const InfoWidget(
-      {super.key,
-      required this.infoText,
-      this.infoTextStyle = const TextStyle(
-        fontWeight: FontWeight.normal,
-        fontSize: 14,
-        color: Colors.black38,
-      ),
-      required this.iconData,
-      required this.iconColor,
-      this.elevation = 6,
-      this.shadowColor});
+      {super.key, required this.infoText, required this.iconData, required this.iconColor, this.elevation = 6, this.shadowColor});
 
   final String infoText;
-  final TextStyle infoTextStyle;
   final IconData iconData;
   final Color iconColor;
   final double elevation;
@@ -34,6 +23,7 @@ class InfoWidget extends StatelessWidget {
         PopupMenuItem(
           enabled: false,
           child: Card(
+            color: Theme.of(context).colorScheme.surfaceContainer,
             elevation: elevation,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(
@@ -45,10 +35,12 @@ class InfoWidget extends StatelessWidget {
                 Navigator.pop(context);
               },
               child: Container(
+
                 padding: const EdgeInsets.all(
                   16,
                 ),
                 decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainer,
                   boxShadow: shadowColor != null ? [BoxShadow(color: shadowColor!)] : null,
                   // color: const Color(0xffF7F7F7),
                   borderRadius: BorderRadius.circular(

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -18,6 +19,7 @@ void main() async {
   await setupLocator();
   usePathUrlStrategy();
   GoRouter.optionURLReflectsImperativeAPIs = true;
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const ProviderScope(child: OverlaySupport.global(child: DukApp())));
 }
 

@@ -20,17 +20,12 @@ import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 import 'package:work_hu/features/utils.dart';
 
-final createActivityDataProvider = StateNotifierProvider.autoDispose<CreateActivityDataNotifier, CreateActivityState>(
-    (ref) => CreateActivityDataNotifier(
-        ref.read(routerProvider),
-        ref.read(usersRepoProvider),
-        ref.read(userDataProvider.notifier),
-        ref.read(activityRepoProvider),
-        ref.read(activityItemsRepoProvider),
-        ref.read(roundDataProvider.notifier)));
+final createActivityDataProvider = StateNotifierProvider.autoDispose<CreateActivityDataNotifier, CreateActivityState>((ref) =>
+    CreateActivityDataNotifier(ref.read(routerProvider), ref.read(usersRepoProvider), ref.read(userDataProvider).user,
+        ref.read(activityRepoProvider), ref.read(activityItemsRepoProvider), ref.read(roundDataProvider.notifier)));
 
 class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
-  CreateActivityDataNotifier(this.router, this.usersRepository, this.currentUserProvider, this.activityRepository,
+  CreateActivityDataNotifier(this.router, this.usersRepository, this.currentUser, this.activityRepository,
       this.activityItemsRepository, this.roundDataNotifier)
       : super(const CreateActivityState()) {
     hoursController = TextEditingController(text: "");
@@ -51,7 +46,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
 
   final UsersRepository usersRepository;
   final GoRouter router;
-  final UserDataNotifier currentUserProvider;
+  final UserModel? currentUser;
   final RoundDataNotifier roundDataNotifier;
   late final TextEditingController hoursController;
   late final TextEditingController descriptionController;
@@ -66,7 +61,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
   final ScrollController scrollController = ScrollController();
 
   Future<void> getUsers({bool? listO36}) async {
-    var user = currentUserProvider.state;
+    var user = currentUser;
     updateResponsible(user!);
 
     state = state.copyWith(modelState: ModelState.processing);
@@ -76,8 +71,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
           modelState: ModelState.success,
           users: data,
         );
-        updateEmployer(
-            state.users.firstWhere((element) => element.myShareID == 0, orElse: () => currentUserProvider.state!));
+        updateEmployer(state.users.firstWhere((element) => element.myShareID == 0, orElse: () => currentUser!));
       });
     } on DioException catch (e) {
       state = state.copyWith(modelState: ModelState.error, errorMessage: e.response?.data);
@@ -107,7 +101,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
       transactionType: state.transactionType,
       account: state.account,
       hours: double.tryParse(hours) ?? 0,
-      createUser: currentUserProvider.state!,
+      createUser: currentUser!,
     );
 
     var text = hours;
@@ -181,8 +175,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
     items.addAll(state.activityItems);
     List<ActivityItemsModel> newItems = [];
     for (var item in items) {
-      newItems.add(item.copyWith(
-          account: state.account, transactionType: state.transactionType, description: state.description));
+      newItems.add(item.copyWith(account: state.account, transactionType: state.transactionType, description: state.description));
     }
 
     state = state.copyWith(activityItems: newItems);
@@ -207,7 +200,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
           .postActivity(ActivityModel(
               description: descriptionController.value.text,
               account: state.account,
-              createUser: currentUserProvider.state!,
+              createUser: currentUser!,
               activityDateTime: DateTime.parse(dateController.value.text),
               employer: state.employer!,
               responsible: state.responsible!,
@@ -221,9 +214,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
           newItems.add(item.copyWith(activity: activity));
         }
         state = state.copyWith(activityItems: newItems);
-        await activityItemsRepository
-            .postActivityItems(newItems.where((element) => element.hours != 0).toList())
-            .then((data) {
+        await activityItemsRepository.postActivityItems(newItems.where((element) => element.hours != 0).toList()).then((data) {
           pop();
           state = state.copyWith(creationState: ModelState.success, modelState: ModelState.success, errorMessage: data);
         });

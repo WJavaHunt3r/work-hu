@@ -2,8 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
-import 'package:work_hu/features/home/data/repository/team_round_repository.dart';
-import 'package:work_hu/features/home/providers/home_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/profile/data/repository/user_round_repository.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
@@ -22,12 +20,12 @@ final userStatusApiProvider = Provider<UserStatusApi>((ref) => UserStatusApi());
 final userStatusRepoProvider = Provider<UserStatusRepository>((ref) => UserStatusRepository(ref.read(userStatusApiProvider)));
 
 final userStatusDataProvider = StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>((ref) =>
-    UserStatusDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider), ref.read(userStatusRepoProvider),
-        ref.read(userRoundsRepoProvider), ref.watch(roundRepoProvider), ref.watch(teamRoundRepoProvider)));
+    UserStatusDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider).user, ref.read(userStatusRepoProvider),
+        ref.read(userRoundsRepoProvider), ref.watch(roundRepoProvider)));
 
 class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
-  UserStatusDataNotifier(this.usersRepository, this.currentUser, this.userStatusRepoProvider, this.userRoundRepoProvider,
-      this.roundRepoProvider, this.teamRoundRepoProvider)
+  UserStatusDataNotifier(
+      this.usersRepository, this.currentUser, this.userStatusRepoProvider, this.userRoundRepoProvider, this.roundRepoProvider)
       : super(const UserStatusState()) {
     getUsers();
   }
@@ -37,7 +35,6 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   final UserStatusRepository userStatusRepoProvider;
   final UserRoundRepository userRoundRepoProvider;
   final RoundRepository roundRepoProvider;
-  final TeamRoundRepository teamRoundRepoProvider;
 
   Future<void> getUsers([TeamModel? team]) async {
     state = state.copyWith(modelState: ModelState.processing);
@@ -88,7 +85,7 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   Future<void> recalculate() async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await teamRoundRepoProvider.recalculateTeamRounds();
+      await userRoundRepoProvider.recalculate();
       state = state.copyWith(modelState: ModelState.success);
       getUsers();
     } catch (e) {

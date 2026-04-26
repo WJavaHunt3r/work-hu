@@ -64,17 +64,6 @@ class ProfileGrid extends StatelessWidget {
                               iconData: Icons.info_outline,
                               iconColor: Theme.of(context).colorScheme.primary,
                             )),
-                        // Align(
-                        //     alignment: Alignment.topLeft,
-                        //     child: Image(
-                        //       image: AssetImage(
-                        //         isOnTrack
-                        //             ? "assets/img/PACE_Coin_Buk_50a_Static.png"
-                        //             : "assets/img/PACE_Coin_Blank_Static.png",
-                        //       ),
-                        //       fit: BoxFit.fitWidth,
-                        //       height: 18.sp,
-                        //     ))
                       ],
                     ),
                     Text(

@@ -23,7 +23,7 @@ class UserDetails extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var currentUser = ref.watch(userDataProvider);
+    var currentUser = ref.watch(userDataProvider).user;
     bool isEnabled = currentUser != null && currentUser.isAdmin() && enabled;
     return Dialog.fullscreen(
         child: Scaffold(

@@ -10,9 +10,8 @@ import 'package:work_hu/features/card_fill/providers/card_fill_provider.dart';
 import '../data/state/card_fill_state.dart' show CardFillState;
 
 class CardFillLayout extends ConsumerStatefulWidget {
-  const CardFillLayout({super.key, required this.id, required this.userId});
+  const CardFillLayout({super.key, required this.userId});
 
-  final num id;
   final num userId;
 
   @override
@@ -27,7 +26,7 @@ class _CardFillState extends ConsumerState<CardFillLayout> {
     super.initState();
     // Use a post-frame callback to ensure the widget is fully mounted.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(cardFillDataProvider.notifier).setBufeId(widget.id);
+      ref.read(cardFillDataProvider.notifier).setUserId(widget.userId);
     });
   }
 
@@ -38,13 +37,13 @@ class _CardFillState extends ConsumerState<CardFillLayout> {
       children: [
         NumberPinLayout(
             buttonText: "card_fill_button",
-            path: "profile/bufe/${widget.id}/cardFill",
+            path: "profile/bufe/${widget.userId}/cardFill",
             checkoutId: state.base64,
             amount: state.amount,
-            hostedUrl:state.hosted_url,
+            hostedUrl: state.hosted_url,
             amountController: ref.watch(cardFillDataProvider.notifier).amountController,
             addNumber: (text) => ref.watch(cardFillDataProvider.notifier).addNumber(text),
-            createCheckout: () => ref.watch(cardFillDataProvider.notifier).createCheckout(widget.userId, widget.id),
+            createCheckout: () => ref.watch(cardFillDataProvider.notifier).createCheckout(widget.userId),
             onRemoveNumber: () => ref.watch(cardFillDataProvider.notifier).removeLastNumber()),
         ref.watch(cardFillDataProvider).modelState == ModelState.processing
             ? const Center(
@@ -54,7 +53,6 @@ class _CardFillState extends ConsumerState<CardFillLayout> {
       ],
     );
   }
-
 
   void addNumber(String number, WidgetRef ref) {
     ref.watch(cardFillDataProvider.notifier).addNumber(number);

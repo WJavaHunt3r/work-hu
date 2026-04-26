@@ -23,14 +23,12 @@ class ActivityListItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var date = current.activityDateTime;
     var dateString = Utils.dateToString(date);
-    var user = ref.watch(userDataProvider)!;
+    var user = ref.watch(userDataProvider).user!;
     return BaseListTile(
       isLast: isLast,
       index: index,
       onTap: () {
-        context
-            .push("/activity/${current.id}")
-            .then((value) => ref.watch(activityDataProvider.notifier).getActivities());
+        context.push("/activity/${current.id}").then((value) => ref.watch(activityDataProvider.notifier).getActivities());
       },
       title: Text(
         current.description,
@@ -50,8 +48,7 @@ class ActivityListItem extends ConsumerWidget {
                         context.pop();
                       },
                       title: "activities_register_confirm_title".i18n(),
-                      content:
-                          Text("activities_confirm_activity_register_question".i18n(), textAlign: TextAlign.center))),
+                      content: Text("activities_confirm_activity_register_question".i18n(), textAlign: TextAlign.center))),
             )
           : user.id == 255 && !current.registeredInMyShare && current.transactionType != TransactionType.POINT
               ? MaterialButton(
@@ -63,14 +60,11 @@ class ActivityListItem extends ConsumerWidget {
                       context: context,
                       builder: (context) => ConfirmAlertDialog(
                           onConfirm: () {
-                            ref
-                                .watch(activityDataProvider.notifier)
-                                .putActivity(current.copyWith(registeredInMyShare: true));
+                            ref.watch(activityDataProvider.notifier).putActivity(current.copyWith(registeredInMyShare: true));
                             context.pop();
                           },
                           title: "activities_confirm_register_in_myshare_title".i18n(),
-                          content: Text("activities_confirm_register_in_myshare_question".i18n(),
-                              textAlign: TextAlign.center))),
+                          content: Text("activities_confirm_register_in_myshare_question".i18n(), textAlign: TextAlign.center))),
                 )
               : user.id == 255 && current.registeredInMyShare && current.registeredInApp && !current.registeredInTeams
                   ? IconButton(
@@ -87,8 +81,8 @@ class ActivityListItem extends ConsumerWidget {
                                 context.pop();
                               },
                               title: "activities_confirm_register_in_teams_title".i18n(),
-                              content: Text("activities_confirm_register_in_teams_question".i18n(),
-                                  textAlign: TextAlign.center))),
+                              content:
+                                  Text("activities_confirm_register_in_teams_question".i18n(), textAlign: TextAlign.center))),
                     )
                   : current.registeredInMyShare && current.registeredInApp ||
                           current.registeredInApp && current.transactionType == TransactionType.POINT

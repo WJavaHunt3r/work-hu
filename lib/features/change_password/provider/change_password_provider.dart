@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/change_password/data/api/change_password_api.dart';
 import 'package:work_hu/features/change_password/data/repository/change_password_repository.dart';
 import 'package:work_hu/features/change_password/data/state/change_password_state.dart';
@@ -17,32 +21,31 @@ final changePasswordDataProvider = StateNotifierProvider<ChangePasswordDataNotif
 
 class ChangePasswordDataNotifier extends StateNotifier<ChangePasswordState> {
   ChangePasswordDataNotifier(this.changePasswordRepository) : super(const ChangePasswordState()) {
-    // usernameController = TextEditingController(text: "");
-    // passwordController = TextEditingController(text: "");
     newPasswordController = TextEditingController(text: "");
     newPasswordAgainController = TextEditingController(text: "");
 
-    // usernameController.addListener(_updateState);
-    // passwordController.addListener(_updateState);
     newPasswordController.addListener(_updateState);
     newPasswordAgainController.addListener(_updateState);
   }
 
   final ChangePasswordRepository changePasswordRepository;
-  late final TextEditingController usernameController;
-  late final TextEditingController passwordController;
   late final TextEditingController newPasswordController;
   late final TextEditingController newPasswordAgainController;
+  final UserProvider userProvider = locator<UserProvider>();
 
   Future<void> changePassword() async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
       if (state.newPassword != state.newPasswordAgain) {
         clear(false, false);
-        state = state.copyWith(modelState: ModelState.error, message: "A jelszavak nem egyeznek");
+        state = state.copyWith(modelState: ModelState.error, message: "A jelszavak nem egyeznek!");
       } else {
-        await changePasswordRepository.changePassword(
-            state.username, Utils.encrypt(state.password), Utils.encrypt(state.newPassword));
+        var usr = await Utils.getData('user');
+        var pswd = await Utils.getData('password');
+        await changePasswordRepository.changePassword(usr, pswd, state.newPassword).then((e) async {
+          await Utils.saveData('password', state.newPassword);
+          userProvider.setUser(userProvider.user!.copyWith(changedPassword: true));
+        });
         clear(true, true);
       }
     } on DioException catch (e) {
@@ -63,8 +66,6 @@ class ChangePasswordDataNotifier extends StateNotifier<ChangePasswordState> {
   }
 
   void clear(bool success, bool shouldPop) {
-    // usernameController.clear();
-    // passwordController.clear();
     newPasswordController.clear();
     newPasswordAgainController.clear();
     state = state.copyWith(newPassword: "", newPasswordAgain: "", modelState: ModelState.success);

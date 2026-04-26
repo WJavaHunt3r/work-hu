@@ -18,7 +18,8 @@ abstract class BasePage extends ConsumerWidget {
       this.leading,
       this.hasTitleWidget,
       this.hasSearchBar = false,
-      this.titleArgs = const []});
+      this.titleArgs = const [],
+      this.backgroundColor});
 
   final String title;
   final bool? automaticallyImplyLeading;
@@ -31,6 +32,7 @@ abstract class BasePage extends ConsumerWidget {
   final Widget? leading;
   final bool hasSearchBar;
   final bool? hasTitleWidget;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -44,6 +46,7 @@ abstract class BasePage extends ConsumerWidget {
             appBar: extendBodyBehindAppBar ?? false
                 ? null
                 : AppBar(
+                    bottom: buildBottom(ref, context),
                     title: hasTitleWidget ?? false
                         ? buildTitleWidget(ref)
                         : (hasSearchBar
@@ -51,7 +54,6 @@ abstract class BasePage extends ConsumerWidget {
                             : Text(
                                 title.isEmpty ? ref.watch(titleDataProvider) : title.i18n(titleArgs),
                                 style: appBarTextStyle ?? const TextStyle(fontWeight: FontWeight.w800),
-
                               )),
                     leading: leading,
                     centerTitle: centerTitle ?? false,
@@ -65,8 +67,8 @@ abstract class BasePage extends ConsumerWidget {
                 SizedBox.expand(
                   child: Container(
                       padding: EdgeInsets.only(
-                          left: 8.sp,
-                          right: 8.sp,
+                          left: 12.sp,
+                          right: 12.sp,
                           top: isListView || hasSearchBar
                               ? 0
                               : extendBodyBehindAppBar ?? false
@@ -113,5 +115,9 @@ abstract class BasePage extends ConsumerWidget {
 
   Widget buildTitleWidget(WidgetRef ref) {
     return const SizedBox();
+  }
+
+  PreferredSizeWidget? buildBottom(WidgetRef ref, BuildContext context) {
+    return null;
   }
 }

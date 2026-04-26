@@ -83,7 +83,7 @@ class Utils {
     return "";
   }
 
-  static final NumberFormat creditFormat = NumberFormat("#,###");
+  static final NumberFormat creditFormat = NumberFormat("#,###", "hu");
   static final NumberFormat percentFormat = NumberFormat.decimalPatternDigits(decimalDigits: 1);
   static final NumberFormat percentFormat2Digits = NumberFormat.decimalPatternDigits(decimalDigits: 2);
 

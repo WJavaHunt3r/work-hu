@@ -12,7 +12,7 @@ class UserRoundModel with _$UserRoundModel {
     required RoundModel round,
     required UserModel user,
     required int samvirkPayments,
-    required double bmmperfectWeekPoints,
+    double? bmmperfectWeekPoints,
     required num roundCoins,
     required num roundCredits,
     required num roundMyShareGoal,

@@ -11,21 +11,52 @@ import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
+import 'package:work_hu/app/widgets/error_snack_bar.dart';
 import 'package:work_hu/app/widgets/success_alert_dialog.dart';
 import 'package:work_hu/features/change_password/provider/change_password_provider.dart';
+import 'package:work_hu/features/login/data/state/login_state.dart';
 import 'package:work_hu/features/login/providers/login_provider.dart';
 
-class LoginLayout extends ConsumerWidget {
+class LoginLayout extends ConsumerStatefulWidget {
   LoginLayout({required this.origRoute, super.key});
 
   final String origRoute;
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return LoginState();
+  }
+}
+
+class LoginState extends ConsumerState<LoginLayout> {
   static final _formKey = GlobalKey<FormState>();
   final FocusNode passwordNode = FocusNode();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    ref.listen(loginDataProvider, (prev, next) {
+      if (prev != next) {
+        if (next.resetState.isSuccess) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return SuccessAlertDialog(title: ref.read(loginDataProvider).message);
+              }).then((value) => ref.read(loginDataProvider.notifier).clearResetState());
+        }
+        if (next.modelState.isError) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(
+                ErrorSnackBar(
+                  context: context,
+                  text: next.message,
+                ),
+              )
+              .closed
+              .then((value) => ref.read(loginDataProvider.notifier).clear());
+        }
+      }
+    });
     final loginProvider = ref.watch(loginDataProvider.notifier);
-    var isDark = ref.watch(themeProvider) == AppThemeMode.dark;
     return Stack(
       children: [
         Form(
@@ -44,16 +75,6 @@ class LoginLayout extends ConsumerWidget {
                     controller: loginProvider.usernameController,
                     textInputAction: TextInputAction.next,
                     labelText: "login_username".i18n(),
-                    fillColor: isDark ? AppColors.secondaryGray : null,
-                    onFieldSubmitted: (text) {
-                      loginProvider.trimUsername();
-                      passwordNode.requestFocus();
-                    },
-                    onChanged: (text) {
-                      if (_formKey.currentState != null) {
-                        _formKey.currentState!.validate();
-                      }
-                    },
                     autofillHints: const [AutofillHints.username],
                     validator: (text) {
                       if (text == null || text.isEmpty) {
@@ -66,17 +87,12 @@ class LoginLayout extends ConsumerWidget {
                     controller: loginProvider.passwordController,
                     focusNode: passwordNode,
                     labelText: "login_password".i18n(),
-                    fillColor: isDark ? AppColors.secondaryGray : null,
+                    // fillColor: isDark ? AppColors.secondaryGray : null,
                     obscureText: true,
                     isPasswordField: true,
                     onFieldSubmitted: (value) => login(loginProvider, ref, context),
                     autofillHints: const [AutofillHints.password],
                     textInputAction: TextInputAction.go,
-                    onChanged: (text) {
-                      if (_formKey.currentState != null) {
-                        _formKey.currentState!.validate();
-                      }
-                    },
                     validator: (text) {
                       if (text == null || text.isEmpty) {
                         return 'login_form_empty_password'.i18n();
@@ -84,7 +100,7 @@ class LoginLayout extends ConsumerWidget {
                       return null;
                     },
                   ),
-                  ref.watch(loginDataProvider).modelState == ModelState.error
+                  ref.watch(loginDataProvider).modelState.isError
                       ? Center(
                           child: Text(
                             ref.read(loginDataProvider).message,
@@ -97,7 +113,7 @@ class LoginLayout extends ConsumerWidget {
                       child: Row(
                         children: [
                           Expanded(
-                            child: TextButton(
+                            child: FilledButton(
                                 onPressed: () {
                                   // TextInput.finishAutofillContext();
                                   login(loginProvider, ref, context);
@@ -115,18 +131,6 @@ class LoginLayout extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: TextButton(
-                                style: ButtonStyle(
-                                    side: WidgetStateProperty.resolveWith((state) => BorderSide.none),
-                                    backgroundColor: WidgetStateColor.resolveWith((states) {
-                                      // if (states.contains(WidgetState.focused) ||
-                                      //     states.contains(WidgetState.pressed) ||
-                                      //     states.contains(WidgetState.hovered)) {
-                                      //   return AppColors.secondaryGray;
-                                      // }
-                                      return ref.watch(themeProvider) == AppThemeMode.dark
-                                          ? Colors.black
-                                          : AppColors.backgroundColor;
-                                    })),
                                 onPressed: () {
                                   if (ref.watch(loginDataProvider).username.isNotEmpty) {
                                     showDialog(
@@ -137,15 +141,7 @@ class LoginLayout extends ConsumerWidget {
                                               context.pop();
                                             },
                                             title: "login_reset_password_confirm_title".i18n(),
-                                            content:
-                                                Text("login_reset_password_question".i18n(), textAlign: TextAlign.center))).then(
-                                        (value) => ref.read(loginDataProvider).resetState == ModelState.success && context.mounted
-                                            ? showDialog(
-                                                context: context,
-                                                builder: (context) {
-                                                  return SuccessAlertDialog(title: ref.read(loginDataProvider).message);
-                                                }).then((value) => ref.read(loginDataProvider.notifier).clearResetState())
-                                            : null);
+                                            content: Text("login_reset_password_question".i18n(), textAlign: TextAlign.center)));
                                   } else {
                                     showDialog(
                                         context: context,
@@ -155,7 +151,6 @@ class LoginLayout extends ConsumerWidget {
                                 },
                                 child: Text(
                                   "login_forgotten_password".i18n(),
-                                  style: const TextStyle(color: AppColors.primary),
                                 )),
                           ),
                         ],
@@ -166,24 +161,11 @@ class LoginLayout extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: TextButton(
-                                style: ButtonStyle(
-                                    side: WidgetStateProperty.resolveWith((state) => BorderSide.none),
-                                    backgroundColor: WidgetStateColor.resolveWith((states) {
-                                      // if (states.contains(WidgetState.focused) ||
-                                      //     states.contains(WidgetState.pressed) ||
-                                      //     states.contains(WidgetState.hovered)) {
-                                      //   return AppColors.secondaryGray;
-                                      // }
-                                      return ref.watch(themeProvider) == AppThemeMode.dark
-                                          ? Colors.black
-                                          : AppColors.backgroundColor;
-                                    })),
                                 onPressed: () {
                                   _launchUrl();
                                 },
                                 child: Text(
                                   "login_login_guide".i18n(),
-                                  style: const TextStyle(color: AppColors.primary),
                                 )),
                           ),
                         ],
@@ -209,7 +191,7 @@ class LoginLayout extends ConsumerWidget {
   }
 
   navigateTo(WidgetRef ref, BuildContext context) {
-    if (ref.read(userDataProvider) == null) {
+    if (ref.read(userDataProvider).user == null) {
       ref
           .read(changePasswordDataProvider.notifier)
           .setUsername(ref.read(loginDataProvider).username, ref.read(loginDataProvider).password);
@@ -220,16 +202,15 @@ class LoginLayout extends ConsumerWidget {
       });
     } else {
       ref.read(loginDataProvider.notifier).clear();
-      origRoute.isEmpty ? context.replace("/") : context.push(origRoute);
     }
   }
 
   Future<void> login(LoginDataNotifier loginProvider, WidgetRef ref, BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      await loginProvider.login().then((value) async =>
-          ref.read(loginDataProvider).modelState == ModelState.success && context.mounted
-              ? navigateTo(ref, context)
-              : passwordNode.requestFocus());
+      await loginProvider.login();
+      // .then((value) async => ref.read(loginDataProvider).modelState.isSuccess && context.mounted
+      // ? navigateTo(ref, context)
+      // : passwordNode.requestFocus());
     }
   }
 }

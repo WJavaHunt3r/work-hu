@@ -18,7 +18,7 @@ final usersApiProvider = Provider<UsersApi>((ref) => UsersApi());
 final usersRepoProvider = Provider<UsersRepository>((ref) => UsersRepository(ref.read(usersApiProvider)));
 
 final usersDataProvider = StateNotifierProvider.autoDispose<UsersDataNotifier, UsersState>(
-    (ref) => UsersDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider)));
+    (ref) => UsersDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider).user));
 
 class UsersDataNotifier extends StateNotifier<UsersState> {
   UsersDataNotifier(this.usersRepository, this.currentUser) : super(const UsersState()) {
@@ -69,10 +69,8 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
     state = state.copyWith(
         filtered: users
             .where((user) =>
-                Utils.changeSpecChars(user.firstname.toLowerCase())
-                    .startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
-                Utils.changeSpecChars(user.lastname.toLowerCase())
-                    .startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
+                Utils.changeSpecChars(user.firstname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
+                Utils.changeSpecChars(user.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
                 Utils.changeSpecChars("${user.lastname.toLowerCase()} ${user.firstname.toLowerCase()}")
                     .startsWith(Utils.changeSpecChars(filter.toLowerCase())))
             .toList());
@@ -102,9 +100,8 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
             try {
               var user = await usersRepository.getUserById(num.tryParse(field[0]) ?? 0);
               var email = field[6].toString().isNotEmpty ? field[6] : null;
-              var phoneNumber = field[6].toString().isNotEmpty
-                  ? num.tryParse(field[5].toString().substring(1).replaceAll(" ", "")) ?? 0
-                  : 0;
+              var phoneNumber =
+                  field[6].toString().isNotEmpty ? num.tryParse(field[5].toString().substring(1).replaceAll(" ", "")) ?? 0 : 0;
 
               var newUser = user.copyWith(email: email, phoneNumber: phoneNumber == 0 ? null : phoneNumber);
 

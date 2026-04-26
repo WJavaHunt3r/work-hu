@@ -26,21 +26,21 @@ class OrderItems extends BasePage {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("bufe_order_date".i18n()),
-                    Text("${order?.date} ${order?.time}"),
+                    Text("${order?.date}"),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("bufe_order_sum".i18n()),
-                    Text("${order?.brutto.replaceAll(".00", "")} Ft"),
+                    Text("${order?.total} Ft"),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("bufe_order_loc".i18n()),
-                    Text(order?.location == "BUFE1" ? "Büfé" : "Kávézó"),
+                    Text(order?.locationName ?? ""),
                   ],
                 )
               ],
@@ -55,9 +55,12 @@ class OrderItems extends BasePage {
                   return BaseListTile(
                     isLast: index == items.length - 1,
                     index: index,
-                    title: Text("${items[index].name} * ${items[index].amount}"),
-                    trailing: Text("${items[index].brutto} Ft", style: TextStyle(fontSize: 16.sp),),
-                    subtitle: Text("Egység ár: ${items[index].price.replaceAll(".00", "")} Ft"),
+                    title: Text("${items[index].productName} * ${items[index].quantity}"),
+                    trailing: Text(
+                      "${items[index].totalPrice} Ft",
+                      style: TextStyle(fontSize: 16.sp),
+                    ),
+                    subtitle: Text("Egység ár: ${items[index].unitPrice} Ft"),
                     // trailing: Text("${items[index].amount} Ft"),
                   );
                 },

@@ -15,11 +15,9 @@ class PaymentSuccessLayout extends ConsumerStatefulWidget {
   const PaymentSuccessLayout({
     super.key,
     this.checkoutReference,
-    this.bufeId,
   });
 
   final String? checkoutReference;
-  final num? bufeId;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _PaymentSuccessState();
@@ -31,9 +29,7 @@ class _PaymentSuccessState extends ConsumerState<PaymentSuccessLayout> {
     super.initState();
     // Use a post-frame callback to ensure the widget is fully mounted.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(paymentSuccessDataProvider.notifier)
-          .refreshPayment(checkoutReference: widget.checkoutReference, bufeId: widget.bufeId);
+      ref.read(paymentSuccessDataProvider.notifier).refreshSumupPayment(checkoutReference: widget.checkoutReference);
     });
   }
 

@@ -25,22 +25,6 @@ class ChangePasswordLayout extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // BaseTextFormField(
-                    //   // initialValue: ref.read(changePasswordDataProvider).username,
-                    //   controller: ref.watch(changePasswordDataProvider.notifier).usernameController,
-                    //   textInputAction: TextInputAction.next,
-                    //   autofillHints: const [AutofillHints.username],
-                    //   labelText: "change_password_username".i18n(),
-                    // ),
-                    // BaseTextFormField(
-                    //   // initialValue: ref.read(changePasswordDataProvider).password,
-                    //   obscureText: true,
-                    //   isPasswordField: true,
-                    //   autofillHints: const [AutofillHints.password],
-                    //   controller: ref.watch(changePasswordDataProvider.notifier).passwordController,
-                    //   textInputAction: TextInputAction.next,
-                    //   labelText: "change_password_old_password".i18n(),
-                    // ),
                     BaseTextFormField(
                       obscureText: true,
                       isPasswordField: true,
@@ -62,7 +46,7 @@ class ChangePasswordLayout extends ConsumerWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          TextButton(
+                          FilledButton(
                               onPressed: () => ref
                                   .read(changePasswordDataProvider.notifier)
                                   .changePassword()
@@ -73,7 +57,7 @@ class ChangePasswordLayout extends ConsumerWidget {
                                       : null),
                               child: Text(
                                 "change_password_change_action".i18n(),
-                                style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.white),
+                                // style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.white),
                               )),
                         ],
                       ),

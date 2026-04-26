@@ -7,7 +7,7 @@ import 'package:work_hu/features/admin/data/state/admin_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 
 final adminDataProvider =
-    StateNotifierProvider<AdminDataNotifier, AdminState>((ref) => AdminDataNotifier(ref.read(userDataProvider)));
+    StateNotifierProvider<AdminDataNotifier, AdminState>((ref) => AdminDataNotifier(ref.read(userDataProvider).user));
 
 class AdminDataNotifier extends StateNotifier<AdminState> {
   AdminDataNotifier(

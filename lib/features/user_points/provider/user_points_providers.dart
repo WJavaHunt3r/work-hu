@@ -11,7 +11,7 @@ import 'package:work_hu/features/transaction_items/providers/transaction_items_p
 import 'package:work_hu/features/user_points/data/model/user_points_state.dart';
 
 final userPointsDataProvider = StateNotifierProvider<UserPointsDataNotifier, UserPointsState>((ref) => UserPointsDataNotifier(
-    ref.read(transactionItemsRepoProvider), ref.read(userDataProvider), ref.read(activityItemsRepoProvider)));
+    ref.read(transactionItemsRepoProvider), ref.read(userDataProvider).user, ref.read(activityItemsRepoProvider)));
 
 class UserPointsDataNotifier extends StateNotifier<UserPointsState> {
   UserPointsDataNotifier(

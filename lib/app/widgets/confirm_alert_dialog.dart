@@ -19,25 +19,18 @@ class ConfirmAlertDialog extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         icon: icon,
-        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actionsAlignment: MainAxisAlignment.spaceEvenly,
         actions: [
           TextButton(
-              style: ButtonStyle(
-                backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
-                foregroundColor: WidgetStateColor.resolveWith((states) {
-                  return AppColors.primary;
-                }),
-              ),
               onPressed: () => context.pop(),
               child: Text(
                 "cancel".i18n(),
-                style: const TextStyle(fontWeight: FontWeight.bold),
               )),
-          TextButton(
+          FilledButton(
               onPressed: onConfirm,
               child: Text(
                 "confirm".i18n(),
-                //style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
               ))
         ],
         content: content);

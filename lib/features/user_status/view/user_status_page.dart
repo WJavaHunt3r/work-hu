@@ -16,20 +16,20 @@ class UserStatusPage extends BasePage {
 
   @override
   List<Widget> buildActions(BuildContext context, WidgetRef ref) {
-    return ref.watch(userDataProvider)!.isAdmin()
+    return ref.watch(userDataProvider).user!.isAdmin()
         ? [
-            // MaterialButton(
-            //   onPressed: ref.watch(userStatusDataProvider).modelState != ModelState.processing
-            //       ? () => ref.watch(userStatusDataProvider.notifier).recalculate()
-            //       : null,
-            //   child: const Icon(Icons.refresh_outlined),
-            // ),
             MaterialButton(
               onPressed: ref.watch(userStatusDataProvider).modelState != ModelState.processing
-                  ? () => ref.watch(userStatusDataProvider.notifier).setUserStatus()
+                  ? () => ref.watch(userStatusDataProvider.notifier).recalculate()
                   : null,
               child: const Icon(Icons.refresh_outlined),
-            )
+            ),
+            // MaterialButton(
+            //   onPressed: ref.watch(userStatusDataProvider).modelState != ModelState.processing
+            //       ? () => ref.watch(userStatusDataProvider.notifier).setUserStatus()
+            //       : null,
+            //   child: const Icon(Icons.refresh_outlined),
+            // )
           ]
         : [];
   }

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transactions/data/api/transaction_api.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
@@ -14,16 +15,15 @@ final transactionsRepoProvider =
 
 final transactionsDataProvider = StateNotifierProvider.autoDispose<TransactionsDataNotifier, TransactionsState>((ref) =>
     TransactionsDataNotifier(
-        ref.read(transactionsRepoProvider), ref.read(userDataProvider.notifier), ref.read(roundDataProvider.notifier)));
+        ref.read(transactionsRepoProvider), ref.read(userDataProvider).user, ref.read(roundDataProvider.notifier)));
 
 class TransactionsDataNotifier extends StateNotifier<TransactionsState> {
-  TransactionsDataNotifier(this.transactionRepository, this.currentUserProvider, this.roundProvider)
-      : super(const TransactionsState()) {
+  TransactionsDataNotifier(this.transactionRepository, this.currentUser, this.roundProvider) : super(const TransactionsState()) {
     getRounds();
   }
 
   final TransactionRepository transactionRepository;
-  final UserDataNotifier currentUserProvider;
+  final UserModel? currentUser;
   final RoundDataNotifier roundProvider;
 
   Future<void> getTransactions() async {
@@ -42,7 +42,7 @@ class TransactionsDataNotifier extends StateNotifier<TransactionsState> {
   Future<void> deleteTransaction(num id, int index) async {
     state = state.copyWith(modelState: ModelState.processing);
     try {
-      await transactionRepository.deleteTransaction(id, currentUserProvider.state!.id).then((data) {
+      await transactionRepository.deleteTransaction(id, currentUser!.id).then((data) {
         List<TransactionModel> items = [];
         for (var i = 0; i < state.transactions.length; i++) {
           if (i != index) items.add(state.transactions[i]);

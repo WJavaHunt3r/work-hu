@@ -10,6 +10,8 @@ import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/style/app_style.dart';
 
+import 'app/providers/localeProvider.dart';
+
 class DukApp extends ConsumerWidget {
   const DukApp({super.key});
 
@@ -43,25 +45,38 @@ class DukApp extends ConsumerWidget {
     final theme = GlobalTheme();
     final router = ref.watch(routerProvider);
     final appThemeMode = ref.watch(themeProvider);
-    return MaterialApp.router(
-      scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
-      debugShowCheckedModeBanner: false,
-      title: 'DukApp',
-      theme: theme.globalTheme,
-      darkTheme: theme.globalDarkTheme,
-      themeMode: AppThemeMode.getThemeMode(appThemeMode),
-      routerConfig: router,
-      supportedLocales: const [
-        Locale('en', 'US'),
-        Locale('hu', 'HU'),
-      ],
-      locale: const Locale('hu', 'HU'),
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        LocalJsonLocalization.delegate,
-      ],
+    final localeAsyncProvider = ref.watch(localeProvider);
+    return localeAsyncProvider.when(
+      data: (locale) => MaterialApp.router(
+        scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
+        debugShowCheckedModeBanner: false,
+        title: 'DukApp',
+        theme: theme.globalTheme,
+        darkTheme: theme.globalDarkTheme,
+        themeMode: AppThemeMode.getThemeMode(appThemeMode),
+        routerConfig: router,
+        supportedLocales: const [
+          Locale('en', 'US'),
+          Locale('hu', 'HU'),
+        ],
+        locale: const Locale('hu', 'HU'),
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          LocalJsonLocalization.delegate,
+        ],
+      ),
+      loading: () {
+        return MaterialApp(
+          navigatorKey: navigatorKey,
+          home: const Center(child: CircularProgressIndicator()),
+        );
+      },
+      error: (err, stack) => MaterialApp(
+        navigatorKey: navigatorKey,
+        home: const Center(child: Text('Error')),
+      ),
     );
   }
 }
