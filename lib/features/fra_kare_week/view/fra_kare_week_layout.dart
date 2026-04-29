@@ -71,7 +71,7 @@ class FraKareWeekLayout extends ConsumerWidget {
               ),
             )
           : const SizedBox(),
-      ref.watch(fraKareWeekDataProvider).modelState == ModelState.processing
+      ref.watch(fraKareWeekDataProvider).modelState == ModelState.loading
           ? const Center(child: CircularProgressIndicator())
           : const SizedBox()
     ]);

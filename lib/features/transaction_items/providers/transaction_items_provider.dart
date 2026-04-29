@@ -34,7 +34,7 @@ class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> 
   final UserModel? currentUser;
 
   Future<void> getTransactionItems(num transactionId) async {
-    state = state.copyWith(modelState: ModelState.processing, transactionItems: []);
+    state = state.copyWith(modelState: ModelState.loading, transactionItems: []);
     try {
       await transactionItemsRepository.getTransactionItems(transactionId: transactionId).then((data) async {
         data.sort((a, b) => b.user.lastname.compareTo(a.user.lastname));
@@ -46,7 +46,7 @@ class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> 
   }
 
   Future<void> getTransaction(num transactionId) async {
-    state = state.copyWith(modelState: ModelState.processing, transactionItems: []);
+    state = state.copyWith(modelState: ModelState.loading, transactionItems: []);
     try {
       await transactionsRepository.getTransaction(transactionId).then((data) async {
         state = state.copyWith(transaction: data, modelState: ModelState.success);
@@ -58,7 +58,7 @@ class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> 
   }
 
   Future<void> deleteTransactionItem(num id, int index) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await transactionItemsRepository.deleteTransactionItem(id, currentUser!.id).then((data) {
         List<TransactionItemModel> items = state.transactionItems.where((element) => element.id != id).toList();

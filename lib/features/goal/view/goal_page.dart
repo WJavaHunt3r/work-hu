@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/goal/view/goals_layout.dart';
 
-class GoalPage extends BasePage {
+class GoalPage extends LegacyBasePage {
   const GoalPage({super.key, super.title = "admin_goals", super.hasSearchBar = true});
 
   @override

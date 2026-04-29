@@ -39,7 +39,7 @@ class DonationDataNotifier extends StateNotifier<DonationState> {
   final UserModel? currentUser;
 
   Future<void> getDonations(DateTime? dateTime) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await donationRepository.getDonations(dateTime).then((donations) {
         donations.sort((a, b) => b.endDateTime!.compareTo(a.endDateTime!));
@@ -54,7 +54,7 @@ class DonationDataNotifier extends StateNotifier<DonationState> {
     List<DonationModel> origItems = state.donations;
     List<DonationModel> items = [...origItems];
     items.removeWhere((a) => a.id != donationId);
-    state = state.copyWith(donations: items, modelState: ModelState.processing);
+    state = state.copyWith(donations: items, modelState: ModelState.loading);
     try {
       await donationRepository
           .deleteDonation(donationId)
@@ -71,7 +71,7 @@ class DonationDataNotifier extends StateNotifier<DonationState> {
 
   Future<void> saveDonation() async {
     var mode = state.mode;
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     var donation = state.selectedDonation;
     try {
       if (donation != null) {

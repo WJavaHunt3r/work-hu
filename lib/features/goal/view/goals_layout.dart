@@ -41,7 +41,7 @@ class GoalsLayoutState extends ConsumerState<GoalsLayout> {
               }).then((v) => ref.read(goalDataProvider.notifier).getGoals(DateTime.now().year))
           : null;
 
-      if (next.modelState.isProcessing) {
+      if (next.modelState.isLoading) {
         LoadingScreen.instance().show(context: context);
       } else {
         LoadingScreen.instance().hide();

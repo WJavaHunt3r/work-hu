@@ -3,8 +3,8 @@ import 'dart:math' as Math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:work_hu/features/home/widgets/scale_scroll_view.dart';
 import 'package:work_hu/features/profile/data/model/user_round_model.dart';
+import 'package:work_hu/features/profile/widgets/scale_scroll_view.dart';
 import 'package:work_hu/features/user_status/data/model/user_status_model.dart';
 import 'package:work_hu/features/utils.dart';
 

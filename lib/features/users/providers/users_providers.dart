@@ -29,7 +29,7 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
   final UserModel? currentUser;
 
   Future<void> getUsers() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await usersRepository.getUsers(null, true).then((value) {
         value.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
@@ -41,7 +41,7 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
   }
 
   Future<void> resetUserPassword(num userId) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await usersRepository.resetPassword(userId, currentUser!.id);
       state = state.copyWith(modelState: ModelState.success);
@@ -51,7 +51,7 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
   }
 
   Future<void> saveUser() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       var updatedUser = await usersRepository.updateUser(currentUser!.id, state.selectedUser!);
       state = state.copyWith(selectedUser: updatedUser, modelState: ModelState.success);
@@ -79,7 +79,7 @@ class UsersDataNotifier extends StateNotifier<UsersState> {
   Future<void> downloadUserInfo() async {}
 
   Future<void> uploadUserInfo() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
         type: FileType.custom,

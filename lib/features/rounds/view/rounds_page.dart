@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/src/consumer.dart';
-import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/rounds/view/rounds_layout.dart';
 
-class RoundsPage extends BasePage {
+class RoundsPage extends LegacyBasePage {
   const RoundsPage({super.key, super.title = "rounds"});
 
   @override

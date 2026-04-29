@@ -23,7 +23,7 @@ class ActivityItemsDataNotifier extends StateNotifier<ActivityItemsState> {
   final ActivityItemsRepository activityRepository;
 
   Future<void> getActivityItems({required num activityId}) async {
-    state = state.copyWith(modelState: ModelState.processing, activityId: activityId);
+    state = state.copyWith(modelState: ModelState.loading, activityId: activityId);
     try {
       await activityRepository.getActivityItems(activityId: activityId).then((data) async {
         state = state.copyWith(activityItems: data, modelState: ModelState.success);

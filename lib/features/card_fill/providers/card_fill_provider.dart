@@ -36,7 +36,7 @@ class CardFillDataNotifier extends StateNotifier<CardFillState> {
     try {
       var id = UniqueKey().toString().replaceAll('#', "");
       var desc = "payment_$id";
-      state = state.copyWith(modelState: ModelState.processing);
+      state = state.copyWith(modelState: ModelState.loading);
       var response = await bufeRepository.createSumupCheckout(
           amount: num.parse(amountController.text),
           // checkoutReference: "$id-userid:$bufeId",

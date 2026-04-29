@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 
 import 'card_fill_layout.dart';
 
-class CardFillPage extends BasePage {
+class CardFillPage extends LegacyBasePage {
   const CardFillPage({super.key, required this.userId, super.title = "card_fill", super.canPop = true});
 
   final num userId;

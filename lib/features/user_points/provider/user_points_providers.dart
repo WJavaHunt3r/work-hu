@@ -26,7 +26,7 @@ class UserPointsDataNotifier extends StateNotifier<UserPointsState> {
   final ActivityItemsRepository activityItemsRepository;
 
   Future<void> getTransactionItems() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
 
     try {
       if (state.userId != null) {

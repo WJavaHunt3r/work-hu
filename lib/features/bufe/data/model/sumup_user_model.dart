@@ -6,8 +6,12 @@ part 'sumup_user_model.g.dart';
 
 @freezed
 class SumupUserModel with _$SumupUserModel {
-  const factory SumupUserModel({required String full_name, required num balance, required String dukapp_id, required num spent}) =
-      _SumupUserModel;
+  const factory SumupUserModel(
+      {required String full_name,
+      required num balance,
+      required String dukapp_id,
+      required num spent,
+      String? staff_barcode}) = _SumupUserModel;
 
   factory SumupUserModel.fromJson(Map<String, dynamic> json) => _$SumupUserModelFromJson(json);
 }

@@ -12,15 +12,23 @@ class UserProvider extends ChangeNotifier {
   UserProvider();
 
   UserModel? _user;
+  String? _token;
 
   Future<void> setUser(UserModel? user) async {
     if (user == null) {
       await Utils.saveData('user', '');
       await Utils.saveData('password', '');
+      _token = null;
     }
     _user = user;
     notifyListeners();
   }
 
+  Future<void> setToken(String? token) async {
+    _token = token;
+  }
+
   UserModel? get user => _user;
+
+  String? get token => _token;
 }

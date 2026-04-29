@@ -47,7 +47,7 @@ class ActivitiesLayout extends ConsumerWidget {
               tabViews: createTabView(activities, ref, context),
             )),
       ),
-      ref.watch(activityDataProvider).modelState == ModelState.processing
+      ref.watch(activityDataProvider).modelState == ModelState.loading
           ? const Center(child: CircularProgressIndicator())
           : const SizedBox()
     ]);

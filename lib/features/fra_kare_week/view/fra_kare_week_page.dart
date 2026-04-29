@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/features/fra_kare_week/view/fra_kare_week_layout.dart';
 
-class FraKareWeekPage extends BasePage {
+class FraKareWeekPage extends LegacyBasePage {
   const FraKareWeekPage({super.key, super.title = "admin_fra_kare_weeks"});
 
   @override

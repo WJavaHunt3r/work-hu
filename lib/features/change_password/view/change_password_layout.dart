@@ -74,7 +74,7 @@ class ChangePasswordLayout extends ConsumerWidget {
                   ],
                 ),
               ))),
-      ref.watch(changePasswordDataProvider).modelState == ModelState.processing
+      ref.watch(changePasswordDataProvider).modelState == ModelState.loading
           ? const Center(
               child: CircularProgressIndicator(),
             )

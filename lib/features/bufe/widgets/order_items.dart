@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
 
-class OrderItems extends BasePage {
+class OrderItems extends LegacyBasePage {
   OrderItems({super.key, super.title = "bufe_order_items"}) : super(titleArgs: [""]);
 
   @override
@@ -47,7 +47,7 @@ class OrderItems extends BasePage {
             ),
           ),
         ),
-        ref.watch(bufeDataProvider).modelState == ModelState.processing
+        ref.watch(bufeDataProvider).modelState == ModelState.loading
             ? const CircularProgressIndicator()
             : BaseListView(
                 shrinkWrap: true,

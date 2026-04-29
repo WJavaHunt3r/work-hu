@@ -23,7 +23,7 @@ class CreateTransactionsLayout extends ConsumerWidget {
                   const TransactionDetailsCard(),
                 ]
               : enabledWidgets(context, ref)),
-      ref.watch(createTransactionsDataProvider).modelState == ModelState.processing
+      ref.watch(createTransactionsDataProvider).modelState == ModelState.loading
           ? const Center(
               child: CircularProgressIndicator(),
             )

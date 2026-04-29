@@ -3,37 +3,40 @@ import 'package:flutter/services.dart';
 import 'package:localization/localization.dart';
 
 class BaseTextFormField extends StatefulWidget {
-  const BaseTextFormField({super.key,
-    this.initialValue,
-    required this.labelText,
-    this.enabled = true,
-    this.onChanged,
-    this.textAlign = TextAlign.left,
-    this.keyBoardType = TextInputType.text,
-    this.autofocus = false,
-    this.controller,
-    this.autofillHints,
-    this.focusNode,
-    this.textStyle,
-    this.textInputAction,
-    this.obscureText = false,
-    this.validator,
-    this.fillColor,
-    this.onFieldSubmitted,
-    this.isPasswordField = false,
-    this.suffix,
-    this.prefix,
-    this.inputFormatter,
-    this.fldControl,
-    this.onTap,
-    this.maxLines = 1,
-    this.fontSize,
-    this.isHighLighted = false,
-    this.onEditingComplete})
+  const BaseTextFormField(
+      {super.key,
+      this.initialValue,
+      required this.labelText,
+      this.hintText,
+      this.enabled = true,
+      this.onChanged,
+      this.textAlign = TextAlign.left,
+      this.keyBoardType = TextInputType.text,
+      this.autofocus = false,
+      this.controller,
+      this.autofillHints,
+      this.focusNode,
+      this.textStyle,
+      this.textInputAction,
+      this.obscureText = false,
+      this.validator,
+      this.fillColor,
+      this.onFieldSubmitted,
+      this.isPasswordField = false,
+      this.suffix,
+      this.prefix,
+      this.inputFormatter,
+      this.fldControl,
+      this.onTap,
+      this.maxLines = 1,
+      this.fontSize,
+      this.isHighLighted = false,
+      this.onEditingComplete})
       : assert(initialValue != Widget);
 
   final Object? initialValue;
   final String labelText;
+  final String? hintText;
   final bool enabled;
   final bool autofocus;
   final TextAlign textAlign;
@@ -81,126 +84,60 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
   @override
   Widget build(BuildContext context) {
     var enabled = widget.enabled && (widget.fldControl == null || widget.fldControl != "1");
-    var highlightColor = Theme
-        .of(context)
-        .textTheme
-        .bodyMedium
-        ?.color;
+    var theme = Theme.of(context);
     return Visibility(
       visible: widget.fldControl == null || (widget.fldControl != "0" && widget.fldControl != ""),
       child: Padding(
         padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8, right: 8),
-        child: TextFormField(
-          autofillHints: widget.autofillHints,
-          focusNode: widget.focusNode,
-          enabled: enabled,
-          textAlign: widget.textAlign,
-          controller: widget.controller,
-          keyboardType: widget.keyBoardType,
-          initialValue: widget.initialValue?.toString(),
-          autofocus: widget.autofocus,
-          textInputAction: widget.textInputAction,
-          obscureText: _isObscured,
-          style: enabled && !widget.isHighLighted
-              ? null
-              : Theme
-              .of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(
-              fontSize: widget.isHighLighted ? (Theme
-                  .of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.fontSize ?? 0) + 8 : widget.fontSize,
-              color: widget.isHighLighted ? highlightColor : Theme
-                  .of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.color
-                  ?.withAlpha(180)),
-          inputFormatters: widget.inputFormatter == null ? null : [widget.inputFormatter!],
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.only(left: 16, top: 12),
-            // enabledBorder: const OutlineInputBorder(),
-            border: widget.isHighLighted
-                ? OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: highlightColor!,
-                  width: 1,
-                ))
-                : OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Theme
-                      .of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .color!
-                      .withAlpha(100), // Light blue border for disabled
-                  width: 1,
-                )),
-            disabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Theme
-                    .of(context)
-                    .textTheme
-                    .bodyMedium!
-                    .color!
-                    .withAlpha(100), // Light blue border for disabled
-                width: 1,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(widget.labelText.i18n(),
+                style:
+                    theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant)),
+            const SizedBox(height: 8),
+            TextFormField(
+              autofillHints: widget.autofillHints,
+              focusNode: widget.focusNode,
+              enabled: enabled,
+              textAlign: widget.textAlign,
+              controller: widget.controller,
+              keyboardType: widget.keyBoardType,
+              initialValue: widget.initialValue?.toString(),
+              autofocus: widget.autofocus,
+              textInputAction: widget.textInputAction,
+              obscureText: _isObscured,
+              inputFormatters: widget.inputFormatter == null ? null : [widget.inputFormatter!],
+              decoration: InputDecoration(
+                hintText: widget.hintText?.i18n(),
+                filled: true,
+                fillColor: theme.colorScheme.surface,
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: theme.colorScheme.outlineVariant)),
+                focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: theme.colorScheme.primary, width: 2)),
+                prefixIcon: widget.prefix,
+                suffixIcon: widget.isPasswordField
+                    ? IconButton(
+                        onPressed: () => obscuredChanged(),
+                        icon: _isObscured ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+                      )
+                    : widget.suffix,
               ),
+              onChanged: widget.onChanged != null ? (String text) => widget.onChanged!(text) : null,
+              onFieldSubmitted: widget.onFieldSubmitted != null ? (String text) => widget.onFieldSubmitted!(text) : null,
+              // onEditingComplete: widget.onEditingComplete != null ? () => widget.onEditingComplete!() : null,
+              // onTapOutside: (event)=> widget.onEditingComplete != null ? () => widget.onEditingComplete!() : null,
+              validator: widget.fldControl != "3"
+                  ? null
+                  : (String? text) => widget.validator != null
+                      ? widget.validator!(text)
+                      : (text == null || text.isEmpty ? "base_is_required".i18n() : null),
+              onTap: widget.onTap,
+              maxLines: widget.maxLines,
             ),
-            label: widget.fldControl == "3"
-                ? RichText(
-                text: TextSpan(
-                    text: widget.labelText,
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                    children: const [
-                      TextSpan(
-                          text: ' *',
-                          style: TextStyle(
-                            color: Colors.red,
-                          ))
-                    ]))
-                : null,
-            labelStyle: enabled
-                ? null
-                : Theme
-                .of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: Theme
-                .of(context)
-                .textTheme
-                .labelLarge
-                ?.color
-                ?.withAlpha(180)),
-            labelText: widget.fldControl == "3" ? null : widget.labelText,
-            fillColor: widget.fillColor,
-            prefixIcon: widget.prefix,
-            suffixIcon: widget.isPasswordField
-                ? IconButton(
-              onPressed: () => obscuredChanged(),
-              icon: _isObscured ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
-            )
-                : widget.suffix,
-          ),
-          onChanged: widget.onChanged != null ? (String text) => widget.onChanged!(text) : null,
-          onFieldSubmitted: widget.onFieldSubmitted != null ? (String text) => widget.onFieldSubmitted!(text) : null,
-          // onEditingComplete: widget.onEditingComplete != null ? () => widget.onEditingComplete!() : null,
-          // onTapOutside: (event)=> widget.onEditingComplete != null ? () => widget.onEditingComplete!() : null,
-          validator: widget.fldControl != "3"
-              ? null
-              : (String? text) =>
-          widget.validator != null
-              ? widget.validator!(text)
-              : (text == null || text.isEmpty ? "base_is_required".i18n() : null),
-          onTap: widget.onTap,
-          maxLines: widget.maxLines,
+          ],
         ),
       ),
     );
@@ -250,8 +187,10 @@ class ThreeDigitDecimalFormatter extends TextInputFormatter {
   static final RegExp _decimalExp = RegExp(r'^[0-9]*([\,]?[0-9]{0,3})?$');
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue,
-      TextEditingValue newValue,) {
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     // 1. If the new value is empty, allow it.
     if (newValue.text.isEmpty) {
       return newValue;
@@ -279,8 +218,10 @@ class NoDecimalFormatter extends TextInputFormatter {
   static final RegExp _decimalExp = RegExp(r'^[0-9]*$');
 
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue,
-      TextEditingValue newValue,) {
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     // 1. If the new value is empty, allow it.
     if (newValue.text.isEmpty) {
       return newValue;

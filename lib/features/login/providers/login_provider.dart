@@ -1,12 +1,10 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:localization/localization.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
-import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/login/data/api/login_api.dart';
-import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/login/data/repository/login_repository.dart';
 import 'package:work_hu/features/login/data/state/login_state.dart';
 import 'package:work_hu/features/utils.dart';
@@ -18,90 +16,63 @@ final loginRepoProvider = Provider<LoginRepository>((ref) => LoginRepository(ref
 final loginDataProvider =
     StateNotifierProvider.autoDispose<LoginDataNotifier, LoginState>((ref) => LoginDataNotifier(ref.read(loginRepoProvider)));
 
-class LoginDataNotifier extends StateNotifier<LoginState> {
-  LoginDataNotifier(this.loginRepository) : super(const LoginState()) {
-    usernameController = TextEditingController(text: "");
-    passwordController = TextEditingController(text: "");
-
-    usernameController.addListener(_updateState);
-    passwordController.addListener(_updateState);
+class LoginDataNotifier extends BaseDataNotifier<LoginState> {
+  LoginDataNotifier(this._loginRepository) : super(const LoginState()) {
+    initGoogleWeb();
   }
 
-  final LoginRepository loginRepository;
-  late final TextEditingController usernameController;
-  late final TextEditingController passwordController;
+  final LoginRepository _loginRepository;
   final UserProvider userProvider = locator<UserProvider>();
 
-  Future<void> login() async {
-    state = state.copyWith(modelState: ModelState.processing);
-    try {
-      var user = await loginWithSavedData(state.username.trim(), state.password.trim());
+  @override
+  LoginState copyWithStatus(BaseState status) {
+    return state = state.copyWith(status: status);
+  }
 
-      if (user != null) {
-        // if (user.changedPassword) {
-          await Utils.saveData('user', state.username).then((value) async {
-            await Utils.saveData('password', state.password);
-          });
-        // }
-        // clear("", ModelState.success);
-        state = state.copyWith(modelState: ModelState.success);
-      } else {
-        clear("", ModelState.error);
-      }
-    } on DioException {
-      // if(e.type == DioErrorType.)
-      state = state.copyWith(modelState: ModelState.error, message: "login_username_password_error".i18n());
+  Future<void> login({required String usr, required String pswd}) async {
+    executeApiCall<Map<String, dynamic>>(() => _loginRepository.login(usr.trim(), pswd.trim()), onSuccess: (data) async {
+      await Utils.saveData("jwt_token", data['token']);
+      userProvider.setToken(data['token']);
+      executeApiCall(() => _loginRepository.getUserByUsername(data['username']).then((userData) async {
+            userProvider.setUser(userData);
+          }));
+    });
+  }
+
+  Future<void> signInWithGoogle(String idToken) async {
+    try {
+      executeApiCall<Map<String, dynamic>>(() => _loginRepository.loginWithGoogle(idToken), onSuccess: (data) async {
+        userProvider.setToken(data['token']);
+        executeApiCall(() => _loginRepository.getUserByUsername(data['username']).then((userData) async {
+              userProvider.setUser(userData);
+            }));
+      });
+
+      // 4. Handle your JWT response exactly like normal login
+    } catch (error) {
+      print("Google Sign-In Error: $error");
     }
   }
 
-  Future<UserModel?> loginWithSavedData([String? username, String? password]) async {
-    var usr = username ?? await Utils.getData('user');
-    var pswd = password ?? await Utils.getData('password');
-    if (usr.isEmpty || pswd.isEmpty) {
-      return null;
-    }
-    UserModel? user;
-    await loginRepository.login(usr, pswd).then((data) async {
-      await loginRepository.getUserByUsername(data['username']).then((userData) async {
-        // if (userData.changedPassword) {
-          userProvider.setUser(userData);
-        // }
-        user = userData;
+  void initGoogleWeb() {
+    final signIn = GoogleSignIn.instance;
+
+    signIn
+        .initialize(
+      clientId: "470140408680-vvsu3rjroghr7suq603r4eek5lec5bds.apps.googleusercontent.com",
+    )
+        .then((_) {
+      signIn.authenticationEvents.listen((event) async {
+        if (event is GoogleSignInAuthenticationEventSignIn) {
+          // Get the ID Token to send to your Java Backend
+          final auth = event.user.authentication;
+          final String? idToken = auth.idToken;
+
+          if (idToken != null) {
+            await signInWithGoogle(idToken);
+          }
+        } else if (event is GoogleSignInAuthenticationEventSignOut) {}
       });
     });
-    return user;
-  }
-
-  void _updateState() {
-    state = state.copyWith(username: usernameController.value.text, password: passwordController.value.text);
-  }
-
-  void clear([String? s, ModelState? modelState]) {
-    usernameController.clear();
-    passwordController.clear();
-    state = state.copyWith(username: "", password: "", modelState: modelState ?? ModelState.empty, message: s ?? "");
-  }
-
-  Future<void> clearResetState() async {
-    state = state.copyWith(resetState: ModelState.empty);
-  }
-
-  Future<void> reset() async {
-    state = state.copyWith(modelState: ModelState.processing);
-    try {
-      await loginRepository.sendNewPassword(state.username);
-      state =
-          state.copyWith(modelState: ModelState.success, resetState: ModelState.success, message: "Új jelszó emailben elküldve");
-    } on DioException {
-      usernameController.text = "";
-      passwordController.text = "";
-      state = state.copyWith(username: "", password: "", resetState: ModelState.error, message: "Nem létező felhasználónév");
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error);
-    }
-  }
-
-  void trimUsername() {
-    usernameController.text = usernameController.text.trim();
   }
 }

@@ -1,5 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
+import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/features/utils.dart';
+
+import '../app/providers/user_provider.dart';
 
 @singleton
 class DioClient {
@@ -40,6 +44,26 @@ class DioClient {
     // adapter.withCredentials = true;
     // _dio.httpClientAdapter = adapter;
     _dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        // 1. Fetch token from Secure Storage (or your runtime provider)
+        final token = locator<UserProvider>().token ?? await Utils.getData("jwt_token");
+
+        // 2. If token exists, attach to header
+        if (token != '') {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+
+        return handler.next(options);
+      },
+      onError: (DioException e, handler) {
+        // 3. Handle 401 Unauthorized (Token expired)
+        if (e.response?.statusCode == 401) {
+          // Log the user out or refresh token
+        }
+        return handler.next(e);
+      },
+    ));
   }
 
   Dio get dio => _dio;

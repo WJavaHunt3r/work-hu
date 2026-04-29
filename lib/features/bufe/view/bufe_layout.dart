@@ -47,7 +47,7 @@ class _BufeState extends ConsumerState<BufeLayout> {
     final account = ref.watch(bufeDataProvider).account;
     final payments = ref.watch(bufeDataProvider).payments;
     final orders = ref.watch(bufeDataProvider).orders;
-    return account == null && ref.watch(bufeDataProvider).modelState != ModelState.processing
+    return account == null && ref.watch(bufeDataProvider).modelState != ModelState.loading
         ? Center(
             child: Text("bufe_no_user".i18n()),
           )
@@ -145,7 +145,7 @@ class _BufeState extends ConsumerState<BufeLayout> {
                         ),
                       )
                     : const SizedBox(),
-                ref.watch(bufeDataProvider).modelState == ModelState.processing
+                ref.watch(bufeDataProvider).modelState == ModelState.loading
                     ? const Center(child: CircularProgressIndicator())
                     : const SizedBox()
               ]),

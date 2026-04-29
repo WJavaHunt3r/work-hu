@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/payment_goal.dart';
 import 'package:work_hu/app/models/payment_status.dart';
@@ -129,7 +129,7 @@ class _PaymentsState extends ConsumerState<PaymentsLayout> with SingleTickerProv
             ))
           ]),
         ),
-        if (ref.watch(paymentDataProvider).modelState == ModelState.processing)
+        if (ref.watch(paymentDataProvider).modelState == ModelState.loading)
           const Dialog(
             backgroundColor: Colors.transparent,
             child: Center(child: CircularProgressIndicator()),
@@ -176,7 +176,7 @@ class _PaymentsState extends ConsumerState<PaymentsLayout> with SingleTickerProv
   }
 
   Future<dynamic> showPaymentFilter(BuildContext context) async {
-    return await showModalBottomSheet<BasePage>(
+    return await showModalBottomSheet<LegacyBasePage>(
         context: context,
         isDismissible: false,
         enableDrag: false,

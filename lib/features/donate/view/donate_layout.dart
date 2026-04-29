@@ -44,7 +44,7 @@ class _DonateState extends ConsumerState<DonateLayout> {
           hostedUrl: state.hosted_url,
           onRemoveNumber: () => ref.watch(donateDataProvider.notifier).removeLastNumber(),
         ),
-        ref.watch(donateDataProvider).modelState == ModelState.processing
+        ref.watch(donateDataProvider).modelState == ModelState.loading
             ? const Center(
                 child: CircularProgressIndicator.adaptive(),
               )

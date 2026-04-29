@@ -24,7 +24,7 @@ class PaymentDataNotifier extends StateNotifier<PaymentsState> {
   final BufeRepository bufeRepository;
 
   Future<void> getPayments() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await paymentRepository
           .getPayments(
@@ -45,7 +45,7 @@ class PaymentDataNotifier extends StateNotifier<PaymentsState> {
     List<PaymentsModel> origItems = state.payments;
     List<PaymentsModel> items = [...origItems];
     items.removeWhere((a) => a.id == paymentId);
-    state = state.copyWith(payments: items, modelState: ModelState.processing);
+    state = state.copyWith(payments: items, modelState: ModelState.loading);
     try {
       // await bufeRepository.deleteCheckout(checkoutId: checkoutId);
       await paymentRepository
@@ -57,7 +57,7 @@ class PaymentDataNotifier extends StateNotifier<PaymentsState> {
   }
 
   Future<void> refreshPayments() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     for (var payment in state.payments.where((e) => e.status == PaymentStatus.PENDING)) {
       await refreshPayment(payment);
     }
@@ -66,7 +66,7 @@ class PaymentDataNotifier extends StateNotifier<PaymentsState> {
   }
 
   Future<void> refreshPayment(PaymentsModel payment) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       if (payment.status == PaymentStatus.PENDING) {
         var checkout = await bufeRepository.getSumupCheckout(checkoutId: payment.checkoutId);
@@ -91,7 +91,7 @@ class PaymentDataNotifier extends StateNotifier<PaymentsState> {
 
   Future<void> getPayment(num? paymentId) async {
     if (paymentId != null) {
-      state = state.copyWith(modelState: ModelState.processing);
+      state = state.copyWith(modelState: ModelState.loading);
       try {
         await paymentRepository.getPayment(paymentId).then((payments) {
           state = state.copyWith(selectedPayment: payments, modelState: ModelState.success);

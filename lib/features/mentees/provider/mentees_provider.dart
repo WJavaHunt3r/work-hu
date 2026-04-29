@@ -36,7 +36,7 @@ class MenteesDataNotifier extends StateNotifier<MenteesState> {
   final UserModel? currentUser;
 
   Future<void> getMentees() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await menteesRepository
           .getMentorMentee(userId: currentUser!.id)

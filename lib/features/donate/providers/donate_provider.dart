@@ -32,7 +32,7 @@ class DonateDataNotifier extends StateNotifier<DonateState> {
 
   Future<void> getDonation(num id) async {
     try {
-      state = state.copyWith(modelState: ModelState.processing);
+      state = state.copyWith(modelState: ModelState.loading);
       await donationRepository.getDonation(id).then((d) => state = state.copyWith(donation: d, modelState: ModelState.success));
     } on DioException catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
@@ -41,7 +41,7 @@ class DonateDataNotifier extends StateNotifier<DonateState> {
 
   Future<void> createCheckout() async {
     try {
-      state = state.copyWith(modelState: ModelState.processing);
+      state = state.copyWith(modelState: ModelState.loading);
       var reference = "donation_${state.donation!.id!}_${UniqueKey().toString().replaceAll("#", "")}";
       // var response = await bufeRepository.createCheckout(
       //     amount: num.parse(amountController.text),
@@ -101,7 +101,7 @@ class DonateDataNotifier extends StateNotifier<DonateState> {
   Future<void> savePayment() async {
     amountController.text = '';
     try {
-      state = state.copyWith(modelState: ModelState.processing);
+      state = state.copyWith(modelState: ModelState.loading);
 
       var payment = state.payment!;
       await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.PAID), payment.id!);
@@ -114,7 +114,7 @@ class DonateDataNotifier extends StateNotifier<DonateState> {
 
   Future<void> deleteCheckout(PaymentStatus status) async {
     try {
-      state = state.copyWith(modelState: ModelState.processing);
+      state = state.copyWith(modelState: ModelState.loading);
       await deleteCheckoutApi(status, state.checkoutId!, state.payment!);
       amountController.text = '';
       state = state.copyWith(modelState: ModelState.success, base64: null, checkoutId: null, amount: 0);

@@ -27,7 +27,7 @@ class TransactionsDataNotifier extends StateNotifier<TransactionsState> {
   final RoundDataNotifier roundProvider;
 
   Future<void> getTransactions() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await transactionRepository.getTransactions(state.selectedRoundId).then((data) {
         data.sort(
@@ -40,7 +40,7 @@ class TransactionsDataNotifier extends StateNotifier<TransactionsState> {
   }
 
   Future<void> deleteTransaction(num id, int index) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await transactionRepository.deleteTransaction(id, currentUser!.id).then((data) {
         List<TransactionModel> items = [];
@@ -55,7 +55,7 @@ class TransactionsDataNotifier extends StateNotifier<TransactionsState> {
   }
 
   Future<void> getRounds() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       var rounds = await roundProvider.roundRepository.getRounds();
       var currentRound = await roundProvider.roundRepository.getCurrentRounds();

@@ -106,7 +106,7 @@ class TransactionsLayout extends ConsumerWidget {
                 ),
               )
             : const SizedBox(),
-        ref.watch(transactionItemsDataProvider).modelState == ModelState.processing
+        ref.watch(transactionItemsDataProvider).modelState == ModelState.loading
             ? const Center(child: CircularProgressIndicator())
             : const SizedBox()
       ],

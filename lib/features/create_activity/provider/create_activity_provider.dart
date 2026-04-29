@@ -64,7 +64,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
     var user = currentUser;
     updateResponsible(user!);
 
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await usersRepository.getUsers(null, true).then((data) {
         state = state.copyWith(
@@ -194,7 +194,7 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
   }
 
   Future<void> sendActivity() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await activityRepository
           .postActivity(ActivityModel(

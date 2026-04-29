@@ -45,7 +45,7 @@ class _CardFillState extends ConsumerState<CardFillLayout> {
             addNumber: (text) => ref.watch(cardFillDataProvider.notifier).addNumber(text),
             createCheckout: () => ref.watch(cardFillDataProvider.notifier).createCheckout(widget.userId),
             onRemoveNumber: () => ref.watch(cardFillDataProvider.notifier).removeLastNumber()),
-        ref.watch(cardFillDataProvider).modelState == ModelState.processing
+        ref.watch(cardFillDataProvider).modelState == ModelState.loading
             ? const Center(
                 child: CircularProgressIndicator.adaptive(),
               )

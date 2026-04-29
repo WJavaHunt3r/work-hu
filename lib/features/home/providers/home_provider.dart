@@ -1,103 +1,31 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/features/donation/data/repository/donation_repository.dart';
-import 'package:work_hu/features/donation/providers/donation_provider.dart';
-import 'package:work_hu/features/home/data/api/team_round_api.dart';
-import 'package:work_hu/features/home/data/repository/team_round_repository.dart';
-import 'package:work_hu/features/home/data/state/team_round_state.dart';
-import 'package:work_hu/features/profile/data/repository/user_round_repository.dart';
-import 'package:work_hu/features/profile/providers/profile_providers.dart';
-import 'package:work_hu/features/rounds/data/repository/round_repository.dart';
-import 'package:work_hu/features/rounds/provider/round_provider.dart';
-import 'package:work_hu/features/teams/data/repository/teams_repository.dart';
-import 'package:work_hu/features/teams/provider/teams_provider.dart';
-import 'package:work_hu/features/user_status/data/repository/user_status_repository.dart';
-import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/providers/base_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/features/home/data/state/home_state.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/features/login/data/repository/login_repository.dart';
+import 'package:work_hu/features/login/providers/login_provider.dart';
 
-final teamRoundApiProvider = Provider<TeamRoundApi>((ref) => TeamRoundApi());
+final homeDataProvider =
+    StateNotifierProvider.autoDispose<HomeDataNotifier, HomeState>((ref) => HomeDataNotifier(ref.watch(loginRepoProvider)));
 
-final teamRoundRepoProvider = Provider<TeamRoundRepository>((ref) => TeamRoundRepository(ref.read(teamRoundApiProvider)));
+class HomeDataNotifier extends BaseDataNotifier<HomeState> {
+  HomeDataNotifier(this._loginRepository) : super(const HomeState());
 
-final homeDataProvider = StateNotifierProvider.autoDispose<HomeDataNotifier, TeamRoundState>((ref) => HomeDataNotifier(
-    ref.read(teamsRepoProvider),
-    ref.read(donationRepoProvider),
-    ref.watch(teamRoundRepoProvider),
-    ref.watch(userStatusRepoProvider),
-    ref.watch(roundDataProvider.notifier)));
+  final LoginRepository _loginRepository;
+  final UserProvider userProvider = locator<UserProvider>();
 
-class HomeDataNotifier extends StateNotifier<TeamRoundState> {
-  HomeDataNotifier(
-      this.teamRepository, this.donationRepository, this.teamRoundRepository, this.userStatusRepository, this.roundDataNotifier)
-      : super(const TeamRoundState()) {
-    getDonations();
-    getUserStatus();
+  @override
+  HomeState copyWithStatus(BaseState status) {
+    return state = state.copyWith(status: status);
   }
 
-  final TeamRepository teamRepository;
-  final TeamRoundRepository teamRoundRepository;
-  final DonationRepository donationRepository;
-  final UserStatusRepository userStatusRepository;
-  final RoundDataNotifier roundDataNotifier;
-
-  Future<void> getTeamRounds() async {
-    state = state.copyWith(modelState: ModelState.processing);
-    try {
-      await teamRepository.fetchTeams().then((data) async {
-        data.sort((a, b) => b.coins.compareTo(a.coins));
-        state = state.copyWith(teams: data, modelState: ModelState.success);
-      });
-      await teamRoundRepository.fetchTeamRounds().then((data) async {
-        data.sort((a, b) => b.round.roundNumber.compareTo(a.round.roundNumber));
-        state = state.copyWith(teamRounds: data, modelState: ModelState.success);
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error);
-    }
-  }
-
-  Future<void> getUserStatus() async {
-    state = state.copyWith(modelState: ModelState.processing);
-    try {
-      await userStatusRepository.getUserStatuses(DateTime.now().year, null).then((data) async {
-        data.sort((a, b) => b.status.compareTo(a.status));
-        state = state.copyWith(users: data, modelState: ModelState.success);
-      });
-
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error);
-    }
-  }
-
-  Future<void> checkLoginCredentials() async {
-    await getTeamRounds();
-    // state = state.copyWith(modelState: ModelState.processing);
-    // var username = await Utils.getData('user');
-    // var password = await Utils.getData('password');
-    //
-    // var user = userSessionProvider.state;
-    // if (username.isNotEmpty && password.isNotEmpty && user == null) {
-    //   //state = state.copyWith(modelState: ModelState.processing);
-    //   read.state = LoginState(username: username, password: password);
-    //   // await read.login();
-    //   state = state.copyWith(message: read.state.message, modelState: ModelState.success);
-    // } else {
-    //   if (user == null && username.isNotEmpty) {
-    //     await loginRepository.getUser(username).then((value) => userSessionProvider.setUser(value));
-    //   }
-    //   state = state.copyWith(modelState: ModelState.success);
-    // }
-  }
-
-  Future<void> getDonations() async {
-    state = state.copyWith(modelState: ModelState.processing);
-    try {
-      await donationRepository.getDonations(DateTime.now()).then((donations) {
-        donations.sort((a, b) => b.endDateTime!.compareTo(a.endDateTime!));
-        state = state.copyWith(donations: donations, modelState: ModelState.success);
-      });
-    } on DioException {
-      state = state.copyWith(modelState: ModelState.error, message: "Failed to fetch donations ");
-    }
+  Future<void> login({required String usr, required String pswd}) async {
+    executeApiCall<Map<String, dynamic>>(() => _loginRepository.login(usr, pswd),
+        onSuccess: (data) => executeApiCall(() => _loginRepository.getUserByUsername(data['username']).then((userData) async {
+              userProvider.setUser(userData);
+            })));
   }
 }

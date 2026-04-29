@@ -21,7 +21,7 @@ class TeamDataNotifier extends StateNotifier<TeamState> {
   final TeamRepository teamsRepository;
 
   Future<void> getTeams() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await teamsRepository
           .fetchTeams()

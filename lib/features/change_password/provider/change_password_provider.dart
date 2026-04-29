@@ -34,7 +34,7 @@ class ChangePasswordDataNotifier extends StateNotifier<ChangePasswordState> {
   final UserProvider userProvider = locator<UserProvider>();
 
   Future<void> changePassword() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       if (state.newPassword != state.newPasswordAgain) {
         clear(false, false);

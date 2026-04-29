@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/myshare_status/view/myshare_status_layout.dart';
 
-class MyShareStatusPage extends BasePage {
+class MyShareStatusPage extends LegacyBasePage {
   const MyShareStatusPage({super.key, super.title = "myshare_status_title", required this.userGoalRound});
 
   final UserGoalUserRoundModel userGoalRound;

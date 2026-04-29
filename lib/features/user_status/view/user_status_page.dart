@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
 import 'package:work_hu/features/user_status/view/user_status_layout.dart';
 
-class UserStatusPage extends BasePage {
+class UserStatusPage extends LegacyBasePage {
   const UserStatusPage({super.key, super.title = "admin_myshare_status", super.isListView = true});
 
   @override
@@ -19,7 +19,7 @@ class UserStatusPage extends BasePage {
     return ref.watch(userDataProvider).user!.isAdmin()
         ? [
             MaterialButton(
-              onPressed: ref.watch(userStatusDataProvider).modelState != ModelState.processing
+              onPressed: ref.watch(userStatusDataProvider).modelState != ModelState.loading
                   ? () => ref.watch(userStatusDataProvider.notifier).recalculate()
                   : null,
               child: const Icon(Icons.refresh_outlined),

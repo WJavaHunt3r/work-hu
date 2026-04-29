@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/data/models/app_theme_mode.dart';
+import 'package:work_hu/app/models/app_theme_mode.dart';
 import 'package:work_hu/app/providers/router_provider.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
@@ -18,6 +18,7 @@ class DukApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var width = MediaQuery.sizeOf(context).width;
+
     return FlutterWebFrame(
         backgroundColor: AppColors.backgroundColor,
         builder: (context) {
@@ -29,7 +30,6 @@ class DukApp extends ConsumerWidget {
               enableScaleWH: () => width > 500 ? false : true,
               splitScreenMode: false,
               builder: (context, child) {
-                LocalJsonLocalization.delegate.directories = ['lib/I18n'];
                 return Center(
                     child: ClipRect(
                         child: SizedBox(
@@ -45,38 +45,34 @@ class DukApp extends ConsumerWidget {
     final theme = GlobalTheme();
     final router = ref.watch(routerProvider);
     final appThemeMode = ref.watch(themeProvider);
-    final localeAsyncProvider = ref.watch(localeProvider);
-    return localeAsyncProvider.when(
-      data: (locale) => MaterialApp.router(
-        scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
-        debugShowCheckedModeBanner: false,
-        title: 'DukApp',
-        theme: theme.globalTheme,
-        darkTheme: theme.globalDarkTheme,
-        themeMode: AppThemeMode.getThemeMode(appThemeMode),
-        routerConfig: router,
-        supportedLocales: const [
-          Locale('en', 'US'),
-          Locale('hu', 'HU'),
-        ],
-        locale: const Locale('hu', 'HU'),
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          LocalJsonLocalization.delegate,
-        ],
-      ),
-      loading: () {
-        return MaterialApp(
-          navigatorKey: navigatorKey,
-          home: const Center(child: CircularProgressIndicator()),
-        );
+    final localeAsync = ref.watch(localeProvider);
+    final Locale currentLocale = localeAsync.maybeWhen(
+      data: (val) {
+        return val;
       },
-      error: (err, stack) => MaterialApp(
-        navigatorKey: navigatorKey,
-        home: const Center(child: Text('Error')),
-      ),
+      orElse: () {
+        return supportedLocales.first;
+      }, // Fallback to your first supported locale
+    );
+
+    LocalJsonLocalization.delegate.directories = ['lib/I18n'];
+
+    return MaterialApp.router(
+      key: ValueKey(currentLocale.languageCode),
+      scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
+      debugShowCheckedModeBanner: false,
+      theme: theme.globalTheme,
+      darkTheme: theme.globalDarkTheme,
+      themeMode: AppThemeMode.getThemeMode(appThemeMode),
+      routerConfig: router,
+      locale: currentLocale,
+      supportedLocales: supportedLocales,
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        LocalJsonLocalization.delegate,
+      ],
     );
   }
 }

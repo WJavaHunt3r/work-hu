@@ -44,7 +44,7 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
   late final TextEditingController menteeController;
 
   Future<void> getMentorMentee() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await menteesRepository
           .getMentorMentee()
@@ -55,7 +55,7 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
   }
 
   Future<void> postMentee() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       var mentees = MentorMenteeModel(mentor: state.mentor!, mentee: state.mentee!);
       await menteesRepository.postMentee(mentees, currentUser!.id).then((value) {
@@ -76,7 +76,7 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
         items.add(a);
       }
     }
-    state = state.copyWith(mentees: items, modelState: ModelState.processing);
+    state = state.copyWith(mentees: items, modelState: ModelState.loading);
     try {
       await menteesRepository.deleteMentee(id, currentUser!.id).then((value) {
         state = state.copyWith(
@@ -88,7 +88,7 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
   }
 
   Future<void> getUsers() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await usersRepository.getUsers(null, false).then((data) {
         state = state.copyWith(

@@ -50,7 +50,7 @@ class ProfileDataNotifier extends StateNotifier<ProfileState> {
   final RoundDataNotifier roundDataNotifier;
 
   Future<void> getUserInfo() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await getUserInfoAndUserRounds().then((value) => state = state.copyWith(modelState: ModelState.success));
     } catch (e) {

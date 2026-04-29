@@ -145,7 +145,7 @@ class _PaymentSuccessState extends ConsumerState<PaymentSuccessLayout> {
                   )
                 ],
               ),
-        ref.watch(paymentSuccessDataProvider).modelState == ModelState.processing
+        ref.watch(paymentSuccessDataProvider).modelState == ModelState.loading
             ? const Center(child: CircularProgressIndicator())
             : const SizedBox()
       ],

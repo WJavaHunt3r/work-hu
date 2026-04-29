@@ -57,7 +57,7 @@ class MentorMenteeLayout extends ConsumerWidget {
             },
           ),
         ),
-        state == ModelState.processing
+        state == ModelState.loading
             ? const AlertDialog(
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,

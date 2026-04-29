@@ -23,7 +23,7 @@ class UserCampDataNotifier extends StateNotifier<UserCampState> {
   final UserModel? currentUser;
 
   Future<void> getUserCamps() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await userCampRepository.getUserCamps(seasonYear: DateTime.now().year, ).then((value) {
         // value.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
@@ -35,7 +35,7 @@ class UserCampDataNotifier extends StateNotifier<UserCampState> {
   }
 
   Future<void> saveUser() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       // var updatedUser = await userCampRepository.updateUser(currentUser!.id, state.selectedUser!);
       // state = state.copyWith(selectedUser: updatedUser, modelState: ModelState.success);

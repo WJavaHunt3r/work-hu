@@ -42,43 +42,55 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
       refreshListenable: userNotifier,
       navigatorKey: navigatorKey,
-      initialLocation: "/",
+      initialLocation: "/home",
       routes: [
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => LoginPage(),
+        ),
+
+        // --- PROTECTED ROUTES (With Bottom Bar) ---
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
-            // Return the widget that contains the scaffold with the BottomNavigationBar
             return ScaffoldWithNestedNavigation(navigationShell: navigationShell);
           },
           branches: [
-            // The first branch, representing the first tab
+            // Branch 1: User Status (The default page after login)
             StatefulShellBranch(
-              routes: [GoRoute(path: '/', builder: (context, state) => HomePage())],
+              routes: [
+                GoRoute(
+                  path: '/home',
+                  builder: (context, state) => HomePage(),
+                ),
+              ],
             ),
-
-            // The second branch, representing the second tab
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/status',
+                  builder: (context, state) => const ProfilePage(),
+                ),
+              ],
+            ),
+            // Branch 2: Profile
             StatefulShellBranch(
               routes: [
                 GoRoute(
                   path: '/profile',
-                  pageBuilder: (BuildContext context, GoRouterState state) =>
-                      NoTransitionPage(child: userNotifier.user == null ? const LoginPage(origRoute: "") : const ProfilePage()),
-                )
+                  builder: (context, state) => const ProfilePage(),
+                ),
               ],
             ),
 
-            StatefulShellBranch(routes: [
-              GoRoute(
-                path: '/admin',
-                pageBuilder: (BuildContext context, GoRouterState state) {
-                  return const NoTransitionPage(child: AdminPage());
-                },
-                redirect: (context, state) {
-                  final user = userNotifier.user;
-                  if (user == null || !user.isAdmin()) return '/'; // Send home if not admin
-                  return null;
-                },
-              ),
-            ])
+            // Branch 3: Admin
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/admin',
+                  builder: (context, state) => const AdminPage(),
+                ),
+              ],
+            ),
           ],
         ),
         GoRoute(
@@ -95,14 +107,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                     );
                   }),
             ]),
-        // GoRoute(
-        //   path: '/profile/bufe/:id/cardFill/success/:checkout_reference',
-        //   builder: (context, state) {
-        //     return PaymentSuccessPage(
-        //       checkoutReference: state.pathParameters["checkout_reference"],
-        //     );
-        //   },
-        // ),
         GoRoute(
           path: '/profile/userPoints/:id',
           pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(
@@ -203,39 +207,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(path: "/activities", builder: (BuildContext context, GoRouterState state) => const ActivitiesPage())
       ],
       redirect: (BuildContext context, GoRouterState state) async {
-        if (state.matchedLocation.contains("/success/")) {
-          return null;
-        }
-        UserModel? user = userNotifier.user;
-        try {
-          user ??= await ref.read(loginDataProvider.notifier).loginWithSavedData();
-        } on DioException {
-          user = null;
-        }
-        if (user == null) {
-          if (([...userScreens, ...teamLeaderScreens].contains(state.matchedLocation) ||
-              state.matchedLocation.contains("/admin/"))) {
-            return "/profile";
-          } else {
-            return null;
-          }
-        }
-        if (!user.changedPassword) {
-          return "/profile/changePassword";
+        final bool loggedIn = userNotifier.user != null;
+        final bool loggingIn = state.matchedLocation == '/login';
+
+        // 1. If not logged in and not on home, force go home
+        if (!loggedIn) {
+          return loggingIn ? null : '/login';
         }
 
-        if (state.matchedLocation.contains("/login")) {
-          return "/profile";
-        }
-
-        if ((teamLeaderScreens.contains(state.matchedLocation) || state.matchedLocation.contains("/admin/fraKareWeeks/")) &&
-            user.isTeamLeader()) {
-          return state.matchedLocation;
-        }
-
-        if (state.matchedLocation.contains("/admin/") && !user.isAdmin()) {
-          return "/home";
-        }
+        // 2. If logged in and trying to go home, send to status
+        // if (loggingIn) {
+        //   return '/status';
+        // }
 
         return null;
       });
@@ -243,7 +226,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
 List<String> teamLeaderScreens = ["/admin", "/admin/userStatus", "/admin/fraKareWeeks", "/admin/fraKareWeeks/"];
 
-List<String> userScreens = ["/profile", "/createActivity", "/userPoints", "/mentees", "/activities"];
+List<String> userScreens = ["/profile", "/createActivity", "/userPoints", "/mentees", "/activities", "/bufe"];
 
 class ScaffoldWithNestedNavigation extends ConsumerWidget {
   const ScaffoldWithNestedNavigation({super.key, required this.navigationShell});

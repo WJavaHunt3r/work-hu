@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 
 import 'donate_layout.dart';
 
-class DonatePage extends BasePage {
+class DonatePage extends LegacyBasePage {
   const DonatePage({super.key, required this.id, super.title = "donate"});
 
   final num id;

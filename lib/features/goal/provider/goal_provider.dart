@@ -44,7 +44,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
   late final TextEditingController userController;
 
   Future<void> getGoals(num? seasonYear) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await goalRepository.getGoals(seasonYear ?? DateTime.now().year).then((data) async {
         data.sort((a, b) => (a.user!.getFullName()).compareTo(b.user!.getFullName()));
@@ -56,7 +56,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
   }
 
   Future<GoalModel?> getUserSeasonGoal(num userId, num seasonYear) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       return await goalRepository.getGoalByUserAndSeason(userId, seasonYear);
     } catch (e) {
@@ -66,7 +66,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
   }
 
   Future<void> uploadGoalsCsv() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -113,7 +113,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
     List<GoalModel> origItems = state.goals;
     List<GoalModel> items = [...origItems];
     items.removeWhere((a) => a.id != goalId);
-    state = state.copyWith(goals: items, modelState: ModelState.processing);
+    state = state.copyWith(goals: items, modelState: ModelState.loading);
     try {
       await goalRepository
           .deleteGoal(goalId, currentUserProvider!.id)
@@ -130,7 +130,7 @@ class GoalDataNotifier extends StateNotifier<GoalState> {
 
   Future<void> saveGoal() async {
     var mode = state.mode;
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     var goal = state.selectedGoal;
     try {
       if (goal.season != null && goal.user != null && goal.goal != 0) {

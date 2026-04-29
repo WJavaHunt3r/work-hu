@@ -64,7 +64,7 @@ class UserFraKareWeekLayout extends ConsumerWidget {
           )
         ],
       ),
-      ref.watch(userFraKareWeekDataProvider).modelState == ModelState.processing
+      ref.watch(userFraKareWeekDataProvider).modelState == ModelState.loading
           ? const Center(
               child: CircularProgressIndicator(),
             )

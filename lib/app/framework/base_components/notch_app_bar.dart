@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/data/models/app_theme_mode.dart';
+import 'package:work_hu/app/models/app_theme_mode.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 

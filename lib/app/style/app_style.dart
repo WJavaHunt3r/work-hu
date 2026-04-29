@@ -10,14 +10,14 @@ class GlobalTheme {
         brightness: Brightness.light,
         seedColor: AppColors.primary,
         primary: AppColors.primary,
-        surface: Color(0xFFF8F9F8),
+        surface: Color(0xFFfbf9f2),
         error: Color(0xFFCC533B),
-        tertiary: Color(0xFFE8B634),
-        secondary: Color(0xFFB5C257),
-        onPrimary: Colors.white
-        // surfaceContainer: Color(0xFFC9B6A1),
+        tertiary: Color(0xFF9E7297),
+        secondary: Color(0xFF737A61),
+        onPrimary: Colors.white,
+        surfaceContainer: Color(0xFFefeee6),
       ),
-      fontFamily: 'Roboto',
+      fontFamily: 'Inter',
       // textTheme: TextTheme(
       //   bodyLarge: TextStyle(
       //     fontSize: 15.sp,
@@ -53,19 +53,19 @@ class GlobalTheme {
       //     fillColor: AppColors.white,
       //     filled: true,
       //     border: OutlineInputBorder(gapPadding: 8.sp, borderRadius: BorderRadius.all(Radius.circular(8.sp)))),
-      // appBarTheme: AppBarTheme(
-      //     titleTextStyle: TextStyle(fontSize: 18.sp, color: AppColors.primary),
-      //     iconTheme: IconThemeData(color: AppColors.primary, size: 18.sp),
-      //     scrolledUnderElevation: 0.sp,
-      //     systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: AppColors.backgroundColor),
-      //     color: AppColors.backgroundColor,
-      //     actionsIconTheme: IconThemeData(size: 18.sp, color: AppColors.primary)),
-      // cardTheme: CardThemeData(
-      //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
-      //     margin: EdgeInsets.only(top: 8.sp),
-      //     elevation: 0.sp,
-      //     surfaceTintColor: AppColors.white,
-      //     color: AppColors.white),
+      appBarTheme: AppBarTheme(
+          // titleTextStyle: TextStyle(fontSize: 18.sp, color: AppColors.primary),
+          // iconTheme: IconThemeData(color: AppColors.primary, size: 18.sp),
+          scrolledUnderElevation: 2.sp,
+          systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: AppColors.backgroundColor),
+          backgroundColor: AppColors.white,
+          shadowColor: AppColors.surfaceWhite,
+          actionsIconTheme: IconThemeData(size: 18.sp, color: AppColors.primary)),
+      cardTheme: CardThemeData(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
+          // margin: EdgeInsets.only(top: 24.sp),
+          elevation: 2.sp,
+          color: Colors.white),
       // chipTheme: ChipThemeData(
       //   selectedColor: AppColors.primary,
       //   secondarySelectedColor: AppColors.white,
@@ -210,21 +210,6 @@ class GlobalTheme {
       //         }))),
       listTileTheme: const ListTileThemeData(tileColor: Colors.white));
 
-  static final ColorScheme _customColorScheme = ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      primary: AppColors.primary,
-      secondary: AppColors.white,
-      surface: AppColors.backgroundColor,
-      // background: AppColors.backgroundColor,
-      error: AppColors.errorRed,
-      onPrimary: Colors.white,
-      onSecondary: AppColors.primary,
-      onSurface: AppColors.primary,
-      // onBackground: AppColors.primary,
-      onError: Colors.redAccent,
-      brightness: Brightness.light,
-      outline: Colors.transparent);
-
   final globalDarkTheme = ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
@@ -232,8 +217,10 @@ class GlobalTheme {
         // primary: AppColors.primary,
         brightness: Brightness.dark,
         seedColor: AppColors.primary,
-        // surface: Color(0xFFF8F9F8),
+        // surface: Color(0xFFFfbf9f2),
         error: Color(0xFFCC533B),
+        tertiary: Color(0xFF9E7297),
+        secondary: Color(0xFF737A61),
         // secondary: Color(0xFFE8B634),
         surfaceContainer: const Color(0xFF353535),
       ),
@@ -437,17 +424,4 @@ class GlobalTheme {
       //           return RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp));
       //         }))),
       listTileTheme: ListTileThemeData(tileColor: AppColors.secondaryGray));
-
-  static final ColorScheme _customDarkColorScheme = ColorScheme.fromSeed(
-      seedColor: AppColors.primary100,
-      primary: AppColors.primary100,
-      secondary: AppColors.secondaryGray,
-      surface: Colors.black,
-      error: AppColors.errorRed,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onSurface: Colors.white,
-      // onError: Colors.redAccent,
-      brightness: Brightness.dark,
-      outline: Colors.transparent);
 }

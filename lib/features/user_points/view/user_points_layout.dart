@@ -40,7 +40,7 @@ class UserPointsLayoutState extends ConsumerState<UserPointsLayout> {
     var items = ref.watch(userPointsDataProvider).transactionItems;
     var activityItems = ref.watch(userPointsDataProvider).activityItems;
     var currentRound = ref.watch(roundDataProvider).currentRoundNumber;
-    return ref.watch(userPointsDataProvider).modelState == ModelState.processing
+    return ref.watch(userPointsDataProvider).modelState == ModelState.loading
         ? const Center(child: CircularProgressIndicator())
         : items.isNotEmpty
             ? DefaultTabController(

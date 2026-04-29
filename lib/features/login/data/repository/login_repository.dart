@@ -16,6 +16,15 @@ class LoginRepository {
     }
   }
 
+  Future<Map<String, dynamic>> loginWithGoogle(String idToken) async {
+    try {
+      final res = await _loginApi.loginWithGoogleRequest(idToken);
+      return res;
+    } on DioException {
+      rethrow;
+    }
+  }
+
   Future<UserModel> getUserByUsername(String username) async {
     try {
       final res = await _loginApi.getUserByUsername(username);

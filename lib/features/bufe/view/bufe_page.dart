@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
 import 'package:work_hu/features/bufe/view/bufe_layout.dart';
 import 'package:work_hu/features/bufe/widgets/account_balance.dart';
 
-class BufePage extends BasePage {
+class BufePage extends LegacyBasePage {
   const BufePage({super.key, this.onTrack, required this.userId, super.title = "", super.isListView = true});
 
   final bool? onTrack;

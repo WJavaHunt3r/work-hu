@@ -14,6 +14,7 @@ import 'package:localization/localization.dart';
 import 'package:pointycastle/api.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
+import 'package:work_hu/app/widgets/error_dialog.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 import 'package:work_hu/features/rounds/data/model/round_model.dart';
@@ -303,5 +304,13 @@ class Utils {
     var format = DateFormat("MMMM", locale.countryCode);
     String formatted = format.format(date);
     return formatted[0].toUpperCase() + formatted.substring(1);
+  }
+
+  static showErrorDialog(BuildContext context, {String? title, required String content}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => ErrorDialog(title: title, content: content),
+    );
   }
 }

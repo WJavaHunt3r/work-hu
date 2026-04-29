@@ -9,8 +9,7 @@ class LoginApi {
   Future<dynamic> loginRequest(String username, String password) async {
     try {
       final res = await _dioClient.dio.post("/auth/login", data: {'username': username, "password": password});
-      var jwt = res.headers.value("set-cookie")?.split(';')[0];
-      if (jwt != null && jwt.isNotEmpty) _dioClient.dio.options.headers.addAll({"Cookie": jwt});
+      // var jwt = res.headers.value("set-cookie")?.split(';')[0];
       return res.data;
     } catch (e) {
       rethrow;
@@ -38,6 +37,15 @@ class LoginApi {
   Future<dynamic> sendNewPassword(String username) async {
     try {
       final res = await _dioClient.dio.post("/auth/sendNewPassword", data: {'username': username});
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> loginWithGoogleRequest(String idToken) async {
+    try {
+      final res = await _dioClient.dio.post("/auth/google", data: {'idToken': idToken});
       return res.data;
     } catch (e) {
       rethrow;

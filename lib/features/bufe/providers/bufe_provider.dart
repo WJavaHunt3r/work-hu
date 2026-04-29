@@ -23,7 +23,7 @@ class BufeDataNotifier extends StateNotifier<BufeState> {
   final BufeRepository bufeRepository;
 
   Future<void> getAccounts(num userId) async {
-    state = const BufeState(modelState: ModelState.processing);
+    state = const BufeState(modelState: ModelState.loading);
     try {
       var userAccount = await getAccount(userId);
 
@@ -45,7 +45,7 @@ class BufeDataNotifier extends StateNotifier<BufeState> {
   }
 
   FutureOr<void> getPayments(num userId) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await bufeRepository.getPayments(userId: userId).then((data) async {
         data.topUps.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -57,7 +57,7 @@ class BufeDataNotifier extends StateNotifier<BufeState> {
   }
 
   FutureOr<void> getOrders(num userId) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await bufeRepository.getOrders(userId: userId).then((data) async {
         data.items.sort((a, b) => b.date.compareTo(a.date));

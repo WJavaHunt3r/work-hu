@@ -112,7 +112,7 @@ class _DonationsState extends ConsumerState<DonationsLayout> {
             child: const Icon(Icons.add),
           ),
         ),
-        if (ref.watch(donationDataProvider).modelState == ModelState.processing)
+        if (ref.watch(donationDataProvider).modelState == ModelState.loading)
           const Dialog(
             backgroundColor: Colors.transparent,
             child: Center(child: CircularProgressIndicator()),

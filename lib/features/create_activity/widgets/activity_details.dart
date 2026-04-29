@@ -3,13 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
-import 'package:work_hu/app/data/models/app_theme_mode.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/work_drop_down_dearch_form_field.dart';
 import 'package:work_hu/features/create_activity/provider/create_activity_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
+
+import '../../../app/models/app_theme_mode.dart' show AppThemeMode;
 
 class ActivityDetails extends ConsumerWidget {
   const ActivityDetails({super.key});

@@ -42,7 +42,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
       bool? registeredInApp,
       String? searchText,
       bool? registeredInMyShare}) async {
-    state = state.copyWith(modelState: ModelState.processing, registerState: ModelState.empty);
+    state = state.copyWith(modelState: ModelState.loading, registerState: ModelState.empty);
     var user = currentUserProvider.user!;
     if (user.role != Role.ADMIN) {
       employerId = user.id;
@@ -88,7 +88,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
         items.add(a);
       }
     }
-    state = state.copyWith(activities: items, modelState: ModelState.processing);
+    state = state.copyWith(activities: items, modelState: ModelState.loading);
     var user = currentUserProvider.user!;
     try {
       await activityRepository.deleteActivity(id, user.id).then((data) async {
@@ -109,7 +109,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
   }
 
   Future<void> registerActivity(num id) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     var user = currentUserProvider.user!;
     try {
       await activityRepository.registerActivity(id, user.id).then((data) async {
@@ -121,7 +121,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
   }
 
   Future<void> putActivity(ActivityModel activity) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await activityRepository.putActivity(activity, activity.id!).then((data) async {
         getActivities();
@@ -132,7 +132,7 @@ class ActivityDataNotifier extends StateNotifier<ActivityState> {
   }
 
   Future<void> registerActivityInTeams(num id) async {
-    state = state.copyWith(modelState: ModelState.processing, registerState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading, registerState: ModelState.loading);
     var user = currentUserProvider.user!;
     try {
       await activityRepository.registerActivityInTeams(id, user.id).then((data) async {

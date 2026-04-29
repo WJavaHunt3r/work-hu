@@ -63,7 +63,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     var user = currentUser!;
     // var date = DateFormat("yyyy-MM-dd").parse(
     //     transactionDate == null || transactionDate.isEmpty ? DateTime.now().toLocal().toString() : transactionDate);
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await usersRepository
           .getUsers(state.transactionType == TransactionType.BMM_PERFECT_WEEK ? user.paceTeam : null, listO36)
@@ -83,7 +83,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   }
 
   Future<void> sendTransactions() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await transactionRepository
           .createTransaction(

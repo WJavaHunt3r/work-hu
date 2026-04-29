@@ -3,12 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/models/role.dart';
-import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/features/home/providers/home_provider.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/myshare_status/view/myshare_status_page.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
@@ -28,24 +25,6 @@ class UserStatusLayout extends ConsumerWidget {
       children: [
         Column(
           children: [
-            ref.watch(userDataProvider).user!.role == Role.ADMIN
-                ? Padding(
-                    padding: EdgeInsets.symmetric(vertical: 0.sp),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: SizedBox(
-                            height: 30.sp,
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: createTeamFilterChips(context, ref),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : const SizedBox(),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 8.sp),
               child: Row(
@@ -123,25 +102,13 @@ class UserStatusLayout extends ConsumerWidget {
             ),
           ],
         ),
-        ref.watch(userStatusDataProvider).modelState == ModelState.processing
+        ref.watch(userStatusDataProvider).modelState == ModelState.loading
             ? const Center(
                 child: CircularProgressIndicator(),
               )
             : const SizedBox()
       ],
     );
-  }
-
-  List<Widget> createTeamFilterChips(BuildContext context, WidgetRef ref) {
-    List<Widget> chips = [];
-    for (var team in ref.watch(homeDataProvider).teams.toSet()) {
-      bool isSelected = ref.watch(userStatusDataProvider).selectedTeamId == team.id;
-      chips.add(BaseFilterChip(
-          isSelected: isSelected,
-          title: team.teamName,
-          onSelected: (bool selected) => ref.watch(userStatusDataProvider.notifier).setSelectedFilter(selected ? team : null)));
-    }
-    return chips;
   }
 
   createOrderByChips(BuildContext context, WidgetRef ref) {

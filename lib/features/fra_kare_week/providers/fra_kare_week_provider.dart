@@ -25,7 +25,7 @@ class FraKareWeekDataNotifier extends StateNotifier<FraKareWeekState> {
   final UserModel? currentProvider;
 
   Future<void> getFraKareWeeks(num year) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await fraKareWeekRepository.getFraKareWeeks(year: year).then((data) async {
         state = state.copyWith(weeks: data, modelState: ModelState.success);

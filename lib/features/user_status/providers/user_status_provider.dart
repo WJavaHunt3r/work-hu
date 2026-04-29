@@ -37,7 +37,7 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   final RoundRepository roundRepoProvider;
 
   Future<void> getUsers([TeamModel? team]) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       var queryTeam = currentUser!.role == Role.ADMIN ? team : currentUser!.paceTeam;
       // if (state.currentRound == null) {
@@ -83,7 +83,7 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   }
 
   Future<void> recalculate() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await userRoundRepoProvider.recalculate();
       state = state.copyWith(modelState: ModelState.success);
@@ -94,7 +94,7 @@ class UserStatusDataNotifier extends StateNotifier<UserStatusState> {
   }
 
   Future<void> setUserStatus() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await userStatusRepoProvider.setUserStatus(DateTime.now().year);
       state = state.copyWith(modelState: ModelState.success);

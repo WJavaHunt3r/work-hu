@@ -143,7 +143,7 @@ class PaymentMaintenanceState extends ConsumerState<PaymentMaintenance> {
                         ],
                       ),
                     )),
-                ref.watch(paymentDataProvider).modelState == ModelState.processing
+                ref.watch(paymentDataProvider).modelState == ModelState.loading
                     ? Center(
                         child: CircularProgressIndicator(),
                       )

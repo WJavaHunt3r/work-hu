@@ -24,7 +24,7 @@ class RoundDataNotifier extends StateNotifier<RoundsState> {
   final UsersRepository usersRepository;
 
   Future<void> getRounds([num? seasonYear]) async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await roundRepository.getRounds(seasonYear, true).then((data) async {
         data.sort((a, b) => a.roundNumber.compareTo(b.roundNumber));
@@ -49,7 +49,7 @@ class RoundDataNotifier extends StateNotifier<RoundsState> {
   }
 
   Future<void> setPaceTeams() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await usersRepository.setPaceTeams();
       state = state.copyWith(modelState: ModelState.success);

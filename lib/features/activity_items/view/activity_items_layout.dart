@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
-import 'package:work_hu/app/framework/base_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
@@ -12,7 +12,7 @@ import 'package:work_hu/features/activity_items/provider/activity_items_provider
 import 'package:work_hu/features/activity_items/widgets/activity_details_panel.dart';
 import 'package:work_hu/features/utils.dart';
 
-class ActivityItemsLayout extends BasePage {
+class ActivityItemsLayout extends LegacyBasePage {
   const ActivityItemsLayout(
       {required this.activityId, super.key, super.title = "activity_items_registrations", super.isListView = true});
 
@@ -68,7 +68,7 @@ class ActivityItemsLayout extends BasePage {
               ),
             )
           : const SizedBox(),
-      ref.watch(activityItemsDataProvider).modelState == ModelState.processing
+      ref.watch(activityItemsDataProvider).modelState == ModelState.loading
           ? const Center(child: CircularProgressIndicator())
           : const SizedBox()
     ]);

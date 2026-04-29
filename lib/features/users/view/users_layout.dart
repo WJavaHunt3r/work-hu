@@ -65,7 +65,7 @@ class UsersLayout extends ConsumerWidget {
             },
           ),
         ),
-        ref.watch(usersDataProvider).modelState == ModelState.processing
+        ref.watch(usersDataProvider).modelState == ModelState.loading
             ? const Center(child: CircularProgressIndicator())
             : const SizedBox(),
       ],

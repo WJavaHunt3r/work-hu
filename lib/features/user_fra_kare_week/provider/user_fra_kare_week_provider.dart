@@ -22,7 +22,7 @@ class UserFraKareWeekDataNotifier extends StateNotifier<UserFraKareWeekState> {
   final UserFraKareWeekRepository fraKareWeekRepository;
 
   Future<void> getFraKareWeeks() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       await fraKareWeekRepository.getFraKareWeeks(weekNumber: state.weekNumber, teamId: state.selectedTeamId).then((data) async {
         state = state.copyWith(streaks: data, modelState: ModelState.success);
@@ -45,7 +45,7 @@ class UserFraKareWeekDataNotifier extends StateNotifier<UserFraKareWeekState> {
   }
 
   Future<void> saveUserFraKareWeeks() async {
-    state = state.copyWith(modelState: ModelState.processing);
+    state = state.copyWith(modelState: ModelState.loading);
     try {
       for (var streak in state.edits!.values) {
         await fraKareWeekRepository.putFraKareWeek(streak.listened, streak.id);

@@ -1,12 +1,12 @@
 enum ModelState{
   error,
-  processing,
+  loading,
   success,
   empty
 }
 
 extension ModelStateExtension on ModelState {
   bool get isError => this == ModelState.error;
-  bool get isProcessing => this == ModelState.processing;
+  bool get isLoading => this == ModelState.loading;
   bool get isSuccess => this == ModelState.success;
 }
