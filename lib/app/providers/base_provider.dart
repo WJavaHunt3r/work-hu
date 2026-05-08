@@ -10,10 +10,10 @@ import '../widgets/loading_screen.dart';
 abstract class BaseDataNotifier<S> extends StateNotifier<S> {
   BaseDataNotifier(super.initState);
 
-  S copyWithStatus(BaseState status);
+  S copyWithState(BaseState status);
 
   copyWithModelState(ModelState modelState) {
-    return copyWithStatus(BaseState(modelState: modelState));
+    return copyWithState(BaseState(modelState: modelState));
   }
 
   Future<dynamic> executeApiCall<T>(
@@ -34,14 +34,18 @@ abstract class BaseDataNotifier<S> extends StateNotifier<S> {
         LoadingScreen.instance().hide();
         return response;
       } else {
-        state = copyWithStatus(BaseState(modelState: ModelState.error, message: response.message ?? 'api_unknown_error'.i18n()));
-        await onError?.call(response.message ?? "");
+        onError == null
+            ? state =
+                copyWithState(BaseState(modelState: ModelState.error, message:  'api_unknown_error'.i18n()))
+            : await onError.call(response.message ?? "");
         return null;
       }
     } catch (e) {
+      print(e);
       LoadingScreen.instance().hide();
-      state = copyWithStatus(BaseState(modelState: ModelState.error, message: e.toString()));
-      await onError?.call(e.toString());
+      onError == null
+          ? state = copyWithState(BaseState(modelState: ModelState.error, message: e.toString()))
+          : await onError.call(e.toString());
       return null;
     }
   }

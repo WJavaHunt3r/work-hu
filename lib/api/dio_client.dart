@@ -7,15 +7,8 @@ import '../app/providers/user_provider.dart';
 
 @singleton
 class DioClient {
-  // static const String _baseUrl = "http://192.168.0.241:80/work-hu/api"; //Home
-  // static const String _baseUrl = "http://192.168.0.143:8990/work-hu/api"; //Márkó
-  // static const String _baseUrl = "http://192.168.94.91:8990/work-hu/api"; //hotspot
-  // static const String _baseUrl = "http://10.67.28.59:8990/work-hu/api"; //hotspot
   static const String _baseUrl = "http://localhost:8990/dukapp/api"; //meló
-  // static const String _baseUrl = "https://dukappservice.bcc-ktk.org/work-hu/api"; //Duka
-  // static const String _baseUrl = "https://petraandre.bcc-ktk.or g/work-hu/api"; //localhost
-  // static const String _baseUrl = "http://78.139.43.2:8990/work-hu/api"; //távoli
-  // static const String _baseUrl = "https://liger-OPTIMAL-antelope.ngrok-free.app/work-hu/api"; //ngrok
+  // static const String _baseUrl = "https://dukappservice.bcc-ktk.org/dukapp/api"; //Duka
 
   static const String _dioContentType = 'application/json';
 

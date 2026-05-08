@@ -56,7 +56,7 @@ class GoalsLayoutState extends ConsumerState<GoalsLayout> {
               onRefresh: () async => ref.read(goalDataProvider.notifier).getGoals(DateTime.now().year),
               child: Column(children: [
                 Expanded(
-                    child: BaseListView(
+                    child: LegacyBaseListView(
                   itemBuilder: (BuildContext context, int index) {
                     var current = goals[index];
                     return Dismissible(
@@ -77,7 +77,7 @@ class GoalsLayoutState extends ConsumerState<GoalsLayout> {
                                     .then((value) => ref.watch(goalDataProvider.notifier).getGoals(null));
                               },
                               title: Text(current.user!.getFullName()),
-                              subtitle: Text("${Utils.creditFormatting(current.user!.currentMyShareCredit)} Ft"),
+                              subtitle: Text("${Utils.creditFormatting(current.user!.currentMyShareCredit ?? 0)} Ft"),
                               trailing: Text(
                                 "${Utils.creditFormatting(current.goal)} Ft",
                                 style: TextStyle(fontSize: 18.sp),

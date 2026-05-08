@@ -4,8 +4,8 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 
-class ActivityDetails extends StatelessWidget {
-  const ActivityDetails({super.key, required this.activity, required this.hourCount});
+class ActivityItemsDetails extends StatelessWidget {
+  const ActivityItemsDetails({super.key, required this.activity, required this.hourCount});
 
   final ActivityModel activity;
   final num hourCount;
@@ -26,12 +26,12 @@ class ActivityDetails extends StatelessWidget {
             onChanged: (text) => ()),
         BaseTextFormField(
             enabled: false,
-            initialValue: activity.responsible.getFullName(),
+            initialValue: activity.responsibleName,
             labelText: "activity_responsible".i18n(),
             onChanged: (text) => ()),
         BaseTextFormField(
             enabled: false,
-            initialValue: activity.employer.getFullName(),
+            initialValue: activity.employerName,
             labelText: "activity_employer".i18n(),
             onChanged: (text) => ()),
         Row(

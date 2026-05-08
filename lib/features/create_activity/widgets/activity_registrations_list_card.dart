@@ -10,14 +10,14 @@ class ActivityRegistrationListCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var items = ref.watch(createActivityDataProvider).activityItems;
-    return BaseListView(
+    return LegacyBaseListView(
       itemCount: ref.watch(createActivityDataProvider).activityItems.length,
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemBuilder: (BuildContext context, int index) {
-        var user = items[index].user;
+        var user = items[index].userName;
         return RegistrationRowWidget(
-            name: user.getFullName(),
+            name: user,
             index: index,
             isLast: index == ref.watch(createActivityDataProvider).activityItems.length - 1,
             value: items[index].hours);

@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/payment_status.dart';
@@ -10,10 +11,7 @@ part 'payment_success_state.freezed.dart';
 
 @freezed
 abstract class PaymentSuccessState with _$PaymentSuccessState {
-  const factory PaymentSuccessState(
-      {SumupCheckoutModel? payment,
-      @Default(ModelState.empty) ModelState modelState,
-      @Default("") String message}) = _PaymentSuccessState;
+  const factory PaymentSuccessState({SumupCheckoutModel? payment, @Default(BaseState()) BaseState status}) = _PaymentSuccessState;
 
   const PaymentSuccessState._();
 }

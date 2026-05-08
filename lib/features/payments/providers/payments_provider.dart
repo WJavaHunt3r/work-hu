@@ -1,9 +1,11 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/payment_status.dart';
-import 'package:work_hu/features/bufe/data/repository/bufe_repository.dart';
-import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
+import 'package:work_hu/app/providers/base_provider.dart';
+import 'package:work_hu/features/donate/providers/donate_provider.dart';
+import 'package:work_hu/features/donate/repository/donate_repository.dart';
 import 'package:work_hu/features/payments/data/api/payments_api.dart';
 import 'package:work_hu/features/payments/data/model/payments_model.dart';
 import 'package:work_hu/features/payments/data/repository/payments_repository.dart';
@@ -15,92 +17,83 @@ final paymentApiProvider = Provider<PaymentsApi>((ref) => PaymentsApi());
 final paymentRepoProvider = Provider<PaymentRepository>((ref) => PaymentRepository(ref.read(paymentApiProvider)));
 
 final paymentDataProvider = StateNotifierProvider.autoDispose<PaymentDataNotifier, PaymentsState>(
-    (ref) => PaymentDataNotifier(ref.read(paymentRepoProvider), ref.read(bufeRepoProvider)));
+    (ref) => PaymentDataNotifier(ref.read(paymentRepoProvider), ref.read(donateRepoProvider)));
 
-class PaymentDataNotifier extends StateNotifier<PaymentsState> {
-  PaymentDataNotifier(this.paymentRepository, this.bufeRepository) : super(const PaymentsState()) {}
+class PaymentDataNotifier extends BaseDataNotifier<PaymentsState> implements ListApiProvider {
+  PaymentDataNotifier(this.paymentRepository, this.donateRepository) : super(const PaymentsState()) {
+    list();
+  }
 
   final PaymentRepository paymentRepository;
-  final BufeRepository bufeRepository;
+  final DonateRepository donateRepository;
 
-  Future<void> getPayments() async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await paymentRepository
-          .getPayments(
-              userId: state.userId,
-              status: state.status,
-              donationId: state.donationId,
-              dateFrom: DateTime.now().subtract(Duration(days: 7)))
-          .then((payments) {
-        payments.sort((a, b) => b.dateTime.compareTo(a.dateTime));
-        state = state.copyWith(payments: payments, modelState: ModelState.success);
-      });
-    } on DioException {
-      state = state.copyWith(modelState: ModelState.error, message: "Failed to fetch payments ");
-    }
+  @override
+  Future<void> list({filter, int? page, int? size, String? sort}) async {
+    executeApiCall<List<PaymentsModel>>(
+        () => paymentRepository.getPayments(
+            userId: state.userId,
+            status: state.paymentStatus,
+            donationId: state.donationId,
+            dateFrom: DateTime.now().subtract(Duration(days: 7))), onSuccess: (payments) async {
+      payments.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+      state = state.copyWith(payments: payments);
+    });
   }
 
   Future<void> deletePayments(num paymentId, int index, String checkoutId) async {
     List<PaymentsModel> origItems = state.payments;
     List<PaymentsModel> items = [...origItems];
     items.removeWhere((a) => a.id == paymentId);
-    state = state.copyWith(payments: items, modelState: ModelState.loading);
-    try {
-      // await bufeRepository.deleteCheckout(checkoutId: checkoutId);
-      await paymentRepository
-          .deletePayment(paymentId)
-          .then((value) => state = state.copyWith(payments: items, modelState: ModelState.success));
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, payments: origItems);
-    }
+    executeApiCall(() async {
+      donateRepository.deleteCheckout(checkoutId: checkoutId);
+    }, onSuccess: (data) async {
+      await paymentRepository.deletePayment(paymentId);
+    }, onError: (d) async {
+      state = state.copyWith(payments: items);
+      state = copyWithModelState(ModelState.error);
+    });
   }
 
   Future<void> refreshPayments() async {
-    state = state.copyWith(modelState: ModelState.loading);
     for (var payment in state.payments.where((e) => e.status == PaymentStatus.PENDING)) {
-      await refreshPayment(payment);
+      executeApiCall(() => refreshPayment(payment));
     }
 
-    getPayments();
+    list();
   }
 
   Future<void> refreshPayment(PaymentsModel payment) async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      if (payment.status == PaymentStatus.PENDING) {
-        var checkout = await bufeRepository.getSumupCheckout(checkoutId: payment.checkoutId);
-        if (checkout.status == PaymentStatus.PAID) {
-          var newPayment = await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.PAID), payment.id!);
-          state = state.copyWith(selectedPayment: newPayment, modelState: ModelState.success);
-        } else if (checkout.status == PaymentStatus.EXPIRED) {
-          var newPayment = await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.EXPIRED), payment.id!);
-          state = state.copyWith(selectedPayment: newPayment, modelState: ModelState.success);
-        }
+    if (payment.status == PaymentStatus.PENDING) {
+      var checkout = await donateRepository.getCheckout(checkoutId: payment.checkoutId);
+      if (checkout.status == PaymentStatus.PAID) {
+        var newPayment = await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.PAID), payment.id!);
+        state = state.copyWith(selectedPayment: newPayment);
+      } else if (checkout.status == PaymentStatus.EXPIRED) {
+        var newPayment = await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.EXPIRED), payment.id!);
+        state = state.copyWith(selectedPayment: newPayment);
       }
-      state = state.copyWith(modelState: ModelState.success);
-    } on DioException catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
   }
 
   presetFilter({num? userId, num? donationId, PaymentStatus? status}) {
-    state = state.copyWith(userId: userId, donationId: donationId, status: status);
-    getPayments();
+    state = state.copyWith(userId: userId, donationId: donationId);
+    list();
   }
 
   Future<void> getPayment(num? paymentId) async {
     if (paymentId != null) {
-      state = state.copyWith(modelState: ModelState.loading);
-      try {
-        await paymentRepository.getPayment(paymentId).then((payments) {
-          state = state.copyWith(selectedPayment: payments, modelState: ModelState.success);
-        });
-      } on DioException {
-        state = state.copyWith(modelState: ModelState.error, message: "Failed to fetch payment ");
-      }
+      executeApiCall<PaymentsModel>(() async {
+        paymentRepository.getPayment(paymentId);
+      }, onSuccess: (data) async {
+        state = state.copyWith(selectedPayment: data);
+      });
     } else {
       state = state.copyWith(selectedPayment: null);
     }
+  }
+
+  @override
+  PaymentsState copyWithState(BaseState status) {
+    return PaymentsState(status: state.status.copyWith(baseStatus: status));
   }
 }

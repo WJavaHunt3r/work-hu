@@ -1,3 +1,4 @@
+import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 
@@ -8,15 +9,25 @@ class ActivityItemsApi {
 
   ActivityItemsApi();
 
-  Future<List<dynamic>> getActivityItems(
-      {num? activityId, num? userId, num? roundId, bool? registeredInApp, String? searchText}) async {
+  Future<dynamic> getActivityItems(
+      {num? activityId,
+      num? userId,
+      num? roundId,
+      bool? registeredInApp,
+      String? searchText,
+      int? size,
+      int? page,
+      SortBuilder? sort}) async {
     try {
       final res = await _dioClient.dio.get("/activityItem", queryParameters: {
         "activityId": activityId,
         "userId": userId,
         "roundId": roundId,
         "registeredInApp": registeredInApp,
-        "searchText": searchText
+        "searchText": searchText,
+        "size": size,
+        "page": page,
+        "sort": sort?.build()
       });
       return res.data;
     } catch (e) {
@@ -53,8 +64,8 @@ class ActivityItemsApi {
 
   Future<dynamic> putActivityItems(ActivityItemsModel activityItem, num activityItemId) async {
     try {
-      final res = await _dioClient.dio
-          .put("/activityItem", queryParameters: {"activityItemId": activityItemId}, data: activityItem);
+      final res =
+          await _dioClient.dio.put("/activityItem", queryParameters: {"activityItemId": activityItemId}, data: activityItem);
       return res.data;
     } catch (e) {
       rethrow;

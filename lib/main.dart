@@ -14,7 +14,6 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
-  // SecurityContext(withTrustedRoots: false);
   await ScreenUtil.ensureScreenSize();
 
   await setupLocator();

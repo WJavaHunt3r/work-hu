@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
+import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/features/activities/data/api/activity_api.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 import 'package:work_hu/features/utils.dart';
@@ -8,14 +10,17 @@ class ActivityRepository {
 
   ActivityRepository(this._activityApi);
 
-  Future<List<ActivityModel>> getActivities(
+  Future<PaginatedResponse<ActivityModel>> getActivities(
       {num? responsibleId,
       num? employerId,
       num? createUserId,
       bool? registeredInApp,
       bool? registeredInMyShare,
       DateTime? referenceDate,
-      String? searchText}) async {
+      String? searchText,
+      required int page,
+      required int size,
+      required SortBuilder sort}) async {
     try {
       final res = await _activityApi.getActivities(
           registeredInApp: registeredInApp,
@@ -24,8 +29,16 @@ class ActivityRepository {
           createUserId: createUserId,
           employerId: employerId,
           referenceDate: referenceDate == null ? "" : Utils.dateToString(referenceDate),
-          searchText: searchText);
-      return res.map((e) => ActivityModel.fromJson(e)).toList();
+          searchText: searchText,
+          page: page,
+          size: size,
+          sort: sort);
+      final paginatedData = PaginatedResponse<ActivityModel>.fromJson(
+        res,
+        (json) => ActivityModel.fromJson(json as Map<String, dynamic>),
+      );
+
+      return paginatedData;
     } on DioException {
       rethrow;
     }

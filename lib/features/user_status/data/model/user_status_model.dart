@@ -10,15 +10,15 @@ part 'user_status_model.g.dart';
 class UserStatusModel with _$UserStatusModel {
   const factory UserStatusModel(
       {required num id,
-      required UserModel user,
+      required String name,
       required num goal,
       required num status,
       required num transactions,
       required num transition,
       required bool onTrack,
-        required bool localOnTrack,
-      required SeasonModel season}) = _UserStatusModel;
+      required bool localOnTrack,
+      required num toOnTrack,
+      required num seasonYear}) = _UserStatusModel;
 
-  factory UserStatusModel.fromJson(Map<String, dynamic> json) =>
-      _$UserStatusModelFromJson(json);
+  factory UserStatusModel.fromJson(Map<String, dynamic> json) => _$UserStatusModelFromJson(json);
 }

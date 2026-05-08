@@ -15,7 +15,7 @@ class MyShareStatusLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var userStatusModel = userGoalRound.userStatus;
-    var user = userGoalRound.userStatus.user;
+    var username = userGoalRound.userStatus.name;
 
     var currentRound = userGoalRound.round;
     var userStatus = userStatusModel.status * 100;
@@ -27,7 +27,7 @@ class MyShareStatusLayout extends StatelessWidget {
       Padding(
           padding: EdgeInsets.symmetric(vertical: 12.sp),
           child: Text(
-            user.getFullName(),
+            username,
             style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.w800),
           )),
       SfRadialGauge(
@@ -65,7 +65,7 @@ class MyShareStatusLayout extends StatelessWidget {
                         TextStyle(fontSize: 30.sp, fontWeight: FontWeight.w800),
                   ),
                   Text(
-                    "${Utils.creditFormatting(userStatusModel.transactions)} Ft",
+                    Utils.creditFormatting(userStatusModel.transactions),
                     style:
                         TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w800),
                   ),

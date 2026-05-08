@@ -1,23 +1,241 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
-import 'package:work_hu/features/profile/view/profile_layout.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/models/app_theme_mode.dart';
+import 'package:work_hu/app/providers/localeProvider.dart';
+import 'package:work_hu/app/providers/theme_provider.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/widgets/base_container.dart';
+import 'package:work_hu/features/profile/data/state/profile_state.dart';
+import 'package:work_hu/features/profile/providers/profile_providers.dart';
 
-class ProfilePage extends LegacyBasePage {
-  const ProfilePage(
-      {super.key, super.title = "profile", super.hasTitleWidget = true, super.isListView = true, super.centerTitle = true});
+class ProfilePage extends BasePage {
+  const ProfilePage({super.key, super.title = "profile_title"});
 
   @override
-  Widget buildLayout(BuildContext context, WidgetRef ref) {
-    return const ProfileLayout();
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return ProfilePageState();
+  }
+}
+
+class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileDataNotifier> {
+  @override
+  Widget buildLayout() {
+    var theme = Theme.of(context);
+    var colorScheme = theme.colorScheme;
+    var user = locator<UserProvider>().user;
+    final currentLocale = ref.watch(localeProvider);
+
+    final localeNames = LocaleNames.of(context)!;
+
+    final languageName = localeNames.nameOf(currentLocale.value!.languageCode);
+
+    final currentThemeMode = ref.watch(themeProvider);
+
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+
+        // Header Profile Section
+        Center(
+          child: Column(
+            children: [
+              const SizedBox(height: 16),
+              Text(
+                user!.getFullName(),
+                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              // Text(
+              //   'profile_premium_member'.i18n(),
+              //   style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
+              // ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 40),
+
+        // Personal Information Section
+        // _buildSectionHeader('profile_section_personal'.i18n(), theme),
+        BaseContainer(
+          padding: const EdgeInsets.all(0),
+          child: Column(
+            children: [
+              _InfoTile(label: 'profile_full_name'.i18n(), value: user.getFullName()),
+              const Divider(height: 1),
+              _InfoTile(label: 'profile_email'.i18n(), value: user.email ?? ""),
+              const Divider(height: 1),
+              _InfoTile(label: 'profile_phone'.i18n(), value: "${user.phoneNumber ?? ""}"),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 32),
+
+        // Account Settings Section
+        // _buildSectionHeader('profile_section_account'.i18n(), theme),
+        BaseContainer(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              _SettingsTile(
+                label: 'profile_my_activities'.i18n(),
+                icon: Icons.list_alt,
+                onTap: ()=> context.push('/profile/activities'),
+              ),
+              const Divider(height: 1),
+              _SettingsTile(
+                label: 'profile_password_security'.i18n(),
+                icon: Icons.shield_outlined,
+              ),
+              const Divider(height: 1),
+              _SettingsTile(
+                label: 'profile_notifications'.i18n(),
+                icon: Icons.notifications_none,
+              ),
+              const Divider(height: 1),
+              _SettingsTile(
+                  label: 'profile_language'.i18n(),
+                  icon: Icons.language,
+                  trailingText: languageName.toString(),
+                  onTap: () {
+                    context.push('/profile/language');
+                  }),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 32),
+
+        // App Settings Section
+        BaseContainer(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              _SettingsTile(
+                  label: 'profile_dark_mode'.i18n(),
+                  icon: Icons.dark_mode_outlined,
+                  trailingText: AppThemeMode.getThemeModeLocale(currentThemeMode).i18n(),
+                  onTap: () {
+                    context.push('/profile/theme');
+                  }),
+              // trailingWidget: Switch.adaptive(
+              //   value: AppThemeMode.getThemeMode(ref.watch(themeProvider)) == ThemeMode.dark,
+              //   onChanged: (v) {
+              //     ref.read(themeProvider.notifier).changeTheme();
+              //   },
+              //   activeTrackColor: colorScheme.primary,
+              // ),
+              // ),
+              const Divider(height: 1),
+              _SettingsTile(
+                label: 'profile_help_support'.i18n(),
+                icon: Icons.help_outline,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 40),
+
+        // Logout Button
+        SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: FilledButton.icon(
+            onPressed: () {
+              ref.read(provider.notifier).logout();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.errorContainer, // Soft red from image
+              foregroundColor: colorScheme.error, // Strong red
+            ),
+            icon: const Icon(Icons.logout),
+            label: Text(
+              'profile_logout'.i18n(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+        const SizedBox(height: 48),
+      ],
+    );
   }
 
-// @override
-// Widget buildTitleWidget(WidgetRef ref) {
-//   var mode = ref.read(themeProvider);
-//   return IconButton(
-//       onPressed: () =>
-//           ref.read(themeProvider.notifier).setTheme(mode == AppThemeMode.light ? AppThemeMode.dark : AppThemeMode.light),
-//       icon: Icon(mode == AppThemeMode.light ? Icons.dark_mode : Icons.light_mode));
-// }
+  @override
+  AutoDisposeStateNotifierProvider<ProfileDataNotifier, ProfileState> get provider => profileDataProvider;
+
+  @override
+  BaseState get status => state.status;
+}
+
+class _InfoTile extends StatelessWidget {
+  final String label, value;
+
+  const _InfoTile({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(18),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: Theme.of(context).textTheme.bodySmall),
+              const SizedBox(height: 4),
+              Text(value, style: Theme.of(context).textTheme.bodyLarge),
+            ],
+          ),
+          Icon(Icons.edit_outlined, size: 20, color: Theme.of(context).hintColor.withOpacity(0.3)),
+        ],
+      ),
+    );
+  }
+}
+
+class _SettingsTile extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final String? trailingText;
+  final Widget? trailingWidget;
+  final Function? onTap;
+
+  const _SettingsTile({required this.label, required this.icon, this.trailingText, this.trailingWidget, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainer,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: theme.colorScheme.primary),
+      ),
+      title: Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
+      trailing: trailingWidget ??
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (trailingText != null)
+                Text(trailingText!, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor)),
+              const SizedBox(width: 8),
+              const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+            ],
+          ),
+      onTap: () => onTap?.call(),
+    );
+  }
 }

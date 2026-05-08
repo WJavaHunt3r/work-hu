@@ -62,7 +62,7 @@ class TransactionsLayout extends ConsumerWidget {
                     ),
                   ),
                   Expanded(
-                      child: BaseListView(
+                      child: LegacyBaseListView(
                           itemCount: transactionItems.length,
                           itemBuilder: (BuildContext context, int index) {
                             var current = transactionItems[index];

@@ -56,39 +56,17 @@ class BufeApi {
     }
   }
 
-  Future<dynamic> createCheckout(
-      {required num amount,
-      required String checkoutReference,
-      required String description,
-      required String redirectUrl,
-      String? returnUrl}) async {
+  Future<dynamic> createCustomer({
+    required String fullname,
+    required num dukappId,
+    required String email,
+  }) async {
     try {
-      final res = await _dioClient.dio.post("/checkouts", data: {
-        "checkout_reference": checkoutReference,
-        "amount": amount,
-        "description": description,
-        "currency": "HUF",
-        "redirect_url": redirectUrl,
-        "return_url": returnUrl
+      final res = await _dioClient.dio.post("/external-create-customer", data: {
+        "full_name": fullname,
+        "dukapp_id": dukappId.toString(),
+        "email": email,
       });
-      return res.data;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<dynamic> getCheckout({required String checkoutId}) async {
-    try {
-      final res = await _dioClient.dio.get("/checkouts/$checkoutId");
-      return res.data;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<dynamic> deleteCheckout({required String checkoutId}) async {
-    try {
-      final res = await _dioClient.dio.delete("/checkouts/$checkoutId");
       return res.data;
     } catch (e) {
       rethrow;

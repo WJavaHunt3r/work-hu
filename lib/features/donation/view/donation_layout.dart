@@ -39,7 +39,7 @@ class _DonationsState extends ConsumerState<DonationsLayout> {
           onRefresh: () async => ref.read(donationDataProvider.notifier).getDonations(null),
           child: Column(children: [
             Expanded(
-                child: BaseListView(
+                child: LegacyBaseListView(
               itemBuilder: (BuildContext context, int index) {
                 var current = donations[index];
                 var startDateString = Utils.dateToString( current.startDateTime!);

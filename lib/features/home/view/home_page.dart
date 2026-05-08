@@ -1,17 +1,29 @@
+import 'dart:math';
+
+import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/providers/localeProvider.dart';
-import 'package:work_hu/app/widgets/base_text_from_field.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/widgets/base_alert_dialog.dart';
+import 'package:work_hu/app/widgets/base_container.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
+import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/features/home/data/state/home_state.dart';
 import 'package:work_hu/features/home/providers/home_provider.dart';
+import 'package:work_hu/features/utils.dart';
 
 class HomePage extends BasePage {
   HomePage({
     super.key,
-  }) : super(title: 'home_brand_name', leading: Image.asset('icons/dukapp_icon_round.png'));
+  }) : super(hasAppBar: false, title: 'home_brand_name', leading: Image.asset('/assets/icons/dukapp_icon_round.png'));
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -20,287 +32,180 @@ class HomePage extends BasePage {
 }
 
 class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier> {
-  bool _isLogin = true;
-  bool _rememberMe = false;
-  final _formKey = GlobalKey<FormState>();
-
   @override
   Widget buildLayout() {
     final theme = Theme.of(context);
-    return SingleChildScrollView(
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.read(provider.notifier).getAccount();
+      },
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMainCard(theme),
-          const SizedBox(height: 24),
-          _buildPageFooter(theme),
+          _buildWelcomeTitle(theme),
+          _buildBalanceCard(theme),
+          SizedBox(height: 24.sp),
+          Row(
+            children: [
+              Expanded(
+                  child: _buildActionCard(theme,
+                      title: 'home_send_money'.i18n(),
+                      subtitle: 'home_send_subtitle'.i18n(),
+                      icon: Icons.send,
+                      onTap: () {},
+                      color: Theme.of(context).colorScheme.primary,
+                      cardColor: Theme.of(context).colorScheme.primaryContainer)),
+              SizedBox(width: 24.sp),
+              Expanded(
+                  child: _buildActionCard(theme, onTap: () {
+                context.push("/balance/topUps");
+              },
+                      title: 'home_bills'.i18n(),
+                      subtitle: 'home_bills_subtitle'.i18n(),
+                      icon: Icons.receipt_long,
+                      color: Theme.of(context).colorScheme.tertiary,
+                      cardColor: Theme.of(context).colorScheme.tertiaryContainer)),
+            ],
+          ),
+          SizedBox(height: 32.sp),
+          if (state.familiyAccounts.isNotEmpty) _buildFamilyAccounts(theme),
+          SizedBox(height: 32.sp),
+          if (state.donations.isNotEmpty) _buildDonations(theme),
+          _buildTransactionHeader(theme),
+          SizedBox(height: 16.sp),
+          _buildTransactionList(theme),
         ],
       ),
     );
   }
 
-  @override
-  List<Widget>? buildActions(context, ref) {
-    return [
-      SizedBox(
-        width: 100,
-        child: ListView.separated(
-          physics: const NeverScrollableScrollPhysics(),
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (BuildContext context, int index) {
-            final localeAsync = ref.watch(localeProvider);
+  // @override
+  // List<Widget>? buildActions(context, ref) {
+  //   return [
+  //     IconButton(
+  //         onPressed: () {},
+  //         icon: Icon(
+  //           Icons.qr_code_2,
+  //           size: 24,
+  //         ))
+  //   ];
+  // }
 
-            final selectedLocale = localeAsync.value ?? defaultLocale;
-            final currentLocale = supportedLocales[index];
-
-            final isSelected = selectedLocale.languageCode == currentLocale.languageCode;
-
-            return TextButton(
-              onPressed: () => ref.read(localeProvider.notifier).setLocale(currentLocale),
-              // onPressed: () => ref.watch(themeProvider.notifier).setTheme(AppThemeMode.dark),
-              child: Text(
-                currentLocale.languageCode.toUpperCase(),
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.bold),
+  Widget _buildBalanceCard(ThemeData theme) {
+    return BaseContainer(
+      child: Column(
+        children: [
+          Text('home_balance_title'.i18n(), style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.outline)),
+          SizedBox(height: 12.sp),
+          Text(Utils.creditFormatting(state.account?.balance ?? 0),
+              style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold)),
+          SizedBox(height: 24.sp),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () {
+                    context.push("/balance/topUp").then((r) {
+                      if (r != null && r == true) {
+                        ref.read(provider.notifier).getAccount();
+                      }
+                    });
+                  },
+                  icon: Icon(Icons.add_circle_outline, size: 20.sp),
+                  label: Text('home_top_up'.i18n()),
+                ),
               ),
-            );
-          },
-          separatorBuilder: (BuildContext context, int index) {
-            return const Center(child: Text("|"));
-          },
-          itemCount: supportedLocales.length,
-        ),
-      )
-    ];
+              SizedBox(width: 24.sp),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    _showQrCode(context);
+                  },
+                  icon: Icon(Icons.grid_view, size: 20.sp),
+                  label: Text('home_my_barcode'.i18n()),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
   }
 
-  Widget _buildMainCard(ThemeData theme) {
-    final colorScheme = theme.colorScheme;
-
-    return Card(
-      margin: const EdgeInsets.all(24),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
+  Widget _buildActionCard(ThemeData theme,
+      {required String title,
+      required String subtitle,
+      required IconData icon,
+      required Color color,
+      required Color cardColor,
+      Function? onTap}) {
+    return GestureDetector(
+      onTap: () {
+        onTap?.call();
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        height: 180,
+        decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(24), border: BoxBorder.all(color: color)),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'home_welcome_title'.i18n(),
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              child: Icon(
+                icon,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'home_welcome_subtitle'.i18n(),
-              style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
-            ),
-            const SizedBox(height: 24),
-            _buildToggleButtons(theme),
-            const SizedBox(height: 24),
-            Form(
-              key: _formKey,
-              child: _isLogin ? _buildLoginForms() : _buildRegisterForms(),
-            ),
-            const SizedBox(height: 12),
-            _buildRememberMeRow(theme),
-            const SizedBox(height: 24),
-            _buildLoginButton(theme),
-            const SizedBox(height: 20),
-            _buildDivider(theme),
-            const SizedBox(height: 20),
-            _buildGoogleButton(theme),
-            const SizedBox(height: 24),
-            _buildFooterText(theme),
+            const Spacer(),
+            Text(title, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            SizedBox(height: 4.sp),
+            Text(subtitle, style: theme.textTheme.bodySmall),
           ],
         ),
       ),
     );
   }
 
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController passwordAgainController = TextEditingController();
-
-  _buildLoginForms() {
-    return Column(
-      children: [
-        BaseTextFormField(
-          controller: emailController,
-          fldControl: "3",
-          labelText: "home_email_label",
-          hintText: "home_email_hint",
-        ),
-        const SizedBox(height: 16),
-        BaseTextFormField(
-          controller: passwordController,
-          fldControl: "3",
-          labelText: "home_password_label",
-          hintText: "home_password_hint",
-        ),
-      ],
-    );
-  }
-
-  _buildRegisterForms() {
-    return Column(
-      children: [
-        BaseTextFormField(
-          controller: nameController,
-          labelText: "home_name_label",
-          hintText: "home_name_hint",
-        ),
-        const SizedBox(height: 16),
-        BaseTextFormField(
-          controller: emailController,
-          labelText: "home_email_label",
-          hintText: "home_email_hint",
-        ),
-        const SizedBox(height: 16),
-        BaseTextFormField(
-          controller: passwordController,
-          labelText: "home_password_label",
-          hintText: "home_password_hint",
-        ),
-        const SizedBox(height: 16),
-        BaseTextFormField(
-          controller: passwordAgainController,
-          labelText: "home_password_again_label",
-          hintText: "home_password_again_hint",
-        ),
-      ],
-    );
-  }
-
-  Widget _buildToggleButtons(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Expanded(child: _toggleItem(theme, 'home_toggle_login'.i18n(), _isLogin, () => setState(() => _isLogin = true))),
-          Expanded(child: _toggleItem(theme, 'home_toggle_register'.i18n(), !_isLogin, () => setState(() => _isLogin = false))),
-        ],
-      ),
-    );
-  }
-
-  Widget _toggleItem(ThemeData theme, String text, bool active, VoidCallback onTap) {
-    final colorScheme = theme.colorScheme;
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        elevation: 0,
-        color: active ? null : Colors.transparent,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0),
-          child: Center(
-            child: Text(
-              text,
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontWeight: active ? FontWeight.bold : FontWeight.normal,
-                color: active ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRememberMeRow(ThemeData theme) {
+  Widget _buildTransactionHeader(ThemeData theme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Checkbox(value: _rememberMe, onChanged: (v) => setState(() => _rememberMe = v!)),
-            Text('home_remember_me'.i18n(), style: theme.textTheme.bodyMedium),
-          ],
-        ),
-        if (_isLogin)
-          TextButton(
-              onPressed: () {}, child: Text('home_forgot_password'.i18n(), style: TextStyle(color: theme.colorScheme.onSurface))),
+        Text('home_recent_transactions'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        TextButton(onPressed: () {}, child: Text('home_see_all'.i18n(), style: TextStyle(color: theme.colorScheme.primary))),
       ],
     );
   }
 
-  Widget _buildLoginButton(ThemeData theme) {
-    return SizedBox(
-      width: double.infinity,
-      child: FilledButton.icon(
-        style: FilledButton.styleFrom(
-          backgroundColor: theme.colorScheme.primary,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
-        onPressed: () {},
-        label: const Icon(Icons.arrow_forward, size: 18),
-        icon: Text(_isLogin ? 'home_login_button'.i18n() : 'home_register_button'.i18n(),
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+  Widget _buildTransactionList(ThemeData theme) {
+    return state.orders.isEmpty
+        ? const SizedBox()
+        : BaseContainer(
+            width: double.infinity,
+            child: Column(
+              children:
+                  state.orders.map((e) => _transactionItem(theme, e.locationName, e.date, e.total, Icons.shopping_bag)).toList(),
+            ),
+          );
+  }
+
+  Widget _transactionItem(ThemeData theme, String name, DateTime date, num amount, IconData icon) {
+    final locale = ref.watch(localeProvider).value?.toString() ?? 'en_US';
+
+    // 2. Use the locale in the DateFormat constructor
+    String formattedDate = DateFormat.yMEd(locale).format(date);
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      tileColor: Colors.transparent,
+      leading: CircleAvatar(
+        backgroundColor: theme.colorScheme.surfaceContainerLow,
+        child: Icon(icon, color: theme.colorScheme.onSurface),
       ),
-    );
-  }
-
-  Widget _buildDivider(ThemeData theme) {
-    return Row(
-      children: [
-        Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
-        Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text('home_divider_text'.i18n(), style: theme.textTheme.labelSmall)),
-        Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
-      ],
-    );
-  }
-
-  Widget _buildGoogleButton(ThemeData theme) {
-    var mode = theme.brightness.name;
-    return OutlinedButton.icon(
-      iconAlignment: IconAlignment.start,
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(double.infinity, 54),
-        padding: const EdgeInsets.symmetric(vertical: 0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-      onPressed: () {},
-      icon: Image(
-        height: 35,
-        image: AssetImage('logos/$mode/google_sign_in_icon.png'),
-      ),
-      label: Text('home_google_login'.i18n(), style: TextStyle(color: theme.colorScheme.onSurface)),
-    );
-  }
-
-  Widget _buildFooterText(ThemeData theme) {
-    return Wrap(
-      children: [
-        Text('home_no_account'.i18n()),
-        GestureDetector(
-            onTap: () {}, child: Text('home_create_account'.i18n(), style: const TextStyle(fontWeight: FontWeight.bold))),
-      ],
-    );
-  }
-
-  Widget _buildPageFooter(ThemeData theme) {
-    final style = theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.outline);
-    return Column(
-      children: [
-        Text('home_brand_name'.i18n(), style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('home_privacy_policy'.i18n(), style: style),
-            const SizedBox(width: 24),
-            Text('home_terms_service'.i18n(), style: style),
-          ],
-        ),
-        const SizedBox(height: 32),
-        Text('home_copyright'.i18n(),
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline), textAlign: TextAlign.center),
-      ],
+      title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: Text(formattedDate, style: theme.textTheme.bodySmall),
+      trailing: Text(Utils.creditFormatting(amount),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
     );
   }
 
@@ -310,12 +215,96 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
   @override
   BaseState get status => state.status;
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
-    passwordAgainController.dispose();
-    super.dispose();
+  _showQrCode(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierColor: Theme.of(context).colorScheme.surfaceContainer.withAlpha(200),
+        builder: (buildContext) {
+          return BaseAlertDialog(
+            title: "home_barcode".i18n(),
+            content: BaseContainer(
+              color: Colors.white,
+              height: 200.sp,
+              child: BarcodeWidget(
+                width: double.infinity,
+                barcode: Barcode.code128(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.black),
+                data: state.account?.customer_code ?? "",
+              ),
+            ),
+            cancelVisible: false,
+            confirmVisible: false,
+            onTap: () {},
+          );
+        });
+  }
+
+  Widget _buildWelcomeTitle(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12, bottom: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('home_welcome_title'.i18n([locator<UserProvider>().user!.firstname]),
+              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+          SizedBox(height: 8.sp),
+          Text('home_welcome_subtitle'.i18n(), style: theme.textTheme.bodyMedium)
+        ],
+      ),
+    );
+  }
+
+  _buildDonations(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('home_donations'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        SizedBox(height: 16.sp),
+        Column(
+            children: state.donations.map((e) {
+          return BaseContainer(
+              width: double.infinity,
+              height: 150.sp,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                      ref.watch(localeProvider).value == const Locale("hu", "HU")
+                          ? e.description.toString()
+                          : e.descriptionNO.toString(),
+                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                      "${DateFormat('MMM dd, yyyy • HH:mm').format(e.startDateTime!)} - ${DateFormat('MMM dd, yyyy • HH:mm').format(e.endDateTime!)}"),
+                  FilledButton(onPressed: () => context.push("/donate/${e.id}"), child: Text("home_donate".i18n()))
+                ],
+              ));
+        }).toList()),
+        SizedBox(height: 16.sp),
+      ],
+    );
+  }
+
+  _buildFamilyAccounts(ThemeData theme) {
+    var items = state.familiyAccounts;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('home_family_members'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+      SizedBox(height: 16.sp),
+      BaseListView(
+          hasBottomPadding: false,
+          children: items
+              .map((e) => BaseListTile(
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(e.full_name),
+                      Text(Utils.creditFormatting(e.balance))
+                    ],
+                  ),
+                  isLast: items.indexOf(e) == items.length - 1,
+                  index: items.indexOf(e)))
+              .toList())
+    ]);
   }
 }

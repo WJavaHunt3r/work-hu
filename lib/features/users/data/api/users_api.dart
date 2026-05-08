@@ -39,7 +39,7 @@ class UsersApi {
 
   Future<List<dynamic>> getChildren(num id) async {
     try {
-      final res = await _dioClient.dio.get("/user/$id/children");
+      final res = await _dioClient.dio.get("/user/me/family");
       return res.data;
     } catch (e) {
       rethrow;

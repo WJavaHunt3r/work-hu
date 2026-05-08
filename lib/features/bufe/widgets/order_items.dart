@@ -49,7 +49,7 @@ class OrderItems extends LegacyBasePage {
         ),
         ref.watch(bufeDataProvider).modelState == ModelState.loading
             ? const CircularProgressIndicator()
-            : BaseListView(
+            : LegacyBaseListView(
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
                   return BaseListTile(

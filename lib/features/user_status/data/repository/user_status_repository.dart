@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
+import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 
 import '../api/user_status_api.dart';
 import '../model/user_status_model.dart';
@@ -8,10 +10,21 @@ class UserStatusRepository {
 
   UserStatusRepository(this._userStatusApi);
 
-  Future<List<UserStatusModel>> getUserStatuses(num seasonYear, num? teamId) async {
+  Future<PaginatedResponse<UserStatusModel>> getUserStatuses(
+    num seasonYear,
+    num? teamId, {
+    required int page,
+    required int size,
+    required SortBuilder sort,
+  }) async {
     try {
-      final res = await _userStatusApi.getUserStatuses(seasonYear, teamId);
-      return res.map((e) => UserStatusModel.fromJson(e)).toList();
+      final res = await _userStatusApi.getUserStatuses(seasonYear, teamId, page: page, size: size, sort: sort);
+      final paginatedData = PaginatedResponse<UserStatusModel>.fromJson(
+        res,
+        (json) => UserStatusModel.fromJson(json as Map<String, dynamic>),
+      );
+
+      return paginatedData;
     } on DioException {
       rethrow;
     }

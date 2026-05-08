@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 
@@ -51,7 +52,9 @@ abstract class BaseFilterChipState<T, W extends BaseFilterChip<T>> extends Consu
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: FilterChip(
+          selectedColor: Theme.of(context).colorScheme.primary,
           label: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text("header_label".i18n([widget.label.i18n(), labelValue ?? ""])),
               Visibility(visible: !isActive, child: const Icon(Icons.arrow_drop_down)),
@@ -105,7 +108,7 @@ class ModalBottomFilterChipState<T> extends BaseFilterChipState<T, ModalBottomFi
               backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
               onClosing: () => context.pop(),
               builder: (context) {
-                return BaseListView(
+                return LegacyBaseListView(
                     itemBuilder: (BuildContext context, int index) {},
                     itemCount: widget.children.length,
                     children: [
@@ -115,18 +118,26 @@ class ModalBottomFilterChipState<T> extends BaseFilterChipState<T, ModalBottomFi
                           Text(widget.label.i18n())
                         ],
                       ),
-                      ...widget.children.map((e) => ListTile(
-                            title: widget.title(e),
-                            leading: Radio<T>(
-                              value: e,
-                              groupValue: selectedItem,
-                              onChanged: (value) {},
-                            ),
-                            onTap: () {
-                              selectedItem = e;
-                              widget.onItemSelected(e);
-                              context.pop();
-                            },
+                      RadioGroup<T>(
+                          onChanged: (e) {
+                            {
+                              if (e != null) {
+                                selectedItem = e;
+                                widget.onItemSelected(e);
+                                context.pop();
+                              }
+                            }
+                          },
+                          groupValue: selectedItem,
+                          child: Column(
+                            children: [
+                              ...widget.children.map((e) => ListTile(
+                                    title: widget.title(e),
+                                    leading: Radio<T>(
+                                      value: e,
+                                    ),
+                                  )),
+                            ],
                           )),
                       const SizedBox(
                         height: 10,
@@ -143,6 +154,7 @@ class DialogFilterChip<T> extends BaseFilterChip<T> {
       required super.label,
       required super.labelValue,
       required super.onDeleted,
+      super.showDelete,
       super.initialValue,
       required super.onItemSelected,
       required this.children,
@@ -162,42 +174,47 @@ class DialogFilterChipState<T> extends BaseFilterChipState<T, DialogFilterChip<T
   void onSelected(bool value) {
     showDialog(
         context: context,
-        builder: (context) {
+        builder: (dialogContext) {
           return Dialog.fullscreen(
               child: Scaffold(
             appBar: AppBar(
                 title: Row(
               children: [
-                Text(widget.label.i18n([":"]), style: Theme.of(context).textTheme.titleMedium)
+                Text(widget.label.i18n([":"]), style: Theme.of(dialogContext).textTheme.titleMedium)
               ],
             )),
-            body: FutureBuilder(
-              future: widget.children(),
-              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error loading data: ${snapshot.error}'));
-                }
-                final List<T> items = snapshot.data?.toList() ?? [];
-                return BaseListView(
-                  itemBuilder: (BuildContext context, int index) {},
-                  itemCount: items.length,
-                  children: items
-                      .map((e) => ListTile(
-                            title: widget.title(e),
-                            tileColor:
-                                selectedItem == e || widget.initialValue == e ? Theme.of(context).colorScheme.primary : null,
-                            onTap: () {
-                              selectedItem = e;
-                              widget.onItemSelected(e);
-                              context.pop();
-                            },
-                          ))
-                      .toList(),
-                );
-              },
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(12.sp),
+                child: FutureBuilder(
+                  future: widget.children(),
+                  builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error loading data: ${snapshot.error}'));
+                    }
+                    final List<T> items = snapshot.data?.toList() ?? [];
+                    return BaseListView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: items
+                          .map((e) => ListTile(
+                                title: widget.title(e),
+                                selected: selectedItem == e || widget.initialValue == e,
+                                // tileColor:
+                                //      ? Theme.of(context).colorScheme.primary : null,
+                                onTap: () {
+                                  selectedItem = e;
+                                  Navigator.of(context).pop();
+                                  widget.onItemSelected(e);
+                                },
+                              ))
+                          .toList(),
+                    );
+                  },
+                ),
+              ),
             ),
           ));
         });

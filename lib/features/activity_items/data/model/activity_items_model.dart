@@ -13,13 +13,15 @@ part 'activity_items_model.g.dart';
 class ActivityItemsModel with _$ActivityItemsModel {
   const factory ActivityItemsModel(
       {num? id,
-      ActivityModel? activity,
+      num? activityId,
       DateTime? createDateTime,
-      required UserModel createUser,
+      required num createUserId,
+      required String createUserName,
       required String description,
       required double hours,
-      required UserModel user,
-      required RoundModel round,
+      required String userName,
+      required num userId,
+      required num roundId,
       required TransactionType transactionType,
       required Account account}) = _ActivityItemsModel;
 

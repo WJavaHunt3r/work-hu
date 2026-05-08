@@ -1,14 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/models/role.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
+import 'package:work_hu/app/framework/base_components/sort_builder.dart';
+import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/data/api/activity_api.dart';
+import 'package:work_hu/features/activities/data/model/activity_filter.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 import 'package:work_hu/features/activities/data/state/activity_state.dart';
-import 'package:work_hu/features/activity_items/data/repository/activity_items_repository.dart';
-import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
-import 'package:work_hu/features/rounds/data/state/rounds_state.dart';
-import 'package:work_hu/features/rounds/provider/round_provider.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 
 import '../data/repository/activity_repository.dart';
 
@@ -16,130 +19,74 @@ final activityApiProvider = Provider<ActivityApi>((ref) => ActivityApi());
 
 final activityRepoProvider = Provider<ActivityRepository>((ref) => ActivityRepository(ref.read(activityApiProvider)));
 
-final activityDataProvider = StateNotifierProvider.autoDispose<ActivityDataNotifier, ActivityState>((ref) =>
-    ActivityDataNotifier(ref.read(activityRepoProvider), ref.read(userDataProvider.notifier),
-        ref.read(activityItemsRepoProvider), ref.read(roundDataProvider)));
+final activityDataProvider = StateNotifierProvider.autoDispose<ActivityDataNotifier, ActivityState>(
+    (ref) => ActivityDataNotifier(ref.read(activityRepoProvider)));
 
-class ActivityDataNotifier extends StateNotifier<ActivityState> {
+class ActivityDataNotifier extends BaseDataNotifier<ActivityState> implements ListApiProvider<ActivityFilter> {
   ActivityDataNotifier(
     this.activityRepository,
-    this.currentUserProvider,
-    this.activityItemsRepository,
-    this.roundsProvider,
-  ) : super(ActivityState(referenceDate: DateTime.now())) {
-    getActivities();
+  ) : super(ActivityState(filter: ActivityFilter(referenceDate: DateTime(DateTime.now().year, DateTime.now().month, 1)))) {
+    list();
   }
 
   final ActivityRepository activityRepository;
-  final ActivityItemsRepository activityItemsRepository;
-  final UserProvider currentUserProvider;
-  final RoundsState roundsProvider;
+  final UserModel? user = locator<UserProvider>().user;
 
-  Future<void> getActivities(
-      {num? responsibleId,
-      num? employerId,
-      num? createUserId,
-      bool? registeredInApp,
-      String? searchText,
-      bool? registeredInMyShare}) async {
-    state = state.copyWith(modelState: ModelState.loading, registerState: ModelState.empty);
-    var user = currentUserProvider.user!;
-    if (user.role != Role.ADMIN) {
-      employerId = user.id;
-      responsibleId=user.id;
-      createUserId=user.id;
-    }
-    try {
-      await activityRepository
-          .getActivities(
-          registeredInApp: false,
-          registeredInMyShare: false,
-          responsibleId: responsibleId,
-          createUserId: createUserId,
-          searchText: searchText,
-          employerId: employerId)
-          .then((data) async {
-        data.sort((a, b) => b.activityDateTime.compareTo(a.activityDateTime));
-        state = state.copyWith(activities: data, modelState: ModelState.success);
-      });
-      await activityRepository
-          .getActivities(
-              registeredInApp: true,
-              registeredInMyShare: registeredInMyShare,
-              responsibleId: responsibleId,
-              createUserId: createUserId,
-              referenceDate: state.referenceDate,
-              searchText: searchText,
-              employerId: employerId)
-          .then((data) async {
-        data.sort((a, b) => b.activityDateTime.compareTo(a.activityDateTime));
-        state = state.copyWith(activities: [... state.activities,... data], modelState: ModelState.success);
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error);
-    }
+  @override
+  Future<void> list({ActivityFilter? filter, int? page, int? size, String? sort}) async {
+    var sort = SortBuilder()..add("activityDateTime", descending: true);
+    state = state.copyWith(filter: filter ?? state.filter);
+    await executeApiCall<PaginatedResponse<ActivityModel>>(
+        () => activityRepository.getActivities(
+            registeredInMyShare: state.filter.registeredInMyShare,
+            responsibleId: state.filter.responsible?.id,
+            createUserId: state.filter.createUser?.id,
+            referenceDate: state.filter.referenceDate,
+            searchText: state.filter.description,
+            employerId: state.filter.employer?.id,
+            page: page ?? state.status.number,
+            size: size ?? state.status.size,
+            sort: sort), onSuccess: (data) async {
+      state = state.copyWith(
+          activities: [...state.activities, ...data.content],
+          status: state.status
+              .copyWith(totalElements: data.page.totalElements, totalPages: data.page.totalPages, number: data.page.number));
+    });
   }
 
   Future<void> deleteActivity(num id, int index) async {
     List<ActivityModel> origItems = state.activities;
-    List<ActivityModel> items = [];
-    for (var a in state.activities) {
-      if (a.id != id) {
-        items.add(a);
-      }
-    }
-    state = state.copyWith(activities: items, modelState: ModelState.loading);
-    var user = currentUserProvider.user!;
-    try {
-      await activityRepository.deleteActivity(id, user.id).then((data) async {
-        state = state.copyWith(activities: items, modelState: ModelState.success);
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, activities: origItems);
-    }
-  }
-
-  void updateIsExpanded(bool isExpanded) {
-    state = state.copyWith(isExpanded: isExpanded);
-  }
-
-  void setReferenceDate(DateTime? date) {
-    state = state.copyWith(referenceDate: date);
-    getActivities();
+    origItems.removeAt(index);
+    List<ActivityModel> items = [...origItems];
+    executeApiCall(() => activityRepository.deleteActivity(id, user!.id), onSuccess: (data) async {
+      state = state.copyWith(activities: items);
+    }, onError: (e) async {
+      state = state.copyWith(activities: origItems);
+    });
   }
 
   Future<void> registerActivity(num id) async {
-    state = state.copyWith(modelState: ModelState.loading);
-    var user = currentUserProvider.user!;
-    try {
-      await activityRepository.registerActivity(id, user.id).then((data) async {
-        state = state.copyWith(message: data, modelState: ModelState.success, registerState: ModelState.success);
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error);
-    }
+    executeApiCall(() => activityRepository.registerActivity(id, user!.id));
   }
 
   Future<void> putActivity(ActivityModel activity) async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await activityRepository.putActivity(activity, activity.id!).then((data) async {
-        getActivities();
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error);
-    }
+    executeApiCall(() => activityRepository.putActivity(activity, activity.id!), onSuccess: (data) async {
+      list();
+    });
   }
 
   Future<void> registerActivityInTeams(num id) async {
-    state = state.copyWith(modelState: ModelState.loading, registerState: ModelState.loading);
-    var user = currentUserProvider.user!;
-    try {
-      await activityRepository.registerActivityInTeams(id, user.id).then((data) async {
-        state = state.copyWith(message: data, modelState: ModelState.success, registerState: ModelState.success);
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error);
-    }
+    executeApiCall(() => activityRepository.registerActivityInTeams(id, user!.id));
+  }
+
+  @override
+  ActivityState copyWithState(BaseState status) {
+    return state.copyWith(status: state.status.copyWith(baseStatus: status));
+  }
+
+  @override
+  void dispose() {
+    debugPrintStack();
+    super.dispose();
   }
 }

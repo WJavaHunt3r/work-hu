@@ -75,12 +75,12 @@ class UserDetails extends ConsumerWidget {
                             )),
                           ],
                         ),
-                        BaseTextFormField(
-                          labelText: "user_details_date_of_birth".i18n(),
-                          initialValue: Utils.dateToString(user.birthDate),
-                          enabled: isEnabled,
-                          onChanged: (String text) {},
-                        ),
+                        // BaseTextFormField(
+                        //   labelText: "user_details_date_of_birth".i18n(),
+                        //   initialValue: Utils.dateToString(user.birthDate),
+                        //   enabled: isEnabled,
+                        //   onChanged: (String text) {},
+                        // ),
                         BaseTextFormField(
                           labelText: "user_details_email".i18n(),
                           initialValue: user.email ?? "",

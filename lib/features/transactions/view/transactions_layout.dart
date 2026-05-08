@@ -46,7 +46,7 @@ class TransactionsLayout extends ConsumerWidget {
                 onChanged: (value) => ref.watch(transactionsDataProvider.notifier).setSelectedRound(value?.id ?? 0)),
           ),
           Expanded(
-              child: BaseListView(
+              child: LegacyBaseListView(
             itemBuilder: (BuildContext context, int index) {
               var current = transactions[index];
               var date = current.createDateTime;

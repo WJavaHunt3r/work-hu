@@ -96,12 +96,12 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
     var hours = hoursController.value.text.replaceAll(",", ".");
     var registration = ActivityItemsModel(
       description: description ?? state.description,
-      user: state.selectedUser!,
-      round: roundDataNotifier.getCurrentRound()!,
+      userId: state.selectedUser!.id,
+      roundId: roundDataNotifier.getCurrentRound()!.id,
       transactionType: state.transactionType,
       account: state.account,
       hours: double.tryParse(hours) ?? 0,
-      createUser: currentUser!,
+      createUserId: currentUser!.id, createUserName: '', userName: '',
     );
 
     var text = hours;
@@ -200,18 +200,18 @@ class CreateActivityDataNotifier extends StateNotifier<CreateActivityState> {
           .postActivity(ActivityModel(
               description: descriptionController.value.text,
               account: state.account,
-              createUser: currentUser!,
+              createUserId: currentUser!.id,
               activityDateTime: DateTime.parse(dateController.value.text),
-              employer: state.employer!,
-              responsible: state.responsible!,
+              employerId: state.employer!.id,
+              responsibleId: state.responsible!.id,
               registeredInApp: false,
               registeredInMyShare: false,
               transactionType: state.transactionType,
-              registeredInTeams: false))
+              registeredInTeams: false, createUserName: '', employerName: '', responsibleName: ''))
           .then((activity) async {
         List<ActivityItemsModel> newItems = [];
         for (var item in state.activityItems) {
-          newItems.add(item.copyWith(activity: activity));
+          newItems.add(item.copyWith(activityId: activity.id));
         }
         state = state.copyWith(activityItems: newItems);
         await activityItemsRepository.postActivityItems(newItems.where((element) => element.hours != 0).toList()).then((data) {

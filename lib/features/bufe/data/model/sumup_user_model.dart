@@ -11,6 +11,7 @@ class SumupUserModel with _$SumupUserModel {
       required num balance,
       required String dukapp_id,
       required num spent,
+        String? customer_code,
       String? staff_barcode}) = _SumupUserModel;
 
   factory SumupUserModel.fromJson(Map<String, dynamic> json) => _$SumupUserModelFromJson(json);

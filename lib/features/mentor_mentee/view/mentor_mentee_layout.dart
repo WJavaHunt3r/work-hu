@@ -21,7 +21,7 @@ class MentorMenteeLayout extends ConsumerWidget {
             Expanded(
               child: RefreshIndicator(
                   onRefresh: () async => ref.read(mentorMenteeDataProvider.notifier).getMentorMentee(),
-                  child: BaseListView(
+                  child: LegacyBaseListView(
                       cardBackgroundColor: Colors.transparent,
                       itemBuilder: (context, index) {
                         var current = items[index];

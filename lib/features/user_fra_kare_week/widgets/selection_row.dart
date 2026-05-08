@@ -22,6 +22,7 @@ class SelectionRow extends ConsumerWidget {
               ref.read(userFraKareWeekDataProvider.notifier).setUserFraKareWeeks(fraKareWeek, changed ?? false)),
       isLast: isLast,
       index: index,
+      title: SizedBox(),
     );
   }
 }

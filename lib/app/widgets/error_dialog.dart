@@ -23,7 +23,7 @@ class ErrorDialog extends StatelessWidget {
         style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Theme.of(context).colorScheme.error),
       ),
       alignment: Alignment.center,
-      actions: [OutlinedButton(onPressed: () => context.pop(), child: Text("base_ok".i18n()))],
+      actions: [FilledButton(onPressed: () => Navigator.of(context).pop(), child: Text("base_ok".i18n()))],
       actionsAlignment: MainAxisAlignment.center,
     );
   }

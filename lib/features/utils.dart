@@ -84,12 +84,12 @@ class Utils {
     return "";
   }
 
-  static final NumberFormat creditFormat = NumberFormat("#,###", "hu");
+  static final NumberFormat creditFormat = NumberFormat("#,###", "hu_HU");
   static final NumberFormat percentFormat = NumberFormat.decimalPatternDigits(decimalDigits: 1);
   static final NumberFormat percentFormat2Digits = NumberFormat.decimalPatternDigits(decimalDigits: 2);
 
   static String creditFormatting(num number) {
-    return creditFormat.format(number).replaceAll(",", " ");
+    return "${creditFormat.format(number)} Ft";
   }
 
   static String dateToString(DateTime date) {
@@ -110,6 +110,11 @@ class Utils {
 
   static String dateToStringWithTime(DateTime date) {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day} ${date.hour < 10 ? "0${date.hour}" : date.hour}:${date.minute < 10 ? "0${date.minute}" : date.minute}";
+  }
+
+  static String dateFormating(DateTime? date){
+    if(date == null) return "";
+    return DateFormat('yyyy, MMM dd').format(date);
   }
 
   // static RoundModel createEmptyRound() {
@@ -159,106 +164,6 @@ class Utils {
     return "${dateToString(activity.activityDateTime).replaceAll("-", "")}_${changeSpecChars(activity.description)}";
   }
 
-  static void createActivityXlsx(List<ActivityItemsModel> items, ActivityModel activity) async {
-    var excel = await buildActivityXlsx(items, activity);
-    if (kIsWeb) {
-      excel.save(fileName: "${createFileName(activity)}.xlsx");
-    } else {
-      var newBytes = excel.save();
-      if (newBytes != null) {
-        await FileSaver.instance.saveAs(
-          name: createFileName(activity),
-          bytes: Uint8List.fromList(newBytes),
-          ext: 'xlsx',
-          mimeType: MimeType.microsoftExcel,
-        );
-      }
-    }
-  }
-
-  static Future<Excel> buildActivityXlsx(List<ActivityItemsModel> items, ActivityModel activity) async {
-    ByteData data = await rootBundle.load('assets/docs/munkalap_sablon_uj.xlsx');
-    var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    var excel = Excel.decodeBytes(bytes);
-
-    Sheet sheetObject = excel['Munka1'];
-    var employerCell = sheetObject.cell(CellIndex.indexByString('C2'));
-    employerCell.value = null;
-    employerCell.value = TextCellValue(activity.employer.getFullName());
-    employerCell.cellStyle = (employerCell.cellStyle ?? CellStyle()).copyWith(horizontalAlignVal: HorizontalAlign.Right);
-
-    var descriptionCell = sheetObject.cell(CellIndex.indexByString('C3'));
-    descriptionCell.value = null;
-    descriptionCell.value = TextCellValue(activity.description);
-    descriptionCell.cellStyle = (descriptionCell.cellStyle ?? CellStyle()).copyWith(horizontalAlignVal: HorizontalAlign.Right);
-
-    var responsibleCell = sheetObject.cell(CellIndex.indexByString('C4'));
-    responsibleCell.value = null;
-    responsibleCell.value = TextCellValue(activity.responsible.getFullName());
-    responsibleCell.cellStyle = (responsibleCell.cellStyle ?? CellStyle()).copyWith(horizontalAlignVal: HorizontalAlign.Right);
-
-    var activityIdCell = sheetObject.cell(CellIndex.indexByString('F1'));
-    activityIdCell.value = null;
-    activityIdCell.value = IntCellValue(activity.activityId?.toInt() ?? 0);
-
-    var activityDateCell = sheetObject.cell(CellIndex.indexByString('F2'));
-    activityDateCell.value = null;
-    var date = activity.activityDateTime;
-    activityDateCell.value =
-        DateTimeCellValue(year: date.year, month: date.month, day: date.day, hour: date.hour, minute: date.minute);
-
-    var sumHoursCell = sheetObject.cell(CellIndex.indexByString('F3'));
-    var sumHours = items.map((e) => e.hours).reduce((value, element) => value + element);
-    sumHoursCell.value = null;
-    sumHoursCell.value = DoubleCellValue(sumHours);
-
-    var sumCreditsCell = sheetObject.cell(CellIndex.indexByString('F4'));
-    var sumCredits = activity.account == Account.MYSHARE && activity.transactionType == TransactionType.DUKA_MUNKA
-        ? items.map((e) => (e.hours * 1000).toInt()).reduce((value, element) => value + element)
-        : activity.account == Account.OTHER && activity.transactionType == TransactionType.POINT
-            ? 0
-            : activity.account == Account.MYSHARE && activity.transactionType == TransactionType.HOURS
-                ? items.map((e) => (e.hours * 3000).toInt()).reduce((value, element) => value + element)
-                : items.map((e) => (e.hours * 2000).toInt()).reduce((value, element) => value + element);
-    sumCreditsCell.value = null;
-    sumCreditsCell.value = IntCellValue(sumCredits);
-
-    for (var item in items) {
-      var indexCell = sheetObject.cell(CellIndex.indexByString('A${5 + items.indexOf(item) + 1}'));
-      indexCell.value = null;
-      indexCell.value = IntCellValue(items.indexOf(item) + 1);
-
-      var myShareCell = sheetObject.cell(CellIndex.indexByString('B${5 + items.indexOf(item) + 1}'));
-      myShareCell.value = null;
-      myShareCell.value = IntCellValue(item.user.myShareID.toInt());
-
-      var nameCell = sheetObject.cell(CellIndex.indexByString('C${5 + items.indexOf(item) + 1}'));
-      nameCell.value = null;
-      nameCell.value = TextCellValue(item.user.getFullName());
-      nameCell.cellStyle = (nameCell.cellStyle ?? CellStyle()).copyWith(horizontalAlignVal: HorizontalAlign.Right);
-
-      var ageCell = sheetObject.cell(CellIndex.indexByString('D${5 + items.indexOf(item) + 1}'));
-      ageCell.value = null;
-      ageCell.value = IntCellValue(item.user.getAge().toInt());
-
-      var hourCell = sheetObject.cell(CellIndex.indexByString('E${5 + items.indexOf(item) + 1}'));
-      hourCell.value = null;
-      hourCell.value = DoubleCellValue(item.hours);
-
-      var creditCell = sheetObject.cell(CellIndex.indexByString('F${5 + items.indexOf(item) + 1}'));
-      creditCell.value = null;
-      creditCell.value = activity.account == Account.MYSHARE && activity.transactionType == TransactionType.DUKA_MUNKA
-          ? DoubleCellValue(item.hours * 1000)
-          : activity.account == Account.MYSHARE && activity.transactionType == TransactionType.HOURS
-              ? DoubleCellValue(item.hours * 3000)
-              : activity.account == Account.MYSHARE && activity.transactionType == TransactionType.DUKA_MUNKA_2000
-                  ? DoubleCellValue(item.hours * 2000)
-                  : TextCellValue("");
-    }
-
-    return excel;
-  }
-
   static Future<void> createCreditCsv(List<TransactionItemModel> items, DateTime date, String description) async {
     var headers = ["UserId", "Age", "Name", "LastName", "ClubId", "ClubName", "Amount", "ClubTransactionDate", "Description"];
 
@@ -269,7 +174,7 @@ class Utils {
       var user = transaction.user;
       list.add([
         user.myShareID,
-        (DateTime.now().difference(user.birthDate).inDays / 365).ceil() - 1,
+        (DateTime.now().difference(user.birthDate ?? DateTime.now()).inDays / 365).ceil() - 1,
         user.firstname,
         user.lastname,
         3964,

@@ -1,4 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/payment_status.dart';
@@ -13,11 +15,10 @@ abstract class PaymentsState with _$PaymentsState {
       {@Default([]) List<PaymentsModel> payments,
       num? donationId,
       num? userId,
-      PaymentStatus? status,
+      PaymentStatus? paymentStatus,
       PaymentsModel? selectedPayment,
       @Default(MaintenanceMode.create) MaintenanceMode mode,
-      @Default(ModelState.empty) ModelState modelState,
-      @Default("") String message}) = _PaymentsState;
+      @Default(BaseListState()) BaseListState status}) = _PaymentsState;
 
   const PaymentsState._();
 }

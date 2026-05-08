@@ -1,27 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class BaseListTile extends ListTile {
-  BaseListTile(
-      {super.key,
-      required bool isLast,
-      super.enabled,
-      required int index,
-      super.onTap,
-      super.title,
-      super.trailing,
-      super.subtitle,
-      super.tileColor,
-      super.leading,
-      super.minVerticalPadding,
-      super.contentPadding})
-      : super(
-            shape: RoundedRectangleBorder(
-                borderRadius: index == 0 && isLast
-                    ? BorderRadius.circular(8.sp)
-                    : index == 0
-                        ? BorderRadius.only(topLeft: Radius.circular(8.sp), topRight: Radius.circular(8.sp))
-                        : isLast
-                            ? BorderRadius.only(bottomLeft: Radius.circular(8.sp), bottomRight: Radius.circular(8.sp))
-                            : BorderRadius.zero));
+class BaseListTile extends StatelessWidget {
+  BaseListTile({
+    super.key,
+    required this.isLast,
+    this.enabled = true,
+    required this.index,
+    this.onTap,
+    required this.title,
+    this.trailing,
+    this.subtitle,
+    this.tileColor,
+    this.leading,
+    this.minVerticalPadding,
+    this.contentPadding,
+  });
+
+  final EdgeInsets? contentPadding;
+  final double? minVerticalPadding;
+  final Widget? leading;
+  final Widget? title;
+  final Widget? subtitle;
+  final Widget? trailing;
+  final Color? tileColor;
+  final bool isLast;
+  final bool enabled;
+  final int index;
+  final Function()? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: contentPadding,
+      enabled: enabled,
+      minVerticalPadding: minVerticalPadding,
+      onTap: onTap,
+      leading: leading,
+      title: title,
+      subtitle: subtitle,
+      tileColor: tileColor,
+      trailing: trailing,
+      shape: RoundedRectangleBorder(
+          borderRadius: index == 0 && isLast
+              ? BorderRadius.circular(8.sp)
+              : index == 0
+                  ? BorderRadius.only(topLeft: Radius.circular(8.sp), topRight: Radius.circular(8.sp))
+                  : isLast
+                      ? BorderRadius.only(bottomLeft: Radius.circular(8.sp), bottomRight: Radius.circular(8.sp))
+                      : BorderRadius.zero),
+    );
+  }
 }

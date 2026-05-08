@@ -40,7 +40,7 @@ class FraKareWeekLayout extends ConsumerWidget {
           //       onChanged: (value) => ref.watch(fraKareWeekDataProvider.notifier).setSelectedRound(value?.id ?? 0)),
           // ),
           Expanded(
-              child: BaseListView(
+              child: LegacyBaseListView(
             itemBuilder: (BuildContext context, int index) {
               var current = fraKareWeeks[index];
               return BaseListTile(

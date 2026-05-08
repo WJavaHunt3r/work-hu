@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:work_hu/features/login/data/api/login_api.dart';
+import 'package:work_hu/features/login/data/model/register_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 
 class LoginRepository {
@@ -10,6 +11,15 @@ class LoginRepository {
   Future<Map<String, dynamic>> login(String username, String password) async {
     try {
       final res = await _loginApi.loginRequest(username, password);
+      return res;
+    } on DioException {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> register(RegisterModel userData) async {
+    try {
+      final res = await _loginApi.registerRequest(userData);
       return res;
     } on DioException {
       rethrow;
@@ -28,6 +38,15 @@ class LoginRepository {
   Future<UserModel> getUserByUsername(String username) async {
     try {
       final res = await _loginApi.getUserByUsername(username);
+      return UserModel.fromJson(res);
+    } on DioException {
+      rethrow;
+    }
+  }
+
+  Future<UserModel> getProfile() async {
+    try {
+      final res = await _loginApi.getProfile();
       return UserModel.fromJson(res);
     } on DioException {
       rethrow;

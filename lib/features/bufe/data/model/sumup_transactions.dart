@@ -10,12 +10,12 @@ enum EntryType { topup, purchase, unknown }
 @freezed
 class TopUpResponse with _$TopUpResponse {
   const factory TopUpResponse(
-      {required List<TopUpEntry> topUps,
+      {required List<TopUpEntry> items,
       @JsonKey(name: 'dukapp_id') required String dukappId,
       @JsonKey(name: 'customer_id') required String customerId,
-      required num offset,
-      required num limit,
-      required num total}) = _TopUpResponse;
+      required int offset,
+      required int limit,
+      required int total}) = _TopUpResponse;
 
   factory TopUpResponse.fromJson(Map<String, dynamic> json) => _$TopUpResponseFromJson(json);
 }

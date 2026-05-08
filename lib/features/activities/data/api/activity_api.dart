@@ -1,3 +1,4 @@
+import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 
@@ -8,14 +9,17 @@ class ActivityApi {
 
   ActivityApi();
 
-  Future<List<dynamic>> getActivities(
+  Future<dynamic> getActivities(
       {num? responsibleId,
       num? employerId,
       num? createUserId,
       bool? registeredInApp,
       bool? registeredInMyShare,
       String? searchText,
-      String? referenceDate}) async {
+      String? referenceDate,
+      required int page,
+      required int size,
+      required SortBuilder sort}) async {
     try {
       final res = await _dioClient.dio.get("/activity", queryParameters: {
         "responsibleId": responsibleId,
@@ -24,8 +28,10 @@ class ActivityApi {
         "registeredInApp": registeredInApp,
         "registeredInMyShare": registeredInMyShare,
         "referenceDate": referenceDate,
-        "searchText": searchText
-
+        "searchText": searchText,
+        "page": page,
+        "size": size,
+        "sort": sort.build()
       });
       return res.data;
     } catch (e) {

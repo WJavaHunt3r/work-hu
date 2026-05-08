@@ -12,18 +12,18 @@ class UserModel with _$UserModel {
       {required num id,
       required String firstname,
       required String lastname,
-      required DateTime birthDate,
+      DateTime? birthDate,
       TeamModel? paceTeam,
       required Role role,
-      required num myShareID,
-      required num baseMyShareCredit,
-      required num currentMyShareCredit,
+      num? myShareID,
+      num? baseMyShareCredit,
+      num? currentMyShareCredit,
       required bool changedPassword,
       num? familyId,
       num? spouseId,
       num? phoneNumber,
       num? bufeId,
-      required num points,
+      num? points,
       String? email}) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
@@ -36,7 +36,10 @@ class UserModel with _$UserModel {
   }
 
   num getAge() {
-    return (DateTime.now().difference(birthDate).inDays / 365).ceil() - 1;
+    if(birthDate == null){
+      return 0;
+    }
+    return (DateTime.now().difference(birthDate!).inDays / 365).ceil() - 1;
   }
 
   bool isMentor() {

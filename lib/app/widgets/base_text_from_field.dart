@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 
 class BaseTextFormField extends StatefulWidget {
@@ -72,7 +73,7 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
   @override
   void initState() {
     super.initState();
-    _isObscured = widget.obscureText;
+    _isObscured = widget.isPasswordField;
   }
 
   void obscuredChanged() {
@@ -88,7 +89,7 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
     return Visibility(
       visible: widget.fldControl == null || (widget.fldControl != "0" && widget.fldControl != ""),
       child: Padding(
-        padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8, right: 8),
+        padding: EdgeInsets.all(8.sp),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,

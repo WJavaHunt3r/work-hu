@@ -10,9 +10,9 @@ class BufeRepository {
 
   BufeRepository(this._bufeApi);
 
-  Future<TopUpResponse> getPayments({required num userId}) async {
+  Future<TopUpResponse> getPayments({required num userId, int? limit = 50, int? offset = 0}) async {
     try {
-      final res = await _bufeApi.getPayments(userId: userId);
+      final res = await _bufeApi.getPayments(userId: userId, limit: limit, offset: offset);
       return TopUpResponse.fromJson(res);
     } on DioException {
       rethrow;
@@ -24,14 +24,13 @@ class BufeRepository {
       final res = await _bufeApi.getAccount(userId);
       return SumupUserModel.fromJson(res);
     } catch (e) {
-      // return BufeAccountModel(name: "Wagner André", balance: 2000);
       rethrow;
     }
   }
 
-  Future<Order> getOrders({required num userId}) async {
+  Future<Order> getOrders({required num userId, int? limit = 50, int? offset = 0}) async {
     try {
-      final res = await _bufeApi.getOrders(userId: userId);
+      final res = await _bufeApi.getOrders(userId: userId, limit: limit, offset: offset);
       return Order.fromJson(res);
     } on DioException {
       rethrow;
@@ -53,23 +52,18 @@ class BufeRepository {
     }
   }
 
-  // Future<CheckoutModel> getCheckout({required String checkoutId}) async {
-  //   try {
-  //     final res = await _bufeApi.getCheckout(checkoutId: checkoutId);
-  //     return CheckoutModel.fromJson(res);
-  //   } on DioException {
-  //     rethrow;
-  //   }
-  // }
-  //
-  // Future<CheckoutModel> deleteCheckout({required String checkoutId}) async {
-  //   try {
-  //     final res = await _bufeApi.deleteCheckout(checkoutId: checkoutId);
-  //     return CheckoutModel.fromJson(res);
-  //   } on DioException {
-  //     rethrow;
-  //   }
-  // }
+  Future<SumupUserModel> createCustomer({
+    required String fullname,
+    required num dukappId,
+    required String email,
+  }) async {
+    try {
+      final res = await _bufeApi.createCustomer(fullname: fullname, dukappId: dukappId, email: email);
+      return SumupUserModel.fromJson(res);
+    } on DioException {
+      rethrow;
+    }
+  }
 
   Future<dynamic> deleteSumupCheckout({required String checkoutId}) async {
     try {

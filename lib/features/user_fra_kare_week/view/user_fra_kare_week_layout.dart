@@ -20,7 +20,7 @@ class UserFraKareWeekLayout extends ConsumerWidget {
       Column(
         children: [
           Expanded(
-              child: BaseListView(
+              child: LegacyBaseListView(
             itemCount: streaks.length,
             itemBuilder: (BuildContext context, int index) {
               var item = streaks[index];

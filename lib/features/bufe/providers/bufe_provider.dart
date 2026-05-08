@@ -48,8 +48,8 @@ class BufeDataNotifier extends StateNotifier<BufeState> {
     state = state.copyWith(modelState: ModelState.loading);
     try {
       await bufeRepository.getPayments(userId: userId).then((data) async {
-        data.topUps.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        state = state.copyWith(payments: data.topUps, modelState: ModelState.success);
+        data.items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        state = state.copyWith(payments: data.items, modelState: ModelState.success);
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error);

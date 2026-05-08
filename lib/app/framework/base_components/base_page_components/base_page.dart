@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/title_provider.dart';
@@ -14,7 +13,7 @@ import '../../../models/mode_state.dart';
 
 abstract class BasePage extends ConsumerStatefulWidget {
   const BasePage(
-      {super.key, required this.title, this.hasHeadData = false, this.canPop = false, this.leading, this.hasAppBar = false});
+      {super.key, required this.title, this.hasHeadData = false, this.canPop = true, this.leading, this.hasAppBar = true});
 
   final Object title;
   final bool hasHeadData;
@@ -54,30 +53,35 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
         confirmExit();
       },
       child: Scaffold(
+        extendBodyBehindAppBar: !widget.hasAppBar,
         resizeToAvoidBottomInset: false,
         persistentFooterButtons: buildPersistentFooterButtons(context, ref),
         persistentFooterDecoration: BoxDecoration(),
         persistentFooterAlignment: AlignmentDirectional.bottomCenter,
         bottomNavigationBar: buildBottomNavigationBar(context, ref),
         floatingActionButton: buildFloatingActionButton(context, ref),
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: (widget.title is Widget
-              ? widget.title as Widget
-              : Text(((widget.title) as String).i18n(),
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold))),
-          leadingWidth: 80,
-          leading: widget.leading,
-          actions: buildActions(context, ref),
-          actionsPadding: EdgeInsets.symmetric(horizontal: 4),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [Expanded(child: SingleChildScrollView(child: buildLayout()))],
-          ),
+        appBar: !widget.hasAppBar
+            ? null
+            : AppBar(
+                automaticallyImplyLeading: true,
+                title: (widget.title is Widget
+                    ? widget.title as Widget
+                    : Text(((widget.title) as String).i18n(),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold))),
+                leadingWidth: 80.sp,
+                leading: widget.leading,
+                actions: buildActions(context, ref),
+                actionsPadding: EdgeInsets.symmetric(horizontal: 12.sp),
+              ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+                child: SingleChildScrollView(
+                  controller: getController(),
+                    child: Padding(padding: EdgeInsets.only(left: 24.sp, right: 24.sp, top: 8.sp,  bottom: 8.sp), child: buildLayout())))
+          ],
         ),
       ),
     );
@@ -125,6 +129,8 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
   List<Widget>? buildActions(BuildContext context, WidgetRef ref) {
     return [];
   }
+
+  ScrollController? getController() {}
 }
 
 abstract class LegacyBasePage extends ConsumerWidget {

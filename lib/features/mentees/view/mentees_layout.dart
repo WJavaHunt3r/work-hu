@@ -24,7 +24,7 @@ class MenteesLayout extends ConsumerWidget {
               child: RefreshIndicator(
                   onRefresh: () async =>
                       ref.read(menteesDataProvider.notifier).getMentees(),
-                  child: BaseListView(
+                  child: LegacyBaseListView(
                       cardBackgroundColor: Colors.transparent,
                       itemBuilder: (context, index) {
                         var current = items[index];
@@ -58,7 +58,7 @@ class MenteesLayout extends ConsumerWidget {
                             style: style,
                           ),
                           title: Text(
-                            current.userStatus.user.getFullName(),
+                            current.userStatus.name,
                             style: style,
                           ),
                           trailing: Text(

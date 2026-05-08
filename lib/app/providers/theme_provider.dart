@@ -21,7 +21,7 @@ class ThemeModeNotifier extends StateNotifier<AppThemeMode> {
     } else if (savedTheme == 'dark') {
       state = AppThemeMode.dark;
     } else {
-      state = AppThemeMode.light;
+      state = AppThemeMode.system;
     }
   }
 
@@ -40,6 +40,20 @@ class ThemeModeNotifier extends StateNotifier<AppThemeMode> {
         break;
     }
     state = mode; // Update the state
+  }
+
+  Future<void> changeTheme() async {
+    switch(state){
+
+      case AppThemeMode.system:
+        break;
+      case AppThemeMode.light:
+        setTheme(AppThemeMode.dark);
+        break;
+      case AppThemeMode.dark:
+        setTheme(AppThemeMode.light);
+        break;
+    }
   }
 }
 

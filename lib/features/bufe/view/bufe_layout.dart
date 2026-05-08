@@ -105,7 +105,7 @@ class _BufeState extends ConsumerState<BufeLayout> {
                         ],
                       ),
                     ),
-                    BaseListView(
+                    LegacyBaseListView(
                       shrinkWrap: true,
                       itemBuilder: (BuildContext context, int index) {
                         return OrderListItem(
@@ -123,7 +123,7 @@ class _BufeState extends ConsumerState<BufeLayout> {
                         Text("bufe_payments".i18n()),
                       ],
                     ),
-                    BaseListView(
+                    LegacyBaseListView(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (BuildContext context, int index) {

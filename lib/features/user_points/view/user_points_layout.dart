@@ -86,7 +86,7 @@ class UserPointsLayoutState extends ConsumerState<UserPointsLayout> {
     List<TransactionItemModel> currentItems =
         items.where((element) => element.transactionDate.month == DateTime.now().month).toList();
     list.add(
-      BaseListView(
+      LegacyBaseListView(
           itemBuilder: (BuildContext context, int index) {
             var current = currentItems[index];
             return PointsListItem(
@@ -116,7 +116,7 @@ class UserPointsLayoutState extends ConsumerState<UserPointsLayout> {
                     return PointsListItem(
                       value: current.hours,
                       title: current.description,
-                      date: current.activity?.activityDateTime ?? DateTime.now(),
+                      date: current.createDateTime ?? DateTime.now(),
                       isLast: index == activityItems.length - 1,
                       index: index,
                     );
@@ -126,7 +126,7 @@ class UserPointsLayoutState extends ConsumerState<UserPointsLayout> {
           ]),
     );
 
-    list.add(BaseListView(
+    list.add(LegacyBaseListView(
         itemBuilder: (context, index) {
           var current = items[index];
           return PointsListItem(

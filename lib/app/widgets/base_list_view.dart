@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:work_hu/app/widgets/base_container.dart';
 
-class BaseListView extends StatelessWidget {
-  const BaseListView(
+class LegacyBaseListView extends StatelessWidget {
+  const LegacyBaseListView(
       {super.key,
       required this.itemBuilder,
       required this.itemCount,
@@ -39,5 +40,53 @@ class BaseListView extends StatelessWidget {
           : const SizedBox(),
       ...children
     ]);
+  }
+}
+
+class BaseListView extends StatelessWidget {
+  const BaseListView({
+    super.key,
+    required this.children,
+    this.color,
+    this.physics,
+    this.hasBottomPadding = true,
+    this.separated = true,
+    this.isExpanded = false,
+    this.scrollController
+  });
+
+  final List<Widget> children;
+  final Color? color;
+  final ScrollPhysics? physics;
+  final bool hasBottomPadding;
+  final bool separated;
+  final bool isExpanded;
+  final ScrollController? scrollController;
+
+  @override
+  Widget build(BuildContext context) {
+    return children.isEmpty ? const SizedBox():Padding(
+      padding: hasBottomPadding ? EdgeInsets.only(bottom: 75.sp) : EdgeInsets.zero,
+      child: BaseContainer(
+        padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 8.sp),
+        child: isExpanded ? Expanded(child: buildListView()) : buildListView(),
+      ),
+    );
+  }
+
+  Widget buildListView() {
+    return ListView.separated(
+      controller: scrollController,
+      itemCount: children.length,
+      shrinkWrap: true,
+      physics: physics,
+      padding: EdgeInsets.zero,
+      itemBuilder: (BuildContext context, int index) {
+        return children[index];
+      },
+      separatorBuilder: (BuildContext context, int index) {
+        return separated ? Divider(height: 1.sp, color: Theme.of(context).colorScheme.surface) : const SizedBox(height: 0);
+      },
+    );
   }
 }

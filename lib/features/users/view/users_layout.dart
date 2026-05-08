@@ -24,7 +24,7 @@ class UsersLayout extends ConsumerWidget {
                 child: Column(
                   children: [
                     Expanded(
-                      child: BaseListView(
+                      child: LegacyBaseListView(
                         itemBuilder: (BuildContext context, int index) {
                           return UserListItem(
                             user: users[index],

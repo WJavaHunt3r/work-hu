@@ -37,7 +37,7 @@ class NotchAppBar extends ConsumerWidget {
                 ),
                 icon: Icon(Icons.run_circle_outlined, size: 25.sp, color: isDark ? AppColors.backgroundColor : AppColors.primary),
                 tooltip: 'myshare_status_status'.i18n(),
-                onPressed: () => context.go("/home"),
+                onPressed: () => context.go("/balance"),
               ),
               Text('myshare_status_status'.i18n(),
                   style: TextStyle(

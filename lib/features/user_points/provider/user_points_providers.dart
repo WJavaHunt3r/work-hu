@@ -41,7 +41,7 @@ class UserPointsDataNotifier extends StateNotifier<UserPointsState> {
         transactionItems.sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
 
         await activityItemsRepository.getActivityItems(registeredInApp: false, userId: state.userId).then((acItems) async =>
-            state = state.copyWith(activityItems: acItems, transactionItems: transactionItems, modelState: ModelState.success));
+            state = state.copyWith(activityItems: acItems.content, transactionItems: transactionItems, modelState: ModelState.success));
       } else {
         state = state.copyWith(modelState: ModelState.error, message: "No User set");
       }

@@ -1,11 +1,10 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/view/activities_page.dart';
-import 'package:work_hu/features/activity_items/view/activity_items_layout.dart';
+import 'package:work_hu/features/activity_items/view/activity_items_page.dart';
 import 'package:work_hu/features/admin/view/admin_page.dart';
 import 'package:work_hu/features/bufe/view/bufe_page.dart';
 import 'package:work_hu/features/bufe/widgets/order_items.dart';
@@ -16,19 +15,24 @@ import 'package:work_hu/features/create_transactions/view/create_point_transacti
 import 'package:work_hu/features/create_transactions/view/create_samvirk_transactions_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_transaction_page.dart';
 import 'package:work_hu/features/donate/view/donate_page.dart';
+import 'package:work_hu/features/donate_success_page/view/donate_payment_success_page.dart';
 import 'package:work_hu/features/donation/view/donation_page.dart';
 import 'package:work_hu/features/fra_kare_week/view/fra_kare_week_page.dart';
 import 'package:work_hu/features/goal/view/goal_page.dart';
 import 'package:work_hu/features/home/view/home_page.dart';
-import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/login/providers/login_provider.dart';
 import 'package:work_hu/features/login/view/login_page.dart';
 import 'package:work_hu/features/mentees/view/mentees_page.dart';
 import 'package:work_hu/features/mentor_mentee/view/mentor_mentees_page.dart';
 import 'package:work_hu/features/payment_success/view/payment_success_page.dart';
 import 'package:work_hu/features/payments/view/payments_page.dart';
+import 'package:work_hu/features/profile/view/language_picker_page.dart';
 import 'package:work_hu/features/profile/view/profile_page.dart';
 import 'package:work_hu/features/rounds/view/rounds_page.dart';
+import 'package:work_hu/features/status/view/status_page.dart';
+import 'package:work_hu/features/top_up/view/top_up_page.dart';
+import 'package:work_hu/features/top_ups/view/top_ups_page.dart';
+import 'package:work_hu/features/tos/view/privacy_policy.dart';
+import 'package:work_hu/features/tos/view/tos_view.dart';
 import 'package:work_hu/features/transaction_items/view/transaction_items_page.dart';
 import 'package:work_hu/features/transactions/view/transactions_page.dart';
 import 'package:work_hu/features/user_fra_kare_week/view/user_fra_kare_week_page.dart';
@@ -36,13 +40,19 @@ import 'package:work_hu/features/user_points/view/user_points_page.dart';
 import 'package:work_hu/features/user_status/view/user_status_page.dart';
 import 'package:work_hu/features/users/view/users_page.dart';
 
+import '../../features/profile/view/theme_picker_page.dart';
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
+final _shellNavigatorAdminKey = GlobalKey<NavigatorState>(debugLabel: 'shellAdmin');
+final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellHome');
+final _shellNavigatorStatusKey = GlobalKey<NavigatorState>(debugLabel: 'shellStatus');
 final routerProvider = Provider<GoRouter>((ref) {
   final userNotifier = ref.watch(userDataProvider);
   return GoRouter(
       refreshListenable: userNotifier,
       navigatorKey: navigatorKey,
-      initialLocation: "/home",
+      initialLocation: "/",
       routes: [
         GoRoute(
           path: '/login',
@@ -57,33 +67,76 @@ final routerProvider = Provider<GoRouter>((ref) {
           branches: [
             // Branch 1: User Status (The default page after login)
             StatefulShellBranch(
+              navigatorKey: _shellNavigatorHomeKey,
               routes: [
-                GoRoute(
-                  path: '/home',
-                  builder: (context, state) => HomePage(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/status',
-                  builder: (context, state) => const ProfilePage(),
-                ),
+                GoRoute(path: '/balance', builder: (context, state) => HomePage(), routes: [
+                  GoRoute(path: "topUps", builder: (BuildContext context, GoRouterState state) => const TopUpsPage()),
+                ]),
               ],
             ),
             // Branch 2: Profile
             StatefulShellBranch(
+              navigatorKey: _shellNavigatorProfileKey,
               routes: [
-                GoRoute(
-                  path: '/profile',
-                  builder: (context, state) => const ProfilePage(),
-                ),
+                GoRoute(path: '/profile', builder: (context, state) => const ProfilePage(), routes: [
+                  GoRoute(
+                      path: "activities",
+                      builder: (BuildContext context, GoRouterState state) => const ActivitiesPage(),
+                      routes: [
+                        GoRoute(
+                          path: ':id/items',
+                          builder: (BuildContext context, GoRouterState state) {
+                            return ActivityItemsPage(activityId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
+                          },
+                        ),
+                        GoRoute(
+                          path: 'createActivity',
+                          builder: (BuildContext context, GoRouterState state) => const CreateActivityPage(),
+                        ),
+                      ]),
+                  GoRoute(
+                    path: 'theme',
+                    pageBuilder: (context, state) {
+                      return CustomTransitionPage(
+                        key: state.pageKey,
+                        child: const ThemePickerPage(),
+                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                          // Animate from the bottom up
+                          const begin = Offset(0.0, 1.0);
+                          const end = Offset.zero;
+                          const curve = Curves.easeInOut;
+                          final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                          return SlideTransition(position: animation.drive(tween), child: child);
+                        },
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'language',
+                    pageBuilder: (context, state) {
+                      return CustomTransitionPage(
+                        key: state.pageKey,
+                        child: const LanguagePickerPage(),
+                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                          // Animate from the bottom up
+                          const begin = Offset(0.0, 1.0);
+                          const end = Offset.zero;
+                          const curve = Curves.easeInOut;
+                          final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                          return SlideTransition(position: animation.drive(tween), child: child);
+                        },
+                      );
+                    },
+                  ),
+                ]),
               ],
             ),
 
             // Branch 3: Admin
             StatefulShellBranch(
+              navigatorKey: _shellNavigatorAdminKey,
               routes: [
                 GoRoute(
                   path: '/admin',
@@ -91,8 +144,32 @@ final routerProvider = Provider<GoRouter>((ref) {
                 ),
               ],
             ),
+
+            StatefulShellBranch(
+              navigatorKey: _shellNavigatorStatusKey,
+              routes: [
+                GoRoute(path: '/status', builder: (context, state) => StatusPage()),
+              ],
+            ),
           ],
         ),
+        GoRoute(
+          path: '/tos',
+          builder: (context, state) => const ToSPage(),
+        ),
+        GoRoute(
+          path: '/privacy',
+          builder: (context, state) => const PrivacyPolicy(),
+        ),
+        GoRoute(path: "/balance/topUp", builder: (BuildContext context, GoRouterState state) => TopUpPage(), routes: [
+          GoRoute(
+              path: "success/:checkout_reference",
+              builder: (BuildContext context, GoRouterState state) {
+                return PaymentSuccessPage(
+                  checkoutReference: state.pathParameters["checkout_reference"],
+                );
+              }),
+        ]),
         GoRoute(
             path: "/donate/:id",
             builder: (BuildContext context, GoRouterState state) => DonatePage(
@@ -102,7 +179,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                   path: "success/:checkout_reference",
                   builder: (BuildContext context, GoRouterState state) {
-                    return PaymentSuccessPage(
+                    return DonatePaymentSuccessPage(
                       checkoutReference: state.pathParameters["checkout_reference"],
                     );
                   }),
@@ -115,34 +192,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           )),
         ),
         GoRoute(
-            path: '/profile/changePassword',
+            path: '/change-password',
             builder: (BuildContext context, GoRouterState state) {
               return const ChangePasswordPage();
             }),
-        GoRoute(
-            path: '/profile/bufe/:id',
-            builder: (BuildContext context, GoRouterState state) {
-              return BufePage(
-                onTrack: true,
-                userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-              );
-            },
-            routes: [
-              GoRoute(path: "orderItems", builder: (BuildContext context, GoRouterState state) => OrderItems()),
-              GoRoute(
-                  path: "cardFill",
-                  builder: (BuildContext context, GoRouterState state) {
-                    return CardFillPage(userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
-                  },
-                  routes: [
-                    GoRoute(
-                        path: "success/:checkout_reference(.*)",
-                        builder: (BuildContext context, GoRouterState state) {
-                          return PaymentSuccessPage(checkoutReference: state.pathParameters["checkout_reference"]);
-                        }),
-                  ])
-            ]),
-        GoRoute(path: "/donation", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
         GoRoute(path: "/admin/activities", builder: (BuildContext context, GoRouterState state) => const ActivitiesPage()),
         GoRoute(
             path: "/admin/createTransaction",
@@ -188,38 +241,37 @@ final routerProvider = Provider<GoRouter>((ref) {
                 },
               ),
             ]),
-        GoRoute(
-          path: '/createActivity',
-          builder: (BuildContext context, GoRouterState state) => const CreateActivityPage(),
-        ),
-        GoRoute(
-          path: '/activity/:id',
-          builder: (BuildContext context, GoRouterState state) {
-            return ActivityItemsLayout(activityId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
-          },
-        ),
+
+
         GoRoute(
           path: '/mentees',
           builder: (BuildContext context, GoRouterState state) {
             return const MenteesPage();
           },
         ),
-        GoRoute(path: "/activities", builder: (BuildContext context, GoRouterState state) => const ActivitiesPage())
       ],
       redirect: (BuildContext context, GoRouterState state) async {
-        final bool loggedIn = userNotifier.user != null;
-        final bool loggingIn = state.matchedLocation == '/login';
+        var user = userNotifier.user;
+        final bool loggedIn = user != null;
 
-        // 1. If not logged in and not on home, force go home
-        if (!loggedIn) {
-          return loggingIn ? null : '/login';
+        // Use startsWith to catch sub-routes like /donate/12/success/...
+        final bool isPublicRoute = state.matchedLocation.startsWith('/login') ||
+            state.matchedLocation.startsWith('/tos') ||
+            state.matchedLocation.startsWith('/privacy') ||
+            state.matchedLocation.startsWith('/donate'); // Crucial for your success page
+
+        if (loggedIn && !user.changedPassword) {
+          return '/change-password';
         }
 
-        // 2. If logged in and trying to go home, send to status
-        // if (loggingIn) {
-        //   return '/status';
-        // }
+        // If the user isn't logged in AND it's not a public route, kick to login
+        if (!loggedIn && !isPublicRoute) {
+          return '/login';
+        }
 
+        if (loggedIn && state.matchedLocation == '/') {
+          return '/balance';
+        }
         return null;
       });
 });
@@ -248,66 +300,56 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
       body: navigationShell, // The navigation shell contains the page for the current branch
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainer,
-          // Use theme's card color
-          borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
-          // Standard card corner radius
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
           boxShadow: [
             BoxShadow(
-              // The key to a top shadow is a negative y-offset
-              offset: const Offset(0, -5),
-              blurRadius: 10.0, // How soft the shadow is
+              blurRadius: 5.0, // How soft the shadow is
               spreadRadius: 0, // How far the shadow extends
               color: Colors.black.withValues(alpha: 0.15), // Shadow color
             ),
           ],
         ),
         child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
           enableFeedback: false,
           backgroundColor: Colors.transparent,
           elevation: 0,
           currentIndex: navigationShell.currentIndex,
-          items: user == null
-              ? noUserScreens()
-              : user.isUser()
-                  ? userScreens()
-                  : adminScreens(),
+          items: user!.isUser() ? userScreens() : adminScreens(),
           onTap: _goBranch,
         ),
       ),
     );
   }
 
-  List<BottomNavigationBarItem> noUserScreens() => <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.run_circle_rounded),
-            icon: const Icon(Icons.run_circle_outlined),
-            label: 'myshare_status_status'.i18n()),
-        BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.login), icon: const Icon(Icons.login_outlined), label: 'login_title'.i18n()),
-      ];
-
   List<BottomNavigationBarItem> userScreens() => <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.run_circle_rounded),
-            icon: const Icon(Icons.run_circle_outlined),
-            label: 'myshare_status_status'.i18n()),
+            activeIcon: const Icon(Icons.account_balance_wallet),
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            label: 'nav_bar_home'.i18n()),
+        // BottomNavigationBarItem(
+        //     activeIcon: const Icon(Icons.bar_chart), icon: const Icon(Icons.bar_chart_outlined), label: 'nav_bar_status'.i18n()),
         BottomNavigationBarItem(
             activeIcon: const Icon(Icons.person_2_rounded),
             icon: const Icon(Icons.person_2_outlined),
-            label: 'profile_title'.i18n()),
+            label: 'nav_bar_profile'.i18n()),
       ];
 
   List<BottomNavigationBarItem> adminScreens() => <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.run_circle_rounded),
-            icon: const Icon(Icons.run_circle_outlined),
-            label: 'myshare_status_status'.i18n()),
+            activeIcon: const Icon(Icons.account_balance_wallet),
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            label: 'nav_bar_home'.i18n()),
         BottomNavigationBarItem(
             activeIcon: const Icon(Icons.person_2_rounded),
             icon: const Icon(Icons.person_2_outlined),
-            label: 'profile_title'.i18n()),
-        const BottomNavigationBarItem(
-            activeIcon: Icon(Icons.admin_panel_settings), icon: Icon(Icons.admin_panel_settings_outlined), label: 'Admin')
+            label: 'nav_bar_profile'.i18n()),
+        // BottomNavigationBarItem(
+        //     activeIcon: const Icon(Icons.bar_chart), icon: const Icon(Icons.bar_chart_outlined), label: 'nav_bar_status'.i18n()),
+        BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.admin_panel_settings),
+            icon: const Icon(Icons.admin_panel_settings_outlined),
+            label: 'nav_bar_admin'.i18n())
       ];
 }

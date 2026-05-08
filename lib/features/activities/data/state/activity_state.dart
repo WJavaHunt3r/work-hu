@@ -1,5 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/features/activities/data/model/activity_filter.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 
 part 'activity_state.freezed.dart';
@@ -8,21 +11,8 @@ part 'activity_state.freezed.dart';
 abstract class ActivityState with _$ActivityState {
   const factory ActivityState(
       {@Default([]) List<ActivityModel> activities,
-      @Default(ModelState.empty) ModelState modelState,
-      @Default(false) bool isExpanded,
-      @Default(ModelState.empty) ModelState registerState,
-      DateTime? referenceDate,
-      @Default("") String message}) = _ActivityState;
+      @Default(ActivityFilter()) ActivityFilter filter,
+      @Default(BaseListState()) BaseListState status}) = _ActivityState;
 
   const ActivityState._();
-
-  List<ActivityModel> getMyActivities(num userId, {bool? registeredInApp = false}) {
-    return activities
-        .where((a) => a.createUser.id == userId || a.responsible.id == userId && a.registeredInApp == registeredInApp)
-        .toList();
-  }
-
-  List<ActivityModel> queryActivities(String pattern) {
-    return activities.where((a) => a.toString().contains(pattern)).toList();
-  }
 }
