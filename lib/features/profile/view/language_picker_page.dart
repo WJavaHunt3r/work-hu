@@ -9,6 +9,8 @@ import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/features/home/data/state/home_state.dart';
 import 'package:work_hu/features/home/providers/home_provider.dart';
 
+import '../../../app/widgets/base_list_item.dart';
+
 class LanguagePickerPage extends BasePage {
   const LanguagePickerPage({super.key, super.title = "settings_language"});
 
@@ -31,16 +33,18 @@ class LanguagePickerPageState extends BasePageState<LanguagePickerPage, HomeStat
       children: [
         ...supportedLocales.map((Locale e) {
           var native = LocaleNamesLocalizationsDelegate.nativeLocaleNames["${e.languageCode}_${e.countryCode}"];
-          return ListTile(
+          return BaseListTile(
             title: Text("${localeNames.nameOf(e.languageCode)}"),
             subtitle: Text(
               "${native?.substring(0, native.indexOf(" ("))}",
-              style: Theme.of(context).textTheme.bodySmall,
             ),
             onTap: () {
               localeNotifier.setLocale(Locale(e.languageCode, e.countryCode));
             },
+            selected: currentLocale.value == e,
             trailing: currentLocale.value == e ? const Icon(Icons.check) : null,
+            isLast: supportedLocales.indexOf(e) == supportedLocales.length - 1,
+            index: supportedLocales.indexOf(e),
           );
         }),
       ],

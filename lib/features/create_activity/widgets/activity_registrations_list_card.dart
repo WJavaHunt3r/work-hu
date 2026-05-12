@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
@@ -10,19 +12,16 @@ class ActivityRegistrationListCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var items = ref.watch(createActivityDataProvider).activityItems;
-    return LegacyBaseListView(
-      itemCount: ref.watch(createActivityDataProvider).activityItems.length,
+    return BaseListView(
       physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemBuilder: (BuildContext context, int index) {
-        var user = items[index].userName;
+      children: items.map((e) {
+        var user = e.userName;
         return RegistrationRowWidget(
             name: user,
-            index: index,
-            isLast: index == ref.watch(createActivityDataProvider).activityItems.length - 1,
-            value: items[index].hours);
-      },
-      children: [],
+            index: items.indexOf(e),
+            isLast: items.indexOf(e) == ref.watch(createActivityDataProvider).activityItems.length - 1,
+            value: e.hours);
+      }).toList(),
     );
   }
 }

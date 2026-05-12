@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 
+import 'base_list_item.dart';
 import 'base_list_view.dart';
 
 abstract class BaseFilterChip<T> extends ConsumerStatefulWidget {
@@ -52,7 +53,7 @@ abstract class BaseFilterChipState<T, W extends BaseFilterChip<T>> extends Consu
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: FilterChip(
-          selectedColor: Theme.of(context).colorScheme.primary,
+          selectedColor: Theme.of(context).colorScheme.secondary,
           label: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -199,16 +200,16 @@ class DialogFilterChipState<T> extends BaseFilterChipState<T, DialogFilterChip<T
                     return BaseListView(
                       physics: const NeverScrollableScrollPhysics(),
                       children: items
-                          .map((e) => ListTile(
-                                title: widget.title(e),
+                          .map((e) => BaseListTile(
                                 selected: selectedItem == e || widget.initialValue == e,
-                                // tileColor:
-                                //      ? Theme.of(context).colorScheme.primary : null,
+                                title: widget.title(e),
                                 onTap: () {
                                   selectedItem = e;
                                   Navigator.of(context).pop();
                                   widget.onItemSelected(e);
                                 },
+                                isLast: items.indexOf(e) == items.length,
+                                index: items.indexOf(e),
                               ))
                           .toList(),
                     );

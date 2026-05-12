@@ -5,9 +5,9 @@ import 'package:work_hu/features/activity_items/data/api/activity_items_api.dart
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 
 class ActivityItemsRepository {
-  final ActivityItemsApi _activityApi;
+  final ActivityItemsApi _activityItemsApi;
 
-  ActivityItemsRepository(this._activityApi);
+  ActivityItemsRepository(this._activityItemsApi);
 
   Future<PaginatedResponse<ActivityItemsModel>> getActivityItems(
       {num? activityId,
@@ -19,7 +19,7 @@ class ActivityItemsRepository {
       int? page,
       SortBuilder? sort}) async {
     try {
-      final res = await _activityApi.getActivityItems(
+      final res = await _activityItemsApi.getActivityItems(
           activityId: activityId,
           userId: userId,
           registeredInApp: registeredInApp,
@@ -40,7 +40,7 @@ class ActivityItemsRepository {
 
   Future<ActivityItemsModel> getActivityItem(num activityItemId) async {
     try {
-      final res = await _activityApi.getActivityItem(activityItemId);
+      final res = await _activityItemsApi.getActivityItem(activityItemId);
       return ActivityItemsModel.fromJson(res);
     } catch (e) {
       rethrow;
@@ -49,7 +49,7 @@ class ActivityItemsRepository {
 
   Future<String> postActivityItems(List<ActivityItemsModel> activityItems) async {
     try {
-      final res = await _activityApi.postActivityItems(activityItems.map((e) => e.toJson()).toList());
+      final res = await _activityItemsApi.postActivityItems(activityItems.map((e) => e.toJson()).toList());
       return res;
     } catch (e) {
       rethrow;
@@ -58,7 +58,7 @@ class ActivityItemsRepository {
 
   Future<ActivityItemsModel> postActivityItem(ActivityItemsModel activity) async {
     try {
-      final res = await _activityApi.postActivityItem(activity);
+      final res = await _activityItemsApi.postActivityItem(activity);
       return ActivityItemsModel.fromJson(res);
     } catch (e) {
       rethrow;
@@ -67,16 +67,16 @@ class ActivityItemsRepository {
 
   Future<ActivityItemsModel> putActivityItems(ActivityItemsModel activity, num activityId) async {
     try {
-      final res = await _activityApi.putActivityItems(activity, activityId);
+      final res = await _activityItemsApi.putActivityItems(activity, activityId);
       return ActivityItemsModel.fromJson(res);
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<String> deleteActivityItems(num activityId, userId) async {
+  Future<String> deleteActivityItems(num activityItemId, userId) async {
     try {
-      final res = await _activityApi.deleteActivityItems(activityId, userId);
+      final res = await _activityItemsApi.deleteActivityItems(activityItemId, userId);
       return res;
     } catch (e) {
       rethrow;

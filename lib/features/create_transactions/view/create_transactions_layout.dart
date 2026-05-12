@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
 import 'package:work_hu/features/create_transactions/widget/add_transaction_card.dart';
 import 'package:work_hu/features/create_transactions/widget/transaction_details_card.dart';
@@ -17,12 +20,14 @@ class CreateTransactionsLayout extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     Future(() => ref.read(createTransactionsDataProvider).creationState == ModelState.success ? context.pop() : null);
     return Stack(children: [
-      Column(
-          children: ref.watch(createTransactionsDataProvider.notifier).descriptionController.value.text.isEmpty
-              ? [
-                  const TransactionDetailsCard(),
-                ]
-              : enabledWidgets(context, ref)),
+      SingleChildScrollView(
+        child: Column(
+            children: ref.watch(createTransactionsDataProvider.notifier).descriptionController.value.text.isEmpty
+                ? [
+                    const TransactionDetailsCard(),
+                  ]
+                : enabledWidgets(context, ref)),
+      ),
       ref.watch(createTransactionsDataProvider).modelState == ModelState.loading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -37,35 +42,30 @@ class CreateTransactionsLayout extends ConsumerWidget {
     var account = ref.watch(createTransactionsDataProvider).account;
     return [
       const TransactionDetailsCard(),
+      SizedBox(height: 16.sp),
       TransactionSumCard(items: items),
+      SizedBox(height: 16.sp),
       AddTransactionCard(
         account: account,
       ),
-      Expanded(
-        child: SingleChildScrollView(
-            child: Card(
-          margin: EdgeInsets.only(bottom: 8.sp, top: 8.sp),
-          color: Colors.transparent,
-          child: ListView.builder(
-            itemCount: ref.watch(createTransactionsDataProvider).transactionItems.length,
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemBuilder: (BuildContext context, int index) {
-              var user = items[index].user;
-              return TransactionRowWidget(
-                name: user.getFullName(),
-                index: index,
-                isLast: index == ref.watch(createTransactionsDataProvider).transactionItems.length - 1,
-                value: transactionType == TransactionType.HOURS
-                    ? items[index].hours
-                    : transactionType == TransactionType.CREDIT
-                        ? items[index].credit
-                        : items[index].points,
-              );
-            },
-          ),
-        )),
-      )
+      SizedBox(height: 16.sp),
+      Column(
+        children: items.map(
+          (e) {
+            return TransactionRowWidget(
+              name: e.userName,
+              index: items.indexOf(e),
+              isLast: items.indexOf(e) == items.length - 1,
+              value: transactionType == TransactionType.HOURS
+                  ? e.hours
+                  : transactionType == TransactionType.CREDIT
+                      ? e.credit
+                      : e.points,
+            );
+          },
+        ).toList(),
+      ),
+      SizedBox(height: 180.sp),
     ];
   }
 }

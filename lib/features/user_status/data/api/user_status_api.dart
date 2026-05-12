@@ -1,4 +1,3 @@
-import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/app/locator.dart';
 
 import '../../../../api/dio_client.dart';
@@ -13,13 +12,13 @@ class UserStatusApi {
     num? teamId, {
     required int page,
     required int size,
-    required SortBuilder sort,
+    required List<String> sort,
   }) async {
     try {
       final res = await _dioClient.dio.get("/userStatus", queryParameters: {
         "seasonYear": seasonYear, "teamId": teamId, "page": page, // The page index (starts at 0 by default)
         "size": size, // How many items per page
-        "sort": sort.build(),
+        "sort": sort,
       });
       return res.data;
     } catch (e) {

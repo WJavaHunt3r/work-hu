@@ -28,7 +28,7 @@ class PaymentDataNotifier extends BaseDataNotifier<PaymentsState> implements Lis
   final DonateRepository donateRepository;
 
   @override
-  Future<void> list({filter, int? page, int? size, String? sort}) async {
+  Future<void> list({filter, int? page, int? size, List<String>? sort}) async {
     executeApiCall<List<PaymentsModel>>(
         () => paymentRepository.getPayments(
             userId: state.userId,

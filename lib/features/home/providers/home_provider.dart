@@ -14,7 +14,6 @@ import 'package:work_hu/features/donation/providers/donation_provider.dart';
 import 'package:work_hu/features/home/data/state/home_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
-import 'package:work_hu/features/users/data/state/users_state.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 
 final homeDataProvider = StateNotifierProvider.autoDispose<HomeDataNotifier, HomeState>(
@@ -37,8 +36,8 @@ class HomeDataNotifier extends BaseDataNotifier<HomeState> {
     var userId = _currentUser!.id;
     executeApiCall<SumupUserModel>(() => _bufeRepository.getAccount(userId), onSuccess: (data) async {
       state = state.copyWith(account: data);
+      if (state.familiyAccounts.isEmpty) getFamily(userId);
       getOrders(userId);
-      getFamily(userId);
     }, onError: (data) async {
       if (data.contains("404")) {
         executeApiCall<SumupUserModel>(
@@ -65,6 +64,7 @@ class HomeDataNotifier extends BaseDataNotifier<HomeState> {
     executeApiCall<List<UserModel>?>(() => _usersRepository.getChildren(userId), onSuccess: (data) async {
       if (data != null) {
         executeApiCall<String?>(() async {
+          state = state.copyWith(familiyAccounts: []);
           for (var user in data) {
             _bufeRepository.getAccount(user.id).then((r) {
               state = state.copyWith(familiyAccounts: [...state.familiyAccounts, r]);

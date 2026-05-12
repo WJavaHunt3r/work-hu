@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/title_provider.dart';
@@ -23,9 +24,12 @@ abstract class BasePage extends ConsumerStatefulWidget {
 }
 
 abstract class BasePageState<P extends BasePage, S extends dynamic, N extends StateNotifier<S>> extends ConsumerState<P> {
+
+  late final ScrollController _scrollController;
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       postInit(ref);
     });
@@ -42,49 +46,66 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
       if (status.modelState.isError) {
         Utils.showErrorDialog(
           context,
-          content: status.message,
+          content: status.message.i18n(),
         );
       }
     });
     return PopScope(
-      canPop: widget.canPop,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        confirmExit();
-      },
-      child: Scaffold(
-        extendBodyBehindAppBar: !widget.hasAppBar,
-        resizeToAvoidBottomInset: false,
-        persistentFooterButtons: buildPersistentFooterButtons(context, ref),
-        persistentFooterDecoration: BoxDecoration(),
-        persistentFooterAlignment: AlignmentDirectional.bottomCenter,
-        bottomNavigationBar: buildBottomNavigationBar(context, ref),
-        floatingActionButton: buildFloatingActionButton(context, ref),
-        appBar: !widget.hasAppBar
-            ? null
-            : AppBar(
-                automaticallyImplyLeading: true,
-                title: (widget.title is Widget
-                    ? widget.title as Widget
-                    : Text(((widget.title) as String).i18n(),
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold))),
-                leadingWidth: 80.sp,
-                leading: widget.leading,
-                actions: buildActions(context, ref),
-                actionsPadding: EdgeInsets.symmetric(horizontal: 12.sp),
-              ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-                child: SingleChildScrollView(
-                  controller: getController(),
-                    child: Padding(padding: EdgeInsets.only(left: 24.sp, right: 24.sp, top: 8.sp,  bottom: 8.sp), child: buildLayout())))
-          ],
-        ),
-      ),
-    );
+        canPop: widget.canPop,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          confirmExit();
+        },
+        child: Scaffold(
+          extendBodyBehindAppBar: !widget.hasAppBar,
+          resizeToAvoidBottomInset: true,
+          persistentFooterButtons: buildPersistentFooterButtons(context, ref),
+          persistentFooterDecoration: const BoxDecoration(),
+          persistentFooterAlignment: AlignmentDirectional.bottomCenter,
+          bottomNavigationBar: buildBottomNavigationBar(context, ref),
+          floatingActionButton: buildFloatingActionButton(context, ref),
+          appBar: !widget.hasAppBar
+              ? null
+              : AppBar(
+                  automaticallyImplyLeading: true,
+                  title: (widget.title is Widget
+                      ? widget.title as Widget
+                      : Text(((widget.title) as String).i18n(),
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold))),
+                  leadingWidth: 80.sp,
+                  leading: widget.leading,
+                  actions: buildActions(context, ref),
+                  actionsPadding: EdgeInsets.symmetric(horizontal: 12.sp),
+                ),
+          body: RefreshIndicator(
+            onRefresh: () async {
+              onRefresh();
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (ScrollNotification scrollInfo) {
+                        if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent - 200) {
+                          onScroll(); // A fenti logikával
+                        }
+                        return true;
+                      },
+                      child: SingleChildScrollView(
+                        controller:  _scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(), // Ez kell az iOS bounce miatt!
+                        child: Padding(
+                          padding:  EdgeInsets.symmetric(horizontal: 8.sp, vertical: 16.sp),
+                          child: buildLayout(),
+                        ),
+                      ),
+                    ))
+              ],
+            ),
+          ),
+        ));
   }
 
   void postInit(WidgetRef ref) {}
@@ -117,7 +138,7 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
           title: "base_exit",
           content: "base_exit_question",
           onConfirm: () {
-            Navigator.of(dialogContext).pop(true);
+            dialogContext.pop();
           },
         );
       },
@@ -130,7 +151,13 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
     return [];
   }
 
-  ScrollController? getController() {}
+  void onRefresh() {}
+
+  ScrollController getController() {
+    return _scrollController;
+  }
+
+  void onScroll() {}
 }
 
 abstract class LegacyBasePage extends ConsumerWidget {

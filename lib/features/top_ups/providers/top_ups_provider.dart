@@ -26,7 +26,7 @@ class TopUpsDataNotifier extends BaseDataNotifier<TopUpsState> implements ListAp
   final UserModel? currentUser = locator<UserProvider>().user;
 
   @override
-  Future<void> list({num? filter, int? page, int? size, String? sort}) async {
+  Future<void> list({num? filter, int? page, int? size, List<String>? sort}) async {
     executeApiCall<TopUpResponse?>(() => _bufeRepository.getPayments(userId: filter ?? 0), onSuccess: (data) async {
       state = state.copyWith(
           topUps: data?.items ?? [],

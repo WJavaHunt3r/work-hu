@@ -37,7 +37,7 @@ class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> 
     state = state.copyWith(modelState: ModelState.loading, transactionItems: []);
     try {
       await transactionItemsRepository.getTransactionItems(transactionId: transactionId).then((data) async {
-        data.sort((a, b) => b.user.lastname.compareTo(a.user.lastname));
+        data.sort((a, b) => b.userName.compareTo(a.userName));
         state = state.copyWith(transactionItems: data, modelState: ModelState.success);
       });
     } catch (e) {
@@ -73,7 +73,9 @@ class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> 
     var list = <TransactionItemModel>[];
     DateTime date = DateTime.now();
     String desc = "";
+    var users = <UserModel>[];
     for (var item in state.transactionItems) {
+      users.add(await usersRepository.getUserById(item.userId));
       date = item.transactionDate;
       desc = item.description;
       list.add(TransactionItemModel(
@@ -95,8 +97,9 @@ class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> 
                               ? item.credit
                               : 0,
           hours: item.hours,
-          user: item.user));
+          userName: item.userName,
+          userId: item.userId));
     }
-    Utils.createCreditCsv(list, date, desc);
+    Utils.createCreditCsv(list, date, desc, users);
   }
 }

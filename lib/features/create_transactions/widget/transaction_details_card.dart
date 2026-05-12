@@ -1,7 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:work_hu/app/widgets/base_container.dart';
+import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
 
 class TransactionDetailsCard extends ConsumerWidget {
@@ -9,27 +10,24 @@ class TransactionDetailsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.all(8.sp),
-        child: Column(
-          children: [
-            TextField(
-              controller: ref.watch(createTransactionsDataProvider.notifier).dateController,
-              decoration: InputDecoration(
-                  labelText: "Transaction Date",
-                  suffixIcon: IconButton(
-                    onPressed: () => _selectDate(context, ref),
-                    icon: const Icon(Icons.calendar_month),
-                  )),
+    return BaseContainer(
+      padding: EdgeInsets.all(8.sp),
+      child: Column(
+        children: [
+          BaseTextFormField(
+            controller: ref.watch(createTransactionsDataProvider.notifier).dateController,
+            labelText: "Transaction Date",
+            suffix: IconButton(
+              onPressed: () => _selectDate(context, ref),
+              icon: const Icon(Icons.calendar_month),
             ),
-            SizedBox(height: 5.sp),
-            TextField(
-              controller: ref.watch(createTransactionsDataProvider.notifier).descriptionController,
-              decoration: const InputDecoration(labelText: "Description"),
-            )
-          ],
-        ),
+          ),
+          SizedBox(height: 5.sp),
+          BaseTextFormField(
+            controller: ref.watch(createTransactionsDataProvider.notifier).descriptionController,
+            labelText: "Description",
+          )
+        ],
       ),
     );
   }

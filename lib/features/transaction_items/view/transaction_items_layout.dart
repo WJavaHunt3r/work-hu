@@ -78,7 +78,7 @@ class TransactionsLayout extends ConsumerWidget {
                                   child: BaseListTile(
                                       isLast: isLast,
                                       index: index,
-                                      title: Text(current.user.getFullName()),
+                                      title: Text(current.userName),
                                       trailing: Text(
                                         createTrailingText(current),
                                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),

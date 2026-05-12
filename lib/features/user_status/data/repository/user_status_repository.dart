@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
-import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 
 import '../api/user_status_api.dart';
 import '../model/user_status_model.dart';
@@ -15,7 +14,7 @@ class UserStatusRepository {
     num? teamId, {
     required int page,
     required int size,
-    required SortBuilder sort,
+    required List<String> sort,
   }) async {
     try {
       final res = await _userStatusApi.getUserStatuses(seasonYear, teamId, page: page, size: size, sort: sort);

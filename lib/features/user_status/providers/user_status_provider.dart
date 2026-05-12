@@ -3,9 +3,9 @@ import 'package:work_hu/app/framework/base_components/base_page_components/base_
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/framework/base_components/sort_builder.dart';
-import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/widgets/base_sort_widget.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/user_status/data/model/user_status_model.dart';
@@ -24,36 +24,36 @@ final userStatusDataProvider =
           ref.read(userStatusRepoProvider),
         ));
 
-class UserStatusDataNotifier extends BaseDataNotifier<UserStatusState> implements ListApiProvider<TeamModel> {
+class UserStatusDataNotifier extends BaseDataNotifier<UserStatusState> implements ListApiProvider<dynamic> {
   UserStatusDataNotifier(this.currentUser, this.userStatusRepoProvider) : super(const UserStatusState()) {
-    list();
+    state = state.copyWith(
+        status: state.status.copyWith(sortParameters: [
+      SortItem(label: "status_filter_name", values: ["user.lastname", "user.firstname"], descending: false),
+      SortItem(label: "status_filter_name", values: ["user.lastname", "user.firstname"], descending: true),
+      SortItem(label: "status_filter_status", values: ["status"], descending: false),
+      SortItem(label: "status_filter_status", values: ["status"], descending: true)
+    ]));
+    // list();
   }
 
   final UserModel? currentUser;
   final UserStatusRepository userStatusRepoProvider;
 
   @override
-  Future<void> list({TeamModel? filter, int? page, int? size, String? sort}) async {
-    var sort = SortBuilder()
-      ..add("user.lastname", descending: false)
-      ..add("user.firstname", descending: false);
+  Future<void> list({dynamic filter, int? page, int? size, List<String>? sort}) async {
     await executeApiCall<PaginatedResponse<UserStatusModel>>(
         () => userStatusRepoProvider.getUserStatuses(DateTime.now().year, null,
-            page: page ?? state.status.number, size: size ?? state.status.size, sort: sort), onSuccess: (data) async {
+            page: page ?? state.status.number,
+            size: size ?? state.status.size,
+            sort: sort ?? state.status.sort), onSuccess: (data) async {
       state = state.copyWith(
-          userStatuses: [...state.userStatuses, ...data.content],
-          status: state.status
-              .copyWith(totalElements: data.page.totalElements, number: data.page.number, totalPages: data.page.totalPages));
+          userStatuses: page == 0 ? data.content : [...state.userStatuses, ...data.content],
+          status: state.status.copyWith(
+              totalElements: data.page.totalElements,
+              number: data.page.number,
+              totalPages: data.page.totalPages,
+              sort: sort ?? state.status.sort));
     });
-  }
-
-  setSelectedFilter(TeamModel? team) {
-    state = state.copyWith(selectedTeamId: team == null ? 0 : team.id);
-    list(filter: team);
-  }
-
-  setSelectedOrderType(OrderByType orderByType) {
-    state = state.copyWith(selectedOrderType: orderByType);
   }
 
   Future<void> recalculate() async {
@@ -69,5 +69,3 @@ class UserStatusDataNotifier extends BaseDataNotifier<UserStatusState> implement
     return state.copyWith(status: state.status.copyWith(baseStatus: status));
   }
 }
-
-enum OrderByType { NAME, STATUS, NONE }

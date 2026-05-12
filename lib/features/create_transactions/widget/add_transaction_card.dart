@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/base_container.dart';
+import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/app/widgets/work_drop_down_dearch_form_field.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/profile/widgets/info_card.dart';
+import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
+import 'package:work_hu/features/user_combo/view/user_combo.dart';
 import 'package:work_hu/features/utils.dart';
 
 class AddTransactionCard extends ConsumerWidget {
@@ -20,90 +25,40 @@ class AddTransactionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var isError = ref
-        .watch(createTransactionsDataProvider)
-        .modelState == ModelState.error;
-    return InfoCard(
-        padding: 8.sp,
-        height: isError ? 210.sp : 130.sp,
+    var isError = ref.watch(createTransactionsDataProvider).modelState == ModelState.error;
+    return BaseContainer(
+        padding: EdgeInsets.all(8.sp),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            WorkDropDownSearchFormField<UserModel>(
-              focusNode: ref
-                  .watch(createTransactionsDataProvider.notifier)
-                  .usersFocusNode,
-              direction: AxisDirection.up,
-              controller: ref
-                  .read(createTransactionsDataProvider.notifier)
-                  .userController,
-              autofocus: true,
-              onSuggestionSelected: (UserModel suggestion) =>
+            UserComboWidget(
+              controller: ref.watch(createTransactionsDataProvider.notifier).userController,
+              onSuggestionSelected: (UserComboModel suggestion) =>
                   ref.read(createTransactionsDataProvider.notifier).updateSelectedUser(suggestion),
-              itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
-              suggestionsCallback: (String pattern) =>
-                  ref.read(createTransactionsDataProvider.notifier).filterUsers(pattern),
+              labelText: "create_activity_user".i18n(),
             ),
             SizedBox(height: 10.sp),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
-                    width: 150.sp,
-                    child: TextField(
-                      controller: ref
-                          .read(createTransactionsDataProvider.notifier)
-                          .valueController,
-                      keyboardType: TextInputType.number,
-                      focusNode: ref
-                          .read(createTransactionsDataProvider.notifier)
-                          .valueFocusNode,
+                  width: 150.sp,
+                  child: BaseTextFormField(
+                      controller: ref.read(createTransactionsDataProvider.notifier).valueController,
+                      keyBoardType: TextInputType.number,
+                      focusNode: ref.read(createTransactionsDataProvider.notifier).valueFocusNode,
                       textInputAction: TextInputAction.send,
-                      onSubmitted: ref
-                          .watch(createTransactionsDataProvider)
-                          .selectedUser != null &&
-                          ref
-                              .watch(createTransactionsDataProvider.notifier)
-                              .valueController
-                              .value
-                              .text
-                              .isNotEmpty
+                      onFieldSubmitted: ref.watch(createTransactionsDataProvider).selectedUser != null &&
+                              ref.watch(createTransactionsDataProvider.notifier).valueController.value.text.isNotEmpty
                           ? (text) => ref.read(createTransactionsDataProvider.notifier).addTransaction()
                           : null,
-                      decoration: InputDecoration(
-                          labelText:
-                          Utils.getTransactionTypeText(ref
-                              .watch(createTransactionsDataProvider)
-                              .transactionType)),
-                    )),
+                      labelText: Utils.getTransactionTypeText(ref.watch(createTransactionsDataProvider).transactionType)),
+                ),
                 TextButton(
-                    onPressed: ref
-                        .watch(createTransactionsDataProvider)
-                        .selectedUser != null &&
-                        ref
-                            .watch(createTransactionsDataProvider.notifier)
-                            .valueController
-                            .value
-                            .text
-                            .isNotEmpty
+                    onPressed: ref.watch(createTransactionsDataProvider).selectedUser != null &&
+                            ref.watch(createTransactionsDataProvider.notifier).valueController.value.text.isNotEmpty
                         ? () => ref.read(createTransactionsDataProvider.notifier).addTransaction()
                         : null,
-                    // style: ButtonStyle(
-                    //   side: WidgetStateBorderSide.resolveWith(
-                    //     (states) {
-                    //       if (states.contains(WidgetState.disabled)) {
-                    //         return BorderSide(color: Colors.grey.shade300, width: 2.sp);
-                    //       }
-                    //       return BorderSide(color: AppColors.primary, width: 2.sp);
-                    //     },
-                    //   ),
-                    //   backgroundColor: WidgetStateColor.resolveWith((states) {
-                    //     if (states.contains(WidgetState.disabled)) {
-                    //       return Colors.grey.shade300;
-                    //     }
-                    //     return AppColors.primary;
-                    //   }),
-                    // ),
                     child: const Icon(
                       Icons.add,
                       color: AppColors.white,
@@ -112,14 +67,12 @@ class AddTransactionCard extends ConsumerWidget {
             ),
             isError
                 ? Padding(
-              padding: EdgeInsets.only(top: 8.sp, left: 8.sp, right: 8.sp),
-              child: Text(
-                ref
-                    .watch(createTransactionsDataProvider)
-                    .message,
-                style: const TextStyle(color: AppColors.errorRed),
-              ),
-            )
+                    padding: EdgeInsets.only(top: 8.sp, left: 8.sp, right: 8.sp),
+                    child: Text(
+                      ref.watch(createTransactionsDataProvider).message,
+                      style: const TextStyle(color: AppColors.errorRed),
+                    ),
+                  )
                 : const SizedBox(),
           ],
         ));

@@ -20,7 +20,7 @@ class ActivityRepository {
       String? searchText,
       required int page,
       required int size,
-      required SortBuilder sort}) async {
+      required List<String> sort}) async {
     try {
       final res = await _activityApi.getActivities(
           registeredInApp: registeredInApp,

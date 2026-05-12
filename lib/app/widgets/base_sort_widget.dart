@@ -23,7 +23,14 @@ class BaseSortWidgetState extends State<BaseSortWidget> {
   @override
   void initState() {
     super.initState();
-    selected = sortParameters.isNotEmpty ? sortParameters.first : null;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (sortParameters.isNotEmpty) {
+        selected = sortParameters.first;
+        onSelected(selected!);
+      } else {
+        selected = null;
+      }
+    });
   }
 
   @override
@@ -47,11 +54,11 @@ class BaseSortWidgetState extends State<BaseSortWidget> {
                         child: Row(
                           children: [
                             Text(
-                              "${e.label.i18n()} ${"order_by".i18n()} ${e.ascending == "1" ? "asc".i18n() : "desc".i18n()}",
+                              "${e.label.i18n()} ${e.descending ? "base_filter_desc".i18n() : "base_filter_asc".i18n()}",
                               style: const TextStyle(color: Colors.black),
                             ),
                             const Spacer(),
-                            if (e.value == selected?.value && e.ascending == selected?.ascending)
+                            if (e.label == selected?.label && e.descending == selected?.descending)
                               const Icon(
                                 Icons.check,
                                 color: Colors.white,
@@ -66,8 +73,8 @@ class BaseSortWidgetState extends State<BaseSortWidget> {
 
 class SortItem {
   final String label;
-  final String value;
-  final String ascending;
+  final List<String> values;
+  final bool descending;
 
-  SortItem({required this.label, required this.value, required this.ascending});
+  SortItem({required this.label, required this.values, required this.descending});
 }

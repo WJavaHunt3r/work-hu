@@ -361,10 +361,6 @@ class GlobalTheme {
             fontWeight: FontWeight.normal,
             fontSize: 12.sp,
             overflow: TextOverflow.ellipsis),
-        indicator: ShapeDecoration(
-          color: AppColors.primary100,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        ),
       ),
       // dialogTheme: DialogThemeData(
       //   // backgroundColor: AppColors.secondaryGray,
@@ -468,5 +464,5 @@ class GlobalTheme {
           tileColor: Colors.transparent,
           contentPadding:  const EdgeInsets.all(0),
           selectedTileColor: AppColors.primary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.sp.sp)))));
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(24.sp)))));
 }

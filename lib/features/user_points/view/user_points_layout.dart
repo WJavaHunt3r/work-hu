@@ -54,9 +54,7 @@ class UserPointsLayoutState extends ConsumerState<UserPointsLayout> {
   }
 
   num countItems(List<TransactionItemModel> items) {
-    var count = items.map((e) => e.round!.roundNumber).toList().isNotEmpty
-        ? items.map((e) => e.round!.roundNumber).toSet().toList().length
-        : 0;
+    var count = items.map((e) => e.roundId).toList().isNotEmpty ? items.map((e) => e.roundId).toSet().toList().length : 0;
 
     return count;
   }

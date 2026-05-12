@@ -7,12 +7,12 @@ import 'package:work_hu/app/framework/base_components/base_page_components/base_
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/base_filter_chip.dart';
 import 'package:work_hu/features/user_status/data/state/user_status_state.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
 import '../../../app/widgets/base_list_item.dart';
-import '../widgets/base_filter_chip.dart';
 
 class UserStatusPage extends BaseListPage {
   const UserStatusPage({super.key, super.title = "admin_myshare_status"});
@@ -25,7 +25,7 @@ class UserStatusPage extends BaseListPage {
 
 class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusState, UserStatusDataNotifier> {
   @override
-  Widget buildListTiles(item) {
+  Widget buildListTile(item) {
     var index = items.indexOf(item);
     var userStatus = item.status * 100;
 
@@ -48,6 +48,16 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
       title: Text(
         item.name,
       ),
+      leading: item.onTrack
+          ? Icon(
+              Icons.done_outline,
+              size: 24.sp,
+            )
+          : Icon(
+              Icons.close_rounded,
+              color: Theme.of(context).colorScheme.error,
+              size: 24.sp,
+            ),
       subtitle: item.onTrack
           ? const Text(
               "On Track",
@@ -63,7 +73,8 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
         "${Utils.percentFormat.format(userStatus)}%",
         style: Theme.of(context).textTheme.bodyLarge,
       ),
-      tileColor: item.onTrack ? AppColors.primary : null,
+      tileColor:
+          item.onTrack ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.surfaceContainerHighest,
     );
   }
 
@@ -79,23 +90,6 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
         : [];
   }
 
-  // @override
-  // List<BaseFilterChip<dynamic>> buildFilterLayout(BuildContext context, WidgetRef ref) {
-  //   return [
-  //   BaseFilterChip<dynamic>(
-  //     isSelected: ref.watch(userStatusDataProvider).selectedOrderType == OrderByType.NAME,
-  //     title: "myshare_status_name".i18n(),
-  //     onSelected: (bool selected) =>
-  //         ref.watch(userStatusDataProvider.notifier).setSelectedOrderType(selected ? OrderByType.NAME : OrderByType.NONE),
-  //   ),
-  //   BaseFilterChip(
-  //     isSelected: ref.watch(userStatusDataProvider).selectedOrderType == OrderByType.STATUS,
-  //     title: "myshare_status_status".i18n(),
-  //     onSelected: (bool selected) =>
-  //         ref.watch(userStatusDataProvider.notifier).setSelectedOrderType(selected ? OrderByType.STATUS : OrderByType.NONE),
-  //   ),
-  //   ];
-  // }
   @override
   List<dynamic> getFilters() {
     return [];

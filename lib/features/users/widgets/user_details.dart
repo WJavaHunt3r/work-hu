@@ -129,21 +129,22 @@ class UserDetails extends ConsumerWidget {
                               )
                           ],
                         ),
-                        isEnabled
-                            ? WorkDropDownSearchFormField<TeamModel>(
-                                minCharsForSuggestions: 2,
-                                controller: TextEditingController(),
-                                onSuggestionSelected: (value) =>
-                                    ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(paceTeam: value)),
-                                itemBuilder: (context, e) => Text(e.teamName.toString()),
-                                suggestionsCallback: (value) => ref.watch(teamsDataProvider).teams)
-                            : BaseTextFormField(
-                                labelText: "user_details_team".i18n(),
-                                initialValue: user.paceTeam?.teamName ?? "",
-                                keyBoardType: TextInputType.number,
-                                enabled: false,
-                                onChanged: (String text) => null,
-                              ),
+                        // isEnabled
+                        //     ? WorkDropDownSearchFormField<TeamModel>(
+                        //         controller: TextEditingController(),
+                        //         onSuggestionSelected: (value) =>
+                        //             ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(paceTeam: value)),
+                        //         itemBuilder: (context, e) => Text(e.teamName.toString()),
+                        //         suggestionsCallback: (value) => ref.watch(teamsDataProvider).teams,
+                        //         labelText: '',
+                        //       )
+                        //     : BaseTextFormField(
+                        //         labelText: "user_details_team".i18n(),
+                        //         initialValue: user.paceTeam?.teamName ?? "",
+                        //         keyBoardType: TextInputType.number,
+                        //         enabled: false,
+                        //         onChanged: (String text) => null,
+                        //       ),
                         isEnabled
                             ? Padding(
                                 padding: EdgeInsets.only(top: 4.sp, bottom: 4.sp),

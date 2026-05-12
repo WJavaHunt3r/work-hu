@@ -19,6 +19,7 @@ import 'package:work_hu/features/transaction_items/providers/transaction_items_p
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
 import 'package:work_hu/features/transactions/data/repository/transactions_repository.dart';
 import 'package:work_hu/features/transactions/providers/transactions_provider.dart';
+import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 import 'package:work_hu/features/utils.dart';
@@ -43,7 +44,6 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     dateController.addListener(_updateDateAndDescription);
     exchangeController.addListener(_updateState);
     valueController.addListener(_updateState);
-    getUsers();
   }
 
   final UsersRepository usersRepository;
@@ -58,29 +58,6 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   final TransactionItemsRepository transactionItemsRepository;
   late final FocusNode valueFocusNode;
   late final FocusScopeNode usersFocusNode;
-
-  Future<void> getUsers({bool? listO36}) async {
-    var user = currentUser!;
-    // var date = DateFormat("yyyy-MM-dd").parse(
-    //     transactionDate == null || transactionDate.isEmpty ? DateTime.now().toLocal().toString() : transactionDate);
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await usersRepository
-          .getUsers(state.transactionType == TransactionType.BMM_PERFECT_WEEK ? user.paceTeam : null, listO36)
-          .then((data) {
-        state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK
-            ? _createTransactionItems(data)
-            : _clearTransactions();
-        state = state.copyWith(
-          modelState: ModelState.success,
-          creationState: ModelState.empty,
-          users: data,
-        );
-      });
-    } on DioException catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
-  }
 
   Future<void> sendTransactions() async {
     state = state.copyWith(modelState: ModelState.loading);
@@ -106,7 +83,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
             .then((data) {
           if (state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK) {
             _clearAllFields();
-            _createTransactionItems(state.users);
+            // _createTransactionItems(state.users);
           } else {
             _clearAllFields();
           }
@@ -129,19 +106,19 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   }
 
   update({required num userId, double? hours, double? points, num? credits}) {
-    TransactionItemModel? transactionItem = state.transactionItems.firstWhere((t) => t.user.id == userId);
+    TransactionItemModel? transactionItem = state.transactionItems.firstWhere((t) => t.userId == userId);
     var newItem = transactionItem.copyWith(
         hours: hours ?? transactionItem.hours,
         points: points ?? transactionItem.points,
         credit: credits ?? transactionItem.credit);
 
     state = state.copyWith(
-        transactionItems: state.transactionItems.map((e) => e.user.id == userId ? newItem : e).toList(),
+        transactionItems: state.transactionItems.map((e) => e.userId == userId ? newItem : e).toList(),
         creationState: ModelState.empty);
   }
 
-  void _createTransactionItems(List<UserModel> users) {
-    for (UserModel u in users) {
+  void _createTransactionItems(List<UserComboModel> users) {
+    for (UserComboModel u in users) {
       state = state.copyWith(selectedUser: u);
       addTransaction(description: "${currentUser!.paceTeam!.teamName} csapat tökéletes BMM hét");
     }
@@ -157,9 +134,10 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         transactionId: 0,
         transactionDate: DateUtils.dateOnly(state.transactionDate ?? DateTime.now()),
         description: state.description,
-        user: state.selectedUser!,
+        userId: state.selectedUser!.id,
+        userName: state.selectedUser!.comboText,
         createUserId: currentUser!.id,
-        round: roundDataNotifier.getCurrentRound(),
+        roundId: roundDataNotifier.getCurrentRound()!.id,
         points: state.transactionType != TransactionType.CREDIT && state.transactionType != TransactionType.HOURS
             ? double.tryParse(valueController.value.text) ?? 0
             : 0,
@@ -208,24 +186,17 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     state = state.copyWith();
   }
 
-  updateSelectedUser(UserModel? u) {
+  updateSelectedUser(UserComboModel? u) {
     valueFocusNode.requestFocus();
-    userController.text = "${u?.getFullName()} ( ${u?.getAge()}) ";
     state = state.copyWith(selectedUser: u);
   }
 
-  Future<List<UserModel>> filterUsers(String filter) async {
-    var filtered = state.users
-        .where((u) =>
-            Utils.changeSpecChars(u.firstname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
-            Utils.changeSpecChars(u.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())))
-        .toList();
-    filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
-    return filtered;
-  }
-
   Future<void> createCreditsCsv() async {
-    Utils.createCreditCsv(state.transactionItems, state.transactionDate ?? DateTime.now(), state.description);
+    var users = <UserModel>[];
+    for (var item in state.transactionItems) {
+      users.add(await usersRepository.getUserById(item.userId));
+    }
+    Utils.createCreditCsv(state.transactionItems, state.transactionDate ?? DateTime.now(), state.description, users);
   }
 
   Future<void> createHoursCsv() async {}
@@ -248,7 +219,6 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         for (var row in fields) {
           if (rowNb != 0) {
             var field = row[0].split(";");
-            var user = state.users.firstWhere((element) => element.myShareID.toString() == field[1]);
             var creditNok = field[5];
             var creditHUF = int.parse(creditNok) * double.parse(exchangeController.value.text);
             DateTime date;
@@ -264,7 +234,6 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
             }
 
             valueController.text = creditHUF.toString();
-            state = state.copyWith(selectedUser: user);
 
             addTransaction(description: "Samvirk befizetés ${Utils.dateToString(date)}");
           }

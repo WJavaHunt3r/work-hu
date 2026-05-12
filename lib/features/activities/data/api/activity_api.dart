@@ -19,7 +19,7 @@ class ActivityApi {
       String? referenceDate,
       required int page,
       required int size,
-      required SortBuilder sort}) async {
+      required List<String> sort}) async {
     try {
       final res = await _dioClient.dio.get("/activity", queryParameters: {
         "responsibleId": responsibleId,
@@ -31,7 +31,7 @@ class ActivityApi {
         "searchText": searchText,
         "page": page,
         "size": size,
-        "sort": sort.build()
+        "sort": sort
       });
       return res.data;
     } catch (e) {

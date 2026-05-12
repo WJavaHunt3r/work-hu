@@ -8,9 +8,10 @@ import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/app/widgets/menu_options_list_tile.dart';
 import 'package:work_hu/features/admin/data/state/admin_state.dart';
 import 'package:work_hu/features/admin/providers/admin_provider.dart';
+
+import '../../../app/widgets/base_list_item.dart';
 
 class AdminPage extends BasePage {
   const AdminPage({super.key, super.title = "Admin"});
@@ -38,9 +39,9 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
   }
 
   List<Widget> teamLeaderScreens(BuildContext context) => [
-        createListTile(context: context, title: "admin_myshare_status", route: "userStatus"),
+        createListTile(context: context, title: "admin_myshare_status", route: "userStatus", index: 0),
         createListTile(context: context, title: "admin_fra_kare_weeks", route: "fraKareWeeks"),
-        createListTile(context: context, title: "admin_statistics", route: "statistics", enabled: false),
+        createListTile(context: context, title: "admin_statistics", route: "statistics", enabled: false, isLast: true),
       ];
 
   List<Widget> adminLeaderScreens(BuildContext context) => [
@@ -56,18 +57,28 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
         createListTile(context: context, title: "admin_payments", route: "payments"),
         createListTile(context: context, title: "admin_camps", route: "camps"),
         createListTile(context: context, title: "admin_camp_registrations", route: "campRegistrations"),
-        createListTile(context: context, title: "admin_rounds", route: "rounds"),
+        createListTile(context: context, title: "admin_rounds", route: "rounds", isLast: true),
       ];
 
   Widget createListTile(
-      {required BuildContext context, required String title, required String route, Object? extra, bool? enabled}) {
-    return MenuOptionsListTile(
-        title: title.i18n(),
-        enabled: enabled ?? true,
-        onTap: () => context.push(
-              "/admin/$route",
-              extra: extra,
-            ));
+      {required BuildContext context,
+      required String title,
+      required String route,
+      Object? extra,
+      bool? enabled,
+      bool? isLast,
+      int? index}) {
+    return BaseListTile(
+      enabled: enabled ?? true,
+      title: Text(title.i18n()),
+      trailing: const Icon(Icons.arrow_forward_ios_rounded),
+      onTap: () => context.push(
+        "/admin/$route",
+        extra: extra,
+      ),
+      isLast: isLast ?? false,
+      index: index ?? 1,
+    );
   }
 
   @override

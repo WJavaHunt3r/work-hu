@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
@@ -11,6 +12,7 @@ import 'package:work_hu/app/providers/localeProvider.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/profile/data/state/profile_state.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
 
@@ -39,18 +41,18 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
 
     return Column(
       children: [
-        const SizedBox(height: 24),
+        SizedBox(height: 24.sp),
 
         // Header Profile Section
         Center(
           child: Column(
             children: [
-              const SizedBox(height: 16),
+              SizedBox(height: 16.sp),
               Text(
                 user!.getFullName(),
                 style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4.sp),
               // Text(
               //   'profile_premium_member'.i18n(),
               //   style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
@@ -59,7 +61,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
           ),
         ),
 
-        const SizedBox(height: 40),
+        SizedBox(height: 40.sp),
 
         // Personal Information Section
         // _buildSectionHeader('profile_section_personal'.i18n(), theme),
@@ -76,7 +78,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
           ),
         ),
 
-        const SizedBox(height: 32),
+        SizedBox(height: 32.sp),
 
         // Account Settings Section
         // _buildSectionHeader('profile_section_account'.i18n(), theme),
@@ -87,7 +89,8 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
               _SettingsTile(
                 label: 'profile_my_activities'.i18n(),
                 icon: Icons.list_alt,
-                onTap: ()=> context.push('/profile/activities'),
+                onTap: () => context.push('/profile/activities'),
+                index: 0,
               ),
               const Divider(height: 1),
               _SettingsTile(
@@ -101,17 +104,19 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
               ),
               const Divider(height: 1),
               _SettingsTile(
-                  label: 'profile_language'.i18n(),
-                  icon: Icons.language,
-                  trailingText: languageName.toString(),
-                  onTap: () {
-                    context.push('/profile/language');
-                  }),
+                label: 'profile_language'.i18n(),
+                icon: Icons.language,
+                trailingText: languageName.toString(),
+                onTap: () {
+                  context.push('/profile/language');
+                },
+                isLast: true,
+              ),
             ],
           ),
         ),
 
-        const SizedBox(height: 32),
+        SizedBox(height: 32.sp),
 
         // App Settings Section
         BaseContainer(
@@ -124,7 +129,8 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
                   trailingText: AppThemeMode.getThemeModeLocale(currentThemeMode).i18n(),
                   onTap: () {
                     context.push('/profile/theme');
-                  }),
+                  },
+                  index: 0),
               // trailingWidget: Switch.adaptive(
               //   value: AppThemeMode.getThemeMode(ref.watch(themeProvider)) == ThemeMode.dark,
               //   onChanged: (v) {
@@ -134,15 +140,12 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
               // ),
               // ),
               const Divider(height: 1),
-              _SettingsTile(
-                label: 'profile_help_support'.i18n(),
-                icon: Icons.help_outline,
-              ),
+              _SettingsTile(label: 'profile_help_support'.i18n(), icon: Icons.help_outline, isLast: true),
             ],
           ),
         ),
 
-        const SizedBox(height: 40),
+        SizedBox(height: 40.sp),
 
         // Logout Button
         SizedBox(
@@ -163,7 +166,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
             ),
           ),
         ),
-        const SizedBox(height: 48),
+        SizedBox(height: 48.sp),
       ],
     );
   }
@@ -183,7 +186,7 @@ class _InfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18.sp),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -191,11 +194,11 @@ class _InfoTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: Theme.of(context).textTheme.bodySmall),
-              const SizedBox(height: 4),
+              SizedBox(height: 4.sp),
               Text(value, style: Theme.of(context).textTheme.bodyLarge),
             ],
           ),
-          Icon(Icons.edit_outlined, size: 20, color: Theme.of(context).hintColor.withOpacity(0.3)),
+          Icon(Icons.edit_outlined, size: 20.sp, color: Theme.of(context).hintColor.withOpacity(0.3)),
         ],
       ),
     );
@@ -206,16 +209,18 @@ class _SettingsTile extends StatelessWidget {
   final String label;
   final IconData icon;
   final String? trailingText;
-  final Widget? trailingWidget;
   final Function? onTap;
+  final bool isLast;
+  final int index;
 
-  const _SettingsTile({required this.label, required this.icon, this.trailingText, this.trailingWidget, this.onTap});
+  const _SettingsTile(
+      {required this.label, required this.icon, this.trailingText, this.onTap, this.isLast = false, this.index = 1});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+    return BaseListTile(
+      contentPadding: EdgeInsets.all(18.sp),
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -225,17 +230,18 @@ class _SettingsTile extends StatelessWidget {
         child: Icon(icon, color: theme.colorScheme.primary),
       ),
       title: Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-      trailing: trailingWidget ??
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (trailingText != null)
-                Text(trailingText!, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor)),
-              const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-            ],
-          ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (trailingText != null)
+            Text(trailingText!, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor)),
+          SizedBox(width: 8.sp),
+          Icon(Icons.arrow_forward_ios, size: 14.sp, color: Colors.grey),
+        ],
+      ),
       onTap: () => onTap?.call(),
+      isLast: isLast,
+      index: index,
     );
   }
 }

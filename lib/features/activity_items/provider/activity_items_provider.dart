@@ -4,6 +4,8 @@ import 'package:work_hu/app/framework/base_components/base_page_components/base_
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/framework/base_components/sort_builder.dart';
+import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 import 'package:work_hu/features/activities/data/repository/activity_repository.dart';
 import 'package:work_hu/features/activities/providers/avtivity_provider.dart';
@@ -11,6 +13,7 @@ import 'package:work_hu/features/activity_items/data/api/activity_items_api.dart
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 import 'package:work_hu/features/activity_items/data/repository/activity_items_repository.dart';
 import 'package:work_hu/features/activity_items/data/state/activity_items_state.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
@@ -34,15 +37,15 @@ class ActivityItemsDataNotifier extends BaseDataNotifier<ActivityItemsState> imp
   final ActivityRepository _activityRepository;
   final UsersRepository _usersRepository;
 
-  Future<void> getActivity(num activityId)async{
-    executeApiCall<ActivityModel>(() => _activityRepository.getActivity(activityId), onSuccess: (data)async{
+  Future<void> getActivity(num activityId) async {
+    executeApiCall<ActivityModel>(() => _activityRepository.getActivity(activityId), onSuccess: (data) async {
       state = state.copyWith(activity: data);
       list();
     });
   }
 
   @override
-  Future<void> list({num? filter, int? page, int? size, String? sort}) async {
+  Future<void> list({num? filter, int? page, int? size, List<String>? sort}) async {
     var sort = SortBuilder()
       ..add("user.lastname", descending: false)
       ..add("user.firstname", descending: false);
@@ -56,11 +59,18 @@ class ActivityItemsDataNotifier extends BaseDataNotifier<ActivityItemsState> imp
     });
   }
 
-  Future<void> deleteActivityItem(num num, int index) async {}
+  Future<void> deleteActivityItem(num id) async {
+    executeApiCall<void>(() => activityItemRepository.deleteActivityItems(id, locator<UserProvider>().user!.id),
+        onSuccess: (data) async {
+      list();
+    });
+  }
 
   Future<void> createCreditCsv() async {
     var list = <TransactionItemModel>[];
+    var users = <UserModel>[];
     for (var item in state.activityItems) {
+      users.add(await _usersRepository.getUserById(item.userId));
       list.add(TransactionItemModel(
           transactionDate: state.activity!.activityDateTime,
           description: item.description,
@@ -74,10 +84,10 @@ class ActivityItemsDataNotifier extends BaseDataNotifier<ActivityItemsState> imp
                   ? item.hours * 2000
                   : item.hours * 3000,
           hours: item.hours,
-          user: await _usersRepository.getUserById(item.userId)));
+          userId: item.userId, userName: item.userName));
     }
-    Utils.createCreditCsv(
-        list, state.activity!.activityDateTime, state.activity!.description);
+
+    Utils.createCreditCsv(list, state.activity!.activityDateTime, state.activity!.description, users);
   }
 
   @override

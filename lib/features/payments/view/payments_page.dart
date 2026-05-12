@@ -28,7 +28,7 @@ class PaymentsPage extends BaseListPage {
 
 class PaymentsPageState extends BaseListPageState<PaymentsPage, PaymentsState, PaymentDataNotifier> {
   @override
-  Widget buildListTiles(item) {
+  Widget buildListTile(item) {
     var payments = state.payments;
     var index = payments.indexOf(item);
     var date = item.dateTime;

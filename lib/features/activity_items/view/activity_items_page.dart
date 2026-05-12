@@ -5,13 +5,11 @@ import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
-import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_header_chip.dart';
-import 'package:work_hu/app/widgets/base_list_view.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 import 'package:work_hu/features/activity_items/data/state/activity_items_state.dart';
 import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
-import 'package:work_hu/features/activity_items/widgets/activity_details.dart';
 import 'package:work_hu/features/utils.dart';
 
 import '../../../app/framework/base_components/base_page_components/base_list_page.dart';
@@ -34,49 +32,36 @@ class ActivityItemsPageState extends BaseListPageState<ActivityItemsPage, Activi
   }
 
   @override
-  Widget buildListLayout(BuildContext context, WidgetRef ref) {
-    var items = state.activityItems;
-    var activity = state.activity;
-    var listItems = items.map((e) {
-      return activity?.registeredInApp ?? false || activity!.registeredInMyShare
-          ? listItem(e, context, ref)
-          : Dismissible(
-              key: UniqueKey(),
-              onDismissed: (direction) => ref.read(provider.notifier).deleteActivityItem(e.id!, items.indexOf(e)),
-              dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
-              child: listItem(e, context, ref));
-    });
-    return Column(children: [
-      // activity == null
-      //     ? const SizedBox()
-      //     : BaseContainer(
-      //         child: ActivityItemsDetails(
-      //           activity: activity,
-      //           hourCount: items.map((e) => e.hours).reduce((a, b) => a + b),
-      //         ),
-      //       ),
-      BaseListView(
-        children: listItems.toList(),
-      ),
-    ]);
-  }
-
-  Widget listItem(ActivityItemsModel current, BuildContext context, WidgetRef ref) {
+  Widget buildListTile(item) {
     var date = state.activity!.activityDateTime;
     var dateString = Utils.dateToString(date);
-    return ListTile(
+    return BaseListTile(
       onTap: () {},
       trailing: Text(
-        "${current.hours.toString()} ${Utils.getTransactionTypeText(TransactionType.HOURS, false)}",
+        "${item.hours.toString()} ${Utils.getTransactionTypeText(TransactionType.HOURS, false)}",
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
       ),
       title: Row(
         children: [
-          Text(current.userName, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(item.userName, style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
       subtitle: Text(dateString),
+      isLast: items.indexOf(item) == items.length - 1,
+      index: items.indexOf(item),
     );
+  }
+
+  @override
+  onDelete(e) {
+    e as ActivityItemsModel;
+    ref.watch(provider.notifier).deleteActivityItem(e.id!);
+  }
+
+  @override
+  bool canDelete(item) {
+    var activity = state.activity;
+    return !activity!.registeredInApp && !activity.registeredInMyShare;
   }
 
   @override

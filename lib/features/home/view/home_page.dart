@@ -35,47 +35,39 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
   @override
   Widget buildLayout() {
     final theme = Theme.of(context);
-    return RefreshIndicator(
-      onRefresh: () async {
-        ref.read(provider.notifier).getAccount();
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildWelcomeTitle(theme),
-          _buildBalanceCard(theme),
-          SizedBox(height: 24.sp),
-          Row(
-            children: [
-              Expanded(
-                  child: _buildActionCard(theme,
-                      title: 'home_send_money'.i18n(),
-                      subtitle: 'home_send_subtitle'.i18n(),
-                      icon: Icons.send,
-                      onTap: () {},
-                      color: Theme.of(context).colorScheme.primary,
-                      cardColor: Theme.of(context).colorScheme.primaryContainer)),
-              SizedBox(width: 24.sp),
-              Expanded(
-                  child: _buildActionCard(theme, onTap: () {
-                context.push("/balance/topUps");
-              },
-                      title: 'home_bills'.i18n(),
-                      subtitle: 'home_bills_subtitle'.i18n(),
-                      icon: Icons.receipt_long,
-                      color: Theme.of(context).colorScheme.tertiary,
-                      cardColor: Theme.of(context).colorScheme.tertiaryContainer)),
-            ],
-          ),
-          SizedBox(height: 32.sp),
-          if (state.familiyAccounts.isNotEmpty) _buildFamilyAccounts(theme),
-          SizedBox(height: 32.sp),
-          if (state.donations.isNotEmpty) _buildDonations(theme),
-          _buildTransactionHeader(theme),
-          SizedBox(height: 16.sp),
-          _buildTransactionList(theme),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildWelcomeTitle(theme),
+        _buildBalanceCard(theme),
+        SizedBox(height: 24.sp),
+        Row(
+          children: [
+            Expanded(
+                child: _buildActionCard(theme,
+                    title: 'home_send_money'.i18n(), subtitle: 'home_send_subtitle'.i18n(), icon: Icons.send, onTap: () {
+              context.push("/balance/transfer").then((e) => ref.read(provider.notifier).getAccount());
+            }, color: Theme.of(context).colorScheme.primary, cardColor: Theme.of(context).colorScheme.primaryContainer)),
+            SizedBox(width: 24.sp),
+            Expanded(
+                child: _buildActionCard(theme, onTap: () {
+              context.push("/balance/topUps");
+            },
+                    title: 'home_bills'.i18n(),
+                    subtitle: 'home_bills_subtitle'.i18n(),
+                    icon: Icons.receipt_long,
+                    color: Theme.of(context).colorScheme.tertiary,
+                    cardColor: Theme.of(context).colorScheme.tertiaryContainer)),
+          ],
+        ),
+        SizedBox(height: 32.sp),
+        if (state.familiyAccounts.isNotEmpty) _buildFamilyAccounts(theme),
+        SizedBox(height: 32.sp),
+        if (state.donations.isNotEmpty) _buildDonations(theme),
+        _buildTransactionHeader(theme),
+        SizedBox(height: 16.sp),
+        _buildTransactionList(theme),
+      ],
     );
   }
 
@@ -297,14 +289,16 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
               .map((e) => BaseListTile(
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(e.full_name),
-                      Text(Utils.creditFormatting(e.balance))
-                    ],
+                    children: [Text(e.full_name), Text(Utils.creditFormatting(e.balance))],
                   ),
                   isLast: items.indexOf(e) == items.length - 1,
                   index: items.indexOf(e)))
               .toList())
     ]);
+  }
+
+  @override
+  void onRefresh() {
+    ref.read(provider.notifier).getAccount();
   }
 }

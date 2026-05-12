@@ -9,6 +9,8 @@ import 'package:work_hu/app/widgets/work_drop_down_dearch_form_field.dart';
 import 'package:work_hu/features/goal/data/model/goal_model.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
+import 'package:work_hu/features/user_combo/view/user_combo.dart';
 
 class GoalsMaintenance extends ConsumerWidget {
   const GoalsMaintenance({super.key});
@@ -39,31 +41,19 @@ class GoalsMaintenance extends ConsumerWidget {
       ),
       body: Form(
           key: _formKey,
-          onPopInvoked: (pop) =>
-              ref.read(goalDataProvider.notifier).presetGoal(const GoalModel(goal: 0), MaintenanceMode.create),
+          onPopInvoked: (pop) => ref.read(goalDataProvider.notifier).presetGoal(const GoalModel(goal: 0), MaintenanceMode.create),
           child: Padding(
             padding: EdgeInsets.all(8.sp),
             child: Column(
               children: [
                 Row(
                   children: [
-                    Text("goal_maintenance_user".i18n()),
-                  ],
-                ),
-                Row(
-                  children: [
                     Expanded(
-                        child: WorkDropDownSearchFormField<UserModel>(
-                      enabled: true,
-                      direction: AxisDirection.down,
-                      onTap: () => ref.watch(goalDataProvider.notifier).userController.selection = TextSelection(
-                          baseOffset: 0,
-                          extentOffset: ref.watch(goalDataProvider.notifier).userController.value.text.length),
-                      onSuggestionSelected: (UserModel suggestion) =>
-                          ref.watch(goalDataProvider.notifier).updateGoal(goal.copyWith(user: suggestion)),
-                      itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
-                      suggestionsCallback: (String pattern) => ref.read(goalDataProvider.notifier).filterUsers(pattern),
-                      controller: ref.watch(goalDataProvider.notifier).userController,
+                        child: UserComboWidget(
+                      controller: TextEditingController(),
+                      onSuggestionSelected: (UserComboModel suggestion) => null,
+                      // ref.watch(goalDataProvider.notifier).updateGoal(goal.copyWith(user: suggestion)),
+                      labelText: "goal_maintenance_user".i18n(),
                     )),
                   ],
                 ),
@@ -87,9 +77,7 @@ class GoalsMaintenance extends ConsumerWidget {
                         initialValue: goal.goal.toString(),
                         keyBoardType: TextInputType.number,
                         onChanged: (String text) => text.isNotEmpty
-                            ? ref
-                                .watch(goalDataProvider.notifier)
-                                .updateGoal(goal.copyWith(goal: num.tryParse(text) ?? 0))
+                            ? ref.watch(goalDataProvider.notifier).updateGoal(goal.copyWith(goal: num.tryParse(text) ?? 0))
                             : null,
                       ),
                     ),

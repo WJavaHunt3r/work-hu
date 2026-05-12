@@ -33,7 +33,7 @@ class BaseAlertDialog extends StatelessWidget {
       actions: [
         if (cancelVisible)
           OutlinedButton(
-            onPressed: () => context.pop(),
+            onPressed: () => Navigator.of(context).pop(false),
             child: Text("base_cancel".i18n(), style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red)),
           ),
         if (confirmVisible)
@@ -41,7 +41,7 @@ class BaseAlertDialog extends StatelessWidget {
             style: Theme.of(context).filledButtonTheme.style?.copyWith(backgroundColor: WidgetStatePropertyAll(Colors.green)),
             onPressed: () {
               onTap();
-              if (canPop) context.pop(true);
+              if (canPop) Navigator.of(context).pop(true);
             },
             child: Text(
               confirmText != null ? confirmText!.i18n() : "base_ok".i18n(),

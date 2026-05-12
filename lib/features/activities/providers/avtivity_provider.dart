@@ -33,29 +33,30 @@ class ActivityDataNotifier extends BaseDataNotifier<ActivityState> implements Li
   final UserModel? user = locator<UserProvider>().user;
 
   @override
-  Future<void> list({ActivityFilter? filter, int? page, int? size, String? sort}) async {
+  Future<void> list({ActivityFilter? filter, int? page, int? size, List<String>? sort}) async {
     var sort = SortBuilder()..add("activityDateTime", descending: true);
     state = state.copyWith(filter: filter ?? state.filter);
+
     await executeApiCall<PaginatedResponse<ActivityModel>>(
         () => activityRepository.getActivities(
             registeredInMyShare: state.filter.registeredInMyShare,
-            responsibleId: state.filter.responsible?.id,
-            createUserId: state.filter.createUser?.id,
+            responsibleId: user!.isAdmin() ? state.filter.responsible?.id : user!.id,
+            createUserId: user!.isAdmin() ? state.filter.createUser?.id : user!.id,
             referenceDate: state.filter.referenceDate,
             searchText: state.filter.description,
-            employerId: state.filter.employer?.id,
+            employerId: user!.isAdmin() ? state.filter.employer?.id : user!.id,
             page: page ?? state.status.number,
             size: size ?? state.status.size,
-            sort: sort), onSuccess: (data) async {
+            sort: sort.build()), onSuccess: (data) async {
       state = state.copyWith(
-          activities: [...state.activities, ...data.content],
+          activities: state.status.number == 0 ? data.content : [...state.activities, ...data.content],
           status: state.status
               .copyWith(totalElements: data.page.totalElements, totalPages: data.page.totalPages, number: data.page.number));
     });
   }
 
   Future<void> deleteActivity(num id, int index) async {
-    List<ActivityModel> origItems = state.activities;
+    List<ActivityModel> origItems = [...state.activities];
     origItems.removeAt(index);
     List<ActivityModel> items = [...origItems];
     executeApiCall(() => activityRepository.deleteActivity(id, user!.id), onSuccess: (data) async {

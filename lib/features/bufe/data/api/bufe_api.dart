@@ -35,6 +35,26 @@ class BufeApi {
     }
   }
 
+  Future<dynamic> transferAmount(
+      {required num amount,
+      required String fromDukappId,
+      required String toDukappId,
+      required String externalReference,
+      String? message}) async {
+    try {
+      final res = await _dioClient.dio.post("/external-transfer", data: {
+        "amount": amount,
+        "to_dukapp_id": toDukappId,
+        "from_dukapp_id": fromDukappId,
+        "metadata": {"message": message},
+        "external_reference": externalReference
+      });
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<dynamic> createSumupCheckout(
       {required num amount,
       required String description,

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
+import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/widgets/base_confirm_dialog.dart';
 import 'package:work_hu/app/widgets/base_filter_chip.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
+import 'package:work_hu/app/widgets/base_sort_widget.dart';
 
 import 'base_state.dart';
 import 'list_api_provider.dart';
@@ -26,81 +30,98 @@ abstract class BaseListPage extends BasePage {
 abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N extends StateNotifier<S>>
     extends BasePageState<P, S, N> {
   // late BaseSearchBar? searchBar;
-  late ScrollController _scrollController;
   late int _currentPage;
 
-  ScrollController get scrollController => _scrollController;
   final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
   @override
   void initState() {
     super.initState();
     _currentPage = 0;
-    _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
   }
 
   void updatePage(int i) {
+    if (status.modelState.isLoading) return;
     setState(() {
       _currentPage = i;
       list(pageFrom: _currentPage);
     });
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent &&
-        listStatus.totalPages > _currentPage + 1) {
-      updatePage(++_currentPage);
+  @override
+  void onScroll() {
+    double maxScroll = getController().position.maxScrollExtent;
+    double currentScroll = getController().position.pixels;
+    double delta = 200.0; // Küszöbérték
+
+    if (maxScroll - currentScroll <= delta) {
+      if (listStatus.totalPages > _currentPage + 1 && !status.modelState.isLoading) {
+        updatePage(++_currentPage);
+      }
     }
   }
 
-  @override
-  ScrollController? getController() {
-    return _scrollController;
+  List<dynamic> buildListTiles(List<dynamic> listItems) {
+    return listItems
+        .map((e) => Slidable(
+            enabled: canDelete(e),
+            endActionPane: ActionPane(
+              extentRatio: 0.3,
+              motion: const ScrollMotion(),
+              children: [
+                SlidableAction(
+                  onPressed: (context) => _deleteConfirmation(e),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                  foregroundColor: Colors.white,
+                  icon: Icons.delete_outline,
+                  label: 'base_delete'.i18n(),
+                ),
+              ],
+            ),
+            child: buildListTile(e)))
+        .toList();
   }
 
   @override
   Widget buildLayout() {
     var headers = HeaderChipLayout(buildChildren: (filterContext) => buildHeaderLayout(filterContext, ref));
-    var children = items
-        .map((e) => Dismissible(key: UniqueKey(), onDismissed: (direction) => onDelete(), child: buildListTiles(e)))
-        .toList();
-    return RefreshIndicator(
-      onRefresh: () async {
-        if (ref.read(provider.notifier) is ListApiProvider) {
-          updatePage(0);
-        }
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          headers,
-          FilterChipLayout(
-            buildChildren: (filterContext) => buildFilterLayout(filterContext, ref),
-            filterValues: getFilters(),
-            totalElements: listStatus.totalElements,
-            listLength: items.length,
-          ),
-          SizedBox(height: 8.sp),
-          items.isEmpty && !listStatus.baseStatus.modelState.isLoading
-              ? Center(
-                  child: Text(
-                    "base_no_items_found".i18n(),
-                    style: Theme.of(context).textTheme.titleSmall,
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              : items.isEmpty && listStatus.baseStatus.modelState.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : buildListLayout(context, ref) ??
-                      BaseListView(hasBottomPadding: false, physics: const NeverScrollableScrollPhysics(), children: children),
-        ],
-      ),
+    var children = buildListTiles(items) as List<Widget>;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        headers,
+        FilterChipLayout(
+          state: listStatus,
+          buildChildren: (filterContext) => buildFilterLayout(filterContext, ref),
+          filterValues: getFilters(),
+          listLength: items.length,
+          onSelected: (item) {
+            var sort = SortBuilder();
+            for (var s in item.values) {
+              sort.add(s, descending: item.descending);
+            }
+            list(sort: sort.build());
+          },
+        ),
+        SizedBox(height: 8.sp),
+        items.isEmpty && !listStatus.baseStatus.modelState.isLoading
+            ? Center(
+                child: Text(
+                  "base_no_items_found".i18n(),
+                  style: Theme.of(context).textTheme.titleSmall,
+                  textAlign: TextAlign.center,
+                ),
+              )
+            : items.isEmpty && listStatus.baseStatus.modelState.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : buildListLayout(context, ref) ??
+                    BaseListView(hasBottomPadding: false, physics: const NeverScrollableScrollPhysics(), children: children),
+      ],
     );
   }
 
-  Widget buildListTiles(dynamic item) => ListTile(title: Text(item.toString()));
+  Widget buildListTile(dynamic item) => ListTile(title: Text(item.toString()));
 
   List<BaseFilterChip> buildFilterLayout(BuildContext context, WidgetRef ref) {
     return [];
@@ -114,8 +135,8 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
 
   List get items;
 
-  Future<void> list({dynamic filter, int? pageFrom = 0}) async {
-    await (ref.watch(provider.notifier) as ListApiProvider).list(filter: filter, page: pageFrom);
+  Future<void> list({dynamic filter, int? pageFrom = 0, List<String>? sort}) async {
+    await (ref.watch(provider.notifier) as ListApiProvider).list(filter: filter, page: pageFrom, sort: sort);
   }
 
   BaseListState get listStatus;
@@ -125,35 +146,48 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
 
   List<dynamic> getFilters();
 
-  void onDelete() {}
+  void _deleteConfirmation(e) {
+    showDialog(
+        context: context,
+        builder: (context) =>
+            BaseConfirmDialog(title: "base_delete".i18n(), content: "base_delete_question", onConfirm: () => onDelete(e)));
+  }
+
+  onDelete(e) {}
+
+  bool canDelete(item) => false;
+
+  @override
+  void onRefresh() {
+    if (ref.read(provider.notifier) is ListApiProvider) {
+      updatePage(0);
+    }
+  }
 }
 
 class FilterChipLayout extends StatelessWidget {
   final List<BaseFilterChip> Function(BuildContext) buildChildren;
-  final bool isFilter;
 
-  // final Function(SortItem)? onSelected;
+  final Function(SortItem)? onSelected;
 
   final List<dynamic> filterValues;
 
-  const FilterChipLayout({
-    super.key,
-    required this.buildChildren,
-    this.isFilter = true,
-    // this.onSelected,
-    required this.totalElements,
-    required this.listLength,
-    required this.filterValues,
-  });
+  const FilterChipLayout(
+      {super.key,
+      required this.buildChildren,
+      this.onSelected,
+      required this.listLength,
+      required this.filterValues,
+      required this.state});
 
-  final int totalElements;
   final int listLength;
+  final BaseListState state;
 
   @override
   Widget build(BuildContext context) {
     var widgets = buildChildren(context);
     // if (widgets.isEmpty) return const SizedBox();
-    var text = "$listLength/$totalElements";
+    var text = "$listLength/${state.totalElements}";
     return Row(
       children: [
         Expanded(
@@ -162,6 +196,7 @@ class FilterChipLayout extends StatelessWidget {
             child: Wrap(spacing: 8.0, runSpacing: 4.0, alignment: WrapAlignment.start, children: widgets),
           ),
         ),
+        BaseSortWidget(sortParameters: state.sortParameters, onSelected: (value) => onSelected!(value)),
         Text(text.toString(), style: Theme.of(context).textTheme.titleMedium),
       ],
     );

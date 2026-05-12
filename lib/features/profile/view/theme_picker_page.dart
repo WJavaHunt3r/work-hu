@@ -5,6 +5,7 @@ import 'package:work_hu/app/framework/base_components/base_page_components/base_
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/app_theme_mode.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/features/home/data/state/home_state.dart';
 import 'package:work_hu/features/home/providers/home_provider.dart';
@@ -27,13 +28,15 @@ class ThemePickerPageState extends BasePageState<ThemePickerPage, HomeState, Hom
       children: [
         ...AppThemeMode.values.map((mode) {
           final String label = AppThemeMode.getThemeModeLocale(mode).i18n();
-          return ListTile(
+          return BaseListTile(
             title: Text(label),
             onTap: () {
               themeNotifier.setTheme(mode);
             },
             trailing: currentThemeMode == mode ? const Icon(Icons.check) : null,
             selected: currentThemeMode == mode,
+            isLast: AppThemeMode.values.indexOf(mode) == AppThemeMode.values.length -1 ,
+            index: AppThemeMode.values.indexOf(mode),
           );
         }),
       ],

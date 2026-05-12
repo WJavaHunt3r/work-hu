@@ -52,7 +52,8 @@ class BaseListView extends StatelessWidget {
     this.hasBottomPadding = true,
     this.separated = true,
     this.isExpanded = false,
-    this.scrollController
+    this.scrollController,
+    this.shrinkWrap = true
   });
 
   final List<Widget> children;
@@ -62,13 +63,15 @@ class BaseListView extends StatelessWidget {
   final bool separated;
   final bool isExpanded;
   final ScrollController? scrollController;
+  final bool shrinkWrap;
 
   @override
   Widget build(BuildContext context) {
     return children.isEmpty ? const SizedBox():Padding(
       padding: hasBottomPadding ? EdgeInsets.only(bottom: 75.sp) : EdgeInsets.zero,
       child: BaseContainer(
-        padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 8.sp),
+        color: color,
+        padding: EdgeInsets.symmetric(horizontal: 0.sp, vertical: 0.sp),
         child: isExpanded ? Expanded(child: buildListView()) : buildListView(),
       ),
     );
@@ -78,7 +81,7 @@ class BaseListView extends StatelessWidget {
     return ListView.separated(
       controller: scrollController,
       itemCount: children.length,
-      shrinkWrap: true,
+      shrinkWrap: shrinkWrap,
       physics: physics,
       padding: EdgeInsets.zero,
       itemBuilder: (BuildContext context, int index) {

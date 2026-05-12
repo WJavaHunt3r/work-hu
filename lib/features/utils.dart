@@ -17,6 +17,7 @@ import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/widgets/error_dialog.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/season/data/model/season_model.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
@@ -164,14 +165,14 @@ class Utils {
     return "${dateToString(activity.activityDateTime).replaceAll("-", "")}_${changeSpecChars(activity.description)}";
   }
 
-  static Future<void> createCreditCsv(List<TransactionItemModel> items, DateTime date, String description) async {
+  static Future<void> createCreditCsv(List<TransactionItemModel> items, DateTime date, String description, List<UserModel> users) async {
     var headers = ["UserId", "Age", "Name", "LastName", "ClubId", "ClubName", "Amount", "ClubTransactionDate", "Description"];
 
     List<List<dynamic>> list = [];
     list.add(headers);
 
     for (var transaction in items) {
-      var user = transaction.user;
+      var user = users.firstWhere((e) => e.id == transaction.userId);
       list.add([
         user.myShareID,
         (DateTime.now().difference(user.birthDate ?? DateTime.now()).inDays / 365).ceil() - 1,

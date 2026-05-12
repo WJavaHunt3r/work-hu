@@ -32,7 +32,9 @@ class BaseTextFormField extends StatefulWidget {
       this.maxLines = 1,
       this.fontSize,
       this.isHighLighted = false,
-      this.onEditingComplete})
+      this.onEditingComplete,
+      this.onTapOutside,
+      this.padding})
       : assert(initialValue != Widget);
 
   final Object? initialValue;
@@ -53,6 +55,7 @@ class BaseTextFormField extends StatefulWidget {
   final String? Function(String?)? validator;
   final Function(String text)? onChanged;
   final Function(String text)? onFieldSubmitted;
+  final Function()? onTapOutside;
   final Function()? onEditingComplete;
   final Widget? suffix;
   final Widget? prefix;
@@ -62,6 +65,7 @@ class BaseTextFormField extends StatefulWidget {
   final int? maxLines;
   final double? fontSize;
   final bool isHighLighted;
+  final EdgeInsets? padding;
 
   @override
   State<StatefulWidget> createState() => _BaseTextFormFieldState();
@@ -89,7 +93,7 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
     return Visibility(
       visible: widget.fldControl == null || (widget.fldControl != "0" && widget.fldControl != ""),
       child: Padding(
-        padding: EdgeInsets.all(8.sp),
+        padding: widget.padding ?? EdgeInsets.all(8.sp),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,9 +119,9 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
                 filled: true,
                 fillColor: theme.colorScheme.surface,
                 enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: theme.colorScheme.outlineVariant)),
+                    borderRadius: BorderRadius.circular(8.sp), borderSide: BorderSide(color: theme.colorScheme.outlineVariant)),
                 focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: theme.colorScheme.primary, width: 2)),
+                    borderRadius: BorderRadius.circular(8.sp), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.sp)),
                 prefixIcon: widget.prefix,
                 suffixIcon: widget.isPasswordField
                     ? IconButton(
@@ -129,7 +133,7 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
               onChanged: widget.onChanged != null ? (String text) => widget.onChanged!(text) : null,
               onFieldSubmitted: widget.onFieldSubmitted != null ? (String text) => widget.onFieldSubmitted!(text) : null,
               // onEditingComplete: widget.onEditingComplete != null ? () => widget.onEditingComplete!() : null,
-              // onTapOutside: (event)=> widget.onEditingComplete != null ? () => widget.onEditingComplete!() : null,
+              onTapOutside: (event) => widget.onTapOutside?.call(),
               validator: widget.fldControl != "3"
                   ? null
                   : (String? text) => widget.validator != null
@@ -237,5 +241,28 @@ class NoDecimalFormatter extends TextInputFormatter {
     // 3. If it does NOT match (e.g., trying to type a fourth decimal place),
     // revert to the old value, effectively blocking the invalid input.
     return oldValue;
+  }
+
+
+}
+
+class CommaToDotFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    // Kicseréljük az összes vesszőt pontra a bejövő szövegben
+    String truncated = newValue.text.replaceFirst(',', '.');
+
+    // Ha több vessző is lenne (bár number keyboardnál ritka),
+    // érdemes az összeset cserélni:
+    // String truncated = newValue.text.replaceAll(',', '.');
+
+    return newValue.copyWith(
+      text: truncated,
+      // Fontos: a kurzor pozícióját meg kell tartani
+      selection: newValue.selection,
+    );
   }
 }

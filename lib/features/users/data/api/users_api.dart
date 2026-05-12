@@ -1,7 +1,9 @@
 import 'package:work_hu/api/dio_client.dart';
+import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
+import 'package:work_hu/features/user_combo/data/model/user_filter.dart';
 
 class UsersApi {
   final DioClient _dioClient = locator<DioClient>();
@@ -13,6 +15,16 @@ class UsersApi {
       Map<String, dynamic> map = {"listO36": listO36};
       if (teamModel != null) map.addAll({"teamId": teamModel.id});
       final res = await _dioClient.dio.get("/user", queryParameters: map);
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> fetchByQuery(UserFilter filter, int? size, int? page, SortBuilder? sort) async {
+    try {
+      Map<String, dynamic> map = {...filter.toJson(), "size": size, "page": page, "sort": sort?.build()};
+      final res = await _dioClient.dio.get("/userCombo", queryParameters: map);
       return res.data;
     } catch (e) {
       rethrow;

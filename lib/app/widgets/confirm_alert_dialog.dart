@@ -22,7 +22,7 @@ class ConfirmAlertDialog extends StatelessWidget {
         actionsAlignment: MainAxisAlignment.spaceEvenly,
         actions: [
           TextButton(
-              onPressed: () => context.pop(),
+              onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 "cancel".i18n(),
               )),

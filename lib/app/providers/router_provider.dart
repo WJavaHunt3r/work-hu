@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
@@ -35,6 +36,7 @@ import 'package:work_hu/features/tos/view/privacy_policy.dart';
 import 'package:work_hu/features/tos/view/tos_view.dart';
 import 'package:work_hu/features/transaction_items/view/transaction_items_page.dart';
 import 'package:work_hu/features/transactions/view/transactions_page.dart';
+import 'package:work_hu/features/transfer_amount/view/transfer_amount_page.dart';
 import 'package:work_hu/features/user_fra_kare_week/view/user_fra_kare_week_page.dart';
 import 'package:work_hu/features/user_points/view/user_points_page.dart';
 import 'package:work_hu/features/user_status/view/user_status_page.dart';
@@ -71,6 +73,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               routes: [
                 GoRoute(path: '/balance', builder: (context, state) => HomePage(), routes: [
                   GoRoute(path: "topUps", builder: (BuildContext context, GoRouterState state) => const TopUpsPage()),
+                  GoRoute(path: "transfer", builder: (BuildContext context, GoRouterState state) => const TransferAmountPage()),
                 ]),
               ],
             ),
@@ -242,7 +245,6 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ]),
 
-
         GoRoute(
           path: '/mentees',
           builder: (BuildContext context, GoRouterState state) {
@@ -301,10 +303,10 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(24.sp), topRight: Radius.circular(24.sp)),
           boxShadow: [
             BoxShadow(
-              blurRadius: 5.0, // How soft the shadow is
+              blurRadius: 5.sp, // How soft the shadow is
               spreadRadius: 0, // How far the shadow extends
               color: Colors.black.withValues(alpha: 0.15), // Shadow color
             ),

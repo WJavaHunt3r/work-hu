@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -5,6 +7,7 @@ import 'package:work_hu/app/framework/base_components/base_page_components/base_
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/features/top_ups/providers/top_ups_provider.dart';
 
+import '../../../app/widgets/base_list_item.dart';
 import '../data/state/top_ups_state.dart';
 
 class TopUpsPage extends BaseListPage {
@@ -20,8 +23,8 @@ class TopUpsPage extends BaseListPage {
 
 class TopUpsPageState extends BaseListPageState<TopUpsPage, TopUpsState, TopUpsDataNotifier> {
   @override
-  Widget buildListTiles(item) {
-    return ListTile(
+  Widget buildListTile(item) {
+    return BaseListTile(
       // leading: const CircleAvatar(
       //   backgroundColor: Colors.greenReplacement, // Custom green
       //   child: Icon(Icons.add, color: Colors.white),
@@ -50,6 +53,8 @@ class TopUpsPageState extends BaseListPageState<TopUpsPage, TopUpsState, TopUpsD
           ),
         ],
       ),
+      isLast: items.indexOf(e) == items.length - 1,
+      index: items.indexOf(e),
     );
   }
 

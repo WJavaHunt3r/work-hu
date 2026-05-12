@@ -7,8 +7,8 @@ import '../app/providers/user_provider.dart';
 
 @singleton
 class DioClient {
-  static const String _baseUrl = "http://localhost:8990/dukapp/api"; //meló
-  // static const String _baseUrl = "https://dukappservice.bcc-ktk.org/dukapp/api"; //Duka
+  // static const String _baseUrl = "http://localhost:8990/dukapp/api"; //meló
+  static const String _baseUrl = "https://dukappservice.bcc-ktk.org/dukapp/api"; //Duka
 
   static const String _dioContentType = 'application/json';
 

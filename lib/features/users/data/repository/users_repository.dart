@@ -1,6 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
+import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
+import 'package:work_hu/features/user_combo/data/model/user_filter.dart';
 import 'package:work_hu/features/users/data/api/users_api.dart';
 
 class UsersRepository {
@@ -13,6 +17,21 @@ class UsersRepository {
       final res = await _userApi.getUsers(teamModel, listO36);
       var map = res.map((e) => UserModel.fromJson(e)).toList();
       return map;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<PaginatedResponse<UserComboModel>> fetchByQuery(
+      {required UserFilter filter, int? size, int? page, SortBuilder? sort}) async {
+    try {
+      final res = await _userApi.fetchByQuery(filter, size, page, sort);
+
+      final paginatedData = PaginatedResponse<UserComboModel>.fromJson(
+        res,
+        (json) => UserComboModel.fromJson(json as Map<String, dynamic>),
+      );
+      return paginatedData;
     } catch (e) {
       rethrow;
     }
