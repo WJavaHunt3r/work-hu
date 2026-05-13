@@ -127,7 +127,7 @@ class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityStat
 
   @override
   onDelete(e) {
-    ref.read(provider.notifier).deleteActivity((e as ActivityModel).id!, items.indexOf(e));
+    ref.read(provider.notifier).deleteActivity((e as ActivityModel).id!);
   }
 
   @override

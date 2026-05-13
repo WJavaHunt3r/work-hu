@@ -355,5 +355,11 @@
   "base_filter_desc": "desc",
   "base_filter_asc": "asc",
   "base_delete_question": "Are you sure you wish to delete this item?",
-  "activity_create_user": "Create user"
+  "activity_create_user": "Create user",
+  "transfer_amount_balance": "Balance",
+  "status_to_onTrack": "%s Ft to be on track",
+  "status_title": "Status",
+  "status_goal": "Goal: %s",
+  "activity_items_transactionType": "Work type",
+  "profile_version": "Version: %s"
 }

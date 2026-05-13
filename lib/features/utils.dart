@@ -74,7 +74,7 @@ class Utils {
     return max(1, min(val, maxTextScaleFactor));
   }
 
-  static String getTransactionTypeText(TransactionType transactionType, [bool long = true]) {
+  static String getTransactionTypeText(TransactionType? transactionType, [bool long = true]) {
     if (transactionType == TransactionType.POINT) {
       return long ? "base_text_points".i18n() : "base_text_points_short".i18n();
     } else if ([TransactionType.HOURS, TransactionType.DUKA_MUNKA, TransactionType.DUKA_MUNKA_2000].contains(transactionType)) {
@@ -86,11 +86,15 @@ class Utils {
   }
 
   static final NumberFormat creditFormat = NumberFormat("#,###", "hu_HU");
-  static final NumberFormat percentFormat = NumberFormat.decimalPatternDigits(decimalDigits: 1);
+  static final NumberFormat percentFormat = NumberFormat.decimalPatternDigits(decimalDigits: 0, locale: "hu_HU");
   static final NumberFormat percentFormat2Digits = NumberFormat.decimalPatternDigits(decimalDigits: 2);
 
   static String creditFormatting(num number) {
     return "${creditFormat.format(number)} Ft";
+  }
+
+  static String percentFormatting(num number) {
+    return "${percentFormat.format(number)} %";
   }
 
   static String dateToString(DateTime date) {

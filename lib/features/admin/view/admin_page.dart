@@ -7,6 +7,7 @@ import 'package:work_hu/app/framework/base_components/base_page_components/base_
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/features/admin/data/state/admin_state.dart';
 import 'package:work_hu/features/admin/providers/admin_provider.dart';
@@ -26,8 +27,7 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
   @override
   Widget buildLayout() {
     var user = locator<UserProvider>().user;
-    return BaseListView(
-      hasBottomPadding: false,
+    return Column(
       children: user == null
           ? []
           : user.role == Role.TEAM_LEADER
@@ -40,15 +40,15 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
 
   List<Widget> teamLeaderScreens(BuildContext context) => [
         createListTile(context: context, title: "admin_myshare_status", route: "userStatus", index: 0),
-        createListTile(context: context, title: "admin_fra_kare_weeks", route: "fraKareWeeks"),
-        createListTile(context: context, title: "admin_statistics", route: "statistics", enabled: false, isLast: true),
+        // createListTile(context: context, title: "admin_fra_kare_weeks", route: "fraKareWeeks"),
+        // createListTile(context: context, title: "admin_statistics", route: "statistics", enabled: false, isLast: true),
       ];
 
   List<Widget> adminLeaderScreens(BuildContext context) => [
-        createListTile(context: context, title: "admin_activities", route: "activities"),
+        // createListTile(context: context, title: "admin_activities", route: "activities"),
         createListTile(context: context, title: "admin_myshare_credits", route: "createTransaction"),
-        createListTile(context: context, title: "admin_samvirk_credit", route: "createSamvirkTransaction"),
-        createListTile(context: context, title: "admin_points", route: "createPointsTransaction"),
+        // createListTile(context: context, title: "admin_samvirk_credit", route: "createSamvirkTransaction"),
+        // createListTile(context: context, title: "admin_points", route: "createPointsTransaction"),
         createListTile(context: context, title: "admin_users", route: "users"),
         createListTile(context: context, title: "admin_goals", route: "goals"),
         createListTile(context: context, title: "admin_mentor_mentees", route: "mentorMentees"),
@@ -69,6 +69,7 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
       bool? isLast,
       int? index}) {
     return BaseListTile(
+      tileColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       enabled: enabled ?? true,
       title: Text(title.i18n()),
       trailing: const Icon(Icons.arrow_forward_ios_rounded),

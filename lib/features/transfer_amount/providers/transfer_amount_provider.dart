@@ -7,6 +7,7 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/bufe/data/model/sumup_create_checkout_response.dart';
+import 'package:work_hu/features/bufe/data/model/sumup_user_model.dart';
 import 'package:work_hu/features/bufe/data/repository/bufe_repository.dart';
 import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -18,7 +19,9 @@ final transferAmountDataProvider = StateNotifierProvider.autoDispose<TransferAmo
     (ref) => TransferAmountDataNotifier(ref.watch(bufeRepoProvider)));
 
 class TransferAmountDataNotifier extends BaseDataNotifier<TransferAmountState> {
-  TransferAmountDataNotifier(this._bufeRepository) : super(const TransferAmountState()) {}
+  TransferAmountDataNotifier(this._bufeRepository) : super(const TransferAmountState()) {
+    getAccount();
+  }
 
   final BufeRepository _bufeRepository;
   final UserModel? currentUser = locator<UserProvider>().user;
@@ -43,5 +46,15 @@ class TransferAmountDataNotifier extends BaseDataNotifier<TransferAmountState> {
 
   void setSelectedUser(UserComboModel user) {
     state = state.copyWith(selectedUser: user);
+  }
+  void setAmount(num amount) {
+    state = state.copyWith(amount: amount);
+  }
+
+  Future<void> getAccount() async {
+    var userId = locator<UserProvider>().user!.id;
+    executeApiCall<SumupUserModel>(() => _bufeRepository.getAccount(userId), onSuccess: (data) async {
+      state = state.copyWith(account: data);
+    });
   }
 }

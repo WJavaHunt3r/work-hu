@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/profile/data/state/profile_state.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/status/data/state/status_state.dart';
@@ -30,7 +31,9 @@ class StatusDataNotifier extends BaseDataNotifier<StatusState> {
     this.userStatusRepoProvider,
     this.usersRepository,
     this.roundDataNotifier,
-  ) : super(const StatusState());
+  ) : super(const StatusState()) {
+    getUserInfoAndUserRounds();
+  }
 
   final UserProvider currentUser;
   final UserRoundRepository userRoundRepoProvider;
@@ -43,62 +46,31 @@ class StatusDataNotifier extends BaseDataNotifier<StatusState> {
   }
 
   Future<void> getUserInfoAndUserRounds() async {
+    // roundDataNotifier.getCurrentRound();
     var userModel = currentUser.user;
 
     if (userModel != null) {
-      // await userFraKareWeekRepo.getFraKareWeeks(userId: userModel.id, year: DateTime.now().year).then((data) {
-      //   data.sort((a, b) => b.fraKareWeek.weekNumber.compareTo(a.fraKareWeek.weekNumber));
-      //   state = state.copyWith(fraKareWeeks: data);
-      // });
-      getUserRound(userModel.id).then((userRounds) async {
-        if (userRounds.isNotEmpty && userRounds.length == 1) {
-          await getUserStatus(userModel.id).then((userStatus) async {
-            state = state.copyWith(statuses: [userStatus], userRounds: [userRounds.first]);
+      executeApiCall<UserStatusModel>(() => getUserStatus(userModel.id), onSuccess: (userRounds) async {
+        state = state.copyWith(statuses: [userRounds]);
+      });
+
+      executeApiCall<List<UserModel>>(() => usersRepository.getChildren(userModel.id), onSuccess: (children) async {
+        state = state.copyWith(children: children);
+        for (var child in children) {
+          await getUserStatus(child.id).then((status) async {
+            state = state.copyWith(statuses: [...state.statuses, status]);
           });
         }
       });
-      // if (userModel.spouseId != null) {
-      //   usersRepository.getUserById(userModel.spouseId!).then((value) async {
-      //     state = state.copyWith(spouse: value);
-      //     await getUserRound(value.id).then((userRounds) async {
-      //       if (userRounds.isNotEmpty && userRounds.length == 1) {
-      //         await getUserStatus(value.id).then((status) async {
-      //           state = state.copyWith(statuses: [...state.statuses, status], userRounds: [...state.userRounds, userRounds[0]]);
-      //         });
-      //       }
-      //     });
-      //   });
-      // }
-
-      // usersRepository.getChildren(userModel.id).then((children) async {
-      //   state = state.copyWith(children: children);
-      //   for (var child in children) {
-      //     await getUserRound(child.id).then((userRounds) async {
-      //       if (userRounds.isNotEmpty && userRounds.length == 1) {
-      //         await getUserStatus(child.id).then((status) async {
-      //           state = state.copyWith(statuses: [...state.statuses, status], userRounds: [...state.userRounds, userRounds[0]]);
-      //         });
-      //       }
-      //     });
-      //   }
-      // });
     }
   }
 
-  Future<List<UserRoundModel>> getUserRound(num id) async {
-    return await userRoundRepoProvider.fetchUserRounds(
-        userId: id, seasonYear: DateTime.now().year, roundId: roundDataNotifier.getCurrentRound()!.id);
+  Future<List<UserRoundModel>> getUserRounds(num id) async {
+    return userRoundRepoProvider.fetchUserRounds(userId: id, seasonYear: DateTime.now().year);
   }
 
   Future<UserStatusModel> getUserStatus(num id) async {
     return await userStatusRepoProvider.getUserStatusByUserId(id, DateTime.now().year);
-  }
-
-  Future<void> logout() async {
-    var googleAuth = GoogleSignIn.instance;
-    googleAuth.disconnect();
-    currentUser.setToken(null);
-    currentUser.setUser(null);
   }
 
   @override

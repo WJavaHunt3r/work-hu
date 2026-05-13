@@ -1,3 +1,5 @@
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
@@ -66,6 +68,9 @@ class DukApp extends ConsumerWidget {
         LocalJsonLocalization.delegate.directories = ['lib/I18n'];
 
         return MaterialApp.router(
+          scrollBehavior: const MaterialScrollBehavior().copyWith(
+            dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.trackpad},
+          ),
           scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
           debugShowCheckedModeBanner: false,
           theme: theme.globalTheme,

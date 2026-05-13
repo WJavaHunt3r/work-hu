@@ -371,5 +371,11 @@
   "base_filter_desc": "szerint csökkenő",
   "base_filter_asc": "szerint növekvő",
   "base_delete_question": "Biztosan törlöd a tételt?",
-  "activity_create_user": "Létrehozó"
+  "activity_create_user": "Létrehozó",
+  "transfer_amount_balance": "Egyenleg",
+  "status_to_onTrack": "Hiányzik: %s Ft",
+  "status_title": "Státusz",
+  "status_goal": "Cél: %s",
+  "activity_items_transactionType": "Munka jellege",
+  "profile_version": "Verzió: %s"
 }

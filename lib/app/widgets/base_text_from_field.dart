@@ -118,7 +118,7 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
                 hintText: widget.hintText?.i18n(),
                 filled: true,
                 fillColor: theme.colorScheme.surface,
-                enabledBorder: OutlineInputBorder(
+                border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.sp), borderSide: BorderSide(color: theme.colorScheme.outlineVariant)),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.sp), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.sp)),

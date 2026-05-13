@@ -74,6 +74,9 @@ class ActivityItemsPageState extends BaseListPageState<ActivityItemsPage, Activi
       ),
       BaseHeaderChip(label: "activity_items_employer", labelValue: () async => activity?.employerName ?? ""),
       BaseHeaderChip(label: "activity_items_responsible", labelValue: () async => activity?.responsibleName ?? ""),
+      BaseHeaderChip(
+          label: "activity_items_transactionType",
+          labelValue: () async => activity?.transactionType.name ?? ""),
       if (locator<UserProvider>().user!.isAdmin())
         BaseHeaderChip(label: "activity_items_created_by", labelValue: () async => activity?.createUserName ?? ""),
     ];

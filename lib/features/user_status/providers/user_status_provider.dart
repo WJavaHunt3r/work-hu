@@ -2,12 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
-import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
-import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_sort_widget.dart';
-import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/teams/data/model/team_model.dart';
+import 'package:work_hu/features/user_rounds/data/repository/user_round_repository.dart';
+import 'package:work_hu/features/user_rounds/providers/user_rounds_provider.dart';
 import 'package:work_hu/features/user_status/data/model/user_status_model.dart';
 import 'package:work_hu/features/user_status/data/state/user_status_state.dart';
 
@@ -18,14 +16,11 @@ final userStatusApiProvider = Provider<UserStatusApi>((ref) => UserStatusApi());
 
 final userStatusRepoProvider = Provider<UserStatusRepository>((ref) => UserStatusRepository(ref.read(userStatusApiProvider)));
 
-final userStatusDataProvider =
-    StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>((ref) => UserStatusDataNotifier(
-          ref.read(userDataProvider).user,
-          ref.read(userStatusRepoProvider),
-        ));
+final userStatusDataProvider = StateNotifierProvider.autoDispose<UserStatusDataNotifier, UserStatusState>(
+    (ref) => UserStatusDataNotifier(ref.read(userStatusRepoProvider), ref.read(userRoundsRepoProvider)));
 
 class UserStatusDataNotifier extends BaseDataNotifier<UserStatusState> implements ListApiProvider<dynamic> {
-  UserStatusDataNotifier(this.currentUser, this.userStatusRepoProvider) : super(const UserStatusState()) {
+  UserStatusDataNotifier(this._userStatusRepoProvider, this._userRoundRepository) : super(const UserStatusState()) {
     state = state.copyWith(
         status: state.status.copyWith(sortParameters: [
       SortItem(label: "status_filter_name", values: ["user.lastname", "user.firstname"], descending: false),
@@ -36,13 +31,13 @@ class UserStatusDataNotifier extends BaseDataNotifier<UserStatusState> implement
     // list();
   }
 
-  final UserModel? currentUser;
-  final UserStatusRepository userStatusRepoProvider;
+  final UserStatusRepository _userStatusRepoProvider;
+  final UserRoundRepository _userRoundRepository;
 
   @override
   Future<void> list({dynamic filter, int? page, int? size, List<String>? sort}) async {
     await executeApiCall<PaginatedResponse<UserStatusModel>>(
-        () => userStatusRepoProvider.getUserStatuses(DateTime.now().year, null,
+        () => _userStatusRepoProvider.getUserStatuses(DateTime.now().year, null,
             page: page ?? state.status.number,
             size: size ?? state.status.size,
             sort: sort ?? state.status.sort), onSuccess: (data) async {
@@ -57,11 +52,11 @@ class UserStatusDataNotifier extends BaseDataNotifier<UserStatusState> implement
   }
 
   Future<void> recalculate() async {
-    list();
+    executeApiCall(() => _userRoundRepository.recalculate(), onSuccess: (data) => list());
   }
 
   Future<void> setUserStatus() async {
-    executeApiCall(() => userStatusRepoProvider.setUserStatus(DateTime.now().year), onSuccess: (data) async => list());
+    executeApiCall(() => _userStatusRepoProvider.setUserStatus(DateTime.now().year), onSuccess: (data) async => list());
   }
 
   @override

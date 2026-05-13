@@ -40,23 +40,31 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
     _currentPage = 0;
   }
 
-  void updatePage(int i) {
+  void updatePage(int nextPage) {
     if (status.modelState.isLoading) return;
+
     setState(() {
-      _currentPage = i;
+      _currentPage = nextPage;
       list(pageFrom: _currentPage);
     });
   }
 
   @override
   void onScroll() {
-    double maxScroll = getController().position.maxScrollExtent;
-    double currentScroll = getController().position.pixels;
-    double delta = 200.0; // Küszöbérték
+    if (status.modelState.isLoading) return;
+
+    final pos = getController().position;
+    double maxScroll = pos.maxScrollExtent;
+    double currentScroll = pos.pixels;
+
+    if (currentScroll <= 0) return;
+
+    double delta = 200.0;
 
     if (maxScroll - currentScroll <= delta) {
-      if (listStatus.totalPages > _currentPage + 1 && !status.modelState.isLoading) {
-        updatePage(++_currentPage);
+      if (listStatus.totalPages > _currentPage + 1) {
+        // Itt már tudjuk, hogy kell az új oldal
+        updatePage(_currentPage + 1);
       }
     }
   }
@@ -116,7 +124,7 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
             : items.isEmpty && listStatus.baseStatus.modelState.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : buildListLayout(context, ref) ??
-                    BaseListView(hasBottomPadding: false, physics: const NeverScrollableScrollPhysics(), children: children),
+                    BaseListView(hasBottomPadding: true, physics: const NeverScrollableScrollPhysics(), children: children),
       ],
     );
   }

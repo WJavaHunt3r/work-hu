@@ -24,8 +24,8 @@ abstract class BasePage extends ConsumerStatefulWidget {
 }
 
 abstract class BasePageState<P extends BasePage, S extends dynamic, N extends StateNotifier<S>> extends ConsumerState<P> {
-
   late final ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
@@ -51,61 +51,62 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
       }
     });
     return PopScope(
-        canPop: widget.canPop,
-        onPopInvokedWithResult: (didPop, result) {
-          if (didPop) return;
-          confirmExit();
-        },
-        child: Scaffold(
-          extendBodyBehindAppBar: !widget.hasAppBar,
-          resizeToAvoidBottomInset: true,
-          persistentFooterButtons: buildPersistentFooterButtons(context, ref),
-          persistentFooterDecoration: const BoxDecoration(),
-          persistentFooterAlignment: AlignmentDirectional.bottomCenter,
-          bottomNavigationBar: buildBottomNavigationBar(context, ref),
-          floatingActionButton: buildFloatingActionButton(context, ref),
-          appBar: !widget.hasAppBar
-              ? null
-              : AppBar(
-                  automaticallyImplyLeading: true,
-                  title: (widget.title is Widget
-                      ? widget.title as Widget
-                      : Text(((widget.title) as String).i18n(),
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold))),
-                  leadingWidth: 80.sp,
-                  leading: widget.leading,
-                  actions: buildActions(context, ref),
-                  actionsPadding: EdgeInsets.symmetric(horizontal: 12.sp),
-                ),
-          body: RefreshIndicator(
-            onRefresh: () async {
-              onRefresh();
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
+      canPop: widget.canPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        confirmExit();
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: !widget.hasAppBar,
+        resizeToAvoidBottomInset: true,
+        persistentFooterButtons: buildPersistentFooterButtons(context, ref),
+        persistentFooterDecoration: const BoxDecoration(),
+        persistentFooterAlignment: AlignmentDirectional.bottomCenter,
+        bottomNavigationBar: buildBottomNavigationBar(context, ref),
+        floatingActionButton: buildFloatingActionButton(context, ref),
+        appBar: !widget.hasAppBar
+            ? null
+            : AppBar(
+                automaticallyImplyLeading: true,
+                title: (widget.title is Widget
+                    ? widget.title as Widget
+                    : Text(((widget.title) as String).i18n(),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold))),
+                leadingWidth: widget.leading == null ? null : 80.sp,
+                leading: widget.leading,
+                actions: buildActions(context, ref),
+                actionsPadding: EdgeInsets.symmetric(horizontal: 12.sp),
+              ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+                child: RefreshIndicator(
+                    onRefresh: () async {
+                      onRefresh();
+                    },
                     child: NotificationListener<ScrollNotification>(
-                      onNotification: (ScrollNotification scrollInfo) {
-                        if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent - 200) {
-                          onScroll(); // A fenti logikával
+                      onNotification: (ScrollNotification notification) {
+                        if (notification is ScrollUpdateNotification) {
+                          onScroll();
                         }
-                        return true;
+                        return false;
                       },
                       child: SingleChildScrollView(
-                        controller:  _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(), // Ez kell az iOS bounce miatt!
+                        controller: _scrollController,
+                        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                        // Ez kell az iOS bounce miatt!
                         child: Padding(
-                          padding:  EdgeInsets.symmetric(horizontal: 8.sp, vertical: 16.sp),
+                          padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 16.sp),
                           child: buildLayout(),
                         ),
                       ),
-                    ))
-              ],
-            ),
-          ),
-        ));
+                    )))
+          ],
+        ),
+      ),
+    );
   }
 
   void postInit(WidgetRef ref) {}

@@ -55,19 +55,12 @@ class ActivityDataNotifier extends BaseDataNotifier<ActivityState> implements Li
     });
   }
 
-  Future<void> deleteActivity(num id, int index) async {
-    List<ActivityModel> origItems = [...state.activities];
-    origItems.removeAt(index);
-    List<ActivityModel> items = [...origItems];
-    executeApiCall(() => activityRepository.deleteActivity(id, user!.id), onSuccess: (data) async {
-      state = state.copyWith(activities: items);
-    }, onError: (e) async {
-      state = state.copyWith(activities: origItems);
-    });
+  Future<void> deleteActivity(num id) async {
+    executeApiCall(() => activityRepository.deleteActivity(id, user!.id), onSuccess: (data) => list());
   }
 
   Future<void> registerActivity(num id) async {
-    executeApiCall(() => activityRepository.registerActivity(id, user!.id));
+    executeApiCall(() => activityRepository.registerActivity(id, user!.id), onSuccess: (data) => list());
   }
 
   Future<void> putActivity(ActivityModel activity) async {
@@ -77,17 +70,11 @@ class ActivityDataNotifier extends BaseDataNotifier<ActivityState> implements Li
   }
 
   Future<void> registerActivityInTeams(num id) async {
-    executeApiCall(() => activityRepository.registerActivityInTeams(id, user!.id));
+    executeApiCall(() => activityRepository.registerActivityInTeams(id, user!.id), onSuccess: (data) => list());
   }
 
   @override
   ActivityState copyWithState(BaseState status) {
     return state.copyWith(status: state.status.copyWith(baseStatus: status));
-  }
-
-  @override
-  void dispose() {
-    debugPrintStack();
-    super.dispose();
   }
 }

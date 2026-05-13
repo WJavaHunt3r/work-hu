@@ -1,14 +1,18 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/features/status/data/state/status_state.dart';
 import 'package:work_hu/features/status/providers/status_providers.dart';
+import 'package:work_hu/features/utils.dart';
 
 class StatusPage extends BasePage {
-  const StatusPage({super.key, super.title = "profile_title"});
+  StatusPage({super.key, super.title = "status_title"});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -22,135 +26,133 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Goal Header
-          const SizedBox(height: 16),
-
-          // Main Goal Card
-          BaseContainer(
-            child: Column(
-              children: [
-                Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var child in state.statuses)
+          Column(
+            children: [
+              BaseContainer(
+                child: Column(
                   children: [
-                    _IconBox(icon: Icons.directions_car_filled_outlined),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    ListTile(
+                      title: Text(child.name, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                      trailing: Text(
+                        Utils.percentFormatting(child.status * 100),
+                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text("status_goal".i18n([Utils.creditFormatting(child.goal).toString()])),
+                    ),
+                    SizedBox(height: 20.sp),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('home_new_car'.i18n(), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                        Text('${'home_target_amount'.i18n()}: 8.500.000 Ft', style: theme.textTheme.bodySmall),
+                        Text(Utils.creditFormatting(child.transactions),
+                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        child.onTrack
+                            ? Row(
+                                children: [
+                                  Icon(
+                                    Icons.done_outline,
+                                    size: 24.sp,
+                                  ),
+                                  const Text(
+                                    "On Track",
+                                  )
+                                ],
+                              )
+                            : Text('status_to_onTrack'.i18n([Utils.creditFormatting(child.toOnTrack).toString()]),
+                                style: theme.textTheme.bodySmall),
                       ],
+                    ),
+                    SizedBox(height: 8.sp),
+                    LinearProgressIndicator(
+                      value: max(0, double.tryParse(child.status.toString()) ?? 0),
+                      minHeight: 10.sp,
+                      borderRadius: BorderRadius.circular(10.sp),
+                      backgroundColor: colorScheme.primary.withOpacity(0.1),
+                      color: colorScheme.primary,
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('5.525.000 Ft', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                    Text('home_saved_amount'.i18n(), style: theme.textTheme.bodySmall),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                LinearProgressIndicator(
-                  value: 0.65,
-                  minHeight: 10,
-                  borderRadius: BorderRadius.circular(10),
-                  backgroundColor: colorScheme.primary.withOpacity(0.1),
-                  color: colorScheme.primary,
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-          // Horizontal Stats
-          Row(
-            children: [
-              Expanded(
-                child: BaseContainer(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('home_remaining_amount'.i18n(), style: theme.textTheme.labelSmall),
-                      const SizedBox(height: 8),
-                      Text('2.975.000 Ft', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: BaseContainer(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('home_expected_completion'.i18n(), style: theme.textTheme.labelSmall),
-                      const SizedBox(height: 8),
-                      Text('2025. Okt.',
-                          style:
-                              theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.purple.shade300)),
-                    ],
-                  ),
-                ),
-              ),
+              SizedBox(height: 16.sp),
             ],
           ),
 
-          const SizedBox(height: 32),
-          Text('home_monthly_performance'.i18n(), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
-
-          // Performance Grid
-          BaseContainer(
-            child: GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 3,
-              mainAxisSpacing: 20,
-              children: [
-                _MonthStatus(month: 'Március', status: true),
-                _MonthStatus(month: 'Április', status: true),
-                _MonthStatus(month: 'Május', status: null),
-                _MonthStatus(month: 'Június', status: true),
-                _MonthStatus(month: 'Július', status: true),
-                _MonthStatus(month: 'Augusztus', status: false, isCurrent: true),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('home_recent_transactions'.i18n(), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-              TextButton(onPressed: () {}, child: Text('home_view_all'.i18n(), style: TextStyle(color: colorScheme.primary))),
-            ],
-          ),
-
-          // Transaction List
-          _TransactionTile(
-              title: 'home_monthly_savings'.i18n(), date: 'Augusztus 12.', amount: '+150.000 Ft', icon: Icons.savings_outlined),
-          const SizedBox(height: 12),
-          _TransactionTile(
-              title: 'home_bonus_deposit'.i18n(), date: 'Augusztus 05.', amount: '+45.000 Ft', icon: Icons.add_card_outlined),
-          const SizedBox(height: 12),
-          _TransactionTile(title: 'home_auto_transfer'.i18n(), date: 'Július 28.', amount: '+150.000 Ft', icon: Icons.history),
-          const SizedBox(height: 100), // Space for FAB
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget? buildFloatingActionButton(BuildContext context, WidgetRef ref) {
-    return FloatingActionButton(
-      onPressed: () {},
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      child: const Icon(Icons.add, color: Colors.white),
+        // Horizontal Stats
+        // Row(
+        //   children: [
+        //     Expanded(
+        //       child: BaseContainer(
+        //         child: Column(
+        //           crossAxisAlignment: CrossAxisAlignment.start,
+        //           children: [
+        //             Text('home_remaining_amount'.i18n(), style: theme.textTheme.labelSmall),
+        //             SizedBox(height: 8.sp),
+        //             Text('2.975.000 Ft', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        //           ],
+        //         ),
+        //       ),
+        //     ),
+        //     SizedBox(width: 12.sp),
+        //     Expanded(
+        //       child: BaseContainer(
+        //         child: Column(
+        //           crossAxisAlignment: CrossAxisAlignment.start,
+        //           children: [
+        //             Text('home_expected_completion'.i18n(), style: theme.textTheme.labelSmall),
+        //             SizedBox(height: 8.sp),
+        //             Text('2025. Okt.',
+        //                 style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Colors.purple.shade300)),
+        //           ],
+        //         ),
+        //       ),
+        //     ),
+        //   ],
+        // ),
+        //
+        // SizedBox(height: 32.sp),
+        // Text('home_monthly_performance'.i18n(), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        // SizedBox(height: 16.sp),
+        //
+        // // Performance Grid
+        // BaseContainer(
+        //   child: GridView.count(
+        //     shrinkWrap: true,
+        //     physics: const NeverScrollableScrollPhysics(),
+        //     crossAxisCount: 3,
+        //     mainAxisSpacing: 15.sp,
+        //     children: [
+        //       _MonthStatus(month: 'Március', status: true),
+        //       _MonthStatus(month: 'Április', status: true),
+        //       _MonthStatus(month: 'Május', status: null),
+        //       _MonthStatus(month: 'Június', status: true),
+        //       _MonthStatus(month: 'Július', status: true),
+        //       _MonthStatus(month: 'Augusztus', status: false, isCurrent: true),
+        //     ],
+        //   ),
+        // ),
+        //
+        // SizedBox(height: 32.sp),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //   children: [
+        //     Text('home_recent_transactions'.i18n(), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        //     TextButton(onPressed: () {}, child: Text('home_view_all'.i18n(), style: TextStyle(color: colorScheme.primary))),
+        //   ],
+        // ),
+        //
+        // // Transaction List
+        // _TransactionTile(
+        //     title: 'home_monthly_savings'.i18n(), date: 'Augusztus 12.', amount: '+150.000 Ft', icon: Icons.savings_outlined),
+        // SizedBox(height: 12.sp),
+        // _TransactionTile(
+        //     title: 'home_bonus_deposit'.i18n(), date: 'Augusztus 05.', amount: '+45.000 Ft', icon: Icons.add_card_outlined),
+        // SizedBox(height: 12.sp),
+        // _TransactionTile(title: 'home_auto_transfer'.i18n(), date: 'Július 28.', amount: '+150.000 Ft', icon: Icons.history),
+        // SizedBox(height: 100.sp), // Space for FAB
+      ],
     );
   }
 
@@ -174,7 +176,7 @@ class _MonthStatus extends StatelessWidget {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(8.sp),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(color: color.withOpacity(0.3)),
@@ -183,10 +185,10 @@ class _MonthStatus extends StatelessWidget {
           child: Icon(
             status == true ? Icons.check : (status == false ? Icons.more_horiz : Icons.remove),
             color: isCurrent ? color : Colors.grey,
-            size: 20,
+            size: 20.sp,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.sp),
         Text(
           month,
           style: TextStyle(
@@ -211,7 +213,7 @@ class _TransactionTile extends StatelessWidget {
       child: Row(
         children: [
           _IconBox(icon: icon),
-          const SizedBox(width: 16),
+          SizedBox(width: 16.sp),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,7 +238,7 @@ class _IconBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: EdgeInsets.all(10.sp),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
         shape: BoxShape.circle,

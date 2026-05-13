@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
-import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
-import 'package:work_hu/features/top_up/data/state/top_up_state.dart';
-import 'package:work_hu/features/top_up/providers/top_up_provider.dart';
 import 'package:work_hu/features/transfer_amount/data/state/transfer_amount_state.dart';
 import 'package:work_hu/features/transfer_amount/providers/transfer_amount_provider.dart';
 import 'package:work_hu/features/user_combo/view/user_combo.dart';
+import 'package:work_hu/features/utils.dart';
 
 class TransferAmountPage extends BasePage {
   const TransferAmountPage({
@@ -29,14 +26,31 @@ class TransferAmountPageState extends BasePageState<TransferAmountPage, Transfer
   final TextEditingController userController = TextEditingController(text: "");
 
   @override
+  void initState() {
+    super.initState();
+    _amountController.addListener(() => ref.read(provider.notifier).setAmount(int.tryParse(_amountController.text) ?? 0));
+  }
+
+  @override
   Widget buildLayout() {
     final theme = Theme.of(context);
     return SingleChildScrollView(
         child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 32.sp),
+        BaseContainer(
+            width: double.infinity,
+            child: Column(
+              children: [
+                Text('transfer_amount_balance'.i18n(),
+                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.outline)),
+                SizedBox(height: 12.sp),
+                Text(Utils.creditFormatting(state.account?.balance ?? 0),
+                    style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold)),
+              ],
+            )),
 
+        SizedBox(height: 16.sp),
         // Amount Input Card
         BaseContainer(
           child: Form(
@@ -59,8 +73,11 @@ class TransferAmountPageState extends BasePageState<TransferAmountPage, Transfer
                   child: TextField(
                     controller: _amountController,
                     keyboardType: TextInputType.number,
-                    style: theme.textTheme.displaySmall
-                        ?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+                    style: theme.textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: state.amount > (state.account?.balance ?? 0)
+                            ? Theme.of(context).colorScheme.error
+                            : Theme.of(context).colorScheme.primary),
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       prefixText: 'Ft     ',
@@ -88,12 +105,12 @@ class TransferAmountPageState extends BasePageState<TransferAmountPage, Transfer
           ),
         ),
 
-        SizedBox(height: 40.sp),
+        SizedBox(height: 16.sp),
         SizedBox(
           width: double.infinity,
           height: 56.sp,
           child: FilledButton(
-            onPressed: state.selectedUser == null
+            onPressed: state.selectedUser == null || state.amount > (state.account?.balance ?? 0)
                 ? null
                 : () {
                     ref

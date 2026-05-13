@@ -15,6 +15,7 @@ import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/profile/data/state/profile_state.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class ProfilePage extends BasePage {
   const ProfilePage({super.key, super.title = "profile_title"});
@@ -145,7 +146,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
           ),
         ),
 
-        SizedBox(height: 40.sp),
+        SizedBox(height: 32.sp),
 
         // Logout Button
         SizedBox(
@@ -166,7 +167,21 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
             ),
           ),
         ),
-        SizedBox(height: 48.sp),
+
+        SizedBox(height: 32.sp),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FutureBuilder<PackageInfo>(
+                future: PackageInfo.fromPlatform(),
+                builder: (context, data) {
+                  if (!data.hasData) return const Text(" ");
+                  return Text("profile_version".i18n([data.data!.version]));
+                }),
+          ],
+        ),
+        SizedBox(height: 32.sp),
       ],
     );
   }
