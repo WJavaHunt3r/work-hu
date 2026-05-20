@@ -49,7 +49,7 @@ class ActivityDataNotifier extends BaseDataNotifier<ActivityState> implements Li
             size: size ?? state.status.size,
             sort: sort.build()), onSuccess: (data) async {
       state = state.copyWith(
-          activities: state.status.number == 0 ? data.content : [...state.activities, ...data.content],
+          activities:  data.page.number == 0 ? data.content : [...state.activities, ...data.content],
           status: state.status
               .copyWith(totalElements: data.page.totalElements, totalPages: data.page.totalPages, number: data.page.number));
     });

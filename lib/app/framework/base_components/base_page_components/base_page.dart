@@ -14,13 +14,20 @@ import '../../../models/mode_state.dart';
 
 abstract class BasePage extends ConsumerStatefulWidget {
   const BasePage(
-      {super.key, required this.title, this.hasHeadData = false, this.canPop = true, this.leading, this.hasAppBar = true});
+      {super.key,
+      required this.title,
+      this.hasHeadData = false,
+      this.canPop = true,
+      this.leading,
+      this.hasAppBar = true,
+      this.canRefresh = true});
 
   final Object title;
   final bool hasHeadData;
   final bool canPop;
   final Widget? leading;
   final bool hasAppBar;
+  final bool canRefresh;
 }
 
 abstract class BasePageState<P extends BasePage, S extends dynamic, N extends StateNotifier<S>> extends ConsumerState<P> {
@@ -82,28 +89,34 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
           mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
-                child: RefreshIndicator(
-                    onRefresh: () async {
-                      onRefresh();
-                    },
-                    child: NotificationListener<ScrollNotification>(
-                      onNotification: (ScrollNotification notification) {
-                        if (notification is ScrollUpdateNotification) {
-                          onScroll();
-                        }
-                        return false;
-                      },
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                        // Ez kell az iOS bounce miatt!
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 16.sp),
-                          child: buildLayout(),
-                        ),
-                      ),
-                    )))
+                child: widget.canRefresh
+                    ? RefreshIndicator(
+                        onRefresh: () async {
+                          onRefresh();
+                        },
+                        child: _buildScrollView())
+                    : _buildScrollView())
           ],
+        ),
+      ),
+    );
+  }
+
+  _buildScrollView() {
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification notification) {
+        if (notification is ScrollUpdateNotification) {
+          onScroll();
+        }
+        return false;
+      },
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        // Ez kell az iOS bounce miatt!
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 16.sp),
+          child: buildLayout(),
         ),
       ),
     );

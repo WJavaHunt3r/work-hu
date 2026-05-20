@@ -11,12 +11,14 @@ import 'package:work_hu/features/create_activity/provider/create_activity_provid
 import 'package:work_hu/features/utils.dart';
 
 class RegistrationRowWidget extends ConsumerWidget {
-  const RegistrationRowWidget({super.key, required this.index, required this.name, required this.value, required this.isLast});
+  const RegistrationRowWidget(
+      {super.key, required this.index, required this.name, required this.value, required this.isLast, required this.onTap});
 
   final num index;
   final String name;
   final num value;
   final bool isLast;
+  final Function() onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,9 +33,9 @@ class RegistrationRowWidget extends ConsumerWidget {
               borderRadius: index == 0 && isLast
                   ? BorderRadius.only(topRight: Radius.circular(24.sp), bottomRight: Radius.circular(24.sp))
                   : index == 0
-                      ? BorderRadius.only( topRight: Radius.circular(24.sp))
+                      ? BorderRadius.only(topRight: Radius.circular(24.sp))
                       : isLast
-                          ? BorderRadius.only( bottomRight: Radius.circular(24.sp))
+                          ? BorderRadius.only(bottomRight: Radius.circular(24.sp))
                           : BorderRadius.zero,
               onPressed: (context) => ref.read(createActivityDataProvider.notifier).deleteRegistration(index.toInt()),
               backgroundColor: Theme.of(context).colorScheme.error,
@@ -57,6 +59,7 @@ class RegistrationRowWidget extends ConsumerWidget {
             "${value % 1 == 0 ? value.toStringAsFixed(0) : value.toStringAsFixed(1)} ${Utils.getTransactionTypeText(TransactionType.HOURS, false)}",
             style: style,
           ),
+          onTap: onTap.call(),
         ));
   }
 }

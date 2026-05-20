@@ -1,5 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/goal/data/api/goal_api.dart';
+import 'package:work_hu/features/goal/data/model/goal_filter.dart';
 import 'package:work_hu/features/goal/data/model/goal_model.dart';
 
 class GoalRepository {
@@ -7,10 +10,14 @@ class GoalRepository {
 
   GoalRepository(this._goalApi);
 
-  Future<List<GoalModel>> getGoals(num? seasonYear) async {
+  Future<PaginatedResponse<GoalModel>> getGoals({required GoalFilter filter, required PageStru pageStru}) async {
     try {
-      final res = await _goalApi.getGoals(seasonYear);
-      return res.map((e) => GoalModel.fromJson(e)).toList();
+      final res = await _goalApi.getGoals(filter: filter, pageStru: pageStru);
+      final paginatedData = PaginatedResponse<GoalModel>.fromJson(
+        res,
+        (json) => GoalModel.fromJson(json as Map<String, dynamic>),
+      );
+      return paginatedData;
     } on DioException {
       rethrow;
     }

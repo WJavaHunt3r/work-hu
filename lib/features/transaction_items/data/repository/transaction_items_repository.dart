@@ -1,25 +1,28 @@
 import 'package:dio/dio.dart';
-import 'package:work_hu/app/data/models/transaction_type.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/transaction_items/data/api/transaction_items_api.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
+
+import '../models/transaction_items_filter.dart';
 
 class TransactionItemsRepository {
   final TransactionItemsApi _transactionItemsApi;
 
   TransactionItemsRepository(this._transactionItemsApi);
 
-  Future<List<TransactionItemModel>> getTransactionItems(
-      {num? transactionId,
-      num? userId,
-      num? roundId,
-      num? seasonYear,
-      DateTime? startDate,
-      DateTime? endDate,
-      TransactionType? transactionType}) async {
+  Future<PaginatedResponse<TransactionItemModel>> getTransactionItems({
+    TransactionItemsFilter? filter,
+    required int page,
+    required int size,
+    required List<String> sort,
+  }) async {
     try {
-      final res = await _transactionItemsApi.getTransactionItems(
-          transactionId, userId, roundId, seasonYear, startDate, endDate, transactionType);
-      return res.map((e) => TransactionItemModel.fromJson(e)).toList();
+      final res = await _transactionItemsApi.getTransactionItems(filter: filter, page: page, size: size, sort: sort);
+      final paginatedData = PaginatedResponse<TransactionItemModel>.fromJson(
+        res,
+        (json) => TransactionItemModel.fromJson(json as Map<String, dynamic>),
+      );
+      return paginatedData;
     } on DioException {
       rethrow;
     }

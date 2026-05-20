@@ -53,15 +53,14 @@ class ActivityItemsDataNotifier extends BaseDataNotifier<ActivityItemsState> imp
         () => activityItemRepository.getActivityItems(activityId: state.activity!.id, page: page, size: size, sort: sort),
         onSuccess: (data) async {
       state = state.copyWith(
-          activityItems: data.content,
+          activityItems: data.page.number == 0 ? data.content : [...state.activityItems, ...data.content],
           status: state.status
               .copyWith(totalElements: data.page.totalElements, totalPages: data.page.totalPages, number: data.page.number));
     });
   }
 
   Future<void> deleteActivityItem(num id) async {
-    executeApiCall<void>(() => activityItemRepository.deleteActivityItems(id, locator<UserProvider>().user!.id),
-        onSuccess: (data) async {
+    executeApiCall<void>(() => activityItemRepository.deleteActivityItems(id), onSuccess: (data) async {
       list();
     });
   }
@@ -84,7 +83,8 @@ class ActivityItemsDataNotifier extends BaseDataNotifier<ActivityItemsState> imp
                   ? item.hours * 2000
                   : item.hours * 3000,
           hours: item.hours,
-          userId: item.userId, userName: item.userName));
+          userId: item.userId,
+          userName: item.userName));
     }
 
     Utils.createCreditCsv(list, state.activity!.activityDateTime, state.activity!.description, users);
@@ -93,5 +93,10 @@ class ActivityItemsDataNotifier extends BaseDataNotifier<ActivityItemsState> imp
   @override
   ActivityItemsState copyWithState(BaseState status) {
     return state.copyWith(status: state.status.copyWith(baseStatus: status));
+  }
+
+  Future<void> registerActivity() async {
+    createCreditCsv();
+    await executeApiCall(() => _activityRepository.registerActivity(state.activity!.id!, locator<UserProvider>().user!.id));
   }
 }

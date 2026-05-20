@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 
 class PrivacyPolicy extends StatelessWidget {
@@ -17,17 +18,17 @@ class PrivacyPolicy extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: EdgeInsets.symmetric(horizontal: 20.sp),
         child: Column(
           children: [
-            const SizedBox(height: 10),
+            SizedBox(height: 10.sp),
             Center(
               child: Text(
                 'pp_last_updated'.i18n(),
-                style: TextStyle(color: colorScheme.onBackground.withOpacity(0.5), fontSize: 13),
+                style: TextStyle(color: colorScheme.onSurface.withAlpha(126), fontSize: 13.sp),
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: 30.sp),
 
             // Google Data Section (Light Card)
             _buildInfoCard(
@@ -63,15 +64,15 @@ class PrivacyPolicy extends StatelessWidget {
               contentKey: 'pp_rights_body',
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20.sp),
 
             // Footer Contact / Action
             Container(
-              margin: const EdgeInsets.only(bottom: 40),
-              padding: const EdgeInsets.all(24),
+              margin: EdgeInsets.only(bottom: 40.sp),
+              padding: EdgeInsets.all(24.sp),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceVariant, // Eltérő szín a láblécnek
-                borderRadius: BorderRadius.circular(20),
+                color: colorScheme.surfaceContainerHighest, // Eltérő szín a láblécnek
+                borderRadius: BorderRadius.circular(20.sp),
               ),
               child: Column(
                 children: [
@@ -79,7 +80,7 @@ class PrivacyPolicy extends StatelessWidget {
                     'pp_contact_us'.i18n(),
                     style: TextStyle(color: colorScheme.onSurfaceVariant),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.sp),
                   ElevatedButton(
                     onPressed: () {},
                     child: Text('pp_delete_account_btn'.i18n()),
@@ -102,31 +103,31 @@ class PrivacyPolicy extends StatelessWidget {
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      margin: const EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(20.sp),
+      margin: EdgeInsets.only(bottom: 16.sp),
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: theme.dividerColor.withOpacity(0.05)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10)],
+        borderRadius: BorderRadius.circular(15.sp),
+        border: Border.all(color: theme.dividerColor.withAlpha(12)),
+        boxShadow: [BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 10.sp)],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: theme.colorScheme.primary, size: 24),
-          const SizedBox(width: 16),
+          Icon(icon, color: theme.colorScheme.primary, size: 24.sp),
+          SizedBox(width: 16.sp),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   titleKey.i18n(),
-                  style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 16.sp),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.sp),
                 Text(
                   bodyKey.i18n(),
-                  style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7), fontSize: 13, height: 1.4),
+                  style: TextStyle(color: theme.colorScheme.onSurface.withAlpha(200), fontSize: 13.sp, height: 1.4.sp),
                 ),
               ],
             ),
@@ -146,11 +147,11 @@ class PrivacyPolicy extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      margin: const EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(24.sp),
+      margin: EdgeInsets.only(bottom: 16.sp),
       decoration: BoxDecoration(
-        color: isDarkTheme ? theme.colorScheme.surfaceVariant : const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(15),
+        color: isDarkTheme ? theme.colorScheme.surfaceContainerHighest : const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(15.sp),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,10 +160,10 @@ class PrivacyPolicy extends StatelessWidget {
             titleKey.i18n(),
             style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 16),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.sp),
           Text(
             contentKey.i18n(),
-            style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.5),
+            style: TextStyle(color: Colors.white70, fontSize: 14.sp, height: 1.5.sp),
           ),
         ],
       ),

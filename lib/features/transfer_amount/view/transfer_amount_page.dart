@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/widgets/base_alert_dialog.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/features/transfer_amount/data/state/transfer_amount_state.dart';
 import 'package:work_hu/features/transfer_amount/providers/transfer_amount_provider.dart';
@@ -113,10 +115,19 @@ class TransferAmountPageState extends BasePageState<TransferAmountPage, Transfer
             onPressed: state.selectedUser == null || state.amount > (state.account?.balance ?? 0)
                 ? null
                 : () {
-                    ref
-                        .watch(provider.notifier)
-                        .transfer(amount: int.tryParse(_amountController.text) ?? 0)
-                        .then((value) async {});
+                    ref.watch(provider.notifier).transfer(amount: int.tryParse(_amountController.text) ?? 0).then((value) async {
+                      if (state.status.modelState.isSuccess && context.mounted) {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return BaseAlertDialog(
+                                  cancelVisible: false,
+                                  title: "transfer_success_title".i18n(),
+                                  content: Text("transfer_success_content".i18n()),
+                                  onTap: () => null);
+                            }).then((value) => Navigator.of(context).pop(true));
+                      }
+                    });
                   },
             child: Text(
               'top_up_confirm_amount'.i18n(),
@@ -159,7 +170,7 @@ class _AmountPresetButton extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 24.sp, vertical: 12.sp),
         decoration: BoxDecoration(
           color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
         ),
         child: Text(
           label,
@@ -188,7 +199,7 @@ class _PaymentTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.sp),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12.sp),
@@ -200,10 +211,10 @@ class _PaymentTile extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(8.sp),
               decoration: BoxDecoration(
                 color: theme.colorScheme.onSurface,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8.sp),
               ),
               child: Icon(icon, color: theme.colorScheme.surface),
             ),
@@ -237,7 +248,7 @@ class _DashedAddButton extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.sp),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.sp),
         border: Border.all(color: theme.dividerColor, style: BorderStyle.solid),
@@ -245,7 +256,7 @@ class _DashedAddButton extends StatelessWidget {
       child: Row(
         children: [
           Icon(Icons.add, color: theme.hintColor),
-          SizedBox(width: 16),
+          SizedBox(width: 16.sp),
           Text(label, style: theme.textTheme.labelLarge?.copyWith(color: theme.hintColor)),
         ],
       ),

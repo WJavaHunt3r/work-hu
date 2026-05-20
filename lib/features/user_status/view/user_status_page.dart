@@ -4,14 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
-import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
-import 'package:work_hu/app/style/app_colors.dart';
-import 'package:work_hu/app/widgets/base_filter_chip.dart';
 import 'package:work_hu/features/user_status/data/state/user_status_state.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
+import '../../../app/models/mode_state.dart';
 import '../../../app/widgets/base_list_item.dart';
 
 class UserStatusPage extends BaseListPage {
@@ -35,15 +33,6 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
     return BaseListTile(
       isLast: isLast,
       index: index,
-      // onTap: () => showGeneralDialog(
-      //     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      //     barrierColor: AppColors.primary,
-      //     transitionDuration: const Duration(milliseconds: 200),
-      //     context: context,
-      //     pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
-      //       return MyShareStatusPage(
-      //           userGoalRound: UserGoalUserRoundModel(userStatus: item, round: currentRound!));
-      //     }),
       minVerticalPadding: 0,
       title: Text(
         item.name,
@@ -58,17 +47,18 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
               color: Theme.of(context).colorScheme.error,
               size: 24.sp,
             ),
-      subtitle: item.onTrack
-          ? const Text(
-              "On Track",
-            )
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(toOnTrack)])),
-              ],
-            ),
+      subtitle: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          item.onTrack
+              ? const Text(
+                  "On Track",
+                )
+              : Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(toOnTrack)])),
+          Text("myshare_status_goal".i18n([Utils.creditFormatting(item.goal)]))
+        ],
+      ),
       trailing: Text(
         "${Utils.percentFormat.format(userStatus)}%",
         style: Theme.of(context).textTheme.bodyLarge,

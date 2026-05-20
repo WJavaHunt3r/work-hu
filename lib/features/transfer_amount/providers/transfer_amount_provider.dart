@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
@@ -32,7 +33,7 @@ class TransferAmountDataNotifier extends BaseDataNotifier<TransferAmountState> {
         () => _bufeRepository.transferAmount(
             userId: currentUser!.id.toString(),
             toId: state.selectedUser!.id.toString(),
-            externalReferance: "transfer_amount_customer_id:${currentUser!.id} - ${state.selectedUser!.id}",
+            externalReferance: "transfer_${UniqueKey()}:${currentUser!.id} - ${state.selectedUser!.id}",
             message: message,
             amount: amount), onError: (error) async {
       state = state.copyWith(status: const BaseState(modelState: ModelState.error, message: "transfer_amount_error"));

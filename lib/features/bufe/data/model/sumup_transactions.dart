@@ -27,6 +27,7 @@ class TopUpEntry with _$TopUpEntry {
     required double amount,
     @JsonKey(name: 'date') required DateTime createdAt,
     required String description,
+    required String type,
     @JsonKey(name: 'balance_after') required double balanceAfter,
   }) = _TopUpEntry;
 
@@ -51,6 +52,7 @@ class OrderItem with _$OrderItem {
   const factory OrderItem({
     required int quantity,
     required List<dynamic> modifiers,
+    @JsonKey(name: 'image_url') required String imageUrl,
     @JsonKey(name: 'unit_price') required double unitPrice,
     @JsonKey(name: 'total_price') required double totalPrice,
     @JsonKey(name: 'product_name') required String productName,
@@ -63,7 +65,7 @@ class OrderItem with _$OrderItem {
 class OrderEntry with _$OrderEntry {
   const factory OrderEntry({
     required int total,
-    required List<OrderItem> items,
+    @JsonKey(name: 'items') required List<OrderItem> orderItems,
     required DateTime date,
     @JsonKey(name: 'order_id') required String orderId,
     @JsonKey(name: 'location_name') required String locationName,

@@ -134,7 +134,7 @@ class _AmountPresetButton extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 24.sp, vertical: 12.sp),
         decoration: BoxDecoration(
           color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
         ),
         child: Text(
           label,
@@ -163,7 +163,7 @@ class _PaymentTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.sp),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12.sp),
@@ -175,14 +175,14 @@ class _PaymentTile extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(8.sp),
               decoration: BoxDecoration(
                 color: theme.colorScheme.onSurface,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8.sp),
               ),
               child: Icon(icon, color: theme.colorScheme.surface),
             ),
-            SizedBox(width: 16),
+            SizedBox(width: 16.sp),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -212,7 +212,7 @@ class _DashedAddButton extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.sp),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.sp),
         border: Border.all(color: theme.dividerColor, style: BorderStyle.solid),

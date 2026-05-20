@@ -52,7 +52,7 @@ class UserComboDataNotifier extends BaseDataNotifier<UserComboState> implements 
 
   Future<UserComboModel?> getUser({required num id}) async {
     var result = await executeApiCall<UserModel>(
-      () => usersRepository.getUserByMyShareId(id),
+      () => usersRepository.getUserById(id),
     );
 
     if (result != null) {

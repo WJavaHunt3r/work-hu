@@ -83,7 +83,7 @@ app.*.map.json
 /lib/features/transactions/data/state/transactions_state.freezed.dart
 /lib/features/login/data/model/user_model.freezed.dart
 /lib/features/login/data/model/user_model.g.dart
-/lib/features/user_points/data/model/user_points_state.freezed.dart
+/lib/features/user_transactions/data/model/user_points_state.freezed.dart
 /lib/features/profile/data/model/user_round_model.freezed.dart
 /lib/features/profile/data/model/user_round_model.g.dart
 /lib/features/user_status/data/state/user_status_state.freezed.dart

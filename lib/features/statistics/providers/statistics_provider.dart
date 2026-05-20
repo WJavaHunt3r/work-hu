@@ -22,16 +22,16 @@ class StatisticsDataNotifier extends StateNotifier<StatisticsState> {
   final TransactionItemsRepository transactionItemsRepository;
 
   Future<void> getTransactionItems([num? seasonYear]) async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await transactionItemsRepository.getTransactionItems().then((data) async {
-
-        state = state.copyWith();
-
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error);
-    }
+    // state = state.copyWith(modelState: ModelState.loading);
+    // try {
+    //   await transactionItemsRepository.getTransactionItems().then((data) async {
+    //
+    //     state = state.copyWith();
+    //
+    //   });
+    // } catch (e) {
+    //   state = state.copyWith(modelState: ModelState.error);
+    // }
   }
 
 }

@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/transactions/data/api/transaction_api.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
+import 'package:work_hu/features/transactions/data/models/transactions_filter.dart';
 
 class TransactionRepository {
   final TransactionApi _transactionApi;
@@ -25,10 +28,16 @@ class TransactionRepository {
     }
   }
 
-  Future<List<TransactionModel>> getTransactions([num? roundId]) async {
+  Future<PaginatedResponse<TransactionModel>> getTransactions(
+      {required TransactionsFilter filter, required PageStru pageStru}) async {
     try {
-      final res = await _transactionApi.getTransactions(roundId);
-      return res.map((e) => TransactionModel.fromJson(e)).toList();
+      final res = await _transactionApi.getTransactions(filter: filter, pageStru: pageStru);
+      final paginatedData = PaginatedResponse<TransactionModel>.fromJson(
+        res,
+        (json) => TransactionModel.fromJson(json as Map<String, dynamic>),
+      );
+
+      return paginatedData;
     } on DioException {
       rethrow;
     }

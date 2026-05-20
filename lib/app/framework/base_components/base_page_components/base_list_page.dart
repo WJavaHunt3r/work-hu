@@ -6,12 +6,12 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/sort_builder.dart';
-import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_confirm_dialog.dart';
 import 'package:work_hu/app/widgets/base_filter_chip.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/base_sort_widget.dart';
 
+import '../../../models/mode_state.dart';
 import 'base_state.dart';
 import 'list_api_provider.dart';
 
@@ -30,28 +30,31 @@ abstract class BaseListPage extends BasePage {
 abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N extends StateNotifier<S>>
     extends BasePageState<P, S, N> {
   // late BaseSearchBar? searchBar;
-  late int _currentPage;
 
   final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
-  @override
-  void initState() {
-    super.initState();
-    _currentPage = 0;
-  }
+  bool _isLocalLoading = false;
 
-  void updatePage(int nextPage) {
-    if (status.modelState.isLoading) return;
+  void updatePage(int nextPage) async {
+    // Ha a lokális vagy a globális status szerint töltünk, azonnal megállunk
+    if (_isLocalLoading || status.modelState.isLoading) return;
 
-    setState(() {
-      _currentPage = nextPage;
-      list(pageFrom: _currentPage);
-    });
+    // SZINKRON módon azonnal lezárjuk a kaput, mielőtt a list() aszinkron ága elindulna
+    _isLocalLoading = true;
+
+    try {
+      // Meghívjuk a listázót (ha a list() Future-rel tér vissza, érdemes megvárni az await-tel)
+      await list(pageFrom: nextPage);
+    } finally {
+      // Amikor a kérés befejeződött (akár sikeresen, akár hibával), feloldjuk a zárat
+      _isLocalLoading = false;
+    }
   }
 
   @override
   void onScroll() {
-    if (status.modelState.isLoading) return;
+    // Itt is ellenőrizzük a lokális zárat
+    if (_isLocalLoading || status.modelState.isLoading) return;
 
     final pos = getController().position;
     double maxScroll = pos.maxScrollExtent;
@@ -62,9 +65,8 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
     double delta = 200.0;
 
     if (maxScroll - currentScroll <= delta) {
-      if (listStatus.totalPages > _currentPage + 1) {
-        // Itt már tudjuk, hogy kell az új oldal
-        updatePage(_currentPage + 1);
+      if (listStatus.totalPages > listStatus.number + 1) {
+        updatePage(listStatus.number + 1);
       }
     }
   }
@@ -201,7 +203,7 @@ class FilterChipLayout extends StatelessWidget {
         Expanded(
           child: Align(
             alignment: Alignment.centerLeft, // Ensures the Wrap doesn't try to center stack
-            child: Wrap(spacing: 8.0, runSpacing: 4.0, alignment: WrapAlignment.start, children: widgets),
+            child: Wrap(spacing: 8.sp, runSpacing: 4.sp, alignment: WrapAlignment.start, children: widgets),
           ),
         ),
         BaseSortWidget(sortParameters: state.sortParameters, onSelected: (value) => onSelected!(value)),

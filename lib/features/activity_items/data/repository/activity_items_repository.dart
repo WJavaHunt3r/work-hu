@@ -30,7 +30,7 @@ class ActivityItemsRepository {
           sort: sort);
       final paginatedData = PaginatedResponse<ActivityItemsModel>.fromJson(
         res,
-            (json) => ActivityItemsModel.fromJson(json as Map<String, dynamic>),
+        (json) => ActivityItemsModel.fromJson(json as Map<String, dynamic>),
       );
       return paginatedData;
     } on DioException {
@@ -74,9 +74,9 @@ class ActivityItemsRepository {
     }
   }
 
-  Future<String> deleteActivityItems(num activityItemId, userId) async {
+  Future<String> deleteActivityItems(num activityItemId) async {
     try {
-      final res = await _activityItemsApi.deleteActivityItems(activityItemId, userId);
+      final res = await _activityItemsApi.deleteActivityItems(activityItemId);
       return res;
     } catch (e) {
       rethrow;

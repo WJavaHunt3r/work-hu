@@ -77,7 +77,7 @@
   "donations": "Donations",
   "donate": "Donation",
   "donate_button": "Donate",
-  "donate_proceed": "Proceed to payment: %s Ft",
+  "donate_proceed": "Proceed to payment: %s",
   "donation_description": "Description",
   "donation_description_no": "Description (NO)",
   "donation_start_date": "Donation start",
@@ -129,7 +129,7 @@
   "myshare_status_to_be_ontrack": "%s to be On Track",
   "myshare_status_to_be_ontrack_short": " to be On Track",
   "myshare_status_to_be_myshare_ontrack_short": "%s to be On Track (PACE)",
-  "myshare_status_goal": "Goal: %s Ft",
+  "myshare_status_goal": "Goal: %s",
   "myshare_status_name": "Name",
   "myshare_status_status": "Status",
   "create_bmm_transaction_success_message": "BMM points successfully submitted!",
@@ -357,9 +357,17 @@
   "base_delete_question": "Are you sure you wish to delete this item?",
   "activity_create_user": "Create user",
   "transfer_amount_balance": "Balance",
-  "status_to_onTrack": "%s Ft to be on track",
+  "status_to_onTrack": "%s to be on track",
   "status_title": "Status",
   "status_goal": "Goal: %s",
   "activity_items_transactionType": "Work type",
-  "profile_version": "Version: %s"
+  "profile_version": "Version: %s",
+  "bufe_transactions_title": "Transactions",
+  "api_unknown_error": "An unknown error occurred",
+  "create_activity_default_hour": "Default hour",
+  "transaction_items_title": "Transaction items",
+  "transaction_items_date": "Date",
+  "transaction_items_transaction_type": "Transaction type",
+  "transaction_items_account": "Payment account"
+
 }

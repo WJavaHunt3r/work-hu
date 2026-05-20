@@ -13,7 +13,9 @@ import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
 import 'package:work_hu/features/user_combo/view/user_combo.dart';
 
 class GoalsMaintenance extends ConsumerWidget {
-  const GoalsMaintenance({super.key});
+  GoalsMaintenance({super.key});
+
+  final TextEditingController userController = TextEditingController();
 
   static final _formKey = GlobalKey<FormState>();
 
@@ -26,7 +28,7 @@ class GoalsMaintenance extends ConsumerWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: () => context.pop(),
+          onPressed: () => context.pop(false),
         ),
         title: Text(
           "${mode}_goal".i18n(),
@@ -34,58 +36,64 @@ class GoalsMaintenance extends ConsumerWidget {
         ),
         actions: [
           MaterialButton(
-            onPressed: () => ref.read(goalDataProvider.notifier).saveGoal().then((value) => context.pop()),
+            onPressed: () => ref.read(goalDataProvider.notifier).saveGoal().then((value) => context.pop(true)),
             child: const Text("Save"),
           )
         ],
       ),
-      body: Form(
-          key: _formKey,
-          onPopInvoked: (pop) => ref.read(goalDataProvider.notifier).presetGoal(const GoalModel(goal: 0), MaintenanceMode.create),
-          child: Padding(
-            padding: EdgeInsets.all(8.sp),
-            child: Column(
-              children: [
-                Row(
+      body: goal.seasonYear == null
+          ? const SizedBox()
+          : Form(
+              key: _formKey,
+              onPopInvoked: (pop) =>
+                  ref.read(goalDataProvider.notifier).presetGoal(const GoalModel(goal: 0), MaintenanceMode.create),
+              child: Padding(
+                padding: EdgeInsets.all(8.sp),
+                child: Column(
                   children: [
-                    Expanded(
-                        child: UserComboWidget(
-                      controller: TextEditingController(),
-                      onSuggestionSelected: (UserComboModel suggestion) => null,
-                      // ref.watch(goalDataProvider.notifier).updateGoal(goal.copyWith(user: suggestion)),
-                      labelText: "goal_maintenance_user".i18n(),
-                    )),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: UserComboWidget(
+                          initValue: goal.userId,
+                          controller: userController,
+                          fldControl: mode == MaintenanceMode.create ? "3" : "1",
+                          onSuggestionSelected: (UserComboModel suggestion) => ref
+                              .watch(goalDataProvider.notifier)
+                              .updateGoal(goal.copyWith(userId: suggestion.id, username: suggestion.lastname)),
+                          labelText: "goal_maintenance_user".i18n(),
+                        )),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: BaseTextFormField(
+                            enabled: false,
+                            labelText: "goal_maintenance_season".i18n(),
+                            initialValue: goal.seasonYear == null ? "0" : goal.seasonYear.toString(),
+                            onChanged: (season) => {},
+                          ),
+                        ),
+                        const Spacer(
+                          flex: 1,
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: BaseTextFormField(
+                            labelText: "goal_maintenance_goal".i18n(),
+                            initialValue: goal.goal.toString(),
+                            keyBoardType: TextInputType.number,
+                            onChanged: (String text) => text.isNotEmpty
+                                ? ref.watch(goalDataProvider.notifier).updateGoal(goal.copyWith(goal: num.tryParse(text) ?? 0))
+                                : null,
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: BaseTextFormField(
-                        enabled: false,
-                        labelText: "goal_maintenance_season".i18n(),
-                        initialValue: goal.season == null ? "0" : goal.season!.seasonYear.toString(),
-                        onChanged: (season) => {},
-                      ),
-                    ),
-                    const Spacer(
-                      flex: 1,
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: BaseTextFormField(
-                        labelText: "goal_maintenance_goal".i18n(),
-                        initialValue: goal.goal.toString(),
-                        keyBoardType: TextInputType.number,
-                        onChanged: (String text) => text.isNotEmpty
-                            ? ref.watch(goalDataProvider.notifier).updateGoal(goal.copyWith(goal: num.tryParse(text) ?? 0))
-                            : null,
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          )),
+              )),
     ));
   }
 }

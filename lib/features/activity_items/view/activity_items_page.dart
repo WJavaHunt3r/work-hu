@@ -65,18 +65,28 @@ class ActivityItemsPageState extends BaseListPageState<ActivityItemsPage, Activi
   }
 
   @override
+  List<Widget>? buildActions(BuildContext context, WidgetRef ref) {
+    return state.activity != null && !state.activity!.registeredInApp
+        ? [
+            IconButton(
+                onPressed: () => ref.read(provider.notifier).registerActivity().then((r) => Navigator.of(context).pop(true)),
+                icon: const Icon(Icons.send_outlined))
+          ]
+        : null;
+  }
+
+  @override
   List<Widget> buildHeaderLayout(BuildContext context, WidgetRef ref) {
     var activity = state.activity;
     return [
       BaseHeaderChip(
         label: "activity_items_date",
-        labelValue: () async => " ${activity?.description}  - ${Utils.dateFormating(activity?.createDateTime)} ",
+        labelValue: () async =>
+            activity == null ? "" : "${activity.description} - ${Utils.dateFormating(activity.createDateTime)}",
       ),
       BaseHeaderChip(label: "activity_items_employer", labelValue: () async => activity?.employerName ?? ""),
       BaseHeaderChip(label: "activity_items_responsible", labelValue: () async => activity?.responsibleName ?? ""),
-      BaseHeaderChip(
-          label: "activity_items_transactionType",
-          labelValue: () async => activity?.transactionType.name ?? ""),
+      BaseHeaderChip(label: "activity_items_transactionType", labelValue: () async => activity?.transactionType.name ?? ""),
       if (locator<UserProvider>().user!.isAdmin())
         BaseHeaderChip(label: "activity_items_created_by", labelValue: () async => activity?.createUserName ?? ""),
     ];

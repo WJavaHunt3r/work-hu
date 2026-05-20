@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/transaction_items/data/api/transaction_items_api.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
+import 'package:work_hu/features/transaction_items/data/models/transaction_items_filter.dart';
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
 import 'package:work_hu/features/transaction_items/data/state/transaction_items_state.dart';
 import 'package:work_hu/features/transactions/data/repository/transactions_repository.dart';
@@ -34,39 +35,28 @@ class TransactionItemsDataNotifier extends StateNotifier<TransactionItemsState> 
   final UserModel? currentUser;
 
   Future<void> getTransactionItems(num transactionId) async {
-    state = state.copyWith(modelState: ModelState.loading, transactionItems: []);
-    try {
-      await transactionItemsRepository.getTransactionItems(transactionId: transactionId).then((data) async {
-        data.sort((a, b) => b.userName.compareTo(a.userName));
-        state = state.copyWith(transactionItems: data, modelState: ModelState.success);
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+    var sort = SortBuilder()
+      ..add("user.lastname", descending: false)
+      ..add("user.firstname", descending: false);
+    await transactionItemsRepository
+        .getTransactionItems(filter: TransactionItemsFilter(transactionId: transactionId), page: 0, size: 50, sort: sort.build())
+        .then((data) async {
+      state = state.copyWith(transactionItems: data.content);
+    });
   }
 
   Future<void> getTransaction(num transactionId) async {
-    state = state.copyWith(modelState: ModelState.loading, transactionItems: []);
-    try {
-      await transactionsRepository.getTransaction(transactionId).then((data) async {
-        state = state.copyWith(transaction: data, modelState: ModelState.success);
-        getTransactionItems(transactionId);
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+    await transactionsRepository.getTransaction(transactionId).then((data) async {
+      state = state.copyWith(transaction: data);
+      getTransactionItems(transactionId);
+    });
   }
 
   Future<void> deleteTransactionItem(num id, int index) async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await transactionItemsRepository.deleteTransactionItem(id, currentUser!.id).then((data) {
-        List<TransactionItemModel> items = state.transactionItems.where((element) => element.id != id).toList();
-        state = state.copyWith(transactionItems: items, modelState: ModelState.success);
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+    await transactionItemsRepository.deleteTransactionItem(id, currentUser!.id).then((data) {
+      List<TransactionItemModel> items = state.transactionItems.where((element) => element.id != id).toList();
+      state = state.copyWith(transactionItems: items);
+    });
   }
 
   Future<void> createCreditsCsv() async {

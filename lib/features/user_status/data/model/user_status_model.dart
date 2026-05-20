@@ -11,6 +11,7 @@ class UserStatusModel with _$UserStatusModel {
   const factory UserStatusModel(
       {required num id,
       required String name,
+      required num userId,
       required num goal,
       required num status,
       required num transactions,

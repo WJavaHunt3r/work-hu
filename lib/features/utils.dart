@@ -101,6 +101,11 @@ class Utils {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day}";
   }
 
+  static String dateTimeToDateOnlyString(DateTime? date) {
+    if(date == null) return "";
+    return DateFormat("yyyy-MM-dd").format(date);
+  }
+
   static String dateToStringWithDots(DateTime date) {
     return "${date.year}.${date.month < 10 ? "0${date.month}" : date.month}.${date.day < 10 ? "0${date.day}" : date.day}";
   }
@@ -117,9 +122,14 @@ class Utils {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day} ${date.hour < 10 ? "0${date.hour}" : date.hour}:${date.minute < 10 ? "0${date.minute}" : date.minute}";
   }
 
-  static String dateFormating(DateTime? date){
+  static String dateFormating(DateTime? date, [String? locale]){
     if(date == null) return "";
-    return DateFormat('yyyy, MMM dd').format(date);
+    return DateFormat('yyyy. MMM dd.', locale).format(date);
+  }
+
+  static String dateFormatingWithTime(DateTime? date, [String? locale]){
+    if(date == null) return "";
+    return DateFormat('yyyy. MMM dd. • HH:mm', locale).format(date);
   }
 
   // static RoundModel createEmptyRound() {

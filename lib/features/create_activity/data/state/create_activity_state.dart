@@ -15,15 +15,10 @@ abstract class CreateActivityState with _$CreateActivityState {
   const factory CreateActivityState({
     @Default([]) List<ActivityItemsModel> activityItems,
     ActivityModel? activity,
-    UserComboModel? responsible,
-    UserComboModel? employer,
-    DateTime? activityDate,
-    @Default(TransactionType.DUKA_MUNKA) TransactionType transactionType,
-    @Default(Account.MYSHARE) Account account,
-    @Default("") String description,
     @Default(0) num sum,
     UserComboModel? selectedUser,
     double? hours,
+    @Default(1) double defaultHour,
     @Default(BaseState()) BaseState status,
   }) = _CreateActivityState;
 

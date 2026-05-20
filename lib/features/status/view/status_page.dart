@@ -3,12 +3,17 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/status/data/state/status_state.dart';
 import 'package:work_hu/features/status/providers/status_providers.dart';
+import 'package:work_hu/features/user_transactions/widgets/points_list_item.dart';
 import 'package:work_hu/features/utils.dart';
 
 class StatusPage extends BasePage {
@@ -21,6 +26,11 @@ class StatusPage extends BasePage {
 }
 
 class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataNotifier> {
+  @override
+  void onRefresh() {
+    ref.read(statusDataProvider.notifier).getUserInfoAndUserRounds();
+  }
+
   @override
   Widget buildLayout() {
     final theme = Theme.of(context);
@@ -73,6 +83,18 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
                       backgroundColor: colorScheme.primary.withOpacity(0.1),
                       color: colorScheme.primary,
                     ),
+                    if (child.userId != locator<UserProvider>().user!.id)
+                      BaseListTile(
+                        isLast: false,
+                        contentPadding: EdgeInsets.only(top:12.sp),
+                        index: 2,
+                        title: Text('status_recent_transactions'.i18n(),
+                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        onTap: () {
+                          context.push('/status/transactions/${child.userId}');
+                        },
+                        trailing: Icon(Icons.arrow_forward_ios, size: 16.sp),
+                      )
                   ],
                 ),
               ),
@@ -134,14 +156,32 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
         //   ),
         // ),
         //
-        // SizedBox(height: 32.sp),
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //   children: [
-        //     Text('home_recent_transactions'.i18n(), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-        //     TextButton(onPressed: () {}, child: Text('home_view_all'.i18n(), style: TextStyle(color: colorScheme.primary))),
-        //   ],
-        // ),
+        SizedBox(height: 16.sp),
+
+        if (state.transactions.isNotEmpty)
+          Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('status_recent_transactions'.i18n(),
+                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  TextButton(
+                      onPressed: () {
+                        context.push('/status/transactions/${locator<UserProvider>().user!.id}');
+                      },
+                      child: Text('status_view_all'.i18n(), style: TextStyle(color: colorScheme.primary))),
+                ],
+              ),
+              SizedBox(height: 12.sp),
+              ...state.transactions.map((e) => TransactionTile(
+                  title: e.description,
+                  date: Utils.dateFormating(e.transactionDate),
+                  amount: Utils.creditFormatting(e.credit),
+                  transactionType: e.transactionType))
+            ],
+          )
+
         //
         // // Transaction List
         // _TransactionTile(
@@ -197,53 +237,6 @@ class _MonthStatus extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _TransactionTile extends StatelessWidget {
-  final String title, date, amount;
-  final IconData icon;
-
-  const _TransactionTile({required this.title, required this.date, required this.amount, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return BaseContainer(
-      child: Row(
-        children: [
-          _IconBox(icon: icon),
-          SizedBox(width: 16.sp),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-                Text(date, style: Theme.of(context).textTheme.bodySmall),
-              ],
-            ),
-          ),
-          Text(amount, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-}
-
-class _IconBox extends StatelessWidget {
-  final IconData icon;
-
-  const _IconBox({required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(10.sp),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(icon, color: Theme.of(context).colorScheme.primary),
     );
   }
 }

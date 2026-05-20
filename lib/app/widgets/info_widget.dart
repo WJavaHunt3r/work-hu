@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class InfoWidget extends StatelessWidget {
   const InfoWidget(
@@ -35,9 +36,8 @@ class InfoWidget extends StatelessWidget {
                 Navigator.pop(context);
               },
               child: Container(
-
-                padding: const EdgeInsets.all(
-                  16,
+                padding: EdgeInsets.all(
+                  16.sp,
                 ),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainer,

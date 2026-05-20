@@ -72,9 +72,9 @@ class ActivityItemsApi {
     }
   }
 
-  Future<dynamic> deleteActivityItems(num activityItemId, num userId) async {
+  Future<dynamic> deleteActivityItems(num activityItemId) async {
     try {
-      final res = await _dioClient.dio.delete("/activityItem/$activityItemId", queryParameters: {"userId": userId});
+      final res = await _dioClient.dio.delete("/activityItem/$activityItemId");
       return res.data;
     } catch (e) {
       rethrow;

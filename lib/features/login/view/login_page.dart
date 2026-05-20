@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in_web/web_only.dart' as web;
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
@@ -12,7 +13,6 @@ import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/features/login/data/state/login_state.dart';
 import 'package:work_hu/features/login/providers/login_provider.dart';
-import 'package:google_sign_in_web/web_only.dart' as web;
 import 'package:work_hu/features/utils.dart';
 
 class LoginPage extends BasePage {
@@ -21,9 +21,10 @@ class LoginPage extends BasePage {
   }) : super(
             title: 'login_brand_name',
             leading: Padding(
-              padding: const EdgeInsets.all(4),
-              child: Image.asset('icons/dukapp_icon_round.png'),
-            ));
+              padding: EdgeInsets.all(4.sp),
+              child: Image.asset('assets/icons/dukapp_icon_round.png'),
+            ),
+            canRefresh: false);
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -41,13 +42,13 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
     final theme = Theme.of(context);
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: EdgeInsets.all(12..sp),
         child: Column(
           children: [
             _buildMainCard(theme),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.sp),
             if (state.donations.isNotEmpty) _buildDonations(theme),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.sp),
             _buildPageFooter(theme),
           ],
         ),
@@ -64,7 +65,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
             children: state.donations.map((e) {
           return BaseContainer(
               width: double.infinity,
-              height: 150,
+              height: 150.sp,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -80,7 +81,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
                 ],
               ));
         }).toList()),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.sp),
       ],
     );
   }
@@ -89,7 +90,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
   List<Widget>? buildActions(context, ref) {
     return [
       SizedBox(
-        width: 120,
+        width: 120.sp,
         child: ListView.separated(
           physics: const NeverScrollableScrollPhysics(),
           scrollDirection: Axis.horizontal,
@@ -130,28 +131,28 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
             'login_welcome_title'.i18n(),
             style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.sp),
           Text(
             'login_welcome_subtitle'.i18n(),
             style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.sp),
           _buildToggleButtons(theme),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.sp),
           Form(
             key: _formKey,
             child: _isLogin ? _buildLoginForms() : _buildRegisterForms(),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.sp),
           _buildRememberMeRow(theme),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.sp),
           _buildLoginButton(theme),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.sp),
           _buildDivider(theme),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.sp),
           _buildGoogleButton(theme),
-          const SizedBox(height: 24),
-          _isLogin ? _buildFooterText(theme) : SizedBox(),
+          SizedBox(height: 24.sp),
+          _isLogin ? _buildFooterText(theme) : const SizedBox(),
         ],
       ),
     );
@@ -175,7 +176,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
           labelText: "login_email_label",
           hintText: "login_email_hint",
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.sp),
         BaseTextFormField(
           controller: passwordController,
           textInputAction: TextInputAction.send,
@@ -273,10 +274,10 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
 
   Widget _buildToggleButtons(ThemeData theme) {
     return Container(
-      padding: const EdgeInsets.all(2),
+      padding: EdgeInsets.all(2.sp),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.sp),
       ),
       child: Row(
         children: [
@@ -293,10 +294,10 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
       onTap: onTap,
       child: Card(
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.sp)),
         color: active ? null : Colors.transparent,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0),
+          padding: EdgeInsets.symmetric(vertical: 12.sp),
           child: Center(
             child: Text(
               text,
@@ -350,9 +351,9 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
         onPressed: () {
           login();
         },
-        label: const Icon(Icons.arrow_forward, size: 18),
+        label: Icon(Icons.arrow_forward, size: 18.sp),
         icon: Text(_isLogin ? 'login_login_button'.i18n() : 'login_register_button'.i18n(),
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -362,7 +363,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
       children: [
         Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
         Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16.sp),
             child: Text('login_divider_text'.i18n(), style: theme.textTheme.labelSmall)),
         Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
       ],
@@ -372,7 +373,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
   Widget _buildGoogleButton(ThemeData theme) {
     var lngCode = ref.watch(localeProvider).value?.languageCode;
     return Container(
-      height: 50,
+      height: 50.sp,
       width: double.infinity,
       alignment: Alignment.center,
       child: web.renderButton(
@@ -407,16 +408,16 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
+          padding: EdgeInsets.symmetric(horizontal: 32.sp),
           child: Text(
             'login_app_description'.i18n(), // "A DukApp egy biztonságos adománygyűjtő platform..."
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium,
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24.sp),
         Text('login_brand_name'.i18n(), style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 24),
+        SizedBox(height: 24.sp),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -424,14 +425,14 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
               child: Text('login_privacy_policy'.i18n(), style: style),
               onPressed: () => context.go("/privacy"),
             ),
-            const SizedBox(width: 24),
+            SizedBox(width: 24.sp),
             TextButton(
               child: Text('login_terms_service'.i18n(), style: style),
               onPressed: () => context.go("/tos"),
             ),
           ],
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32.sp),
         Text('login_copyright'.i18n(),
             style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline), textAlign: TextAlign.center),
       ],

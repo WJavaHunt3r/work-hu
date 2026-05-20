@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart';
@@ -15,12 +16,8 @@ import 'package:work_hu/features/payment_success/providers/payment_success_provi
 import 'package:work_hu/features/utils.dart';
 
 class PaymentSuccessPage extends BasePage {
-  const PaymentSuccessPage({
-    super.key,
-    this.checkoutReference,
-    super.hasAppBar = false,
-    super.title = "payment_success",
-  });
+  const PaymentSuccessPage(
+      {super.key, this.checkoutReference, super.hasAppBar = false, super.title = "payment_success", super.canRefresh = false});
 
   final String? checkoutReference;
 
@@ -42,14 +39,14 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
     var colorScheme = theme.colorScheme;
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.sp),
         child: state.status.modelState.isSuccess
             ? state.payment!.status == PaymentStatus.PAID
-            ? buildSuccessPage(theme, colorScheme, state.payment!)
-            : buildErrorPage(theme, colorScheme, state.payment!)
+                ? buildSuccessPage(theme, colorScheme, state.payment!)
+                : buildErrorPage(theme, colorScheme, state.payment!)
             : state.status.modelState.isError
-            ? Center(child: Text("payment_success_error".i18n()))
-            : Center(child: CircularProgressIndicator()),
+                ? Center(child: Text("payment_success_error".i18n()))
+                : const Center(child: CircularProgressIndicator()),
       ),
     );
   }
@@ -57,30 +54,30 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
   Widget buildSuccessPage(ThemeData theme, ColorScheme colorScheme, SumupCheckoutModel payment) {
     return Column(
       children: [
-        const SizedBox(height: 40),
+        SizedBox(height: 40.sp),
         // Success Icon with Glow
         Center(
           child: Container(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20.sp),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: colorScheme.primary.withAlpha(10),
             ),
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.sp),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: colorScheme.primary.withAlpha(20),
               ),
               child: Icon(
                 Icons.check_circle_outline,
-                size: 64,
+                size: 64.sp,
                 color: colorScheme.primary,
               ),
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24.sp),
         Text(
           'payment_success_successful'.i18n(),
           style: theme.textTheme.headlineMedium?.copyWith(
@@ -88,12 +85,12 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
             color: colorScheme.primary,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.sp),
         Text(
           'payment_success_transaction_processed'.i18n(),
           style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32.sp),
 
         // Summary Card
         BaseContainer(
@@ -107,7 +104,7 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
                   color: theme.hintColor,
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.sp),
               Text(
                 Utils.creditFormatting(payment.amount), // Usually passed as a param
                 style: theme.textTheme.displaySmall?.copyWith(
@@ -115,16 +112,16 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
                   color: colorScheme.onSurface,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.sp),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.verified_user_outlined,
-                    size: 18,
+                    size: 18.sp,
                     color: colorScheme.primary,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8.sp),
                   Text(
                     'payment_success_transaction_approved'.i18n(),
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -138,7 +135,7 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
           ),
         ),
 
-        const SizedBox(height: 32),
+        SizedBox(height: 32.sp),
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
@@ -146,42 +143,42 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
             style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.sp),
 
         // Details Card
         BaseContainer(
           child: Column(
             children: [
               _DetailRow(label: 'payment_success_transaction_id'.i18n(), value: payment.checkoutReference),
-              const Divider(height: 24),
+              Divider(height: 24.sp),
               _DetailRow(
                   label: 'payment_success_date_time'.i18n(),
                   value: DateFormat('MMM dd, yyyy • HH:mm').format(payment.transactionDate)),
-              const Divider(height: 24),
+              Divider(height: 24.sp),
               _DetailRow(
                 label: 'payment_success_payment_method'.i18n(),
                 value: payment.entryMode!,
                 icon: payment.entryMode == 'APPLE_PAY'
                     ? Icons.apple
                     : payment.entryMode == 'GOOGLE_PAY'
-                    ? Icons.g_mobiledata
-                    : Icons.credit_card,
+                        ? Icons.g_mobiledata
+                        : Icons.credit_card,
               ),
             ],
           ),
         ),
 
-        const SizedBox(height: 40),
+        SizedBox(height: 40.sp),
         // Primary Action
         SizedBox(
           width: double.infinity,
-          height: 56,
+          height: 56.sp,
           child: FilledButton(
             onPressed: () => context.go("/balance"),
-            child: Text('payment_success_back_to_home'.i18n(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            child: Text('payment_success_back_to_home'.i18n(), style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.sp),
       ],
     );
   }
@@ -195,29 +192,29 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
   buildErrorPage(ThemeData theme, ColorScheme colorScheme, SumupCheckoutModel payment) {
     var errorColor = colorScheme.error;
     return Column(children: [
-      const SizedBox(height: 40),
+      SizedBox(height: 40.sp),
       Center(
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20.sp),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: errorColor.withOpacity(0.1),
+            color: errorColor.withAlpha(25),
           ),
           child: Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.sp),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: errorColor.withOpacity(0.15),
+              color: errorColor.withAlpha(40),
             ),
             child: Icon(
               Icons.cancel_outlined,
-              size: 64,
+              size: 64.sp,
               color: errorColor,
             ),
           ),
         ),
       ),
-      const SizedBox(height: 24),
+      SizedBox(height: 24.sp),
 
       Text(
         'payment_success_failed'.i18n(),
@@ -227,7 +224,7 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
           color: colorScheme.onSurface,
         ),
       ),
-      const SizedBox(height: 12),
+      SizedBox(height: 12.sp),
 
       Text(
         'payment_success_failed_subtitle'.i18n(),
@@ -237,7 +234,7 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
           height: 1.5,
         ),
       ),
-      const SizedBox(height: 40),
+      SizedBox(height: 40.sp),
 
       // Amount Card
       BaseContainer(
@@ -251,7 +248,7 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
                 color: theme.hintColor,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.sp),
             Text(
               Utils.creditFormatting(payment.amount),
               style: theme.textTheme.displayMedium?.copyWith(
@@ -263,12 +260,12 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
         ),
       ),
 
-      const SizedBox(height: 32),
+      SizedBox(height: 32.sp),
 
       // Actions
       SizedBox(
         width: double.infinity,
-        height: 56,
+        height: 56.sp,
         child: FilledButton(
           onPressed: () async {
             Uri uri = Uri.parse(state.payment!.hostedUrl.toString());
@@ -278,15 +275,15 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
           },
           child: Text(
             'payment_success_try_again'.i18n(),
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
           ),
         ),
       ),
-      const SizedBox(height: 12),
+      SizedBox(height: 12.sp),
 
       SizedBox(
         width: double.infinity,
-        height: 56,
+        height: 56.sp,
         child: OutlinedButton(
           onPressed: () => context.go("/balance"),
           child: Text(
@@ -295,7 +292,7 @@ class PaymentSuccessStatePage extends BasePageState<PaymentSuccessPage, PaymentS
           ),
         ),
       ),
-      const SizedBox(height: 48)
+      SizedBox(height: 48.sp)
     ]);
   }
 }
@@ -317,8 +314,8 @@ class _DetailRow extends StatelessWidget {
         Row(
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 20, color: theme.colorScheme.onSurface),
-              const SizedBox(width: 8),
+              Icon(icon, size: 20.sp, color: theme.colorScheme.onSurface),
+              SizedBox(width: 8.sp),
             ],
             Text(value, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
           ],

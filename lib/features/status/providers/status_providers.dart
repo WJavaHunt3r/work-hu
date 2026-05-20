@@ -1,11 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
+import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/profile/data/state/profile_state.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/status/data/state/status_state.dart';
+import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
+import 'package:work_hu/features/transaction_items/data/models/transaction_items_filter.dart';
+import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
+import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
 import 'package:work_hu/features/user_rounds/data/model/user_round_model.dart';
 import 'package:work_hu/features/user_rounds/data/repository/user_round_repository.dart';
 import 'package:work_hu/features/user_rounds/providers/user_rounds_provider.dart';
@@ -18,51 +23,61 @@ import 'package:work_hu/features/users/providers/users_providers.dart';
 import '../../../app/providers/base_provider.dart';
 
 final statusDataProvider = StateNotifierProvider.autoDispose<StatusDataNotifier, StatusState>((ref) => StatusDataNotifier(
-    ref.read(userDataProvider.notifier),
     ref.read(userRoundsRepoProvider),
     ref.read(userStatusRepoProvider),
     ref.read(usersRepoProvider),
-    ref.read(roundDataProvider.notifier)));
+    ref.read(roundDataProvider.notifier),
+    ref.read(transactionItemsRepoProvider)));
 
 class StatusDataNotifier extends BaseDataNotifier<StatusState> {
-  StatusDataNotifier(
-    this.currentUser,
-    this.userRoundRepoProvider,
-    this.userStatusRepoProvider,
-    this.usersRepository,
-    this.roundDataNotifier,
-  ) : super(const StatusState()) {
+  StatusDataNotifier(this.userRoundRepoProvider, this.userStatusRepoProvider, this.usersRepository, this.roundDataNotifier,
+      this._transactionItemsRepository)
+      : super(const StatusState()) {
     getUserInfoAndUserRounds();
   }
 
-  final UserProvider currentUser;
   final UserRoundRepository userRoundRepoProvider;
   final UserStatusRepository userStatusRepoProvider;
   final UsersRepository usersRepository;
   final RoundDataNotifier roundDataNotifier;
+  final TransactionItemsRepository _transactionItemsRepository;
 
   Future<void> getUserInfo() async {
     // await executeApiCall(()=> getUserInfoAndUserRounds());
   }
 
   Future<void> getUserInfoAndUserRounds() async {
-    // roundDataNotifier.getCurrentRound();
-    var userModel = currentUser.user;
+    var userModel = locator<UserProvider>().user!;
 
-    if (userModel != null) {
-      executeApiCall<UserStatusModel>(() => getUserStatus(userModel.id), onSuccess: (userRounds) async {
-        state = state.copyWith(statuses: [userRounds]);
-      });
+    await executeApiCall<UserStatusModel>(() => getUserStatus(userModel.id), onSuccess: (userRounds) async {
+      state = state.copyWith(statuses: [userRounds]);
+      if (userRounds.userId == userModel.id) {
+        executeApiCall<PaginatedResponse<TransactionItemModel>>(
+            () => _transactionItemsRepository.getTransactionItems(
+                filter: TransactionItemsFilter(userId: userModel.id, seasonYear: DateTime.now().year),
+                page: 0,
+                size: 10,
+                sort: ["transactionDate,desc"]), onSuccess: (data) async {
+          state = state.copyWith(transactions: data.content);
+        });
+      }
+    }, onError: (error) async {
+      state = copyWithModelState(ModelState.empty);
+    });
 
-      executeApiCall<List<UserModel>>(() => usersRepository.getChildren(userModel.id), onSuccess: (children) async {
-        state = state.copyWith(children: children);
-        for (var child in children) {
-          await getUserStatus(child.id).then((status) async {
-            state = state.copyWith(statuses: [...state.statuses, status]);
-          });
-        }
-      });
-    }
+    executeApiCall<List<UserModel>>(() => usersRepository.getChildren(userModel.id), onSuccess: (children) async {
+      state = state.copyWith(children: children);
+      for (var child in children) {
+        await getUserStatus(child.id).then((status) async {
+          state = state.copyWith(statuses: [...state.statuses, status]);
+        }, onError: (error) async {
+          state = copyWithModelState(ModelState.empty);
+        });
+      }
+
+    }, onError: (error) async {
+      state = copyWithModelState(ModelState.empty);
+    });
   }
 
   Future<List<UserRoundModel>> getUserRounds(num id) async {

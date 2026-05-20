@@ -10,6 +10,7 @@ import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
+import 'package:work_hu/features/activities/providers/avtivity_provider.dart';
 
 class ActivityListItem extends ConsumerWidget {
   const ActivityListItem(
@@ -29,7 +30,9 @@ class ActivityListItem extends ConsumerWidget {
       child: BaseContainer(
         padding: EdgeInsets.all(8.sp),
         onTap: () {
-          context.push("/profile/activities/${current.id}/items");
+          context
+              .push("/profile/activities/${current.id}/items")
+              .then((r) => r != null && r == true ? ref.read(activityDataProvider.notifier).list() : null);
         },
         child: ListTile(
           contentPadding: EdgeInsets.zero,
@@ -44,36 +47,46 @@ class ActivityListItem extends ConsumerWidget {
           ),
           title: Text(
             current.description,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
-          trailing: user.isAdmin() && !current.registeredInApp
+          trailing: !current.registeredInApp &&
+                  !current.registeredInMyShare &&
+                  !current.registeredInTeams &&
+                  ([current.createUserId, current.responsibleId, current.employerId].contains(user.id) || user.isAdmin())
               ? IconButton(
-                  icon: const Icon(Icons.send_outlined),
-                  onPressed: () => onIconPressed(),
-                )
-              : user.isAdmin() && !current.registeredInMyShare && current.transactionType != TransactionType.POINT
-                  ? MaterialButton(
-                      child: const Image(
-                        image: AssetImage("assets/img/myshare-logo.png"),
-                        fit: BoxFit.fitWidth,
-                      ),
+                  onPressed: () => context
+                      .push("/profile/activities/${current.id}/edit")
+                      .then((value) => ref.read(activityDataProvider.notifier).list()),
+                  icon: const Icon(Icons.edit_outlined))
+              : user.isAdmin() && !current.registeredInApp
+                  ? IconButton(
+                      icon: const Icon(Icons.send_outlined),
                       onPressed: () => onIconPressed(),
                     )
-                  : user.isAdmin() && current.registeredInMyShare && current.registeredInApp && !current.registeredInTeams
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.group,
-                            size: 25.sp,
-                            color: Colors.deepPurple,
+                  : user.isAdmin() && !current.registeredInMyShare && current.transactionType != TransactionType.POINT
+                      ? MaterialButton(
+                          child: const Image(
+                            image: AssetImage("assets/img/myshare-logo.png"),
+                            fit: BoxFit.fitWidth,
                           ),
                           onPressed: () => onIconPressed(),
                         )
-                      : current.registeredInMyShare && current.registeredInApp ||
-                              current.registeredInApp && current.transactionType == TransactionType.POINT
-                          ? const Icon(
-                              Icons.done_outline,
-                              color: AppColors.primaryGreen,
+                      : user.isAdmin() && current.registeredInMyShare && current.registeredInApp && !current.registeredInTeams
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.group,
+                                size: 25.sp,
+                                color: Colors.deepPurple,
+                              ),
+                              onPressed: () => onIconPressed(),
                             )
-                          : null,
+                          : current.registeredInMyShare && current.registeredInApp ||
+                                  current.registeredInApp && current.transactionType == TransactionType.POINT
+                              ? const Icon(
+                                  Icons.done_outline,
+                                  color: AppColors.primaryGreen,
+                                )
+                              : null,
           // isThreeLine: true,
           subtitle: Column(
             children: [

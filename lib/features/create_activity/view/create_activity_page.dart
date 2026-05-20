@@ -6,9 +6,7 @@ import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
@@ -21,7 +19,14 @@ import 'package:work_hu/features/user_combo/view/user_combo.dart';
 import 'package:work_hu/features/utils.dart';
 
 class CreateActivityPage extends BasePage {
-  const CreateActivityPage({super.title = "create_activity_new_activity_viewname", super.key, super.canPop = false});
+  const CreateActivityPage(
+      {super.title = "create_activity_new_activity_viewname",
+      super.key,
+      super.canPop = false,
+      super.canRefresh = false,
+      this.id});
+
+  final num? id;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -32,6 +37,7 @@ class CreateActivityPage extends BasePage {
 class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateActivityState, CreateActivityDataNotifier> {
   static final _formKey = GlobalKey<FormState>();
   late final TextEditingController hoursController;
+  late final TextEditingController defaultHourController;
   late final TextEditingController descriptionController;
   late final TextEditingController dateController;
   late final TextEditingController userController;
@@ -45,6 +51,7 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
     super.initState();
     hoursController = TextEditingController(text: "");
     userController = TextEditingController(text: "");
+    defaultHourController = TextEditingController(text: "1");
     employerController = TextEditingController(text: "");
     responsibleController = TextEditingController(text: "");
     descriptionController = TextEditingController(text: "");
@@ -52,26 +59,50 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
     valueFocusNode = FocusNode();
     usersFocusNode = FocusScopeNode();
 
-    dateController.addListener(() => ref.read(provider.notifier).updateDate(dateController.value.text));
-    descriptionController.addListener(() => ref.read(provider.notifier).updateDescription(descriptionController.value.text));
+    dateController.addListener(() => ref.watch(provider.notifier).updateActivity(
+        state.activity!.copyWith(activityDateTime: DateTime.tryParse(dateController.value.text) ?? DateTime.now())));
+    descriptionController.addListener(() =>
+        ref.watch(provider.notifier).updateActivity(state.activity!.copyWith(description: descriptionController.value.text)));
     hoursController.addListener(() => ref.read(provider.notifier).updateHours(hoursController.value.text));
     userController.addListener(() => _scrollToTop());
+
+    defaultHourController.addListener(() {
+      ref.read(provider.notifier).updateDefaultHour(defaultHourController.value.text);
+      hoursController.text = defaultHourController.value.text;
+    });
+  }
+
+  @override
+  void postInit(WidgetRef ref) {
+    super.postInit(ref);
+    if (widget.id != null) {
+      ref.read(provider.notifier).getActivity(widget.id!).then((value) {
+        if (state.status.modelState.isSuccess && state.activity != null) {
+          dateController.text = state.activity!.activityDateTime.toString();
+          descriptionController.text = state.activity!.description;
+        }
+      });
+    } else {
+      ref.read(provider.notifier).presetActivity();
+    }
   }
 
   @override
   Widget buildLayout() {
     var theme = Theme.of(context);
-    return Column(
-      children: [
-        _buildDetails(theme),
-        SizedBox(height: 5.sp),
-        if (state.description.isNotEmpty) _buildSummaryCard(theme),
-        SizedBox(height: 5.sp),
-        if (state.description.isNotEmpty) _buildRegistrationCard(theme),
-        SizedBox(height: 5.sp),
-        if (state.description.isNotEmpty) _buildRegistrationListCard(theme)
-      ],
-    );
+    return state.activity == null
+        ? const SizedBox()
+        : Column(
+            children: [
+              _buildDetails(theme),
+              SizedBox(height: 5.sp),
+              if (state.activity!.description.isNotEmpty) _buildSummaryCard(theme),
+              SizedBox(height: 5.sp),
+              if (state.activity!.description.isNotEmpty) _buildRegistrationCard(theme),
+              SizedBox(height: 5.sp),
+              if (state.activity!.description.isNotEmpty) _buildRegistrationListCard(theme)
+            ],
+          );
   }
 
   _buildDetails(ThemeData theme) {
@@ -80,6 +111,7 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               BaseTextFormField(
                 controller: dateController,
@@ -106,22 +138,22 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
               SizedBox(height: 5.sp),
               UserComboWidget(
                 controller: employerController,
-                initValue: -1,
+                initValue: 281,
                 onSuggestionSelected: (UserComboModel suggestion) {
-                  ref.read(provider.notifier).updateEmployer(suggestion);
+                  ref.watch(provider.notifier).updateActivity(state.activity!.copyWith(employerId: suggestion.id));
                 },
                 labelText: "create_activity_employer".i18n(),
               ),
               UserComboWidget(
                 controller: responsibleController,
-                initValue: locator<UserProvider>().user!.myShareID,
+                initValue: state.activity!.responsibleId,
                 onSuggestionSelected: (UserComboModel suggestion) {
-                  ref.watch(provider.notifier).updateResponsible(suggestion);
+                  ref.watch(provider.notifier).updateActivity(state.activity!.copyWith(responsibleId: suggestion.id));
                 },
                 labelText: "create_activity_responsible".i18n(),
               ),
               SizedBox(height: 5.sp),
-              state.employer?.id == 281
+              state.activity!.employerId == 281
                   ? Padding(
                       padding: EdgeInsets.all(8.sp),
                       child: LayoutBuilder(builder: (context, constraints) {
@@ -141,8 +173,8 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
                                     borderRadius: BorderRadius.circular(8.sp),
                                     borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.sp)),
                               ),
-                              initialValue: state.transactionType,
-                              items: [TransactionType.DUKA_MUNKA_2000, TransactionType.DUKA_MUNKA, TransactionType.POINT]
+                              initialValue: state.activity!.transactionType,
+                              items: [TransactionType.DUKA_MUNKA_2000, TransactionType.DUKA_MUNKA]
                                   .map((e) => DropdownMenuItem<TransactionType>(
                                         value: e,
                                         child: Text(e.name),
@@ -153,7 +185,17 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
                       }),
                     )
                   : const SizedBox(),
-              state.description.isEmpty
+              SizedBox(
+                width: 140.sp,
+                child: BaseTextFormField(
+                  controller: defaultHourController,
+                  inputFormatter: CommaToDotFormatter(),
+                  keyBoardType: const TextInputType.numberWithOptions(decimal: true),
+                  textInputAction: TextInputAction.next,
+                  labelText: "create_activity_default_hour".i18n(),
+                ),
+              ),
+              state.activity!.description.isEmpty
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -206,7 +248,6 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
   }
 
   _buildRegistrationCard(ThemeData theme) {
-    var isError = state.status.modelState.isError;
     return BaseContainer(
         padding: EdgeInsets.all(8.sp),
         child: Row(
@@ -278,16 +319,17 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
             ),
             Row(
               children: [
-                Text("create_activity_sum".i18n([Utils.getTransactionTypeText(state.transactionType, false)])),
+                Text("create_activity_sum".i18n([Utils.getTransactionTypeText(state.activity!.transactionType, false)])),
                 Text(
                   sum % 1 == 0 ? sum.toStringAsFixed(0) : sum.toStringAsFixed(1),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                Text(state.account == Account.MYSHARE && TransactionType.HOURS == (state.transactionType)
+                Text(state.activity!.account == Account.MYSHARE && TransactionType.HOURS == (state.activity!.transactionType)
                     ? " (${(sum * 3000).toInt()} Ft)"
-                    : TransactionType.DUKA_MUNKA_2000 == (state.transactionType)
+                    : TransactionType.DUKA_MUNKA_2000 == (state.activity!.transactionType)
                         ? " (${(sum * 2000).toInt()} Ft)"
-                        : state.account == Account.MYSHARE && state.transactionType == TransactionType.DUKA_MUNKA
+                        : state.activity!.account == Account.MYSHARE &&
+                                state.activity!.transactionType == TransactionType.DUKA_MUNKA
                             ? " (${(sum * 1000).toInt()} Ft)"
                             : "")
               ],
@@ -336,14 +378,19 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(24.sp),
                 child: RegistrationRowWidget(
-                    name: user, index: items.indexOf(e), isLast: items.indexOf(e) == items.length - 1, value: e.hours),
+                  name: user,
+                  index: items.indexOf(e),
+                  isLast: items.indexOf(e) == items.length - 1,
+                  value: e.hours,
+                  onTap: () {},
+                ),
               );
             }).toList()),
     );
   }
 
   _clearControllers() {
-    hoursController.clear();
+    hoursController.text = defaultHourController.text;
     userController.clear();
   }
 }

@@ -101,7 +101,7 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
             Text(widget.labelText.i18n(),
                 style:
                     theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant)),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.sp),
             TextFormField(
               autofillHints: widget.autofillHints,
               focusNode: widget.focusNode,

@@ -18,7 +18,7 @@ import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class ProfilePage extends BasePage {
-  const ProfilePage({super.key, super.title = "profile_title"});
+  const ProfilePage({super.key, super.title = "profile_title", super.canRefresh = false});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -151,7 +151,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
         // Logout Button
         SizedBox(
           width: double.infinity,
-          height: 56,
+          height: 56.sp,
           child: FilledButton.icon(
             onPressed: () {
               ref.read(provider.notifier).logout();
@@ -237,7 +237,7 @@ class _SettingsTile extends StatelessWidget {
     return BaseListTile(
       contentPadding: EdgeInsets.all(18.sp),
       leading: Container(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(8.sp),
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainer,
           shape: BoxShape.circle,

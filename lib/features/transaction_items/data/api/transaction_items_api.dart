@@ -1,23 +1,26 @@
 import 'package:work_hu/api/dio_client.dart';
-import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/features/transaction_items/data/models/transaction_items_filter.dart';
 
 class TransactionItemsApi {
   final DioClient _dioClient = locator<DioClient>();
 
   TransactionItemsApi();
 
-  Future<List<dynamic>> getTransactionItems(num? transactionId, num? userId, num? roundId, num? seasonYear, DateTime? startDate,
-      DateTime? endDate, TransactionType? transactionType) async {
+  Future<dynamic> getTransactionItems(
+      {TransactionItemsFilter? filter, required int page, required int size, required List<String> sort}) async {
     try {
       final res = await _dioClient.dio.get("/transactionItem", queryParameters: {
-        "transactionId": transactionId,
-        "userId": userId,
-        "roundId": roundId,
-        "seasonYear": seasonYear,
-        "startDate": startDate,
-        "endDate": endDate,
-        "transactionType": transactionType
+        "transactionId": filter?.transactionId,
+        "userId": filter?.userId,
+        "roundId": filter?.roundId,
+        "seasonYear": filter?.seasonYear,
+        "startDate": filter?.startDate,
+        "endDate": filter?.endDate,
+        "transactionType": filter?.transactionType,
+        "page": page,
+        "size": size,
+        "sort": sort
       });
       return res.data;
     } catch (e) {

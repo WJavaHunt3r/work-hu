@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_api.dart';
@@ -23,29 +24,48 @@ abstract class BaseDataNotifier<S> extends StateNotifier<S> {
   }) async {
     try {
       state = copyWithModelState(ModelState.loading);
+
       Future.microtask(() {
         LoadingScreen.instance().show(context: navigatorKey.currentContext!);
       });
-      final response = await apiCall(); // This now returns a specific Result class
+
+      final response = await apiCall();
       LoadingScreen.instance().hide();
+
       if (response != null) {
         state = copyWithModelState(ModelState.success);
         await onSuccess?.call(response as T);
-        LoadingScreen.instance().hide();
         return response;
       } else {
-        onError == null
-            ? state =
-                copyWithState(BaseState(modelState: ModelState.error, message:  'api_unknown_error'.i18n()))
-            : await onError.call(response.message ?? "");
+        final errorMessage = response?.message ?? 'api_unknown_error'.i18n();
+
+        if (onError != null) {
+          state = copyWithModelState(ModelState.empty);
+          await onError.call(errorMessage);
+        } else {
+          state = copyWithState(BaseState(modelState: ModelState.error, message: errorMessage));
+        }
         return null;
       }
-    } catch (e) {
-      print(e);
+    } on DioException catch (e) {
       LoadingScreen.instance().hide();
-      onError == null
-          ? state = copyWithState(BaseState(modelState: ModelState.error, message: e.toString()))
-          : await onError.call(e.toString());
+      final dioErrorMsg = e.message ?? 'api_unknown_error'.i18n();
+
+      if (onError != null) {
+        state = copyWithModelState(ModelState.empty);
+        await onError.call(dioErrorMsg);
+      } else {
+        state = copyWithState(BaseState(modelState: ModelState.error, message: "api_unknown_error".i18n()));
+      }
+      return null;
+    } catch (genericError) {
+      LoadingScreen.instance().hide();
+      if (onError != null) {
+        state = copyWithModelState(ModelState.empty);
+        await onError.call(genericError.toString());
+      } else {
+        state = copyWithState(BaseState(modelState: ModelState.error, message: "api_unknown_error".i18n()));
+      }
       return null;
     }
   }

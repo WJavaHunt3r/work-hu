@@ -14,6 +14,9 @@ import 'package:work_hu/app/widgets/base_alert_dialog.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
+import 'package:work_hu/app/widgets/icon_box.dart';
+import 'package:work_hu/features/bufe/data/model/sumup_transactions.dart';
+import 'package:work_hu/features/bufe_transaction_items/view/bufe_transaction_items_page.dart';
 import 'package:work_hu/features/home/data/state/home_state.dart';
 import 'package:work_hu/features/home/providers/home_provider.dart';
 import 'package:work_hu/features/utils.dart';
@@ -44,7 +47,9 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
             Expanded(
                 child: _buildActionCard(theme,
                     title: 'home_send_money'.i18n(), subtitle: 'home_send_subtitle'.i18n(), icon: Icons.send, onTap: () {
-              context.push("/balance/transfer").then((e) => ref.read(provider.notifier).getAccount());
+              context
+                  .push("/balance/transfer")
+                  .then((e) => e != null && e == true ? ref.read(provider.notifier).getAccount() : null);
             }, color: Theme.of(context).colorScheme.primary, cardColor: Theme.of(context).colorScheme.primaryContainer)),
             SizedBox(width: 24.sp),
             Expanded(
@@ -134,14 +139,15 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
         onTap?.call();
       },
       child: Container(
-        padding: const EdgeInsets.all(20),
-        height: 180,
-        decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(24), border: BoxBorder.all(color: color)),
+        padding: EdgeInsets.all(20.sp),
+        height: 180.sp,
+        decoration:
+            BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(24.sp), border: BoxBorder.all(color: color)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(10.sp),
               decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               child: Icon(
                 icon,
@@ -163,7 +169,11 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text('home_recent_transactions'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-        TextButton(onPressed: () {}, child: Text('home_see_all'.i18n(), style: TextStyle(color: theme.colorScheme.primary))),
+        TextButton(
+            onPressed: () {
+              context.push("/balance/transactions");
+            },
+            child: Text('home_see_all'.i18n(), style: TextStyle(color: theme.colorScheme.primary))),
       ],
     );
   }
@@ -173,29 +183,41 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
         ? const SizedBox()
         : BaseContainer(
             width: double.infinity,
+            padding: EdgeInsets.zero,
             child: Column(
-              children:
-                  state.orders.map((e) => _transactionItem(theme, e.locationName, e.date, e.total, Icons.shopping_bag)).toList(),
+              children: state.orders
+                  .map((e) => _transactionItem(
+                      theme,
+                      e.locationName,
+                      e.date,
+                      e.total,
+                      e.locationName == "Büfé" ? Icons.coffee_outlined : Icons.shopping_bag_outlined,
+                      state.orders.indexOf(e),
+                      e.orderItems))
+                  .toList(),
             ),
           );
   }
 
-  Widget _transactionItem(ThemeData theme, String name, DateTime date, num amount, IconData icon) {
+  Widget _transactionItem(
+      ThemeData theme, String name, DateTime date, num amount, IconData icon, int index, List<OrderItem> orderItems) {
     final locale = ref.watch(localeProvider).value?.toString() ?? 'en_US';
 
     // 2. Use the locale in the DateFormat constructor
     String formattedDate = DateFormat.yMEd(locale).format(date);
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      tileColor: Colors.transparent,
-      leading: CircleAvatar(
-        backgroundColor: theme.colorScheme.surfaceContainerLow,
-        child: Icon(icon, color: theme.colorScheme.onSurface),
-      ),
+    return BaseListTile(
+      leading: IconBox(icon: icon),
       title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(formattedDate, style: theme.textTheme.bodySmall),
-      trailing: Text(Utils.creditFormatting(amount),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+      trailing: Text("- ${Utils.creditFormatting(amount)}",
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+      isLast: index == state.orders.length - 1,
+      index: index,
+      onTap: () => showDialog(
+          context: context,
+          builder: (context) {
+            return BufeTransactionItemsPage(items: orderItems);
+          }),
     );
   }
 
@@ -231,7 +253,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
 
   Widget _buildWelcomeTitle(ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.only(top: 12, bottom: 20),
+      padding: EdgeInsets.only(top: 12.sp, bottom: 20.sp),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,7 +309,11 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
               .map((e) => BaseListTile(
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Text(e.full_name), Text(Utils.creditFormatting(e.balance))],
+                    children: [
+                      Text(e.full_name),
+                      Text(Utils.creditFormatting(e.balance),
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold))
+                    ],
                   ),
                   isLast: items.indexOf(e) == items.length - 1,
                   index: items.indexOf(e)))

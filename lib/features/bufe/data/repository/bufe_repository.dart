@@ -28,9 +28,9 @@ class BufeRepository {
     }
   }
 
-  Future<Order> getOrders({required num userId, int? limit = 50, int? offset = 0}) async {
+  Future<Order> getOrders({required num userId, int limit = 50, int page = 0}) async {
     try {
-      final res = await _bufeApi.getOrders(userId: userId, limit: limit, offset: offset);
+      final res = await _bufeApi.getOrders(userId: userId, limit: limit, offset: page * limit);
       return Order.fromJson(res);
     } on DioException {
       rethrow;
@@ -50,7 +50,7 @@ class BufeRepository {
           fromDukappId: userId,
           toDukappId: toId,
           externalReference: externalReferance);
-      return Order.fromJson(res);
+      return res;
     } on DioException {
       rethrow;
     }

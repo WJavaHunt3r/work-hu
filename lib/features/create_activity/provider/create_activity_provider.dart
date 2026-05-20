@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
@@ -29,13 +30,9 @@ class CreateActivityDataNotifier extends BaseDataNotifier<CreateActivityState> {
   final ActivityRepository activityRepository;
   final ActivityItemsRepository activityItemsRepository;
 
-  void updateDate(String text) {
-    state = state.copyWith(activityDate: DateTime.tryParse(text));
-    _updateItems();
-  }
-
-  void updateDescription(String text) {
-    state = state.copyWith(description: text);
+  void updateActivity(ActivityModel activity) {
+    activity = activity.copyWith(transactionType: activity.employerId != 281 ? TransactionType.HOURS : activity.transactionType);
+    state = state.copyWith(activity: activity);
     _updateItems();
   }
 
@@ -43,17 +40,17 @@ class CreateActivityDataNotifier extends BaseDataNotifier<CreateActivityState> {
     state = state.copyWith(hours: double.tryParse(text));
   }
 
-  setTransactionTypeAndAccount(TransactionType transactionType, Account account) {
-    state = state.copyWith(transactionType: transactionType, account: account);
+  void updateDefaultHour(String text) {
+    state = state.copyWith(defaultHour: double.tryParse(text) ?? 0);
   }
 
   addRegistration({String? description, required double hours}) {
     var registration = ActivityItemsModel(
-      description: description ?? state.description,
+      description: description ?? state.activity!.description,
       userId: state.selectedUser!.id,
       roundId: roundDataNotifier.getCurrentRound()!.id,
-      transactionType: state.transactionType,
-      account: state.account,
+      transactionType: state.activity!.transactionType,
+      account: state.activity!.account,
       hours: hours,
       createUserId: currentUser!.id,
       createUserName: '',
@@ -69,10 +66,14 @@ class CreateActivityDataNotifier extends BaseDataNotifier<CreateActivityState> {
     _clearAddFields();
   }
 
-  deleteRegistration(int index) {
+  Future<void> deleteRegistration(int index) async {
     List<ActivityItemsModel> items = [];
     var item = state.activityItems[index];
     var value = item.hours;
+
+    if (item.id != null) {
+      await executeApiCall(() => activityItemsRepository.deleteActivityItems(item.id!));
+    }
 
     for (var i = 0; i < state.activityItems.length; i++) {
       if (i != index) items.add(state.activityItems[i]);
@@ -94,18 +95,9 @@ class CreateActivityDataNotifier extends BaseDataNotifier<CreateActivityState> {
     state = state.copyWith(selectedUser: u);
   }
 
-  updateEmployer(UserComboModel u) {
-    state = state.copyWith(employer: u);
-    updateAccount(u.id == 281 ? TransactionType.DUKA_MUNKA : TransactionType.HOURS);
-  }
-
-  updateResponsible(UserComboModel u) {
-    state = state.copyWith(responsible: u);
-  }
-
   updateAccount(TransactionType transactionTye) {
     var account = transactionTye == TransactionType.POINT ? Account.OTHER : Account.MYSHARE;
-    state = state.copyWith(account: account, transactionType: transactionTye);
+    state = state.copyWith(activity: state.activity!.copyWith(account: account, transactionType: transactionTye));
     _updateItems();
   }
 
@@ -114,39 +106,69 @@ class CreateActivityDataNotifier extends BaseDataNotifier<CreateActivityState> {
     items.addAll(state.activityItems);
     List<ActivityItemsModel> newItems = [];
     for (var item in items) {
-      newItems.add(item.copyWith(account: state.account, transactionType: state.transactionType, description: state.description));
+      newItems.add(item.copyWith(
+          account: state.activity!.account,
+          transactionType: state.activity!.transactionType,
+          description: state.activity!.description));
     }
 
     state = state.copyWith(activityItems: newItems);
   }
 
   Future<void> sendActivity() async {
-    await executeApiCall<ActivityModel>(
-        () => activityRepository.postActivity(ActivityModel(
-            description: state.description,
-            account: state.account,
-            createUserId: currentUser!.id,
-            activityDateTime: state.activityDate ?? DateTime.now(),
-            employerId: state.employer!.id,
-            responsibleId: state.responsible!.id,
-            registeredInApp: false,
-            registeredInMyShare: false,
-            transactionType: state.transactionType,
-            registeredInTeams: false,
-            createUserName: '',
-            employerName: '',
-            responsibleName: '')), onSuccess: (activity) async {
-      List<ActivityItemsModel> newItems = [];
-      for (var item in state.activityItems) {
-        newItems.add(item.copyWith(activityId: activity.id));
-      }
-      await executeApiCall(
-          () => activityItemsRepository.postActivityItems(newItems.where((element) => element.hours != 0).toList()));
-    });
+    if (state.activity!.id != null) {
+      await executeApiCall<ActivityModel>(() => activityRepository.putActivity(state.activity!, state.activity!.id!),
+          onSuccess: (activity) async {
+        await sendActivityItems(activity.id!);
+      });
+    } else {
+      await executeApiCall<ActivityModel>(() => activityRepository.postActivity(state.activity!), onSuccess: (activity) async {
+        await sendActivityItems(activity.id!);
+      });
+    }
+  }
+
+  Future<void> sendActivityItems(num activityId) async {
+    List<ActivityItemsModel> newItems = [];
+    for (var item in state.activityItems) {
+      newItems.add(item.copyWith(activityId: activityId));
+    }
+    await executeApiCall(
+        () => activityItemsRepository.postActivityItems(newItems.where((element) => element.hours != 0).toList()));
   }
 
   @override
   CreateActivityState copyWithState(BaseState status) {
     return state.copyWith(status: status);
+  }
+
+  Future<void> getActivity(num id) async {
+    await executeApiCall<ActivityModel>(() => activityRepository.getActivity(id), onSuccess: (activity) async {
+      var items = await getActivityItems(id);
+      state = state.copyWith(activity: activity, activityItems: items.content);
+    });
+  }
+
+  void presetActivity() {
+    ActivityModel activity = ActivityModel(
+        createUserId: currentUser!.id,
+        createUserName: '',
+        description: '',
+        activityDateTime: DateTime.now(),
+        employerId: 281,
+        employerName: '',
+        responsibleId: currentUser!.id,
+        responsibleName: '',
+        registeredInApp: false,
+        registeredInMyShare: false,
+        registeredInTeams: false,
+        transactionType: TransactionType.DUKA_MUNKA_2000,
+        account: Account.MYSHARE);
+    state = state.copyWith(activity: activity);
+  }
+
+  Future<PaginatedResponse<ActivityItemsModel>> getActivityItems(num activityId) async {
+    return await executeApiCall<PaginatedResponse<ActivityItemsModel>>(
+        () => activityItemsRepository.getActivityItems(activityId: activityId));
   }
 }

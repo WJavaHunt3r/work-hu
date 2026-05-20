@@ -51,9 +51,9 @@ abstract class BaseFilterChipState<T, W extends BaseFilterChip<T>> extends Consu
     var labelValue = widget.labelValue(selectedItem);
     var isActive = labelValue != null && labelValue != "";
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
+      padding: EdgeInsets.only(right: 8.sp),
       child: FilterChip(
-          selectedColor: Theme.of(context).colorScheme.secondary,
+          selectedColor: Theme.of(context).colorScheme.primaryContainer,
           label: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -140,8 +140,8 @@ class ModalBottomFilterChipState<T> extends BaseFilterChipState<T, ModalBottomFi
                                   )),
                             ],
                           )),
-                      const SizedBox(
-                        height: 10,
+                      SizedBox(
+                        height: 10.sp,
                       )
                     ]);
               });

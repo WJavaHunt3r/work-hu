@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/providers/router_provider.dart';
 
@@ -69,16 +70,16 @@ class LoadingScreen {
           color: Colors.black.withAlpha(150),
           child: Center(
             child: Container(
-              constraints: const BoxConstraints(maxWidth: 200, minWidth: 200),
+              constraints: BoxConstraints(maxWidth: 200.sp, minWidth: 200.sp),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(16.sp),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const SizedBox(height: 10),
+                     SizedBox(height: 10.sp),
                     const CircularProgressIndicator(),
-                    const SizedBox(height: 10),
+                     SizedBox(height: 10.sp),
                     StreamBuilder(
                       stream: textController.stream,
                       builder: (context, snapshot) {

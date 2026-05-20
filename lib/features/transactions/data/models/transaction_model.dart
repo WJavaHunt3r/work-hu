@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:work_hu/app/data/models/account.dart';
+import 'package:work_hu/app/data/models/transaction_type.dart';
 
 part 'transaction_model.freezed.dart';
 
@@ -12,6 +13,7 @@ class TransactionModel with _$TransactionModel {
       required String name,
       DateTime? createDateTime,
       num? transactionCount,
+      TransactionType? transactionType,
       required Account account}) = _TransactionModel;
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) => _$TransactionModelFromJson(json);

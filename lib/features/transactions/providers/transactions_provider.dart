@@ -1,12 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/features/rounds/data/state/rounds_state.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transactions/data/api/transaction_api.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
+import 'package:work_hu/features/transactions/data/models/transactions_filter.dart';
 import 'package:work_hu/features/transactions/data/repository/transactions_repository.dart';
 import 'package:work_hu/features/transactions/data/state/transactions_state.dart';
+import 'package:work_hu/features/utils.dart';
+
+import '../../../app/framework/base_components/page_stru.dart';
 
 final transactionsApiProvider = Provider<TransactionApi>((ref) => TransactionApi());
 
@@ -14,61 +24,60 @@ final transactionsRepoProvider =
     Provider<TransactionRepository>((ref) => TransactionRepository(ref.read(transactionsApiProvider)));
 
 final transactionsDataProvider = StateNotifierProvider.autoDispose<TransactionsDataNotifier, TransactionsState>((ref) =>
-    TransactionsDataNotifier(
-        ref.read(transactionsRepoProvider), ref.read(userDataProvider).user, ref.read(roundDataProvider.notifier)));
+    TransactionsDataNotifier(ref.read(transactionsRepoProvider), ref.read(userDataProvider).user, ref.read(roundDataProvider)));
 
-class TransactionsDataNotifier extends StateNotifier<TransactionsState> {
-  TransactionsDataNotifier(this.transactionRepository, this.currentUser, this.roundProvider) : super(const TransactionsState()) {
+class TransactionsDataNotifier extends BaseDataNotifier<TransactionsState> implements ListApiProvider<TransactionsFilter> {
+  TransactionsDataNotifier(this.transactionRepository, this.currentUser, this.roundProvider)
+      : super(const TransactionsState(listState: BaseListState(sort: ["createDateTime,desc"]))) {
     getRounds();
   }
 
   final TransactionRepository transactionRepository;
   final UserModel? currentUser;
-  final RoundDataNotifier roundProvider;
+  final RoundsState roundProvider;
 
-  Future<void> getTransactions() async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await transactionRepository.getTransactions(state.selectedRoundId).then((data) {
-        data.sort(
-            (a, b) => a.createDateTime != null && b.createDateTime != null ? b.createDateTime!.compareTo(a.createDateTime!) : 0);
-        state = state.copyWith(transactions: data, modelState: ModelState.success);
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+  @override
+  Future<void> list({TransactionsFilter? filter, int? page, int? size, List<String>? sort}) async {
+    executeApiCall<PaginatedResponse<TransactionModel>>(
+        () => transactionRepository.getTransactions(
+            filter: filter ?? state.filter,
+            pageStru: PageStru(
+                page: page ?? state.listState.number,
+                size: size ?? state.listState.size,
+                sort: sort ?? state.listState.sort)), onSuccess: (data) async {
+      state = state.copyWith(
+          transactions: page == 0 ? data.content : [...state.transactions, ...data.content],
+          listState: state.listState
+              .copyWith(totalElements: data.page.totalElements, totalPages: data.page.totalPages, number: data.page.number));
+    });
   }
 
   Future<void> deleteTransaction(num id, int index) async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await transactionRepository.deleteTransaction(id, currentUser!.id).then((data) {
-        List<TransactionModel> items = [];
-        for (var i = 0; i < state.transactions.length; i++) {
-          if (i != index) items.add(state.transactions[i]);
-        }
-        state = state.copyWith(transactions: items, modelState: ModelState.success);
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+    await transactionRepository.deleteTransaction(id, currentUser!.id).then((data) {
+      List<TransactionModel> items = [];
+      for (var i = 0; i < state.transactions.length; i++) {
+        if (i != index) items.add(state.transactions[i]);
+      }
+      state = state.copyWith(transactions: items);
+    });
   }
 
   Future<void> getRounds() async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      var rounds = await roundProvider.roundRepository.getRounds();
-      var currentRound = await roundProvider.roundRepository.getCurrentRounds();
-      rounds.sort((a, b) => b.roundNumber.compareTo(a.roundNumber));
-      state = state.copyWith(rounds: rounds, selectedRoundId: currentRound.id, modelState: ModelState.success);
-      await getTransactions();
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+    var rounds = roundProvider.rounds;
+    var currentRound = roundProvider.currentRound;
+    var dateFrom = Utils.dateTimeToDateOnlyString(currentRound?.startDateTime);
+    var dateTo = Utils.dateTimeToDateOnlyString(currentRound?.endDateTime);
+    state = state.copyWith(rounds: rounds, filter: state.filter.copyWith(dateFrom: dateFrom, dateTo: dateTo));
+    list();
   }
 
   Future<void> setSelectedRound(num roundId) async {
-    state = state.copyWith(selectedRoundId: roundId);
-    await getTransactions();
+    // state = state.copyWith(selectedRoundId: roundId);
+    await list();
+  }
+
+  @override
+  TransactionsState copyWithState(BaseState status) {
+    return state.copyWith(listState: state.listState.copyWith(baseStatus: status));
   }
 }

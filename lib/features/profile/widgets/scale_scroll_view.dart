@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FreeScrollList extends StatefulWidget {
   final List<Widget> elements;
@@ -29,7 +30,7 @@ class _FreeScrollListState extends State<FreeScrollList> {
     const double itemWidth = 150.0; // Fixed width of your items
 
     return SizedBox(
-        height: 50,
+        height: 50.sp,
         child: ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
             PointerDeviceKind.touch,
@@ -55,7 +56,7 @@ class _FreeScrollListState extends State<FreeScrollList> {
                   width: itemWidth,
                   decoration: BoxDecoration(
                     // color: Colors.blueAccent,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20.sp),
                   ),
                   child: widget.elements[index],
                 ),

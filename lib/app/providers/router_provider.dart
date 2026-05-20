@@ -7,6 +7,7 @@ import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/view/activities_page.dart';
 import 'package:work_hu/features/activity_items/view/activity_items_page.dart';
 import 'package:work_hu/features/admin/view/admin_page.dart';
+import 'package:work_hu/features/bufe_transactions/view/bufe_transactions_page.dart';
 import 'package:work_hu/features/change_password/view/change_password_page.dart';
 import 'package:work_hu/features/create_activity/view/create_activity_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_point_transactions_page.dart';
@@ -35,8 +36,8 @@ import 'package:work_hu/features/transaction_items/view/transaction_items_page.d
 import 'package:work_hu/features/transactions/view/transactions_page.dart';
 import 'package:work_hu/features/transfer_amount/view/transfer_amount_page.dart';
 import 'package:work_hu/features/user_fra_kare_week/view/user_fra_kare_week_page.dart';
-import 'package:work_hu/features/user_points/view/user_points_page.dart';
 import 'package:work_hu/features/user_status/view/user_status_page.dart';
+import 'package:work_hu/features/user_transactions/view/user_transactions_page.dart';
 import 'package:work_hu/features/users/view/users_page.dart';
 
 import '../../features/profile/view/theme_picker_page.dart';
@@ -51,7 +52,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
       refreshListenable: userNotifier,
       navigatorKey: navigatorKey,
-      initialLocation: "/",
+      initialLocation: "/status",
       routes: [
         GoRoute(
           path: '/login',
@@ -71,13 +72,23 @@ final routerProvider = Provider<GoRouter>((ref) {
                 GoRoute(path: '/balance', builder: (context, state) => HomePage(), routes: [
                   GoRoute(path: "topUps", builder: (BuildContext context, GoRouterState state) => const TopUpsPage()),
                   GoRoute(path: "transfer", builder: (BuildContext context, GoRouterState state) => const TransferAmountPage()),
+                  GoRoute(
+                      path: "transactions", builder: (BuildContext context, GoRouterState state) => const BufeTransactionsPage()),
                 ]),
               ],
             ),
             StatefulShellBranch(
               navigatorKey: _shellNavigatorStatusKey,
               routes: [
-                GoRoute(path: '/status', builder: (context, state) => StatusPage()),
+                GoRoute(path: '/status', builder: (context, state) => StatusPage(), routes: [
+                  GoRoute(
+                    path: 'transactions/:id',
+                    pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(
+                        child: UserTransactionsPage(
+                      userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+                    )),
+                  ),
+                ]),
               ],
             ),
             // Branch 2: Profile
@@ -98,6 +109,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                         GoRoute(
                           path: 'createActivity',
                           builder: (BuildContext context, GoRouterState state) => const CreateActivityPage(),
+                        ),
+                        GoRoute(
+                          path: ':id/edit',
+                          builder: (BuildContext context, GoRouterState state) => CreateActivityPage(
+                            id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+                          ),
                         ),
                       ]),
                   GoRoute(
@@ -171,8 +188,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ]),
         GoRoute(
             path: "/donate/:id",
-            builder: (BuildContext context, GoRouterState state) =>
-                DonatePage(
+            builder: (BuildContext context, GoRouterState state) => DonatePage(
                   id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
                 ),
             routes: [
@@ -184,20 +200,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                     );
                   }),
             ]),
-        GoRoute(
-          path: '/profile/userPoints/:id',
-          pageBuilder: (BuildContext context, GoRouterState state) =>
-              NoTransitionPage(
-                  child: UserPointsPage(
-                    userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-                  )),
-        ),
+
         GoRoute(
             path: '/change-password',
             builder: (BuildContext context, GoRouterState state) {
               return const ChangePasswordPage();
             }),
-        GoRoute(path: "/admin/activities", builder: (BuildContext context, GoRouterState state) => const ActivitiesPage()),
         GoRoute(
             path: "/admin/createTransaction",
             builder: (BuildContext context, GoRouterState state) => const CreateTransactionPage()),
@@ -238,7 +246,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: ':id',
                 builder: (BuildContext context, GoRouterState state) {
-                  return const TransactionItemsPage();
+                  return TransactionItemsPage(transactionId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
                 },
               ),
             ]),
@@ -270,7 +278,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         }
 
         if (loggedIn && state.matchedLocation == '/') {
-          return '/balance';
+          return '/status';
         }
         return null;
       });
@@ -295,17 +303,12 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref
-        .watch(userDataProvider)
-        .user;
+    final user = ref.watch(userDataProvider).user;
     return Scaffold(
       body: navigationShell, // The navigation shell contains the page for the current branch
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Theme
-              .of(context)
-              .colorScheme
-              .surfaceContainerHighest,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.only(topLeft: Radius.circular(24.sp), topRight: Radius.circular(24.sp)),
           boxShadow: [
             BoxShadow(
@@ -328,34 +331,34 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
     );
   }
 
-  List<BottomNavigationBarItem> userScreens() =>
-      <BottomNavigationBarItem>[
+  List<BottomNavigationBarItem> userScreens() => <BottomNavigationBarItem>[
         BottomNavigationBarItem(
             activeIcon: const Icon(Icons.account_balance_wallet),
             icon: const Icon(Icons.account_balance_wallet_outlined),
             label: 'nav_bar_home'.i18n()),
-
         BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.bar_chart), icon: const Icon(Icons.bar_chart_outlined), label: 'nav_bar_status'.i18n()),
+            activeIcon: const Icon(Icons.bar_chart_outlined),
+            icon: const Icon(Icons.bar_chart_outlined),
+            label: 'nav_bar_status'.i18n()),
         BottomNavigationBarItem(
             activeIcon: const Icon(Icons.person_2_rounded),
             icon: const Icon(Icons.person_2_outlined),
             label: 'nav_bar_profile'.i18n()),
       ];
 
-  List<BottomNavigationBarItem> adminScreens() =>
-      <BottomNavigationBarItem>[
+  List<BottomNavigationBarItem> adminScreens() => <BottomNavigationBarItem>[
         BottomNavigationBarItem(
             activeIcon: const Icon(Icons.account_balance_wallet),
             icon: const Icon(Icons.account_balance_wallet_outlined),
             label: 'nav_bar_home'.i18n()),
         BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.bar_chart), icon: const Icon(Icons.bar_chart_outlined), label: 'nav_bar_status'.i18n()),
+            activeIcon: const Icon(Icons.bar_chart_outlined),
+            icon: const Icon(Icons.bar_chart_outlined),
+            label: 'nav_bar_status'.i18n()),
         BottomNavigationBarItem(
             activeIcon: const Icon(Icons.person_2_rounded),
             icon: const Icon(Icons.person_2_outlined),
             label: 'nav_bar_profile'.i18n()),
-
         BottomNavigationBarItem(
             activeIcon: const Icon(Icons.admin_panel_settings),
             icon: const Icon(Icons.admin_panel_settings_outlined),

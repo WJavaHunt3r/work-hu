@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
@@ -73,7 +74,7 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
   Widget _buildConfirmButton(ThemeData theme) {
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: 56.sp,
       child: FilledButton(
         onPressed: () {
           if ((num.tryParse(_amountController.text) ?? 0) != 0) {
@@ -99,7 +100,7 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
         children: [
           Text('top_up_enter_amount'.i18n(), style: theme.textTheme.labelLarge),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            padding: EdgeInsets.symmetric(vertical: 12.sp),
             child: TextField(
               controller: _amountController,
               keyboardType: TextInputType.number,
@@ -115,7 +116,7 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.sp),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [2000, 5000, 10000].map((amt) {
@@ -146,10 +147,10 @@ class _AmountPresetButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: 24.sp, vertical: 12.sp),
         decoration: BoxDecoration(
           color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.sp),
         ),
         child: Text(
           label,
