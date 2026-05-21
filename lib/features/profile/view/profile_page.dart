@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
@@ -13,6 +14,8 @@ import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
+import 'package:work_hu/app/widgets/base_list_view.dart';
+import 'package:work_hu/app/widgets/icon_box.dart';
 import 'package:work_hu/features/profile/data/state/profile_state.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -54,10 +57,6 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
                 style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 4.sp),
-              // Text(
-              //   'profile_premium_member'.i18n(),
-              //   style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
-              // ),
             ],
           ),
         ),
@@ -65,7 +64,6 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
         SizedBox(height: 40.sp),
 
         // Personal Information Section
-        // _buildSectionHeader('profile_section_personal'.i18n(), theme),
         BaseContainer(
           padding: const EdgeInsets.all(0),
           child: Column(
@@ -82,68 +80,61 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
         SizedBox(height: 32.sp),
 
         // Account Settings Section
-        // _buildSectionHeader('profile_section_account'.i18n(), theme),
-        BaseContainer(
-          padding: EdgeInsets.zero,
-          child: Column(
-            children: [
-              _SettingsTile(
-                label: 'profile_my_activities'.i18n(),
-                icon: Icons.list_alt,
-                onTap: () => context.push('/profile/activities'),
-                index: 0,
-              ),
-              const Divider(height: 1),
-              _SettingsTile(
-                label: 'profile_password_security'.i18n(),
-                icon: Icons.shield_outlined,
-              ),
-              const Divider(height: 1),
-              _SettingsTile(
-                label: 'profile_notifications'.i18n(),
-                icon: Icons.notifications_none,
-              ),
-              const Divider(height: 1),
-              _SettingsTile(
-                label: 'profile_language'.i18n(),
-                icon: Icons.language,
-                trailingText: languageName.toString(),
-                onTap: () {
-                  context.push('/profile/language');
-                },
-                isLast: true,
-              ),
-            ],
-          ),
+        BaseListView(
+          hasBottomPadding: false,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _SettingsTile(
+              label: 'profile_my_activities'.i18n(),
+              icon: Icons.list_alt,
+              onTap: () => context.push('/profile/activities'),
+              index: 0,
+            ),
+            Divider(height: 1.sp),
+            _SettingsTile(
+              label: 'profile_booking'.i18n(),
+              icon: Icons.book_outlined,
+              onTap: () {
+                openLink();
+              },
+              isLast: true,
+            ),
+          ],
         ),
 
         SizedBox(height: 32.sp),
 
         // App Settings Section
-        BaseContainer(
-          padding: EdgeInsets.zero,
-          child: Column(
-            children: [
-              _SettingsTile(
-                  label: 'profile_dark_mode'.i18n(),
-                  icon: Icons.dark_mode_outlined,
-                  trailingText: AppThemeMode.getThemeModeLocale(currentThemeMode).i18n(),
-                  onTap: () {
-                    context.push('/profile/theme');
-                  },
-                  index: 0),
-              // trailingWidget: Switch.adaptive(
-              //   value: AppThemeMode.getThemeMode(ref.watch(themeProvider)) == ThemeMode.dark,
-              //   onChanged: (v) {
-              //     ref.read(themeProvider.notifier).changeTheme();
-              //   },
-              //   activeTrackColor: colorScheme.primary,
-              // ),
-              // ),
-              const Divider(height: 1),
-              _SettingsTile(label: 'profile_help_support'.i18n(), icon: Icons.help_outline, isLast: true),
-            ],
-          ),
+        BaseListView(
+          hasBottomPadding: false,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _SettingsTile(label: 'profile_password_security'.i18n(), icon: Icons.shield_outlined, index: 0),
+            const Divider(height: 1),
+            _SettingsTile(
+              label: 'profile_notifications'.i18n(),
+              icon: Icons.notifications_none,
+            ),
+            const Divider(height: 1),
+            _SettingsTile(
+              label: 'profile_language'.i18n(),
+              icon: Icons.language,
+              trailingText: languageName.toString(),
+              onTap: () {
+                context.push('/profile/language');
+              },
+            ),
+            const Divider(height: 1),
+            _SettingsTile(
+                label: 'profile_dark_mode'.i18n(),
+                icon: Icons.dark_mode_outlined,
+                trailingText: AppThemeMode.getThemeModeLocale(currentThemeMode).i18n(),
+                onTap: () {
+                  context.push('/profile/theme');
+                }),
+            const Divider(height: 1),
+            _SettingsTile(label: 'profile_help_support'.i18n(), icon: Icons.help_outline, isLast: true),
+          ],
         ),
 
         SizedBox(height: 32.sp),
@@ -191,6 +182,14 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
 
   @override
   BaseState get status => state.status;
+
+  Future<void> openLink() async {
+    var token = await ref.read(provider.notifier).token();
+    Uri uri = Uri.parse("https://booking.bcc-ktk.org?token=$token");
+    if (!await launchUrl(uri, mode: LaunchMode.inAppBrowserView, webOnlyWindowName: "_self")) {
+      throw Exception('booking_failed_to_launch'.i18n([uri.toString()]));
+    }
+  }
 }
 
 class _InfoTile extends StatelessWidget {
@@ -236,13 +235,8 @@ class _SettingsTile extends StatelessWidget {
     final theme = Theme.of(context);
     return BaseListTile(
       contentPadding: EdgeInsets.all(18.sp),
-      leading: Container(
-        padding: EdgeInsets.all(8.sp),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainer,
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: theme.colorScheme.primary),
+      leading: IconBox(
+        icon: icon,
       ),
       title: Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
       trailing: Row(

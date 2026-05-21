@@ -368,6 +368,7 @@
   "transaction_items_title": "Transaction items",
   "transaction_items_date": "Date",
   "transaction_items_transaction_type": "Transaction type",
-  "transaction_items_account": "Payment account"
-
+  "transaction_items_account": "Payment account",
+  "booking_failed_to_launch": "Booking link failed to launch: %s",
+  "profile_booking": "Room booking"
 }
