@@ -29,6 +29,10 @@ class ProfileDataNotifier extends BaseDataNotifier<ProfileState> {
     currentUser.setUser(null);
   }
 
+  Future<String> token() async {
+   return await executeApiCall(()=> loginRepository.getBookingToken());
+  }
+
   @override
   ProfileState copyWithState(BaseState status) {
     return state.copyWith(status: status);

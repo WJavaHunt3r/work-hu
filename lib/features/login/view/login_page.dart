@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/localeProvider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
@@ -40,20 +41,29 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
   @override
   Widget buildLayout() {
     final theme = Theme.of(context);
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.all(12..sp),
-        child: Column(
-          children: [
-            _buildMainCard(theme),
-            SizedBox(height: 24.sp),
-            if (state.donations.isNotEmpty) _buildDonations(theme),
-            SizedBox(height: 24.sp),
-            _buildPageFooter(theme),
-          ],
-        ),
-      ),
-    );
+    if (state.status.modelState.isError && state.status.message.contains("server_down")) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(Icons.wifi_off_outlined, size: 32.sp, color: theme.colorScheme.error),
+          Text('server_down'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+          SizedBox(height: 16.sp),
+          IconButton(onPressed: () => ref.read(provider.notifier).isAlive(), icon: Icon(Icons.refresh, size: 32.sp)),
+          SizedBox(height: 24.sp),
+          _buildPageFooter(theme),
+        ],
+      );
+    } else {
+      return Column(
+        children: [
+          _buildMainCard(theme),
+          SizedBox(height: 24.sp),
+          if (state.donations.isNotEmpty) _buildDonations(theme),
+          SizedBox(height: 24.sp),
+          _buildPageFooter(theme),
+        ],
+      );
+    }
   }
 
   _buildDonations(ThemeData theme) {

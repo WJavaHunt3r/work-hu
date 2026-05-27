@@ -27,14 +27,17 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
   @override
   Widget buildLayout() {
     var user = locator<UserProvider>().user;
-    return Column(
-      children: user == null
-          ? []
-          : user.role == Role.TEAM_LEADER
-              ? teamLeaderScreens(context)
-              : user.role == Role.ADMIN
-                  ? [...teamLeaderScreens(context), ...adminLeaderScreens(context)]
-                  : [],
+    return BaseContainer(
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: user == null
+            ? []
+            : user.role == Role.TEAM_LEADER
+                ? teamLeaderScreens(context)
+                : user.role == Role.ADMIN
+                    ? [...teamLeaderScreens(context), ...adminLeaderScreens(context)]
+                    : [],
+      ),
     );
   }
 

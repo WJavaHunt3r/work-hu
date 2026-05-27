@@ -24,4 +24,13 @@ class UserRoundApi {
       rethrow;
     }
   }
+
+  Future<int> getHeadData() async {
+    try {
+      final res = await _dioClient.dio.get("/paceUserRound/head");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

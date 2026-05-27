@@ -24,6 +24,7 @@ final loginDataProvider = StateNotifierProvider.autoDispose<LoginDataNotifier, L
 class LoginDataNotifier extends BaseDataNotifier<LoginState> {
   LoginDataNotifier(this._loginRepository, this._donationRepository) : super(const LoginState()) {
     initGoogleWeb();
+    isAlive();
     getDonations();
   }
 
@@ -55,7 +56,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
       required String lastName,
       required String email,
       required String pswd,
-        required String pswdAgain,
+      required String pswdAgain,
       required bool keepLogedIn}) async {
     if (pswd != pswdAgain) {
       copyWithState(BaseState(modelState: ModelState.error, message: "login_password_not_match".i18n()));
@@ -121,5 +122,15 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
         state = state.copyWith(donations: data);
       });
     } catch (e) {}
+  }
+
+  Future<void> isAlive() async {
+    try {
+      await _loginRepository.isAlive().then((data) {
+        state = state.copyWith(status: const BaseState(modelState: ModelState.success, message: ""));
+      });
+    } catch (e) {
+      state = state.copyWith(status: const BaseState(modelState: ModelState.error, message: "server_down"));
+    }
   }
 }

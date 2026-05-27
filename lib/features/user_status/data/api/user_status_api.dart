@@ -1,4 +1,6 @@
+import 'package:work_hu/app/framework/base_components/page_stru.dart';
 import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/features/user_status/data/model/user_status_filter.dart';
 
 import '../../../../api/dio_client.dart';
 
@@ -7,19 +9,9 @@ class UserStatusApi {
 
   UserStatusApi();
 
-  Future<dynamic> getUserStatuses(
-    num? seasonYear,
-    num? teamId, {
-    required int page,
-    required int size,
-    required List<String> sort,
-  }) async {
+  Future<dynamic> getUserStatuses({required UserStatusFilter filter, required PageStru pageStru}) async {
     try {
-      final res = await _dioClient.dio.get("/userStatus", queryParameters: {
-        "seasonYear": seasonYear, "teamId": teamId, "page": page, // The page index (starts at 0 by default)
-        "size": size, // How many items per page
-        "sort": sort,
-      });
+      final res = await _dioClient.dio.get("/userStatus", queryParameters: {...filter.toJson(), ...pageStru.toJson()});
       return res.data;
     } catch (e) {
       rethrow;

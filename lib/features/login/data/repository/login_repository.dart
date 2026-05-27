@@ -35,6 +35,15 @@ class LoginRepository {
     }
   }
 
+  Future<String> isAlive() async {
+    try {
+      final res = await _loginApi.isAlive();
+      return res;
+    } on DioException {
+      rethrow;
+    }
+  }
+
   Future<UserModel> getUserByUsername(String username) async {
     try {
       final res = await _loginApi.getUserByUsername(username);
@@ -65,6 +74,15 @@ class LoginRepository {
   Future<String> sendNewPassword(String username) async {
     try {
       final res = await _loginApi.sendNewPassword(username);
+      return res;
+    } on DioException {
+      rethrow;
+    }
+  }
+
+  Future<String> getBookingToken() async {
+    try {
+      final res = await _loginApi.getBookingToken();
       return res;
     } on DioException {
       rethrow;

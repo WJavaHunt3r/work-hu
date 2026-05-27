@@ -62,10 +62,28 @@ class LoginApi {
     }
   }
 
+  Future<dynamic> isAlive() async {
+    try {
+      final res = await _dioClient.dio.get("/auth/isAlive");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<dynamic> registerRequest(RegisterModel userData) async {
     try {
       final res = await _dioClient.dio.post("/auth/register", data: userData.toJson());
       // var jwt = res.headers.value("set-cookie")?.split(';')[0];
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> getBookingToken() async {
+    try {
+      final res = await _dioClient.dio.get("/auth/bookingToken");
       return res.data;
     } catch (e) {
       rethrow;

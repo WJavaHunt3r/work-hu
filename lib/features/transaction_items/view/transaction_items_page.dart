@@ -49,7 +49,7 @@ class TransactionItemsPageState
     if (current.transactionType == TransactionType.CREDIT) {
       return Utils.creditFormatting(current.credit);
     }
-    if (current.transactionType == TransactionType.HOURS && current.account == Account.MYSHARE) {
+    if (current.transactionType == TransactionType.HOURS || current.account == Account.MYSHARE) {
       return "${Utils.creditFormatting(current.credit)} (${current.hours}h) ";
     }
     return "${Utils.percentFormat.format(current.points)} p";

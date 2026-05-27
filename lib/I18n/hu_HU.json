@@ -391,5 +391,7 @@
   "transaction_items_transaction_type": "Tranzakció típusa",
   "transaction_items_account": "Fizetés formája",
   "booking_failed_to_launch": "Nem sikerült megnyitni a foglalás linket: %s",
-  "profile_booking": "Szoba foglalás"
+  "profile_booking": "Szoba foglalás",
+  "server_down": "A szerver nem elérhető!\nMár dolgozunk a hiba elhárításán!",
+  "user_status_head_on_track": "On Track / Összes fiatal"
 }

@@ -5,6 +5,7 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/widgets/base_header_chip.dart';
 import 'package:work_hu/features/user_status/data/state/user_status_state.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
 import 'package:work_hu/features/utils.dart';
@@ -69,11 +70,19 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
   }
 
   @override
+  List<Widget> buildHeaderLayout(BuildContext context, WidgetRef ref) {
+    return [
+      BaseHeaderChip(
+          label: "user_status_head_on_track", labelValue: () async => "${state.onTrackCount} / ${state.status.totalElements}")
+    ];
+  }
+
+  @override
   List<Widget> buildActions(BuildContext context, WidgetRef ref) {
     return ref.watch(userDataProvider).user!.isAdmin()
         ? [
             MaterialButton(
-              onPressed: !status.modelState.isLoading ? () => ref.watch(userStatusDataProvider.notifier).recalculate() : null,
+              onPressed: !status.modelState.isLoading ? () => ref.watch(provider.notifier).recalculate() : null,
               child: const Icon(Icons.refresh_outlined),
             ),
           ]

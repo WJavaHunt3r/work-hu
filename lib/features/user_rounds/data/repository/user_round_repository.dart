@@ -23,4 +23,12 @@ class UserRoundRepository {
       rethrow;
     }
   }
+
+  Future<int> getHeadData() async {
+    try {
+      return await _userApi.getHeadData();
+    } on DioException {
+      rethrow;
+    }
+  }
 }
