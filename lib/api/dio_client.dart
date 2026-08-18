@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/utils.dart';
@@ -30,29 +31,60 @@ class DioClient {
   DioClient() {
     _dio.options.baseUrl = _baseUrl;
     _dio.options.connectTimeout = _dioConnectTimeout;
-    // _dio.options.sendTimeout = _dioSendTimeout;
     _dio.options.receiveTimeout = _dioReceiveTimeout;
     _dio.options.contentType = _dioContentType;
-    // var adapter = BrowserHttpClientAdapter();
-    // adapter.withCredentials = true;
-    // _dio.httpClientAdapter = adapter;
-    _dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        // 1. Fetch token from Secure Storage (or your runtime provider)
-        final token = locator<UserProvider>().token ?? await Utils.getData("jwt_token");
 
-        // 2. If token exists, attach to header
-        if (token != '') {
+    _dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
+
+    // Use QueuedInterceptor to prevent race conditions during token refresh
+    _dio.interceptors.add(QueuedInterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final token = locator<UserProvider>().token ?? await const FlutterSecureStorage().read(key: "jwt_token");
+        if (token != null && token.isNotEmpty) {
           options.headers['Authorization'] = 'Bearer $token';
         }
-
         return handler.next(options);
       },
-      onError: (DioException e, handler) {
-        // 3. Handle 401 Unauthorized (Token expired)
+      onError: (DioException e, handler) async {
         if (e.response?.statusCode == 401) {
-          // Log the user out or refresh token
+          final storage = const FlutterSecureStorage();
+          final refreshToken = await storage.read(key: 'refresh_token');
+
+          if (refreshToken != null) {
+            try {
+              // Separate Dio instance to avoid looping interceptors
+              final refreshDio = Dio(BaseOptions(baseUrl: _baseUrl));
+              final response = await refreshDio.post('/auth/refreshtoken', data: {
+                'refreshToken': refreshToken,
+              });
+
+              final newAccessToken = response.data['accessToken'];
+              final newRefreshToken = response.data['refreshToken'];
+
+              // Store new tokens
+              await storage.write(key: 'jwt_token', value: newAccessToken);
+              await storage.write(key: 'refresh_token', value: newRefreshToken);
+              locator<UserProvider>().setToken(newAccessToken);
+
+              // Retry original request with the new access token
+              final opts = e.requestOptions;
+              opts.headers['Authorization'] = 'Bearer $newAccessToken';
+              final cloneReq = await _dio.request(
+                opts.path,
+                options: Options(method: opts.method, headers: opts.headers),
+                data: opts.data,
+                queryParameters: opts.queryParameters,
+              );
+
+              return handler.resolve(cloneReq);
+            } catch (refreshError) {
+              // Refresh token expired or revoked -> force logout
+              await locator<UserProvider>().logout();
+              return handler.reject(e);
+            }
+          } else {
+            await locator<UserProvider>().logout();
+          }
         }
         return handler.next(e);
       },

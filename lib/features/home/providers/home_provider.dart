@@ -36,7 +36,7 @@ class HomeDataNotifier extends BaseDataNotifier<HomeState> {
     var userId = _currentUser!.id;
     executeApiCall<SumupUserModel>(() => _bufeRepository.getAccount(userId), onSuccess: (data) async {
       state = state.copyWith(account: data);
-      if (state.familiyAccounts.isEmpty) getFamily(userId);
+      getFamily(userId);
       getOrders(userId);
     }, onError: (data) async {
       if (data.contains("404")) {

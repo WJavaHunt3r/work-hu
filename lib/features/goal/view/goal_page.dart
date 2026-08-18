@@ -27,10 +27,10 @@ class GoalPageState extends BaseListPageState<GoalPage, GoalState, GoalDataNotif
     return BaseListTile(
       isLast: items.length - 1 == index,
       index: index,
-      onTap: () {
-        ref.watch(goalDataProvider.notifier).presetGoal(item, MaintenanceMode.edit);
+      onTap: () async {
+        await ref.read(goalDataProvider.notifier).presetGoal(item, MaintenanceMode.edit);
         showDialog(barrierDismissible: false, context: context, builder: (context) => GoalsMaintenance())
-            .then((value) => value != null && value == true ? ref.watch(goalDataProvider.notifier).list() : null);
+            .then((value) => value != null && value == true ? ref.read(goalDataProvider.notifier).list() : null);
       },
       title: Text(item.username!),
       // subtitle: Text("${Utils.creditFormatting(current.user!.currentMyShareCredit ?? 0)} Ft"),
@@ -69,8 +69,11 @@ class GoalPageState extends BaseListPageState<GoalPage, GoalState, GoalDataNotif
   @override
   buildFloatingActionButton(BuildContext context, WidgetRef ref) {
     return FloatingActionButton(
-      onPressed: () => showDialog(barrierDismissible: false, context: context, builder: (context) => GoalsMaintenance())
-          .then((value) => value != null && value == true ? ref.watch(goalDataProvider.notifier).list() : null),
+      onPressed: () async {
+        await ref.read(goalDataProvider.notifier).presetGoal(GoalModel(goal: 0), MaintenanceMode.create);
+        showDialog(barrierDismissible: false, context: context, builder: (context) => GoalsMaintenance())
+            .then((value) => value != null && value == true ? ref.watch(goalDataProvider.notifier).list() : null);
+      },
       child: const Icon(Icons.add),
     );
   }

@@ -6,6 +6,7 @@ import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/providers/localeProvider.dart';
+import 'package:work_hu/app/widgets/base_filter_chip.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
 import 'package:work_hu/features/transactions/data/state/transactions_state.dart';
@@ -77,4 +78,20 @@ class TransactionPageState extends BaseListPageState<TransactionsPage, Transacti
 
   @override
   AutoDisposeStateNotifierProvider<TransactionsDataNotifier, TransactionsState> get provider => transactionsDataProvider;
+
+  // @override
+  // List<BaseFilterChip> buildFilterLayout(BuildContext context, WidgetRef ref) {
+  //   return [
+  //     DialogFilterChip<DateTime?>(
+  //         label: "activity_reference_date",
+  //         showDelete: false,
+  //         labelValue: (date) =>
+  //         "${date?.year ?? state.filter.referenceDate?.year} - ${Utils.getMonthFromDate(date ?? state.filter.referenceDate!, context)}",
+  //         onDeleted: () => list(filter: state.filter.copyWith(referenceDate: null)),
+  //         initialValue: state.filter.referenceDate,
+  //         onItemSelected: (e) => list(filter: state.filter.copyWith(referenceDate: e)),
+  //         children: () async => dates,
+  //         title: (date) => date == null ? Text("") : Text("${date.year} - ${Utils.getMonthFromDate(date, context)}"))
+  //   ];
+  // }
 }

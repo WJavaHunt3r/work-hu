@@ -50,7 +50,10 @@ class AddTransactionCard extends ConsumerWidget {
                       textInputAction: TextInputAction.send,
                       onFieldSubmitted: ref.watch(createTransactionsDataProvider).selectedUser != null &&
                               ref.watch(createTransactionsDataProvider.notifier).valueController.value.text.isNotEmpty
-                          ? (text) => ref.read(createTransactionsDataProvider.notifier).addTransaction()
+                          ? (text) => ref
+                              .read(createTransactionsDataProvider.notifier)
+                              .addTransaction()
+                              .then((r) => ref.read(createTransactionsDataProvider.notifier).usersFocusNode.requestFocus())
                           : null,
                       labelText: Utils.getTransactionTypeText(ref.watch(createTransactionsDataProvider).transactionType)),
                 ),

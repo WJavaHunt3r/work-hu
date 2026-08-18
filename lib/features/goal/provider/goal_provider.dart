@@ -139,7 +139,7 @@ class GoalDataNotifier extends BaseDataNotifier<GoalState> implements ListApiPro
   }
 
   Future<void> presetGoal(GoalModel goal, MaintenanceMode mode) async {
-    if (goal.seasonYear == null) {
+     if (goal.seasonYear == null) {
       await seasonRepository.getSeasons().then(
           (value) => goal = goal.copyWith(seasonYear: value.firstWhere((s) => s.seasonYear == DateTime.now().year).seasonYear));
     } else {}

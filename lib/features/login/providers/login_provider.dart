@@ -41,6 +41,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
     executeApiCall<Map<String, dynamic>>(() => _loginRepository.login(usr.trim(), pswd.trim()), onSuccess: (data) async {
       if (keepLogedIn) {
         await Utils.saveData("jwt_token", data['token']);
+        await Utils.saveData("refresh_token", data['refreshToken']);
       }
       userProvider.setToken(data['token']);
       executeApiCall(() => _loginRepository.getProfile().then((userData) async {

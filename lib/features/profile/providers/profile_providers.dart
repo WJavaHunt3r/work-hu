@@ -25,8 +25,7 @@ class ProfileDataNotifier extends BaseDataNotifier<ProfileState> {
   Future<void> logout() async {
     var googleAuth = GoogleSignIn.instance;
     googleAuth.disconnect();
-    currentUser.setToken(null);
-    currentUser.setUser(null);
+    currentUser.logout();
   }
 
   Future<String> token() async {

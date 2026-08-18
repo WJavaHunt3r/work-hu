@@ -1,5 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/rounds/data/api/round_api.dart';
+import 'package:work_hu/features/rounds/data/model/round_filter.dart';
 import 'package:work_hu/features/rounds/data/model/round_model.dart';
 
 class RoundRepository {
@@ -7,10 +10,15 @@ class RoundRepository {
 
   RoundRepository(this._roundApi);
 
-  Future<List<RoundModel>> getRounds([num? seasonYear, bool? activeRound]) async {
+  Future<PaginatedResponse<RoundModel>> getRounds({required RoundFilter filter, required PageStru pageStru}) async {
     try {
-      final res = await _roundApi.getRounds(seasonYear, activeRound);
-      return res.map((e) => RoundModel.fromJson(e)).toList();
+      final res = await _roundApi.getRounds(filter: filter, pageStru: pageStru);
+      final paginatedData = PaginatedResponse<RoundModel>.fromJson(
+        res,
+        (json) => RoundModel.fromJson(json as Map<String, dynamic>),
+      );
+
+      return paginatedData;
     } on DioException {
       rethrow;
     }

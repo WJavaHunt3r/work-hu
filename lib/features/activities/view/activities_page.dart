@@ -30,12 +30,25 @@ class ActivitiesPage extends BaseListPage {
 class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityState, ActivityDataNotifier> {
   @override
   AutoDisposeStateNotifierProvider<ActivityDataNotifier, ActivityState> get provider => activityDataProvider;
-
-  late List<DateTime> dates;
+  late List<DateTime?> dates;
 
   @override
   void postInit(WidgetRef ref) {
+    super.postInit(ref);
     dates = createDates();
+  }
+
+  List<DateTime?> createDates() {
+    var dates = <DateTime?>[];
+    dates.add(null);
+    for (var i = 2024; i <= DateTime.now().year; i++) {
+      var month = i != DateTime.now().year ? 12 : DateTime.now().month;
+      for (var j = 1; j <= month; j++) {
+        dates.add(DateTime(i, j, 1));
+      }
+    }
+
+    return dates;
   }
 
   @override
@@ -113,18 +126,6 @@ class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityStat
     );
   }
 
-  List<DateTime> createDates() {
-    var dates = <DateTime>[];
-    for (var i = DateTime.now().year; i >= 2024; i--) {
-      var month = i != DateTime.now().year ? 12 : DateTime.now().month;
-      for (var j = month; j >= 1; j--) {
-        dates.add(DateTime(i, j, 1));
-      }
-    }
-
-    return dates;
-  }
-
   @override
   onDelete(e) {
     ref.read(provider.notifier).deleteActivity((e as ActivityModel).id!);
@@ -133,7 +134,7 @@ class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityStat
   @override
   List<BaseFilterChip> buildFilterLayout(BuildContext context, WidgetRef ref) {
     return [
-      DialogFilterChip<DateTime>(
+      DialogFilterChip<DateTime?>(
           label: "activity_reference_date",
           showDelete: false,
           labelValue: (date) =>
@@ -142,7 +143,7 @@ class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityStat
           initialValue: state.filter.referenceDate,
           onItemSelected: (e) => list(filter: state.filter.copyWith(referenceDate: e)),
           children: () async => dates,
-          title: (date) => Text("${date.year} - ${Utils.getMonthFromDate(date, context)}"))
+          title: (date) => date == null ? Text("") : Text("${date.year} - ${Utils.getMonthFromDate(date, context)}"))
     ];
   }
 

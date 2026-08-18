@@ -40,19 +40,14 @@ class UserProvider extends ChangeNotifier {
   String? get token => _token;
 
   Future<void> initUser() async {
-    // 1. Read token from secure storage
     final String? token = await _storage.read(key: 'jwt_token');
 
     if (token != null) {
       try {
-        // 2. Optional but recommended: Validate the token with a /me or /profile endpoint
-        // This ensures the token hasn't been revoked on the Java backend
         final res = await _dio.dio.get("/user/me");
 
-        // 3. If successful, set the runtime state
         _user = UserModel.fromJson(res.data);
       } catch (e) {
-        // 4. If the token is expired or invalid, wipe it
         await _storage.delete(key: 'jwt_token');
         _user = null;
       }
@@ -67,6 +62,9 @@ class UserProvider extends ChangeNotifier {
 
   Future<void> logout() async {
     await _storage.delete(key: 'jwt_token');
-    _user = null;
+
+    await _dio.dio.post('/auth/logout', queryParameters: {"refreshToken": await _storage.read(key: 'refresh_token')});
+    await _storage.delete(key: 'refresh_token');
+    setUser(null);
   }
 }

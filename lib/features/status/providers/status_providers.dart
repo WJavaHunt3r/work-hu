@@ -39,7 +39,7 @@ class StatusDataNotifier extends BaseDataNotifier<StatusState> {
   final UserRoundRepository userRoundRepoProvider;
   final UserStatusRepository userStatusRepoProvider;
   final UsersRepository usersRepository;
-  final RoundDataNotifier roundDataNotifier;
+  final RoundsDataNotifier roundDataNotifier;
   final TransactionItemsRepository _transactionItemsRepository;
 
   Future<void> getUserInfo() async {

@@ -12,8 +12,7 @@ abstract class TransactionsState with _$TransactionsState {
   const factory TransactionsState(
       {@Default([]) List<TransactionModel> transactions,
         @Default(TransactionsFilter()) TransactionsFilter filter,
-      @Default(BaseListState()) BaseListState listState,
-      @Default([]) List<RoundModel> rounds}) = _TransactionsState;
+      @Default(BaseListState()) BaseListState listState}) = _TransactionsState;
 
   const TransactionsState._();
 }

@@ -3,18 +3,16 @@ import 'package:work_hu/app/framework/base_components/base_page_components/base_
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
-import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/rounds/data/state/rounds_state.dart';
+import 'package:work_hu/features/rounds/data/repository/round_repository.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transactions/data/api/transaction_api.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
 import 'package:work_hu/features/transactions/data/models/transactions_filter.dart';
 import 'package:work_hu/features/transactions/data/repository/transactions_repository.dart';
 import 'package:work_hu/features/transactions/data/state/transactions_state.dart';
-import 'package:work_hu/features/utils.dart';
 
 import '../../../app/framework/base_components/page_stru.dart';
 
@@ -24,21 +22,21 @@ final transactionsRepoProvider =
     Provider<TransactionRepository>((ref) => TransactionRepository(ref.read(transactionsApiProvider)));
 
 final transactionsDataProvider = StateNotifierProvider.autoDispose<TransactionsDataNotifier, TransactionsState>((ref) =>
-    TransactionsDataNotifier(ref.read(transactionsRepoProvider), ref.read(userDataProvider).user, ref.read(roundDataProvider)));
+    TransactionsDataNotifier(ref.read(transactionsRepoProvider), ref.read(userDataProvider).user, ref.read(roundRepoProvider)));
 
 class TransactionsDataNotifier extends BaseDataNotifier<TransactionsState> implements ListApiProvider<TransactionsFilter> {
-  TransactionsDataNotifier(this.transactionRepository, this.currentUser, this.roundProvider)
-      : super(const TransactionsState(listState: BaseListState(sort: ["createDateTime,desc"]))) {
-    getRounds();
+  TransactionsDataNotifier(this.transactionRepository, this.currentUser, this.roundRepository)
+      : super(const TransactionsState(listState: BaseListState(sort: ["createDateTime,desc"]))){
+    list();
   }
 
   final TransactionRepository transactionRepository;
   final UserModel? currentUser;
-  final RoundsState roundProvider;
+  final RoundRepository roundRepository;
 
   @override
   Future<void> list({TransactionsFilter? filter, int? page, int? size, List<String>? sort}) async {
-    executeApiCall<PaginatedResponse<TransactionModel>>(
+    await executeApiCall<PaginatedResponse<TransactionModel>>(
         () => transactionRepository.getTransactions(
             filter: filter ?? state.filter,
             pageStru: PageStru(
@@ -62,19 +60,6 @@ class TransactionsDataNotifier extends BaseDataNotifier<TransactionsState> imple
     });
   }
 
-  Future<void> getRounds() async {
-    var rounds = roundProvider.rounds;
-    var currentRound = roundProvider.currentRound;
-    var dateFrom = Utils.dateTimeToDateOnlyString(currentRound?.startDateTime);
-    var dateTo = Utils.dateTimeToDateOnlyString(currentRound?.endDateTime);
-    state = state.copyWith(rounds: rounds, filter: state.filter.copyWith(dateFrom: dateFrom, dateTo: dateTo));
-    list();
-  }
-
-  Future<void> setSelectedRound(num roundId) async {
-    // state = state.copyWith(selectedRoundId: roundId);
-    await list();
-  }
 
   @override
   TransactionsState copyWithState(BaseState status) {

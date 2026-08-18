@@ -23,6 +23,7 @@ class GoalsMaintenance extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final mode = ref.watch(goalDataProvider).mode;
     final GoalModel goal = ref.watch(goalDataProvider).selectedGoal;
+    var year = goal.seasonYear;
     return Dialog.fullscreen(
         child: Scaffold(
       appBar: AppBar(

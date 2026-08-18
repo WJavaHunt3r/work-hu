@@ -13,19 +13,20 @@ import 'package:work_hu/features/activity_items/data/repository/activity_items_r
 import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
 import 'package:work_hu/features/create_activity/data/state/create_activity_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/rounds/provider/round_provider.dart';
+import 'package:work_hu/features/round_filter_chip/data/state/round_filter_chip_state.dart';
+import 'package:work_hu/features/round_filter_chip/providers/round_filter_chip_provider.dart';
 import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
 
 final createActivityDataProvider = StateNotifierProvider.autoDispose<CreateActivityDataNotifier, CreateActivityState>((ref) =>
     CreateActivityDataNotifier(ref.read(userDataProvider).user, ref.read(activityRepoProvider),
-        ref.read(activityItemsRepoProvider), ref.read(roundDataProvider.notifier)));
+        ref.read(activityItemsRepoProvider), ref.read(roundFilterChipDataProvider.notifier)));
 
 class CreateActivityDataNotifier extends BaseDataNotifier<CreateActivityState> {
   CreateActivityDataNotifier(this.currentUser, this.activityRepository, this.activityItemsRepository, this.roundDataNotifier)
       : super(const CreateActivityState());
 
   final UserModel? currentUser;
-  final RoundDataNotifier roundDataNotifier;
+  final RoundFilterChipDataNotifier roundDataNotifier;
 
   final ActivityRepository activityRepository;
   final ActivityItemsRepository activityItemsRepository;
@@ -44,11 +45,11 @@ class CreateActivityDataNotifier extends BaseDataNotifier<CreateActivityState> {
     state = state.copyWith(defaultHour: double.tryParse(text) ?? 0);
   }
 
-  addRegistration({String? description, required double hours}) {
+  Future<void> addRegistration({String? description, required double hours}) async {
     var registration = ActivityItemsModel(
       description: description ?? state.activity!.description,
       userId: state.selectedUser!.id,
-      roundId: roundDataNotifier.getCurrentRound()!.id,
+      roundId: (await roundDataNotifier.getCurrentRound()).id,
       transactionType: state.activity!.transactionType,
       account: state.activity!.account,
       hours: hours,

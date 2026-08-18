@@ -12,6 +12,8 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/create_transactions/data/state/create_transactions_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/features/round_filter_chip/data/state/round_filter_chip_state.dart';
+import 'package:work_hu/features/round_filter_chip/providers/round_filter_chip_provider.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
@@ -25,8 +27,12 @@ import 'package:work_hu/features/users/providers/users_providers.dart';
 import 'package:work_hu/features/utils.dart';
 
 final createTransactionsDataProvider = StateNotifierProvider.autoDispose<CreateTransactionsDataNotifier, CreateTransactionsState>(
-    (ref) => CreateTransactionsDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider).user,
-        ref.read(transactionsRepoProvider), ref.read(transactionItemsRepoProvider), ref.read(roundDataProvider.notifier)));
+    (ref) => CreateTransactionsDataNotifier(
+        ref.read(usersRepoProvider),
+        ref.read(userDataProvider).user,
+        ref.read(transactionsRepoProvider),
+        ref.read(transactionItemsRepoProvider),
+        ref.read(roundFilterChipDataProvider.notifier)));
 
 class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsState> {
   CreateTransactionsDataNotifier(
@@ -48,7 +54,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
 
   final UsersRepository usersRepository;
   final UserModel? currentUser;
-  final RoundDataNotifier roundDataNotifier;
+  final RoundFilterChipDataNotifier roundDataNotifier;
   late final TextEditingController valueController;
   late final TextEditingController exchangeController;
   late final TextEditingController descriptionController;
@@ -124,7 +130,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     }
   }
 
-  addTransaction({String? description}) {
+  Future<void> addTransaction({String? description}) async {
     if (state.account == Account.SAMVIRK && num.parse(valueController.value.text) <= 3000) {
       state = state.copyWith(modelState: ModelState.error, message: "Must be greater than 3000 HUF");
     } else {
@@ -137,7 +143,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         userId: state.selectedUser!.id,
         userName: state.selectedUser!.comboText,
         createUserId: currentUser!.id,
-        roundId: roundDataNotifier.getCurrentRound()!.id,
+        roundId: (await roundDataNotifier.getCurrentRound()).id,
         points: state.transactionType != TransactionType.CREDIT && state.transactionType != TransactionType.HOURS
             ? double.tryParse(valueController.value.text) ?? 0
             : 0,
