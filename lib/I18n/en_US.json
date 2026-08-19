@@ -372,5 +372,7 @@
   "booking_failed_to_launch": "Booking link failed to launch: %s",
   "profile_booking": "Room booking",
   "server_down": "Server is down!\n Hang tight, we are working on it!",
-  "user_status_head_on_track": "On Track / All youth"
+  "user_status_head_on_track": "On Track / All youth",
+  "user_status_head_goal": "Monthly goal",
+  "rounds_title": "Rounds"
 }

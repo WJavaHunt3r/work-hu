@@ -393,5 +393,7 @@
   "booking_failed_to_launch": "Nem sikerült megnyitni a foglalás linket: %s",
   "profile_booking": "Szoba foglalás",
   "server_down": "A szerver nem elérhető!\nMár dolgozunk a hiba elhárításán!",
-  "user_status_head_on_track": "On Track / Összes fiatal"
+  "user_status_head_on_track": "On Track / Összes fiatal",
+  "user_status_head_goal": "Havi cél",
+  "rounds_title": "Körök"
 }

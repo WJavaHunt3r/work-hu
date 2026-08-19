@@ -69,6 +69,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
         onSuccess: (data) async {
       if (keepLogedIn) {
         await Utils.saveData("jwt_token", data['token']);
+        await Utils.saveData("refresh_token", data['refreshToken']);
       }
       userProvider.setToken(data['token']);
       executeApiCall(() => _loginRepository.getProfile().then((userData) async {
@@ -81,6 +82,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
     try {
       executeApiCall<Map<String, dynamic>>(() => _loginRepository.loginWithGoogle(idToken), onSuccess: (data) async {
         await Utils.saveData("jwt_token", data['token']);
+        await Utils.saveData("refresh_token", data['refreshToken']);
         userProvider.setToken(data['token']);
         executeApiCall(() => _loginRepository.getUserByUsername(data['username']).then((userData) async {
               userProvider.setUser(userData);

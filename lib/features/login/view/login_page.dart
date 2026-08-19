@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -176,10 +177,12 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
 
   _buildLoginForms() {
     return AutofillGroup(
+        key: const ValueKey('login_autofill_group'),
         child: Column(
       children: [
         BaseTextFormField(
           controller: emailController,
+          keyBoardType: TextInputType.emailAddress,
           autofillHints: const [AutofillHints.email, AutofillHints.username],
           textInputAction: TextInputAction.next,
           fldControl: "3",
@@ -205,6 +208,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
 
   void login() {
     if (_formKey.currentState!.validate()) {
+      TextInput.finishAutofillContext(shouldSave: true);
       _isLogin
           ? ref
               .read(loginDataProvider.notifier)
@@ -221,6 +225,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
 
   _buildRegisterForms() {
     return AutofillGroup(
+        key: const ValueKey('login_register_group'),
         child: Column(
       children: [
         Row(
@@ -249,6 +254,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
         SizedBox(height: 16.sp),
         BaseTextFormField(
           fldControl: "3",
+          keyBoardType: TextInputType.emailAddress,
           autofillHints: const [AutofillHints.email],
           controller: emailController,
           labelText: "login_email_label",

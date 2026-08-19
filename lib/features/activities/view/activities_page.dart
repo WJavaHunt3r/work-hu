@@ -48,7 +48,7 @@ class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityStat
       }
     }
 
-    return dates;
+    return dates.reversed.toList();
   }
 
   @override
