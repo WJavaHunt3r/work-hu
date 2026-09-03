@@ -113,7 +113,6 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
       child: SingleChildScrollView(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        // Ez kell az iOS bounce miatt!
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 16.sp),
           child: buildLayout(),

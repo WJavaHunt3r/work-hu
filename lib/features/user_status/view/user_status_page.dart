@@ -6,6 +6,9 @@ import 'package:work_hu/app/framework/base_components/base_page_components/base_
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_header_chip.dart';
+import 'package:work_hu/features/round_filter_chip/providers/round_filter_chip_provider.dart';
+import 'package:work_hu/features/rounds/provider/round_provider.dart';
+import 'package:work_hu/features/user_status/data/model/user_status_model.dart';
 import 'package:work_hu/features/user_status/data/state/user_status_state.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
 import 'package:work_hu/features/utils.dart';
@@ -25,6 +28,7 @@ class UserStatusPage extends BaseListPage {
 class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusState, UserStatusDataNotifier> {
   @override
   Widget buildListTile(item) {
+    item as UserStatusModel;
     var index = items.indexOf(item);
     var userStatus = item.status * 100;
 
@@ -73,7 +77,10 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
   List<Widget> buildHeaderLayout(BuildContext context, WidgetRef ref) {
     return [
       BaseHeaderChip(
-          label: "user_status_head_on_track", labelValue: () async => "${state.onTrackCount} / ${state.status.totalElements}")
+          label: "user_status_head_on_track", labelValue: () async => "${state.onTrackCount} / ${state.status.totalElements}"),
+      BaseHeaderChip(
+          label: "user_status_head_goal",
+          labelValue: () async => "${ref.read(roundFilterChipDataProvider).currentRound?.localMyShareGoal}%")
     ];
   }
 

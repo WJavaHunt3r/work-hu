@@ -25,20 +25,14 @@ class UserCampDataNotifier extends StateNotifier<UserCampState> {
   Future<void> getUserCamps() async {
     state = state.copyWith(modelState: ModelState.loading);
     try {
-      await userCampRepository.getUserCamps(seasonYear: DateTime.now().year, ).then((value) {
+      await userCampRepository
+          .getUserCamps(
+        seasonYear: DateTime.now().year,
+      )
+          .then((value) {
         // value.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
         // state = state.copyWith(userCamp: value, filtered: value, modelState: ModelState.success);
       });
-    } on DioException catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
-  }
-
-  Future<void> saveUser() async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      // var updatedUser = await userCampRepository.updateUser(currentUser!.id, state.selectedUser!);
-      // state = state.copyWith(selectedUser: updatedUser, modelState: ModelState.success);
     } on DioException catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }

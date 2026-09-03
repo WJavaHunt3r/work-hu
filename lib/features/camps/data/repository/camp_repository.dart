@@ -1,16 +1,23 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/camps/data/api/camps_api.dart';
+import 'package:work_hu/features/camps/data/model/camp_filter.dart';
 import 'package:work_hu/features/camps/data/model/camp_model.dart';
 
 class CampRepository {
-  final CampsApi _campApi;
+  final CampApi _campApi;
 
   CampRepository(this._campApi);
 
-  Future<List<CampModel>> getCamps(num seasonId) async {
+  Future<PaginatedResponse<CampModel>> getCamps({required CampFilter filter, required PageStru pageStru}) async {
     try {
-      final res = await _campApi.getCamps(seasonId);
-      return res.map((e) => CampModel.fromJson(e)).toList();
+      final res = await _campApi.getCamps(filter: filter, pageStru: pageStru);
+      final paginatedData = PaginatedResponse<CampModel>.fromJson(
+        res,
+            (json) => CampModel.fromJson(json as Map<String, dynamic>),
+      );
+      return paginatedData;
     } on DioException {
       rethrow;
     }

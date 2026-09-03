@@ -374,5 +374,22 @@
   "server_down": "Server is down!\n Hang tight, we are working on it!",
   "user_status_head_on_track": "On Track / All youth",
   "user_status_head_goal": "Monthly goal",
-  "rounds_title": "Rounds"
+  "rounds_title": "Rounds",
+  "create_transaction_confirm_send": "Confirm transactions",
+  "create_transaction_confirm_send_question": "Are you sure you want to send the transactions?",
+  "create_transaction_warning":"Add at least one transaction!",
+  "create_transaction_send": "Send",
+  "create_transaction_count": "Count",
+  "create_transaction_sum": "Sum (%s)",
+  "create_transaction_description": "Description",
+  "create_transaction_transaction_date": "Transaction date",
+  "camp_maintenance_u18_brunstad": "Brunstad U18",
+  "camp_maintenance_o18_brunstad": "Brunstad O18",
+  "camp_maintenance_u18_local": "Local U18",
+  "camp_maintenance_o18_local": "Local O18",
+  "camp_maintenance_campName": "Camp name",
+  "camp_maintenance_season": "Season",
+  "camp_maintenance_save": "Save",
+  "maintenance_mode_create": "Create",
+  "maintenance_mode_edit": "Edit"
 }

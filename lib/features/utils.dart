@@ -47,6 +47,10 @@ class Utils {
     }
   }
 
+  static Future<void> deleteData(String key) async {
+    await _storage.delete(key: key);
+  }
+
   static String encodeHashToBase64(String secretHash) {
     final base64String = base64.encode(secretHash.codeUnits);
     return base64String.replaceAll('=', ''); // Remove padding
@@ -102,7 +106,7 @@ class Utils {
   }
 
   static String dateTimeToDateOnlyString(DateTime? date) {
-    if(date == null) return "";
+    if (date == null) return "";
     return DateFormat("yyyy-MM-dd").format(date);
   }
 
@@ -122,13 +126,13 @@ class Utils {
     return "${date.year}-${date.month < 10 ? "0${date.month}" : date.month}-${date.day < 10 ? "0${date.day}" : date.day} ${date.hour < 10 ? "0${date.hour}" : date.hour}:${date.minute < 10 ? "0${date.minute}" : date.minute}";
   }
 
-  static String dateFormating(DateTime? date, [String? locale]){
-    if(date == null) return "";
+  static String dateFormating(DateTime? date, [String? locale]) {
+    if (date == null) return "";
     return DateFormat('yyyy. MMM dd.', locale).format(date);
   }
 
-  static String dateFormatingWithTime(DateTime? date, [String? locale]){
-    if(date == null) return "";
+  static String dateFormatingWithTime(DateTime? date, [String? locale]) {
+    if (date == null) return "";
     return DateFormat('yyyy. MMM dd. • HH:mm', locale).format(date);
   }
 
@@ -179,7 +183,8 @@ class Utils {
     return "${dateToString(activity.activityDateTime).replaceAll("-", "")}_${changeSpecChars(activity.description)}";
   }
 
-  static Future<void> createCreditCsv(List<TransactionItemModel> items, DateTime date, String description, List<UserModel> users) async {
+  static Future<void> createCreditCsv(
+      List<TransactionItemModel> items, DateTime date, String description, List<UserModel> users) async {
     var headers = ["UserId", "Age", "Name", "LastName", "ClubId", "ClubName", "Amount", "ClubTransactionDate", "Description"];
 
     List<List<dynamic>> list = [];

@@ -36,24 +36,19 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
   bool _isLocalLoading = false;
 
   void updatePage(int nextPage) async {
-    // Ha a lokális vagy a globális status szerint töltünk, azonnal megállunk
     if (_isLocalLoading || status.modelState.isLoading) return;
 
-    // SZINKRON módon azonnal lezárjuk a kaput, mielőtt a list() aszinkron ága elindulna
     _isLocalLoading = true;
 
     try {
-      // Meghívjuk a listázót (ha a list() Future-rel tér vissza, érdemes megvárni az await-tel)
       await list(pageFrom: nextPage);
     } finally {
-      // Amikor a kérés befejeződött (akár sikeresen, akár hibával), feloldjuk a zárat
       _isLocalLoading = false;
     }
   }
 
   @override
   void onScroll() {
-    // Itt is ellenőrizzük a lokális zárat
     if (_isLocalLoading || status.modelState.isLoading) return;
 
     final pos = getController().position;

@@ -1,16 +1,18 @@
+import 'package:work_hu/app/framework/base_components/page_stru.dart';
 import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/features/camps/data/model/camp_filter.dart';
 import 'package:work_hu/features/camps/data/model/camp_model.dart';
 
 import '../../../../api/dio_client.dart';
 
-class CampsApi {
+class CampApi {
   final DioClient _dioClient = locator<DioClient>();
 
-  CampsApi();
+  CampApi();
 
-  Future<List<dynamic>> getCamps(num? seasonId) async {
+  Future<dynamic> getCamps({required CampFilter filter, required PageStru pageStru}) async {
     try {
-      final res = await _dioClient.dio.get("/camp", queryParameters: {"seasonId": seasonId});
+      final res = await _dioClient.dio.get("/camp", queryParameters: filter.toJson());
       return res.data;
     } catch (e) {
       rethrow;

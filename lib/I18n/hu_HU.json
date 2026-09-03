@@ -395,5 +395,22 @@
   "server_down": "A szerver nem elérhető!\nMár dolgozunk a hiba elhárításán!",
   "user_status_head_on_track": "On Track / Összes fiatal",
   "user_status_head_goal": "Havi cél",
-  "rounds_title": "Körök"
+  "rounds_title": "Körök",
+  "create_transaction_confirm_send": "Tranzakciók megerősítése",
+  "create_transaction_confirm_send_question": "Biztosan elküldöd a tranzakciókat?",
+  "create_transaction_warning":"Addj hozzá legalább 1 tranzakciót!",
+  "create_transaction_send": "Küld",
+  "create_transaction_count": "Elem",
+  "create_transaction_sum": "Szum (%s)",
+  "create_transaction_description": "Megnevezés",
+  "create_transaction_transaction_data": "Tranzakció dátuma",
+  "camp_maintenance_u18_brunstad": "Brunstad U18",
+  "camp_maintenance_o18_brunstad": "Brunstad O18",
+  "camp_maintenance_u18_local": "Helyi U18",
+  "camp_maintenance_o18_local": "Helyi O18",
+  "camp_maintenance_campName": "Megnevezés",
+  "camp_maintenance_season": "Szezon",
+  "camp_maintenance_save": "Mentés",
+  "maintenance_mode_create": "Létrehozás",
+  "maintenance_mode_edit": "Módosítás"
 }

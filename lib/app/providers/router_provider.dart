@@ -8,6 +8,7 @@ import 'package:work_hu/features/activities/view/activities_page.dart';
 import 'package:work_hu/features/activity_items/view/activity_items_page.dart';
 import 'package:work_hu/features/admin/view/admin_page.dart';
 import 'package:work_hu/features/bufe_transactions/view/bufe_transactions_page.dart';
+import 'package:work_hu/features/camps/view/camps_page.dart';
 import 'package:work_hu/features/change_password/view/change_password_page.dart';
 import 'package:work_hu/features/create_activity/view/create_activity_page.dart';
 import 'package:work_hu/features/create_transactions/view/create_point_transactions_page.dart';
@@ -229,6 +230,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(path: "/admin/goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
         GoRoute(path: "/admin/rounds", builder: (BuildContext context, GoRouterState state) => const RoundsPage()),
         GoRoute(path: "/admin/donations", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
+        GoRoute(path: "/admin/camps", builder: (BuildContext context, GoRouterState state) => const CampPage()),
         GoRoute(
             path: "/admin/payments",
             builder: (BuildContext context, GoRouterState state) {

@@ -20,4 +20,10 @@ class UserComboModel with _$UserComboModel {
   factory UserComboModel.fromJson(Map<String, dynamic> json) =>
       _$UserComboModelFromJson(json);
 
+  const UserComboModel._();
+
+  String getFullName() {
+    return "$lastname $firstname";
+  }
+
 }

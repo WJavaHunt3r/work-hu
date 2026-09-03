@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:work_hu/api/dio_client.dart';
 import 'package:work_hu/app/locator.dart';
@@ -17,7 +16,6 @@ class UserProvider extends ChangeNotifier {
 
   UserModel? _user;
   String? _token;
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
   final _dio = locator<DioClient>();
 
   Future<void> setUser(UserModel? user) async {
@@ -40,15 +38,21 @@ class UserProvider extends ChangeNotifier {
   String? get token => _token;
 
   Future<void> initUser() async {
-    final String? token = await _storage.read(key: 'jwt_token');
+    final keepLoggedIn = await Utils.getData('keep_logged_in') == 'true';
 
-    if (token != null) {
+    if (!keepLoggedIn) {
+      await logout();
+      return;
+    }
+    final String token = await Utils.getData('jwt_token');
+
+    if (token.isNotEmpty) {
       try {
         final res = await _dio.dio.get("/user/me");
 
         _user = UserModel.fromJson(res.data);
       } catch (e) {
-        await _storage.delete(key: 'jwt_token');
+        await Utils.deleteData('jwt_token');
         _user = null;
       }
     }
@@ -56,15 +60,15 @@ class UserProvider extends ChangeNotifier {
 
   // Call this during your standard login method
   Future<void> loginSuccess(UserModel user, String token) async {
-    await _storage.write(key: 'jwt_token', value: token);
+    await Utils.saveData('jwt_token', token);
     _user = user;
   }
 
   Future<void> logout() async {
-    await _storage.delete(key: 'jwt_token');
+    await Utils.deleteData('jwt_token');
 
-    await _dio.dio.post('/auth/logout', queryParameters: {"refreshToken": await _storage.read(key: 'refresh_token')});
-    await _storage.delete(key: 'refresh_token');
+    await _dio.dio.post('/auth/logout', queryParameters: {"refreshToken": await Utils.getData('refresh_token')});
+    await Utils.deleteData('refresh_token');
     setUser(null);
   }
 }

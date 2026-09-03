@@ -39,10 +39,10 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
 
   Future<void> login({required String usr, required String pswd, required keepLogedIn}) async {
     executeApiCall<Map<String, dynamic>>(() => _loginRepository.login(usr.trim(), pswd.trim()), onSuccess: (data) async {
-      if (keepLogedIn) {
-        await Utils.saveData("jwt_token", data['token']);
-        await Utils.saveData("refresh_token", data['refreshToken']);
-      }
+      await Utils.saveData("jwt_token", data['token']);
+      await Utils.saveData("refresh_token", data['refreshToken']);
+      await Utils.saveData("keep_logged_in", keepLogedIn.toString());
+
       userProvider.setToken(data['token']);
       executeApiCall(() => _loginRepository.getProfile().then((userData) async {
             userProvider.setUser(userData);
@@ -67,10 +67,10 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
         () => _loginRepository.register(
             RegisterModel(firstname: firstName.trim(), email: email.trim(), password: pswd.trim(), lastname: lastName.trim())),
         onSuccess: (data) async {
-      if (keepLogedIn) {
-        await Utils.saveData("jwt_token", data['token']);
-        await Utils.saveData("refresh_token", data['refreshToken']);
-      }
+      await Utils.saveData("jwt_token", data['token']);
+      await Utils.saveData("refresh_token", data['refreshToken']);
+      await Utils.saveData("keep_logged_in", keepLogedIn.toString());
+
       userProvider.setToken(data['token']);
       executeApiCall(() => _loginRepository.getProfile().then((userData) async {
             userProvider.setUser(userData);

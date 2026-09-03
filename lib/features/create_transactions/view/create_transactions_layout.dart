@@ -21,12 +21,15 @@ class CreateTransactionsLayout extends ConsumerWidget {
     Future(() => ref.read(createTransactionsDataProvider).creationState == ModelState.success ? context.pop() : null);
     return Stack(children: [
       SingleChildScrollView(
-        child: Column(
-            children: ref.watch(createTransactionsDataProvider.notifier).descriptionController.value.text.isEmpty
-                ? [
-                    const TransactionDetailsCard(),
-                  ]
-                : enabledWidgets(context, ref)),
+        child: Padding(
+          padding: EdgeInsets.all(8.sp),
+          child: Column(
+              children: ref.watch(createTransactionsDataProvider.notifier).descriptionController.value.text.isEmpty
+                  ? [
+                      const TransactionDetailsCard(),
+                    ]
+                  : enabledWidgets(context, ref)),
+        ),
       ),
       ref.watch(createTransactionsDataProvider).modelState == ModelState.loading
           ? const Center(

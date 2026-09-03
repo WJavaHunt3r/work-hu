@@ -35,24 +35,22 @@ class DioClient {
     _dio.options.contentType = _dioContentType;
 
     _dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-
     // Use QueuedInterceptor to prevent race conditions during token refresh
     _dio.interceptors.add(QueuedInterceptorsWrapper(
       onRequest: (options, handler) async {
-        final token = locator<UserProvider>().token ?? await const FlutterSecureStorage().read(key: "jwt_token");
-        if (token != null && token.isNotEmpty) {
+        final token = locator<UserProvider>().token ?? await Utils.getData("jwt_token");
+        if (token.isNotEmpty) {
           options.headers['Authorization'] = 'Bearer $token';
         }
         return handler.next(options);
       },
       onError: (DioException e, handler) async {
-        if (e.response?.statusCode == 401) {
-          final storage = const FlutterSecureStorage();
-          final refreshToken = await storage.read(key: 'refresh_token');
+        final statusCode = e.response?.statusCode;
+        if (statusCode == 401|| statusCode == 403) {
+          final refreshToken = await Utils.getData('refresh_token');
 
-          if (refreshToken != null) {
+          if (refreshToken.isNotEmpty) {
             try {
-              // Separate Dio instance to avoid looping interceptors
               final refreshDio = Dio(BaseOptions(baseUrl: _baseUrl));
               final response = await refreshDio.post('/auth/refreshtoken', data: {
                 'refreshToken': refreshToken,
@@ -62,8 +60,8 @@ class DioClient {
               final newRefreshToken = response.data['refreshToken'];
 
               // Store new tokens
-              await storage.write(key: 'jwt_token', value: newAccessToken);
-              await storage.write(key: 'refresh_token', value: newRefreshToken);
+              await Utils.saveData('jwt_token', newAccessToken);
+              await Utils.saveData('refresh_token', newRefreshToken);
               locator<UserProvider>().setToken(newAccessToken);
 
               // Retry original request with the new access token

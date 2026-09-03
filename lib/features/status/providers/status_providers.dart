@@ -26,12 +26,11 @@ final statusDataProvider = StateNotifierProvider.autoDispose<StatusDataNotifier,
     ref.read(userRoundsRepoProvider),
     ref.read(userStatusRepoProvider),
     ref.read(usersRepoProvider),
-    ref.read(roundDataProvider.notifier),
     ref.read(transactionItemsRepoProvider)));
 
 class StatusDataNotifier extends BaseDataNotifier<StatusState> {
-  StatusDataNotifier(this.userRoundRepoProvider, this.userStatusRepoProvider, this.usersRepository, this.roundDataNotifier,
-      this._transactionItemsRepository)
+  StatusDataNotifier(
+      this.userRoundRepoProvider, this.userStatusRepoProvider, this.usersRepository, this._transactionItemsRepository)
       : super(const StatusState()) {
     getUserInfoAndUserRounds();
   }
@@ -39,12 +38,7 @@ class StatusDataNotifier extends BaseDataNotifier<StatusState> {
   final UserRoundRepository userRoundRepoProvider;
   final UserStatusRepository userStatusRepoProvider;
   final UsersRepository usersRepository;
-  final RoundsDataNotifier roundDataNotifier;
   final TransactionItemsRepository _transactionItemsRepository;
-
-  Future<void> getUserInfo() async {
-    // await executeApiCall(()=> getUserInfoAndUserRounds());
-  }
 
   Future<void> getUserInfoAndUserRounds() async {
     var userModel = locator<UserProvider>().user!;
@@ -74,7 +68,6 @@ class StatusDataNotifier extends BaseDataNotifier<StatusState> {
           state = copyWithModelState(ModelState.empty);
         });
       }
-
     }, onError: (error) async {
       state = copyWithModelState(ModelState.empty);
     });

@@ -16,7 +16,7 @@ class TransactionDetailsCard extends ConsumerWidget {
         children: [
           BaseTextFormField(
             controller: ref.watch(createTransactionsDataProvider.notifier).dateController,
-            labelText: "Transaction Date",
+            labelText: "create_transaction_transaction_date",
             suffix: IconButton(
               onPressed: () => _selectDate(context, ref),
               icon: const Icon(Icons.calendar_month),
@@ -25,7 +25,7 @@ class TransactionDetailsCard extends ConsumerWidget {
           SizedBox(height: 5.sp),
           BaseTextFormField(
             controller: ref.watch(createTransactionsDataProvider.notifier).descriptionController,
-            labelText: "Description",
+            labelText: "create_transaction_description",
           )
         ],
       ),

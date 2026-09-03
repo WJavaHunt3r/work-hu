@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/style/app_colors.dart';
@@ -28,7 +29,7 @@ class TransactionSumCard extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const Text("Count: "),
+                Text("create_transaction_count".i18n()),
                 Text(
                   items.length.toStringAsFixed(0),
                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -37,7 +38,8 @@ class TransactionSumCard extends ConsumerWidget {
             ),
             Row(
               children: [
-                Text("Sum (${Utils.getTransactionTypeText(ref.watch(createTransactionsDataProvider).transactionType, false)}): "),
+                Text("create_transaction_sum"
+                    .i18n([Utils.getTransactionTypeText(ref.watch(createTransactionsDataProvider).transactionType, false)])),
                 Text(
                   sum % 1 == 0 ? sum.toStringAsFixed(0) : sum.toStringAsFixed(1),
                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -54,13 +56,13 @@ class TransactionSumCard extends ConsumerWidget {
                 : ref.watch(createTransactionsDataProvider).account == Account.SAMVIRK
                     ? IconButton(onPressed: () => showSamvirkImport(context, ref), icon: const Icon(Icons.upload))
                     : const SizedBox(),
-            TextButton(
+            FilledButton(
                 onPressed: () => ref.watch(createTransactionsDataProvider.notifier).isEmpty()
                     ? showDialog(
                         barrierDismissible: false,
                         context: context,
                         builder: (BuildContext context) {
-                          return const ErrorAlertDialog(title: "Add at least one transaction!");
+                          return ErrorAlertDialog(title: "create_transaction_warning".i18n());
                         })
                     : showDialog(
                         context: context,
@@ -70,8 +72,8 @@ class TransactionSumCard extends ConsumerWidget {
                               ref.read(createTransactionsDataProvider.notifier).sendTransactions();
                               Navigator.of(context).pop(true);
                             },
-                            title: 'Confirm transaction',
-                            content: const Text("Are you sure you want to send the transactions?", textAlign: TextAlign.center),
+                            title: 'create_transaction_confirm_send'.i18n(),
+                            content: Text("create_transaction_confirm_send_question".i18n(), textAlign: TextAlign.center),
                           );
                         }),
                 style: ButtonStyle(
@@ -79,7 +81,8 @@ class TransactionSumCard extends ConsumerWidget {
                     (states) => EdgeInsets.all(2.sp),
                   ),
                 ),
-                child: const Text("Send", style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w800)))
+                child: Text("create_transaction_send".i18n(),
+                    style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w800)))
           ],
         ));
   }

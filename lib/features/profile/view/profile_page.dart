@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
@@ -13,12 +14,10 @@ import 'package:work_hu/app/providers/localeProvider.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
-import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
-import 'package:work_hu/app/widgets/icon_box.dart';
+import 'package:work_hu/app/widgets/settings_tile.dart';
 import 'package:work_hu/features/profile/data/state/profile_state.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class ProfilePage extends BasePage {
   const ProfilePage({super.key, super.title = "profile_title", super.canRefresh = false});
@@ -84,14 +83,14 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
           hasBottomPadding: false,
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            _SettingsTile(
+            SettingsTile(
               label: 'profile_my_activities'.i18n(),
               icon: Icons.list_alt,
               onTap: () => context.push('/profile/activities'),
               index: 0,
             ),
             Divider(height: 1.sp),
-            _SettingsTile(
+            SettingsTile(
               label: 'profile_booking'.i18n(),
               icon: Icons.book_outlined,
               onTap: () {
@@ -109,14 +108,14 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
           hasBottomPadding: false,
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            _SettingsTile(label: 'profile_password_security'.i18n(), icon: Icons.shield_outlined, index: 0),
+            SettingsTile(label: 'profile_password_security'.i18n(), icon: Icons.shield_outlined, index: 0),
             const Divider(height: 1),
-            _SettingsTile(
+            SettingsTile(
               label: 'profile_notifications'.i18n(),
               icon: Icons.notifications_none,
             ),
             const Divider(height: 1),
-            _SettingsTile(
+            SettingsTile(
               label: 'profile_language'.i18n(),
               icon: Icons.language,
               trailingText: languageName.toString(),
@@ -125,7 +124,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
               },
             ),
             const Divider(height: 1),
-            _SettingsTile(
+            SettingsTile(
                 label: 'profile_dark_mode'.i18n(),
                 icon: Icons.dark_mode_outlined,
                 trailingText: AppThemeMode.getThemeModeLocale(currentThemeMode).i18n(),
@@ -133,7 +132,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
                   context.push('/profile/theme');
                 }),
             const Divider(height: 1),
-            _SettingsTile(label: 'profile_help_support'.i18n(), icon: Icons.help_outline, isLast: true),
+            SettingsTile(label: 'profile_help_support'.i18n(), icon: Icons.help_outline, isLast: true),
           ],
         ),
 
@@ -215,42 +214,6 @@ class _InfoTile extends StatelessWidget {
           Icon(Icons.edit_outlined, size: 20.sp, color: Theme.of(context).hintColor.withOpacity(0.3)),
         ],
       ),
-    );
-  }
-}
-
-class _SettingsTile extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final String? trailingText;
-  final Function? onTap;
-  final bool isLast;
-  final int index;
-
-  const _SettingsTile(
-      {required this.label, required this.icon, this.trailingText, this.onTap, this.isLast = false, this.index = 1});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return BaseListTile(
-      contentPadding: EdgeInsets.all(18.sp),
-      leading: IconBox(
-        icon: icon,
-      ),
-      title: Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (trailingText != null)
-            Text(trailingText!, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor)),
-          SizedBox(width: 8.sp),
-          Icon(Icons.arrow_forward_ios, size: 14.sp, color: Colors.grey),
-        ],
-      ),
-      onTap: () => onTap?.call(),
-      isLast: isLast,
-      index: index,
     );
   }
 }

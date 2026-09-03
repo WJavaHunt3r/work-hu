@@ -9,13 +9,14 @@ part 'camp_model.g.dart';
 class CampModel with _$CampModel {
   const factory CampModel({
     num? id,
-    required SeasonModel seasonModel,
-    required DateTime campDate,
-    required DateTime financeCheckDate,
-    required num u18BrunstadFee,
-    required num u18LocalFee,
-    required num o18BrunstadFee,
-    required num o18LocalFee,
+    SeasonModel? season,
+    String? campName,
+    DateTime? campDate,
+    DateTime? financeCheckDate,
+    num? u18BrunstadFee,
+    num? u18LocalFee,
+    num? o18BrunstadFee,
+    num? o18LocalFee,
   }) = _CampModel;
 
   factory CampModel.fromJson(Map<String, dynamic> json) => _$CampModelFromJson(json);
