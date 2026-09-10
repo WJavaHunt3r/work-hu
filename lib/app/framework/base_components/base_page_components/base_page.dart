@@ -77,8 +77,11 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
                 automaticallyImplyLeading: true,
                 title: (widget.title is Widget
                     ? widget.title as Widget
-                    : Text(((widget.title) as String).i18n(),
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold))),
+                    : InkWell(
+                        onTap: () => onRefresh(),
+                        child: Text(((widget.title) as String).i18n(),
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                      )),
                 leadingWidth: widget.leading == null ? null : 80.sp,
                 leading: widget.leading,
                 actions: buildActions(context, ref),

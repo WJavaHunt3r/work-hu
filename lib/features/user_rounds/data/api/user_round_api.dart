@@ -25,7 +25,7 @@ class UserRoundApi {
     }
   }
 
-  Future<int> getHeadData() async {
+  Future<dynamic> getHeadData() async {
     try {
       final res = await _dioClient.dio.get("/paceUserRound/head");
       return res.data;

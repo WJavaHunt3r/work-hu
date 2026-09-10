@@ -96,6 +96,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
   void initGoogleWeb() async {
     final signIn = GoogleSignIn.instance;
 
+
     await signIn
         .initialize(
       clientId: "470140408680-vvsu3rjroghr7suq603r4eek5lec5bds.apps.googleusercontent.com",

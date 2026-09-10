@@ -391,5 +391,13 @@
   "camp_maintenance_season": "Season",
   "camp_maintenance_save": "Save",
   "maintenance_mode_create": "Create",
-  "maintenance_mode_edit": "Edit"
+  "maintenance_mode_edit": "Edit",
+  "status_local_on_track_title": "On Track now",
+  "status_local_on_track_data": "%s people",
+  "status_local_on_track_subData": "out of %s people",
+  "status_local_required_title": "Required",
+  "status_local_required_data": "%s people",
+  "status_local_required_subData": "to reach %s%",
+  "status_local_status": "Local Status",
+  "status_my_status": "My Status"
 }

@@ -11,6 +11,7 @@ import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
+import 'package:work_hu/app/widgets/icon_box.dart';
 import 'package:work_hu/features/status/data/state/status_state.dart';
 import 'package:work_hu/features/status/providers/status_providers.dart';
 import 'package:work_hu/features/user_transactions/widgets/points_list_item.dart';
@@ -39,6 +40,36 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('status_local_status'.i18n(), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            SizedBox(height: 8.sp),
+            Row(
+              children: [
+                Expanded(
+                  child: _OnTrackStatus(
+                      title: "status_local_on_track_title".i18n(),
+                      data: "status_local_on_track_data".i18n([state.userRoundHead.onTrackCount.toString()]),
+                      subData: "status_local_on_track_subData".i18n([state.userRoundHead.goalCount.toString()]),
+                      icon: Icons.stacked_line_chart),
+                ),
+                SizedBox(width: 16.sp),
+                Expanded(
+                  child: _OnTrackStatus(
+                      title: "status_local_required_title".i18n(),
+                      data: "status_local_required_data".i18n([state.userRoundHead.toOnTrackCount.toString()]),
+                      subData: "status_local_required_subData".i18n([state.userRoundHead.churchGoal.toString()]),
+                      icon: Icons.stars),
+                )
+              ],
+            )
+          ],
+        ),
+        SizedBox(height: 16.sp),
+        if (state.statuses.isNotEmpty)
+          Text('status_my_status'.i18n(), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        SizedBox(height: 8.sp),
         for (var child in state.statuses)
           Column(
             children: [
@@ -86,7 +117,7 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
                     if (child.userId != locator<UserProvider>().user!.id)
                       BaseListTile(
                         isLast: false,
-                        contentPadding: EdgeInsets.only(top:12.sp),
+                        contentPadding: EdgeInsets.only(top: 12.sp),
                         index: 2,
                         title: Text('status_recent_transactions'.i18n(),
                             style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
@@ -201,6 +232,38 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
 
   @override
   BaseState get status => state.status;
+}
+
+class _OnTrackStatus extends StatelessWidget {
+  final String title;
+  final String data;
+  final String subData;
+  final IconData icon;
+
+  const _OnTrackStatus({super.key, required this.title, required this.data, required this.subData, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return BaseContainer(
+        child: Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+                child: Text(title,
+                    maxLines: 2,
+                    overflow: TextOverflow.visible,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold))),
+            IconBox(icon: icon),
+          ],
+        ),
+        SizedBox(height: 8.sp),
+        Text(data, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        Text(subData, style: Theme.of(context).textTheme.bodySmall),
+      ],
+    ));
+  }
 }
 
 class _MonthStatus extends StatelessWidget {

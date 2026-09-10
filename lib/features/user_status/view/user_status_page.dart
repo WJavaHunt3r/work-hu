@@ -42,7 +42,7 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
       title: Text(
         item.name,
       ),
-      leading: item.onTrack
+      leading: item.localOnTrack
           ? Icon(
               Icons.done_outline,
               size: 24.sp,
@@ -56,20 +56,28 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          item.localOnTrack
+              ? const Text(
+                  "On Track",
+                )
+              : Text("myshare_status_to_be_local_ontrack_short".i18n([Utils.creditFormatting(item.toLocalOnTrack)])),
           item.onTrack
               ? const Text(
                   "On Track",
                 )
-              : Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(toOnTrack)])),
-          Text("myshare_status_goal".i18n([Utils.creditFormatting(item.goal)]))
+              : Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(item.toOnTrack)])),
+          Text("${"myshare_status_goal".i18n([
+                Utils.creditFormatting(item.goal)
+              ])} - ${"myshare_status_status".i18n()}: ${Utils.creditFormatting(item.transactions)}")
         ],
       ),
       trailing: Text(
         "${Utils.percentFormat.format(userStatus)}%",
         style: Theme.of(context).textTheme.bodyLarge,
       ),
-      tileColor:
-          item.onTrack ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.surfaceContainerHighest,
+      tileColor: item.localOnTrack
+          ? Theme.of(context).colorScheme.primaryContainer
+          : Theme.of(context).colorScheme.surfaceContainerHighest,
     );
   }
 
@@ -77,10 +85,9 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
   List<Widget> buildHeaderLayout(BuildContext context, WidgetRef ref) {
     return [
       BaseHeaderChip(
-          label: "user_status_head_on_track", labelValue: () async => "${state.onTrackCount} / ${state.status.totalElements}"),
-      BaseHeaderChip(
-          label: "user_status_head_goal",
-          labelValue: () async => "${ref.read(roundFilterChipDataProvider).currentRound?.localMyShareGoal}%")
+          label: "user_status_head_on_track",
+          labelValue: () async => "${state.headData.onTrackCount} / ${state.headData.goalCount}"),
+      BaseHeaderChip(label: "user_status_head_goal", labelValue: () async => "${state.headData.churchGoal}%")
     ];
   }
 

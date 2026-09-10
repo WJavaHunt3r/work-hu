@@ -98,7 +98,7 @@ class Utils {
   }
 
   static String percentFormatting(num number) {
-    return "${percentFormat.format(number)} %";
+    return "${percentFormat.format(number)}%";
   }
 
   static String dateToString(DateTime date) {

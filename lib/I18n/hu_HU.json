@@ -134,7 +134,7 @@
   "myshare_status_your_ontrack": "On Track vagy!",
   "myshare_status_to_be_ontrack": "%s szükséges, hogy On Track legyél",
   "myshare_status_to_be_ontrack_short": "Hiányzik: %s",
-  "myshare_status_to_be_myshare_ontrack_short": "%s hiányzik (PACE)",
+  "myshare_status_to_be_local_ontrack_short": "Hiányzik (Helyi): %s",
   "myshare_status_goal": "Teljes cél: %s",
   "myshare_status_name": "Név",
   "myshare_status_status": "Státusz",
@@ -412,5 +412,13 @@
   "camp_maintenance_season": "Szezon",
   "camp_maintenance_save": "Mentés",
   "maintenance_mode_create": "Létrehozás",
-  "maintenance_mode_edit": "Módosítás"
+  "maintenance_mode_edit": "Módosítás",
+  "status_local_on_track_title": "On Track a hónapban",
+  "status_local_on_track_data": "%s fő",
+  "status_local_on_track_subData": "%s főből",
+  "status_local_required_title": "Még szükséges",
+  "status_local_required_data": "%s fő",
+  "status_local_required_subData": "%s%-hoz",
+  "status_local_status": "Helyi státusz",
+  "status_my_status": "Saját státusz"
 }

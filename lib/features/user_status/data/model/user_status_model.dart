@@ -19,6 +19,7 @@ class UserStatusModel with _$UserStatusModel {
       required bool onTrack,
       required bool localOnTrack,
       required num toOnTrack,
+      required num toLocalOnTrack,
       required num seasonYear}) = _UserStatusModel;
 
   factory UserStatusModel.fromJson(Map<String, dynamic> json) => _$UserStatusModelFromJson(json);

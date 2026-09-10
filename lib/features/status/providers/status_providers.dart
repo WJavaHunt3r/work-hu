@@ -1,16 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/framework/base_components/page_stru.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/features/goal/data/model/goal_filter.dart';
+import 'package:work_hu/features/goal/data/model/goal_model.dart';
+import 'package:work_hu/features/goal/data/repository/goal_repository.dart';
+import 'package:work_hu/features/goal/provider/goal_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/features/round_filter_chip/providers/round_filter_chip_provider.dart';
+import 'package:work_hu/features/rounds/data/state/rounds_state.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/status/data/state/status_state.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_items_filter.dart';
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
+import 'package:work_hu/features/user_rounds/data/model/user_round_head_model.dart';
 import 'package:work_hu/features/user_rounds/data/model/user_round_model.dart';
 import 'package:work_hu/features/user_rounds/data/repository/user_round_repository.dart';
 import 'package:work_hu/features/user_rounds/providers/user_rounds_provider.dart';
@@ -26,11 +34,12 @@ final statusDataProvider = StateNotifierProvider.autoDispose<StatusDataNotifier,
     ref.read(userRoundsRepoProvider),
     ref.read(userStatusRepoProvider),
     ref.read(usersRepoProvider),
-    ref.read(transactionItemsRepoProvider)));
+    ref.read(transactionItemsRepoProvider),
+    ref.read(goalRepoProvider)));
 
 class StatusDataNotifier extends BaseDataNotifier<StatusState> {
-  StatusDataNotifier(
-      this.userRoundRepoProvider, this.userStatusRepoProvider, this.usersRepository, this._transactionItemsRepository)
+  StatusDataNotifier(this.userRoundRepoProvider, this.userStatusRepoProvider, this.usersRepository,
+      this._transactionItemsRepository, this.goalsRepository)
       : super(const StatusState()) {
     getUserInfoAndUserRounds();
   }
@@ -39,6 +48,7 @@ class StatusDataNotifier extends BaseDataNotifier<StatusState> {
   final UserStatusRepository userStatusRepoProvider;
   final UsersRepository usersRepository;
   final TransactionItemsRepository _transactionItemsRepository;
+  final GoalRepository goalsRepository;
 
   Future<void> getUserInfoAndUserRounds() async {
     var userModel = locator<UserProvider>().user!;
@@ -70,6 +80,10 @@ class StatusDataNotifier extends BaseDataNotifier<StatusState> {
       }
     }, onError: (error) async {
       state = copyWithModelState(ModelState.empty);
+    });
+
+    executeApiCall<UserRoundHeadModel>(() => userRoundRepoProvider.getHeadData(), onSuccess: (head) async {
+      state = state.copyWith(userRoundHead:  head);
     });
   }
 

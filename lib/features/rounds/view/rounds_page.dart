@@ -25,8 +25,19 @@ class RoundsPageState extends BaseListPageState<RoundsPage, RoundsState, RoundsD
     return BaseListTile(
       isLast: item == items.last,
       index: index,
-      title: Text("${item.season.seasonYear} - ${Utils.getMonthFromDate(item.startDateTime, context)}"),
-      trailing: Text(Utils.percentFormatting(item.myShareGoal)),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("${item.season.seasonYear} - ${Utils.getMonthFromDate(item.startDateTime, context)}"),
+          Row(
+            children: [
+              Text(Utils.percentFormatting(item.localMyShareGoal)),
+              const Text(" - "),
+              Text(Utils.percentFormatting(item.myShareGoal)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

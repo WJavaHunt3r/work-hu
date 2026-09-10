@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:work_hu/features/user_rounds/data/api/user_round_api.dart';
+import 'package:work_hu/features/user_rounds/data/model/user_round_head_model.dart';
 import 'package:work_hu/features/user_rounds/data/model/user_round_model.dart';
 
 class UserRoundRepository {
@@ -24,9 +25,10 @@ class UserRoundRepository {
     }
   }
 
-  Future<int> getHeadData() async {
+  Future<UserRoundHeadModel> getHeadData() async {
     try {
-      return await _userApi.getHeadData();
+      final res = await _userApi.getHeadData();
+      return UserRoundHeadModel.fromJson(res);
     } on DioException {
       rethrow;
     }

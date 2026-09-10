@@ -5,6 +5,7 @@ import 'package:work_hu/app/framework/base_components/page_stru.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/widgets/base_sort_widget.dart';
+import 'package:work_hu/features/user_rounds/data/model/user_round_head_model.dart';
 import 'package:work_hu/features/user_rounds/data/repository/user_round_repository.dart';
 import 'package:work_hu/features/user_rounds/providers/user_rounds_provider.dart';
 import 'package:work_hu/features/user_status/data/model/user_status_filter.dart';
@@ -61,8 +62,8 @@ class UserStatusDataNotifier extends BaseDataNotifier<UserStatusState> implement
   }
 
   Future<void> getHeadData() async {
-    executeApiCall<int>(() => _userRoundRepository.getHeadData(), onSuccess: (data) async {
-      state = state.copyWith(onTrackCount: data);
+    executeApiCall<UserRoundHeadModel>(() => _userRoundRepository.getHeadData(), onSuccess: (data) async {
+      state = state.copyWith(headData: data);
     });
   }
 

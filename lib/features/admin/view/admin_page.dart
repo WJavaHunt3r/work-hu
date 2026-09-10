@@ -29,6 +29,7 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
     var user = locator<UserProvider>().user;
     return BaseListView(
       hasBottomPadding: false,
+      physics: const NeverScrollableScrollPhysics(),
       children: user == null
           ? []
           : user.role == Role.TEAM_LEADER
