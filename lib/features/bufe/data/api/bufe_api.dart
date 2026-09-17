@@ -35,6 +35,16 @@ class BufeApi {
     }
   }
 
+  Future<List<dynamic>> getDukappImages() async {
+    try {
+      final res = await _dioClient.dio
+          .get("external-dukapp-images");
+      return res.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<dynamic> transferAmount(
       {required num amount,
       required String fromDukappId,

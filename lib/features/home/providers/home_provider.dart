@@ -24,6 +24,7 @@ class HomeDataNotifier extends BaseDataNotifier<HomeState> {
     if (_currentUser != null) {
       getAccount();
       getDonations();
+
     }
   }
 
@@ -38,6 +39,7 @@ class HomeDataNotifier extends BaseDataNotifier<HomeState> {
       state = state.copyWith(account: data);
       getFamily(userId);
       getOrders(userId);
+      getImages();
     }, onError: (data) async {
       if (data.contains("404")) {
         executeApiCall<SumupUserModel>(
@@ -57,6 +59,12 @@ class HomeDataNotifier extends BaseDataNotifier<HomeState> {
       if (data != null) {
         state = state.copyWith(orders: data.items);
       }
+    });
+  }
+
+  FutureOr<void> getImages() async {
+    executeApiCall<List<DukappImages>>(() => _bufeRepository.getDukappImages(), onSuccess: (data) async {
+      state = state.copyWith(dukappImages: data);
     });
   }
 

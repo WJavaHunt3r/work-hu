@@ -420,5 +420,6 @@
   "status_local_required_data": "%s fő",
   "status_local_required_subData": "%s%-hoz",
   "status_local_status": "Helyi státusz",
-  "status_my_status": "Saját státusz"
+  "status_my_status": "Saját státusz",
+  "home_onsale_items": "Hétvégi akciók"
 }

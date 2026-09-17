@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
 import 'package:work_hu/api/dio_client.dart';
 import 'package:work_hu/app/locator.dart';
@@ -70,7 +69,7 @@ class UserProvider extends ChangeNotifier {
 
     await _dio.dio.post('/auth/logout', queryParameters: {"refreshToken": await Utils.getData('refresh_token')});
     await Utils.deleteData('refresh_token');
-    await GoogleSignIn.instance.signOut();
+    // await GoogleSignIn.instance.signOut();
     setUser(null);
   }
 }

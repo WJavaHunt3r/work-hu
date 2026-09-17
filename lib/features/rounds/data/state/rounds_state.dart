@@ -11,6 +11,7 @@ part 'rounds_state.freezed.dart';
 abstract class RoundsState with _$RoundsState {
   const factory RoundsState(
       {@Default([]) List<RoundModel> rounds,
+        RoundModel? selectedRound,
       @Default(RoundFilter(activeRound: true)) RoundFilter filter,
       @Default(BaseListState()) BaseListState status,
       @Default(BaseState()) BaseState maintenanceStatus}) = _RoundsState;

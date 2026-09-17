@@ -11,6 +11,7 @@ abstract class HomeState with _$HomeState {
   const factory HomeState({
     SumupUserModel? account,
     @Default([]) List<OrderEntry> orders,
+    @Default([]) List<DukappImages> dukappImages,
     @Default([]) List<DonationModel> donations,
     @Default([]) List<SumupUserModel> familiyAccounts,
     @Default(BaseState()) BaseState status,

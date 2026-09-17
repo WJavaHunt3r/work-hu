@@ -27,6 +27,7 @@ import 'package:work_hu/features/payment_success/view/payment_success_page.dart'
 import 'package:work_hu/features/payments/view/payments_page.dart';
 import 'package:work_hu/features/profile/view/language_picker_page.dart';
 import 'package:work_hu/features/profile/view/profile_page.dart';
+import 'package:work_hu/features/rounds/view/rounds_maintenance_page.dart';
 import 'package:work_hu/features/rounds/view/rounds_page.dart';
 import 'package:work_hu/features/status/view/status_page.dart';
 import 'package:work_hu/features/top_up/view/top_up_page.dart';
@@ -229,6 +230,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(path: "/admin/users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
         GoRoute(path: "/admin/goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
         GoRoute(path: "/admin/rounds", builder: (BuildContext context, GoRouterState state) => const RoundsPage()),
+        GoRoute(
+            path: "/admin/rounds/maintenance",
+            builder: (BuildContext context, GoRouterState state) {
+              var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
+              return RoundsMaintenancePage(
+                id:  map != null ? map["id"] : null,
+              );
+            }),
         GoRoute(path: "/admin/donations", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
         GoRoute(path: "/admin/camps", builder: (BuildContext context, GoRouterState state) => const CampPage()),
         GoRoute(

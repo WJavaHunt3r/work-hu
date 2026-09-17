@@ -46,45 +46,28 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
           children: [
             Expanded(
                 child: _buildActionCard(theme,
-                    title: 'home_send_money'.i18n(),
-                    subtitle: 'home_send_subtitle'.i18n(),
-                    icon: Icons.send,
-                    onTap: () {
-                      context
-                          .push("/balance/transfer")
-                          .then((e) {
-                        if (e != null && e == true) {
-                          ref.read(provider.notifier).getAccount();
-                        }
-                      });
-                    },
-                    color: Theme
-                        .of(context)
-                        .colorScheme
-                        .primary,
-                    cardColor: Theme
-                        .of(context)
-                        .colorScheme
-                        .primaryContainer)),
+                    title: 'home_send_money'.i18n(), subtitle: 'home_send_subtitle'.i18n(), icon: Icons.send, onTap: () {
+              context.push("/balance/transfer").then((e) {
+                if (e != null && e == true) {
+                  ref.read(provider.notifier).getAccount();
+                }
+              });
+            }, color: Theme.of(context).colorScheme.primary, cardColor: Theme.of(context).colorScheme.primaryContainer)),
             SizedBox(width: 24.sp),
             Expanded(
                 child: _buildActionCard(theme, onTap: () {
-                  context.push("/balance/topUps");
-                },
+              context.push("/balance/topUps");
+            },
                     title: 'home_bills'.i18n(),
                     subtitle: 'home_bills_subtitle'.i18n(),
                     icon: Icons.receipt_long,
-                    color: Theme
-                        .of(context)
-                        .colorScheme
-                        .tertiary,
-                    cardColor: Theme
-                        .of(context)
-                        .colorScheme
-                        .tertiaryContainer)),
+                    color: Theme.of(context).colorScheme.tertiary,
+                    cardColor: Theme.of(context).colorScheme.tertiaryContainer)),
           ],
         ),
-        SizedBox(height: 32.sp),
+        SizedBox(height: 16.sp),
+        _buildSaleCard(theme),
+        SizedBox(height: 16.sp),
         if (state.familiyAccounts.isNotEmpty) _buildFamilyAccounts(theme),
         SizedBox(height: 32.sp),
         if (state.donations.isNotEmpty) _buildDonations(theme),
@@ -150,11 +133,11 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
 
   Widget _buildActionCard(ThemeData theme,
       {required String title,
-        required String subtitle,
-        required IconData icon,
-        required Color color,
-        required Color cardColor,
-        Function? onTap}) {
+      required String subtitle,
+      required IconData icon,
+      required Color color,
+      required Color cardColor,
+      Function? onTap}) {
     return GestureDetector(
       onTap: () {
         onTap?.call();
@@ -163,7 +146,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
         padding: EdgeInsets.all(20.sp),
         height: 180.sp,
         decoration:
-        BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(24.sp), border: BoxBorder.all(color: color)),
+            BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(24.sp), border: BoxBorder.all(color: color)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -172,10 +155,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
               decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               child: Icon(
                 icon,
-                color: Theme
-                    .of(context)
-                    .colorScheme
-                    .onPrimary,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
             const Spacer(),
@@ -206,30 +186,26 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
     return state.orders.isEmpty
         ? const SizedBox()
         : BaseContainer(
-      width: double.infinity,
-      padding: EdgeInsets.zero,
-      child: Column(
-        children: state.orders
-            .map((e) =>
-            _transactionItem(
-                theme,
-                e.locationName,
-                e.date,
-                e.total,
-                e.locationName == "Büfé" ? Icons.coffee_outlined : Icons.shopping_bag_outlined,
-                state.orders.indexOf(e),
-                e.orderItems))
-            .toList(),
-      ),
-    );
+            width: double.infinity,
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: state.orders
+                  .map((e) => _transactionItem(
+                      theme,
+                      e.locationName,
+                      e.date,
+                      e.total,
+                      e.locationName == "Büfé" ? Icons.coffee_outlined : Icons.shopping_bag_outlined,
+                      state.orders.indexOf(e),
+                      e.orderItems))
+                  .toList(),
+            ),
+          );
   }
 
-  Widget _transactionItem(ThemeData theme, String name, DateTime date, num amount, IconData icon, int index,
-      List<OrderItem> orderItems) {
-    final locale = ref
-        .watch(localeProvider)
-        .value
-        ?.toString() ?? 'en_US';
+  Widget _transactionItem(
+      ThemeData theme, String name, DateTime date, num amount, IconData icon, int index, List<OrderItem> orderItems) {
+    final locale = ref.watch(localeProvider).value?.toString() ?? 'en_US';
 
     // 2. Use the locale in the DateFormat constructor
     String formattedDate = DateFormat.yMEd(locale).format(date);
@@ -238,19 +214,14 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
       title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(formattedDate, style: theme.textTheme.bodySmall),
       trailing: Text("- ${Utils.creditFormatting(amount)}",
-          style: Theme
-              .of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(fontWeight: FontWeight.bold)),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
       isLast: index == state.orders.length - 1,
       index: index,
-      onTap: () =>
-          showDialog(
-              context: context,
-              builder: (context) {
-                return BufeTransactionItemsPage(items: orderItems);
-              }),
+      onTap: () => showDialog(
+          context: context,
+          builder: (context) {
+            return BufeTransactionItemsPage(items: orderItems);
+          }),
     );
   }
 
@@ -263,11 +234,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
   _showQrCode(BuildContext context) {
     showDialog(
         context: context,
-        barrierColor: Theme
-            .of(context)
-            .colorScheme
-            .surfaceContainer
-            .withAlpha(200),
+        barrierColor: Theme.of(context).colorScheme.surfaceContainer.withAlpha(200),
         builder: (buildContext) {
           return BaseAlertDialog(
             title: "home_barcode".i18n(),
@@ -277,11 +244,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
               child: BarcodeWidget(
                 width: double.infinity,
                 barcode: Barcode.code128(),
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(color: Colors.black),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.black),
                 data: state.account?.customer_code ?? "",
               ),
             ),
@@ -316,27 +279,24 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
         SizedBox(height: 16.sp),
         Column(
             children: state.donations.map((e) {
-              return BaseContainer(
-                  width: double.infinity,
-                  height: 150.sp,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                          ref
-                              .watch(localeProvider)
-                              .value == const Locale("hu", "HU")
-                              ? e.description.toString()
-                              : e.descriptionNO.toString(),
-                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                      Text(
-                          "${DateFormat('MMM dd, yyyy • HH:mm').format(e.startDateTime!)} - ${DateFormat('MMM dd, yyyy • HH:mm')
-                              .format(e.endDateTime!)}"),
-                      FilledButton(onPressed: () => context.push("/donate/${e.id}"), child: Text("home_donate".i18n()))
-                    ],
-                  ));
-            }).toList()),
+          return BaseContainer(
+              width: double.infinity,
+              height: 150.sp,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                      ref.watch(localeProvider).value == const Locale("hu", "HU")
+                          ? e.description.toString()
+                          : e.descriptionNO.toString(),
+                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                      "${DateFormat('MMM dd, yyyy • HH:mm').format(e.startDateTime!)} - ${DateFormat('MMM dd, yyyy • HH:mm').format(e.endDateTime!)}"),
+                  FilledButton(onPressed: () => context.push("/donate/${e.id}"), child: Text("home_donate".i18n()))
+                ],
+              ));
+        }).toList()),
         SizedBox(height: 16.sp),
       ],
     );
@@ -351,18 +311,13 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
           hasBottomPadding: false,
           physics: const NeverScrollableScrollPhysics(),
           children: items
-              .map((e) =>
-              BaseListTile(
+              .map((e) => BaseListTile(
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(e.full_name),
                       Text(Utils.creditFormatting(e.balance),
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.bold))
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold))
                     ],
                   ),
                   isLast: items.indexOf(e) == items.length - 1,
@@ -374,5 +329,36 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
   @override
   void onRefresh() {
     ref.read(provider.notifier).getAccount();
+  }
+
+  _buildSaleCard(ThemeData theme) {
+    if (state.dukappImages.isEmpty) {
+      return const SizedBox();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("home_onsale_items".i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        SizedBox(
+          height: 8.sp,
+        ),
+        SizedBox(
+          height: 300.sp,
+          child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: state.dukappImages
+                  .map((i) => Padding(
+                        padding: EdgeInsets.only(right: 8.sp),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24.sp),
+                          child: Image.network(
+                            i.imageUrl,
+                          ),
+                        ),
+                      ))
+                  .toList()),
+        )
+      ],
+    );
   }
 }

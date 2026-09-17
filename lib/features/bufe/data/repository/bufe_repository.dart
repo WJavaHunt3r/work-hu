@@ -37,6 +37,15 @@ class BufeRepository {
     }
   }
 
+  Future<List<DukappImages>> getDukappImages() async {
+    try {
+      final res = await _bufeApi.getDukappImages();
+      return res.map((r) => DukappImages.fromJson(r)).toList();
+    } on DioException {
+      rethrow;
+    }
+  }
+
   Future<dynamic> transferAmount(
       {required String userId,
       required String toId,
@@ -45,11 +54,7 @@ class BufeRepository {
       String? message}) async {
     try {
       final res = await _bufeApi.transferAmount(
-          message: message,
-          amount: amount,
-          fromDukappId: userId,
-          toDukappId: toId,
-          externalReference: externalReferance);
+          message: message, amount: amount, fromDukappId: userId, toDukappId: toId, externalReference: externalReferance);
       return res;
     } on DioException {
       rethrow;

@@ -74,3 +74,16 @@ class OrderEntry with _$OrderEntry {
 
   factory OrderEntry.fromJson(Map<String, dynamic> json) => _$OrderEntryFromJson(json);
 }
+
+@freezed
+class DukappImages with _$DukappImages {
+  const factory DukappImages({
+    required String id,
+    @JsonKey(name: 'image_url') required String imageUrl,
+    @JsonKey(name: 'starts_at') required String startsAt,
+    @JsonKey(name: 'ends_at') String? endsAt,
+    @JsonKey(name: 'sort_order') required int sortOrder,
+  }) = _DukappImages;
+
+  factory DukappImages.fromJson(Map<String, dynamic> json) => _$DukappImagesFromJson(json);
+}
