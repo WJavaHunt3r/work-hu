@@ -8,7 +8,8 @@ import '../app/providers/user_provider.dart';
 
 @singleton
 class DioClient {
-  // static const String _baseUrl = "http://localhost:8990/dukapp/api"; //meló
+  // Override for a device on the LAN: --dart-define=API_BASE_URL=http://<mac-ip>:8990/dukapp/api
+  //static const String _baseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: "http://192.168.0.102:8990/dukapp/api"); //meló
   static const String _baseUrl = "https://dukappservice.bcc-ktk.org/dukapp/api"; //Duka
 
   static const String _dioContentType = 'application/json';
@@ -49,39 +50,46 @@ class DioClient {
         if (statusCode == 401|| statusCode == 403) {
           final refreshToken = await Utils.getData('refresh_token');
 
-          if (refreshToken.isNotEmpty) {
-            try {
-              final refreshDio = Dio(BaseOptions(baseUrl: _baseUrl));
-              final response = await refreshDio.post('/auth/refreshtoken', data: {
-                'refreshToken': refreshToken,
-              });
-
-              final newAccessToken = response.data['accessToken'];
-              final newRefreshToken = response.data['refreshToken'];
-
-              // Store new tokens
-              await Utils.saveData('jwt_token', newAccessToken);
-              await Utils.saveData('refresh_token', newRefreshToken);
-              locator<UserProvider>().setToken(newAccessToken);
-
-              // Retry original request with the new access token
-              final opts = e.requestOptions;
-              opts.headers['Authorization'] = 'Bearer $newAccessToken';
-              final cloneReq = await _dio.request(
-                opts.path,
-                options: Options(method: opts.method, headers: opts.headers),
-                data: opts.data,
-                queryParameters: opts.queryParameters,
-              );
-
-              return handler.resolve(cloneReq);
-            } catch (refreshError) {
-              // Refresh token expired or revoked -> force logout
-              await locator<UserProvider>().logout();
-              return handler.reject(e);
-            }
-          } else {
+          if (refreshToken.isEmpty) {
             await locator<UserProvider>().logout();
+            return handler.next(e);
+          }
+
+          final String newAccessToken;
+          try {
+            final response = await _plainDio.post('/auth/refreshtoken', data: {
+              'refreshToken': refreshToken,
+            });
+
+            newAccessToken = response.data['accessToken'];
+            final String? newRefreshToken = response.data['refreshToken'];
+
+            await Utils.saveData('jwt_token', newAccessToken);
+            // Keep the current refresh token if the backend does not rotate it.
+            if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
+              await Utils.saveData('refresh_token', newRefreshToken);
+            }
+            locator<UserProvider>().setToken(newAccessToken);
+          } on DioException catch (refreshError) {
+            // Only a rejected refresh token ends the session; network errors and
+            // server errors keep the tokens so the next attempt can succeed.
+            final refreshStatus = refreshError.response?.statusCode;
+            if (refreshStatus == 400 || refreshStatus == 401 || refreshStatus == 403) {
+              await locator<UserProvider>().logout();
+            }
+            return handler.next(e);
+          } catch (_) {
+            return handler.next(e);
+          }
+
+          // Retry the original request with the new access token. Uses the interceptor-free
+          // Dio so a failing retry cannot re-enter this queued handler and deadlock.
+          try {
+            final opts = e.requestOptions;
+            opts.headers['Authorization'] = 'Bearer $newAccessToken';
+            return handler.resolve(await _plainDio.fetch(opts));
+          } on DioException catch (retryError) {
+            return handler.next(retryError);
           }
         }
         return handler.next(e);
@@ -89,5 +97,15 @@ class DioClient {
     ));
   }
 
+  /// Same base URL, no auth/refresh interceptors. For token refresh, retries and logout.
+  final Dio _plainDio = Dio(BaseOptions(
+    baseUrl: _baseUrl,
+    connectTimeout: _dioConnectTimeout,
+    receiveTimeout: _dioReceiveTimeout,
+    contentType: _dioContentType,
+  ));
+
   Dio get dio => _dio;
+
+  Dio get plainDio => _plainDio;
 }

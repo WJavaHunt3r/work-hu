@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_sign_in_web/web_only.dart' as web;
+import 'package:work_hu/features/login/widgets/google_sign_in_button.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
@@ -183,7 +185,9 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
         BaseTextFormField(
           controller: emailController,
           keyBoardType: TextInputType.emailAddress,
-          autofillHints: const [AutofillHints.email, AutofillHints.username],
+          // Flutter web only uses the first hint (as the input's id/name/autocomplete); password
+          // managers pair "username" with "current-password".
+          autofillHints: const [AutofillHints.username],
           textInputAction: TextInputAction.next,
           fldControl: "3",
           labelText: "login_email_label",
@@ -233,7 +237,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
             Expanded(
               child: BaseTextFormField(
                 fldControl: "3",
-                autofillHints: const [AutofillHints.name, AutofillHints.givenName],
+                autofillHints: const [AutofillHints.givenName],
                 controller: firstNameController,
                 labelText: "login_firstname_label",
                 hintText: "login_firstname_hint",
@@ -243,7 +247,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
             Expanded(
               child: BaseTextFormField(
                 fldControl: "3",
-                autofillHints: const [AutofillHints.name, AutofillHints.familyName],
+                autofillHints: const [AutofillHints.familyName],
                 controller: lastNameController,
                 labelText: "login_lastname_label",
                 hintText: "login_lastname_hint",
@@ -255,7 +259,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
         BaseTextFormField(
           fldControl: "3",
           keyBoardType: TextInputType.emailAddress,
-          autofillHints: const [AutofillHints.email],
+          autofillHints: const [AutofillHints.username],
           controller: emailController,
           labelText: "login_email_label",
           hintText: "login_email_hint",
@@ -273,6 +277,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
         BaseTextFormField(
           fldControl: "3",
           controller: passwordController,
+          autofillHints: const [AutofillHints.newPassword],
           isPasswordField: true,
           labelText: "login_password_label",
           hintText: "login_password_hint",
@@ -280,6 +285,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
         SizedBox(height: 16.sp),
         BaseTextFormField(
           isPasswordField: true,
+          autofillHints: const [AutofillHints.newPassword],
           controller: passwordAgainController,
           labelText: "login_password_again_label",
           hintText: "login_password_again_hint",
@@ -392,15 +398,12 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
       height: 50.sp,
       width: double.infinity,
       alignment: Alignment.center,
-      child: web.renderButton(
-          configuration: web.GSIButtonConfiguration(
-        type: web.GSIButtonType.standard,
-        theme: web.GSIButtonTheme.outline,
-        size: web.GSIButtonSize.large,
-        text: _isLogin ? web.GSIButtonText.signinWith : web.GSIButtonText.signupWith,
-        shape: web.GSIButtonShape.rectangular,
-        locale: lngCode,
-      )),
+      child: buildGoogleSignInButton(
+        context: context,
+        isLogin: _isLogin,
+        languageCode: lngCode,
+        onPressed: () => ref.read(loginDataProvider.notifier).signInWithGoogleNative(),
+      ),
     );
   }
 
@@ -456,7 +459,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
   }
 
   @override
-  AutoDisposeStateNotifierProvider<LoginDataNotifier, LoginState> get provider => loginDataProvider;
+  StateNotifierProvider<LoginDataNotifier, LoginState> get provider => loginDataProvider;
 
   @override
   BaseState get status => state.status;

@@ -1,3 +1,8 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:localization/localization.dart';
@@ -23,7 +28,7 @@ final loginDataProvider = StateNotifierProvider.autoDispose<LoginDataNotifier, L
 
 class LoginDataNotifier extends BaseDataNotifier<LoginState> {
   LoginDataNotifier(this._loginRepository, this._donationRepository) : super(const LoginState()) {
-    initGoogleWeb();
+    initGoogle();
     isAlive();
     getDonations();
   }
@@ -83,6 +88,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
       executeApiCall<Map<String, dynamic>>(() => _loginRepository.loginWithGoogle(idToken), onSuccess: (data) async {
         await Utils.saveData("jwt_token", data['token']);
         await Utils.saveData("refresh_token", data['refreshToken']);
+        await Utils.saveData("keep_logged_in", "true");
         userProvider.setToken(data['token']);
         executeApiCall(() => _loginRepository.getUserByUsername(data['username']).then((userData) async {
               userProvider.setUser(userData);
@@ -93,27 +99,50 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
     }
   }
 
-  void initGoogleWeb() async {
+  static const _googleWebClientId = "470140408680-vvsu3rjroghr7suq603r4eek5lec5bds.apps.googleusercontent.com";
+  static Future<void>? _googleInit;
+  StreamSubscription<GoogleSignInAuthenticationEvent>? _googleSub;
+
+  Future<void> initGoogle() async {
     final signIn = GoogleSignIn.instance;
 
+    // initialize() may only be called once per app run.
+    // Web uses the web client id as clientId; on Android/iOS the web client id is the
+    // serverClientId, so the ID token's audience matches what the backend verifies.
+    _googleInit ??= signIn.initialize(
+      clientId: kIsWeb ? _googleWebClientId : null,
+      serverClientId: kIsWeb ? null : _googleWebClientId,
+    );
+    await _googleInit;
 
-    await signIn
-        .initialize(
-      clientId: "470140408680-vvsu3rjroghr7suq603r4eek5lec5bds.apps.googleusercontent.com",
-    )
-        .then((_) {
-      signIn.authenticationEvents.listen((event) async {
-        if (event is GoogleSignInAuthenticationEventSignIn) {
-          // Get the ID Token to send to your Java Backend
-          final auth = event.user.authentication;
-          final String? idToken = auth.idToken;
+    _googleSub = signIn.authenticationEvents.listen((event) async {
+      if (event is GoogleSignInAuthenticationEventSignIn) {
+        final String? idToken = event.user.authentication.idToken;
+        if (idToken != null) {
+          await signInWithGoogle(idToken);
+        }
+      }
+    }, onError: (Object e) => print("Google Sign-In Error: $e"));
+  }
 
-          if (idToken != null) {
-            await signInWithGoogle(idToken);
-          }
-        } else if (event is GoogleSignInAuthenticationEventSignOut) {}
-      });
-    });
+  /// Android / iOS: opens the native account picker. The result is delivered
+  /// through [GoogleSignIn.authenticationEvents] (see [initGoogle]).
+  Future<void> signInWithGoogleNative() async {
+    try {
+      await _googleInit;
+      if (!GoogleSignIn.instance.supportsAuthenticate()) return;
+      await GoogleSignIn.instance.authenticate();
+    } on GoogleSignInException catch (e) {
+      if (e.code != GoogleSignInExceptionCode.canceled) {
+        print("Google Sign-In Error: $e");
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _googleSub?.cancel();
+    super.dispose();
   }
 
   Future<void> sendNewPassword(String username) async {

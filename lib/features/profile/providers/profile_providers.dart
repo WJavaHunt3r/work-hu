@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
@@ -23,9 +25,10 @@ class ProfileDataNotifier extends BaseDataNotifier<ProfileState> {
   final LoginRepository loginRepository;
 
   Future<void> logout() async {
-    var googleAuth = GoogleSignIn.instance;
-    googleAuth.disconnect();
-    currentUser.logout();
+    await currentUser.logout();
+    // Not awaited: disconnect() waits for GoogleSignIn.initialize(), which only runs on the login
+    // page. After a restored session it hasn't run yet, so awaiting here would block logout forever.
+    GoogleSignIn.instance.disconnect().catchError((_) {});
   }
 
   Future<String> token() async {

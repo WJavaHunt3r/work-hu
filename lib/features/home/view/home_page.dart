@@ -1,5 +1,7 @@
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -42,6 +44,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
         _buildWelcomeTitle(theme),
         _buildBalanceCard(theme),
         SizedBox(height: 24.sp),
+        _buildSaleCard(theme),
         Row(
           children: [
             Expanded(
@@ -65,8 +68,6 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
                     cardColor: Theme.of(context).colorScheme.tertiaryContainer)),
           ],
         ),
-        SizedBox(height: 16.sp),
-        _buildSaleCard(theme),
         SizedBox(height: 16.sp),
         if (state.familiyAccounts.isNotEmpty) _buildFamilyAccounts(theme),
         SizedBox(height: 32.sp),
@@ -226,7 +227,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
   }
 
   @override
-  AutoDisposeStateNotifierProvider<HomeDataNotifier, HomeState> get provider => homeDataProvider;
+  StateNotifierProvider<HomeDataNotifier, HomeState> get provider => homeDataProvider;
 
   @override
   BaseState get status => state.status;
@@ -331,33 +332,50 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
     ref.read(provider.notifier).getAccount();
   }
 
-  _buildSaleCard(ThemeData theme) {
-    if (state.dukappImages.isEmpty) {
+  int _saleImageIndex = 0;
+
+  Widget _buildSaleCard(ThemeData theme) {
+    final images = state.dukappImages;
+    if (images.isEmpty) {
       return const SizedBox();
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("home_onsale_items".i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-        SizedBox(
-          height: 8.sp,
-        ),
+        SizedBox(height: 8.sp),
         SizedBox(
           height: 300.sp,
-          child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: state.dukappImages
-                  .map((i) => Padding(
-                        padding: EdgeInsets.only(right: 8.sp),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24.sp),
-                          child: Image.network(
-                            i.imageUrl,
-                          ),
-                        ),
-                      ))
-                  .toList()),
-        )
+          width: double.infinity,
+          child: PageView(
+            onPageChanged: (index) => setState(() => _saleImageIndex = index),
+            children: images
+                .map((i) => ClipRRect(
+                      borderRadius: BorderRadius.circular(24.sp),
+                      child: Image.network(i.imageUrl, width: double.infinity, fit: BoxFit.cover),
+                    ))
+                .toList(),
+          ),
+        ),
+        if (images.length > 1) ...[
+          SizedBox(height: 8.sp),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+                images.length,
+                (index) => AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: EdgeInsets.symmetric(horizontal: 3.sp),
+                      width: index == _saleImageIndex ? 16.sp : 6.sp,
+                      height: 6.sp,
+                      decoration: BoxDecoration(
+                        color: index == _saleImageIndex ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+                        borderRadius: BorderRadius.circular(3.sp),
+                      ),
+                    )),
+          ),
+        ],
+        SizedBox(height: 24.sp),
       ],
     );
   }

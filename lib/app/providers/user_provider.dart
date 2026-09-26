@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
 import 'package:work_hu/api/dio_client.dart';
@@ -10,9 +12,8 @@ final userDataProvider = ChangeNotifierProvider<UserProvider>((ref) => locator<U
 
 @lazySingleton
 class UserProvider extends ChangeNotifier {
-  UserProvider() {
-    initUser();
-  }
+  // initUser() is run once at startup by authInitProvider.
+  UserProvider();
 
   UserModel? _user;
   String? _token;
@@ -40,19 +41,27 @@ class UserProvider extends ChangeNotifier {
   Future<void> initUser() async {
     final keepLoggedIn = await Utils.getData('keep_logged_in') == 'true';
 
+    final String token = await Utils.getData('jwt_token');
+
     if (!keepLoggedIn) {
-      await logout();
+      if (token.isNotEmpty) await logout();
       return;
     }
-    final String token = await Utils.getData('jwt_token');
 
     if (token.isNotEmpty) {
       try {
         final res = await _dio.dio.get("/user/me");
 
         _user = UserModel.fromJson(res.data);
+      } on DioException catch (e) {
+        // Expired or revoked sessions are cleared by DioClient's refresh handling.
+        // Keep the tokens on network errors or timeouts so the next start can restore the session.
+        final status = e.response?.statusCode;
+        if (status == 401 || status == 403) {
+          await Utils.deleteData('jwt_token');
+        }
+        _user = null;
       } catch (e) {
-        await Utils.deleteData('jwt_token');
         _user = null;
       }
     }
@@ -65,11 +74,22 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await Utils.deleteData('jwt_token');
+    final token = _token ?? await Utils.getData('jwt_token');
+    final refreshToken = await Utils.getData('refresh_token');
 
-    await _dio.dio.post('/auth/logout', queryParameters: {"refreshToken": await Utils.getData('refresh_token')});
+    await Utils.deleteData('jwt_token');
     await Utils.deleteData('refresh_token');
     // await GoogleSignIn.instance.signOut();
-    setUser(null);
+    await setUser(null);
+
+    // Uses the interceptor-free Dio: logout is also called from inside DioClient's queued error
+    // interceptor, where a request through the main Dio would deadlock or loop on 401.
+    try {
+      await _dio.plainDio.post('/auth/logout',
+          queryParameters: {"refreshToken": refreshToken},
+          options: Options(headers: {if (token.isNotEmpty) 'Authorization': 'Bearer $token'}));
+    } catch (_) {
+      // The local session is already cleared; a failed server-side revoke is not fatal.
+    }
   }
 }
