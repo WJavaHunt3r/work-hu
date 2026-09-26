@@ -53,9 +53,9 @@ class ActivityItemsDataNotifier extends BaseDataNotifier<ActivityItemsState> imp
     var sort = SortBuilder()
       ..add("user.lastname", descending: false)
       ..add("user.firstname", descending: false);
-    executeApiCall<PaginatedResponse<ActivityItemsModel>>(
+    await executeApiCall<PaginatedResponse<ActivityItemsModel>>(
         () => activityItemRepository.getActivityItems(activityId: state.activity!.id, page: page, size: size, sort: sort),
-        onSuccess: (data) async {
+        background: true, onSuccess: (data) async {
       state = state.copyWith(
           activityItems: data.page.number == 0 ? data.content : [...state.activityItems, ...data.content],
           status: state.status

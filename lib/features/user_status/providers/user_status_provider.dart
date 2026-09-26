@@ -48,7 +48,7 @@ class UserStatusDataNotifier extends BaseDataNotifier<UserStatusState> implement
             filter: filter ?? state.filter,
             pageStru:
                 PageStru(page: page ?? state.status.number, size: size ?? state.status.size, sort: sort ?? state.status.sort)),
-        onSuccess: (data) async {
+        background: true, onSuccess: (data) async {
       state = state.copyWith(
           userStatuses: page == 0 ? data.content : [...state.userStatuses, ...data.content],
           status: state.status.copyWith(

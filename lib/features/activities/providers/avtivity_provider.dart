@@ -52,7 +52,7 @@ class ActivityDataNotifier extends BaseDataNotifier<ActivityState> implements Li
             employerId: user!.isAdmin() ? state.filter.employer?.id : user!.id,
             page: page ?? state.status.number,
             size: size ?? state.status.size,
-            sort: sort.build()), onSuccess: (data) async {
+            sort: sort.build()), background: true, onSuccess: (data) async {
       state = state.copyWith(
           activities:  data.page.number == 0 ? data.content : [...state.activities, ...data.content],
           status: state.status

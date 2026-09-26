@@ -20,56 +20,68 @@ abstract class BaseDataNotifier<S> extends StateNotifier<S> {
     return copyWithState(BaseState(modelState: modelState));
   }
 
+  /// Runs [apiCall] and tracks its progress in the state's [ModelState].
+  ///
+  /// With [background] the call does not block the UI: no loading overlay, the state goes to
+  /// [ModelState.backgroundLoading], and a failure without [onError] becomes
+  /// [ModelState.backgroundError] (shown inline by list pages) instead of an error dialog.
   Future<dynamic> executeApiCall<T>(
     Future<dynamic> Function() apiCall, {
     Future<void> Function(T)? onSuccess,
     Future<void> Function(String)? onError,
+    bool background = false,
   }) async {
-    try {
-      state = copyWithModelState(ModelState.loading);
+    var finished = false;
+    var overlayShown = false;
 
-      Future.microtask(() {
-        LoadingScreen.instance().show(context: navigatorKey.currentContext!);
-      });
+    void hideOverlay() {
+      finished = true;
+      if (overlayShown) {
+        overlayShown = false;
+        LoadingScreen.instance().hide();
+      }
+    }
+
+    Future<dynamic> fail(String message) async {
+      if (onError != null) {
+        state = copyWithModelState(ModelState.empty);
+        await onError.call(message);
+      } else {
+        state = copyWithState(BaseState(
+            modelState: background ? ModelState.backgroundError : ModelState.error,
+            message: background ? message : "api_unknown_error".i18n()));
+      }
+      return null;
+    }
+
+    try {
+      state = copyWithModelState(background ? ModelState.backgroundLoading : ModelState.loading);
+
+      if (!background) {
+        // Deferred so it never runs during a build; skipped if the call already finished.
+        Future.microtask(() {
+          final context = navigatorKey.currentContext;
+          if (finished || context == null) return;
+          overlayShown = true;
+          LoadingScreen.instance().show(context: context);
+        });
+      }
 
       final response = await apiCall();
-      LoadingScreen.instance().hide();
+      hideOverlay();
 
       if (response != null) {
         state = copyWithModelState(ModelState.success);
         await onSuccess?.call(response as T);
         return response;
-      } else {
-        final errorMessage = response?.message ?? 'api_unknown_error'.i18n();
-
-        if (onError != null) {
-          state = copyWithModelState(ModelState.empty);
-          await onError.call(errorMessage);
-        } else {
-          state = copyWithState(BaseState(modelState: ModelState.error, message: errorMessage));
-        }
-        return null;
       }
+      return await fail('api_unknown_error'.i18n());
     } on DioException catch (e) {
-      LoadingScreen.instance().hide();
-      final dioErrorMsg = e.message ?? 'api_unknown_error'.i18n();
-
-      if (onError != null) {
-        state = copyWithModelState(ModelState.empty);
-        await onError.call(dioErrorMsg);
-      } else {
-        state = copyWithState(BaseState(modelState: ModelState.error, message: "api_unknown_error".i18n()));
-      }
-      return null;
+      hideOverlay();
+      return await fail(e.message ?? 'api_unknown_error'.i18n());
     } catch (genericError) {
-      LoadingScreen.instance().hide();
-      if (onError != null) {
-        state = copyWithModelState(ModelState.empty);
-        await onError.call(genericError.toString());
-      } else {
-        state = copyWithState(BaseState(modelState: ModelState.error, message: "api_unknown_error".i18n()));
-      }
-      return null;
+      hideOverlay();
+      return await fail(onError != null ? genericError.toString() : 'api_unknown_error'.i18n());
     }
   }
 }

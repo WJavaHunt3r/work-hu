@@ -44,7 +44,7 @@ class TransactionsDataNotifier extends BaseDataNotifier<TransactionsState> imple
             pageStru: PageStru(
                 page: page ?? state.listState.number,
                 size: size ?? state.listState.size,
-                sort: sort ?? state.listState.sort)), onSuccess: (data) async {
+                sort: sort ?? state.listState.sort)), background: true, onSuccess: (data) async {
       state = state.copyWith(
           transactions: page == 0 ? data.content : [...state.transactions, ...data.content],
           listState: state.listState

@@ -33,7 +33,7 @@ class ActivityListItem extends ConsumerWidget {
         onTap: () {
           context
               .push("/profile/activities/${current.id}/items")
-              .then((r) => r != null && r == true ? ref.read(activityDataProvider.notifier).list() : null);
+              .then((r) => r != null && r == true ? ref.read(activityDataProvider.notifier).list(page: 0) : null);
         },
         child: ListTile(
           contentPadding: EdgeInsets.zero,
@@ -57,7 +57,7 @@ class ActivityListItem extends ConsumerWidget {
               ? IconButton(
                   onPressed: () => context
                       .push("/profile/activities/${current.id}/edit")
-                      .then((value) => ref.read(activityDataProvider.notifier).list()),
+                      .then((value) => ref.read(activityDataProvider.notifier).list(page: 0)),
                   icon: const Icon(Icons.edit_outlined))
               : user.isAdmin() && !current.registeredInApp
                   ? IconButton(

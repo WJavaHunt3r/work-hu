@@ -36,8 +36,16 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
 
   bool _isLocalLoading = false;
 
+  /// Page of the most recent [list] call; tells a reload (0) apart from loading more (> 0).
+  int _requestedPage = 0;
+
+  /// Start loading the next page when less than this many viewport heights are left below.
+  static const double _prefetchViewports = 1.5;
+
   void updatePage(int nextPage) async {
-    if (_isLocalLoading || status.modelState.isLoading) return;
+    // Not every notifier awaits its API call, so also check the state flag, which
+    // executeApiCall sets synchronously.
+    if (_isLocalLoading || status.modelState.isAnyLoading) return;
 
     _isLocalLoading = true;
 
@@ -49,21 +57,19 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
   }
 
   @override
-  void onScroll() {
-    if (_isLocalLoading || status.modelState.isLoading) return;
+  void onScroll() => _maybeLoadNextPage();
 
-    final pos = getController().position;
-    double maxScroll = pos.maxScrollExtent;
-    double currentScroll = pos.pixels;
+  void _maybeLoadNextPage() {
+    // After a failed page, wait for the user to tap retry instead of re-requesting on every scroll event.
+    if (!mounted || status.modelState.isAnyLoading || status.modelState.isBackgroundError) return;
+    if (listStatus.totalPages <= listStatus.number + 1) return;
 
-    if (currentScroll <= 0) return;
+    final controller = getController();
+    if (!controller.hasClients) return;
+    final pos = controller.position;
 
-    double delta = 200.0;
-
-    if (maxScroll - currentScroll <= delta) {
-      if (listStatus.totalPages > listStatus.number + 1) {
-        updatePage(listStatus.number + 1);
-      }
+    if (pos.extentAfter < pos.viewportDimension * _prefetchViewports) {
+      updatePage(listStatus.number + 1);
     }
   }
 
@@ -90,6 +96,13 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
 
   @override
   Widget buildLayout() {
+    // Also covers a first page that doesn't fill the screen, where no scroll event would ever fire.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeLoadNextPage());
+
+    final modelState = listStatus.baseStatus.modelState;
+    final isReloading = modelState.isBackgroundLoading && _requestedPage == 0 && items.isNotEmpty;
+    final isLoadingMore = modelState.isBackgroundLoading && _requestedPage > 0;
+
     var headers = HeaderChipLayout(buildChildren: (filterContext) => buildHeaderLayout(filterContext, ref));
     var children = buildListTiles(items) as List<Widget>;
     return Column(
@@ -110,20 +123,60 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
             list(sort: sort.build());
           },
         ),
-        SizedBox(height: 8.sp),
-        items.isEmpty && !listStatus.baseStatus.modelState.isLoading
-            ? Center(
-                child: Text(
-                  "base_no_items_found".i18n(),
-                  style: Theme.of(context).textTheme.titleSmall,
-                  textAlign: TextAlign.center,
-                ),
-              )
-            : items.isEmpty && listStatus.baseStatus.modelState.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : buildListLayout(context, ref) ??
-                    BaseListView(hasBottomPadding: true, physics: const NeverScrollableScrollPhysics(), children: children),
+        // Fixed height so the list doesn't jump when the reload indicator appears.
+        SizedBox(
+          height: 8.sp,
+          child: isReloading ? Center(child: LinearProgressIndicator(minHeight: 2.sp)) : null,
+        ),
+        if (items.isEmpty && modelState.isAnyLoading)
+          Padding(padding: EdgeInsets.symmetric(vertical: 32.sp), child: const Center(child: CircularProgressIndicator()))
+        else if (items.isEmpty && modelState.isBackgroundError)
+          _buildRetry()
+        else if (items.isEmpty)
+          Center(
+            child: Text(
+              "base_no_items_found".i18n(),
+              style: Theme.of(context).textTheme.titleSmall,
+              textAlign: TextAlign.center,
+            ),
+          )
+        else ...[
+          buildListLayout(context, ref) ??
+              BaseListView(
+                  hasBottomPadding: !isLoadingMore && !modelState.isBackgroundError,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: children),
+          if (isLoadingMore)
+            Padding(
+              padding: EdgeInsets.only(top: 16.sp, bottom: 80.sp),
+              child: Center(
+                  child: SizedBox(
+                      width: 24.sp, height: 24.sp, child: CircularProgressIndicator(strokeWidth: 2.sp))),
+            ),
+          if (modelState.isBackgroundError) _buildRetry(),
+        ],
       ],
+    );
+  }
+
+  Widget _buildRetry() {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: EdgeInsets.only(top: 16.sp, bottom: 80.sp),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("api_unknown_error".i18n(), style: theme.textTheme.bodySmall, textAlign: TextAlign.center),
+            SizedBox(height: 8.sp),
+            TextButton.icon(
+              onPressed: () => list(pageFrom: _requestedPage),
+              icon: const Icon(Icons.refresh),
+              label: Text("retry".i18n()),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -142,7 +195,8 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
   List get items;
 
   Future<void> list({dynamic filter, int? pageFrom = 0, List<String>? sort}) async {
-    await (ref.watch(provider.notifier) as ListApiProvider).list(filter: filter, page: pageFrom, sort: sort);
+    _requestedPage = pageFrom ?? 0;
+    await (ref.read(provider.notifier) as ListApiProvider).list(filter: filter, page: pageFrom, sort: sort);
   }
 
   BaseListState get listStatus;

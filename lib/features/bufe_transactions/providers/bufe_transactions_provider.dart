@@ -29,8 +29,8 @@ class BufeTransactionsDataNotifier extends BaseDataNotifier<BufeTransactionsStat
 
   @override
   Future<void> list({num? filter, int? page, int? size, List<String>? sort}) async {
-    executeApiCall<Order?>(() => _bufeRepository.getOrders(userId: filter ?? 0, page: page ?? state.listStatus.number ,
-        limit: size ?? state.listStatus.size), onSuccess: (data) async {
+    await executeApiCall<Order?>(() => _bufeRepository.getOrders(userId: filter ?? 0, page: page ?? state.listStatus.number ,
+        limit: size ?? state.listStatus.size), background: true, onSuccess: (data) async {
       state = state.copyWith(
           orders: data?.items ?? [],
           listStatus: state.listStatus.copyWith(

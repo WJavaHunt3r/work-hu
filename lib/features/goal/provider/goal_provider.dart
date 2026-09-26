@@ -58,13 +58,13 @@ class GoalDataNotifier extends BaseDataNotifier<GoalState> implements ListApiPro
 
   @override
   Future<void> list({GoalFilter? filter, int? page, int? size, List<String>? sort}) async {
-    executeApiCall<PaginatedResponse<GoalModel>>(
+    await executeApiCall<PaginatedResponse<GoalModel>>(
         () => goalRepository.getGoals(
             filter: filter ?? state.filter,
             pageStru: PageStru(
                 page: page ?? state.listState.number,
                 size: size ?? state.listState.size,
-                sort: sort ?? state.listState.sort)), onSuccess: (data) async {
+                sort: sort ?? state.listState.sort)), background: true, onSuccess: (data) async {
       state = state.copyWith(
           goals: page == 0 ? data.content : [...state.goals, ...data.content],
           listState: state.listState

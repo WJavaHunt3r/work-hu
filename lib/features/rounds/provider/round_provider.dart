@@ -31,11 +31,11 @@ class RoundsDataNotifier extends BaseDataNotifier<RoundsState> implements ListAp
   @override
   Future<void> list({RoundFilter? filter, int? page, int? size, List<String>? sort}) async {
     var sort = SortBuilder()..add("startDateTime", descending: true);
-    executeApiCall<PaginatedResponse<RoundModel>>(
+    await executeApiCall<PaginatedResponse<RoundModel>>(
         (() => roundRepository.getRounds(
             filter: filter ?? state.filter,
             pageStru: PageStru(page: page ?? state.status.number, size: size ?? state.status.size, sort: sort.build()))),
-        onSuccess: (data) async {
+        background: true, onSuccess: (data) async {
       state = state.copyWith(
           rounds: page == 0 ? data.content : [...state.rounds, ...data.content],
           status: state.status

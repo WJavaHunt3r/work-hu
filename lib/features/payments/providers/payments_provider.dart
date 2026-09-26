@@ -31,12 +31,12 @@ class PaymentDataNotifier extends BaseDataNotifier<PaymentsState> implements Lis
 
   @override
   Future<void> list({filter, int? page, int? size, List<String>? sort}) async {
-    executeApiCall<List<PaymentsModel>>(
+    await executeApiCall<List<PaymentsModel>>(
         () => paymentRepository.getPayments(
             userId: state.userId,
             status: state.paymentStatus,
             donationId: state.donationId,
-            dateFrom: DateTime.now().subtract(Duration(days: 7))), onSuccess: (payments) async {
+            dateFrom: DateTime.now().subtract(Duration(days: 7))), background: true, onSuccess: (payments) async {
       payments.sort((a, b) => b.dateTime.compareTo(a.dateTime));
       state = state.copyWith(payments: payments);
     });
@@ -96,6 +96,6 @@ class PaymentDataNotifier extends BaseDataNotifier<PaymentsState> implements Lis
 
   @override
   PaymentsState copyWithState(BaseState status) {
-    return PaymentsState(status: state.status.copyWith(baseStatus: status));
+    return state.copyWith(status: state.status.copyWith(baseStatus: status));
   }
 }

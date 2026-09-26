@@ -40,14 +40,14 @@ class UserTransactionsDataNotifier extends BaseDataNotifier<UserTransactionsStat
   @override
   Future<void> list({DateTime? filter, int? page, int? size, List<String>? sort}) async {
     if (state.userId != null) {
-      executeApiCall<PaginatedResponse<TransactionItemModel>>(
+      await executeApiCall<PaginatedResponse<TransactionItemModel>>(
           () => transactionItemsRepository.getTransactionItems(
               filter: TransactionItemsFilter(
                 userId: state.userId,
               ),
               page: page ?? state.listState.number,
               size: size ?? state.listState.size,
-              sort: ["transactionDate,desc"]), onSuccess: ((data) async {
+              sort: ["transactionDate,desc"]), background: true, onSuccess: ((data) async {
         state = state.copyWith(
             transactionItems: data.page.number == 0 ? data.content : [...state.transactionItems, ...data.content],
             listState: state.listState

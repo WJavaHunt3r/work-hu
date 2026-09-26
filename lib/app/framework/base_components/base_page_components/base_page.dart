@@ -9,7 +9,6 @@ import 'package:work_hu/app/framework/base_components/base_page_components/base_
 import 'package:work_hu/app/framework/base_components/title_provider.dart';
 import 'package:work_hu/app/widgets/base_confirm_dialog.dart';
 import 'package:work_hu/app/widgets/base_search_bar.dart';
-import 'package:work_hu/app/widgets/loading_screen.dart';
 import 'package:work_hu/features/utils.dart';
 
 import '../../../models/mode_state.dart';
@@ -46,12 +45,9 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
 
   @override
   Widget build(BuildContext context) {
+    // The loading overlay is driven by BaseDataNotifier.executeApiCall; showing it here as well
+    // unbalanced LoadingScreen's show/hide counter.
     ref.listen(provider, (previous, next) {
-      if (status.modelState.isLoading) {
-        LoadingScreen.instance().show(context: context);
-      } else {
-        LoadingScreen.instance().hide();
-      }
       if (status.modelState.isError) {
         Utils.showErrorDialog(
           context,

@@ -53,7 +53,7 @@ class UsersDataNotifier extends BaseDataNotifier<UsersState> implements ListApiP
             filter: filter ?? state.filter,
             page: page ?? state.listState.number,
             size: size ?? state.listState.size,
-            sort: sort), onSuccess: (data) async {
+            sort: sort), background: true, onSuccess: (data) async {
       state = state.copyWith(
           users: page == 0 ? data.content : [...state.users, ...data.content],
           listState: state.listState

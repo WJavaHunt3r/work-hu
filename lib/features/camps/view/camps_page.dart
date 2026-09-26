@@ -33,7 +33,7 @@ class CampPageState extends BaseListPageState<CampPage, CampState, CampDataNotif
       onTap: () async {
         await ref.read(campsDataProvider.notifier).presetCamp(item, MaintenanceMode.edit);
         showDialog(barrierDismissible: false, context: context, builder: (context) => CampsMaintenance())
-            .then((value) => value != null && value == true ? ref.read(campsDataProvider.notifier).list() : null);
+            .then((value) => value != null && value == true ? ref.read(campsDataProvider.notifier).list(page: 0) : null);
       },
       title: Text(item.campName!),
       subtitle: Column(
@@ -76,7 +76,7 @@ class CampPageState extends BaseListPageState<CampPage, CampState, CampDataNotif
       onPressed: () async {
         await ref.read(campsDataProvider.notifier).presetCamp(const CampModel(), MaintenanceMode.create);
         showDialog(barrierDismissible: false, context: context, builder: (context) => CampsMaintenance())
-            .then((value) => value != null && value == true ? ref.watch(campsDataProvider.notifier).list() : null);
+            .then((value) => value != null && value == true ? ref.read(campsDataProvider.notifier).list(page: 0) : null);
       },
       child: const Icon(Icons.add),
     );

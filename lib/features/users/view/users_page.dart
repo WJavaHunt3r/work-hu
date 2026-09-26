@@ -36,7 +36,7 @@ class UsersPageState extends BaseListPageState<UsersPage, UsersState, UsersDataN
             context: context,
             pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
               return UserDetails();
-            }).then((value) => value == true ? ref.watch(usersDataProvider.notifier).list() : null);
+            }).then((value) => value == true ? ref.read(usersDataProvider.notifier).list(page: 0) : null);
       },
     );
   }

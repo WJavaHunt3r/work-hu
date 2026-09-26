@@ -52,13 +52,13 @@ class CampDataNotifier extends BaseDataNotifier<CampState> implements ListApiPro
 
   @override
   Future<void> list({CampFilter? filter, int? page, int? size, List<String>? sort}) async {
-    executeApiCall<PaginatedResponse<CampModel>>(
+    await executeApiCall<PaginatedResponse<CampModel>>(
         () => campsRepository.getCamps(
             filter: filter ?? state.filter,
             pageStru: PageStru(
                 page: page ?? state.listState.number,
                 size: size ?? state.listState.size,
-                sort: sort ?? state.listState.sort)), onSuccess: (data) async {
+                sort: sort ?? state.listState.sort)), background: true, onSuccess: (data) async {
       state = state.copyWith(
           camps: page == 0 ? data.content : [...state.camps, ...data.content],
           listState: state.listState
