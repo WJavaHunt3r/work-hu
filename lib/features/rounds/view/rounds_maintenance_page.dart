@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart' show AutoDisposeStateNotifierProvider;
-import 'package:flutter_riverpod/src/consumer.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
@@ -77,7 +76,7 @@ class RoundsMaintenancePageState extends BasePageState<RoundsMaintenancePage, Ro
   }
 
   @override
-  AutoDisposeStateNotifierProvider<RoundsDataNotifier, RoundsState> get provider => roundDataProvider;
+  StateNotifierProvider<RoundsDataNotifier, RoundsState> get provider => roundDataProvider;
 
   @override
   BaseState get status => state.maintenanceStatus;

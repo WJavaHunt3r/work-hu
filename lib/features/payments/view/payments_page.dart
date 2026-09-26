@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -119,7 +121,7 @@ class PaymentsPageState extends BaseListPageState<PaymentsPage, PaymentsState, P
   }
 
   @override
-  AutoDisposeStateNotifierProvider<PaymentDataNotifier, PaymentsState> get provider => paymentDataProvider;
+  StateNotifierProvider<PaymentDataNotifier, PaymentsState> get provider => paymentDataProvider;
 
   @override
   List<Widget> buildActions(BuildContext context, WidgetRef ref) {

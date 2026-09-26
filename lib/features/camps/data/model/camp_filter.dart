@@ -6,7 +6,7 @@ part 'camp_filter.freezed.dart';
 part 'camp_filter.g.dart';
 
 @freezed
-class CampFilter with _$CampFilter {
+abstract class CampFilter with _$CampFilter {
   const factory CampFilter({
     int? seasonYear,
   }) = _CampFilter;

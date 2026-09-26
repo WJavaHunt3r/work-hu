@@ -10,7 +10,7 @@ part 'activity_items_model.freezed.dart';
 part 'activity_items_model.g.dart';
 
 @freezed
-class ActivityItemsModel with _$ActivityItemsModel {
+abstract class ActivityItemsModel with _$ActivityItemsModel {
   const factory ActivityItemsModel(
       {num? id,
       num? activityId,

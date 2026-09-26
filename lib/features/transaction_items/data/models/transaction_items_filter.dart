@@ -6,7 +6,7 @@ part 'transaction_items_filter.freezed.dart';
 part 'transaction_items_filter.g.dart';
 
 @freezed
-class TransactionItemsFilter with _$TransactionItemsFilter {
+abstract class TransactionItemsFilter with _$TransactionItemsFilter {
   const factory TransactionItemsFilter(
       {num? transactionId,
       num? userId,

@@ -5,7 +5,7 @@ part 'team_model.freezed.dart';
 part 'team_model.g.dart';
 
 @freezed
-class TeamModel with _$TeamModel {
+abstract class TeamModel with _$TeamModel {
   const factory TeamModel(
       {required num id,
       required num teamLeaderId,

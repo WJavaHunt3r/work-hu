@@ -7,7 +7,7 @@ part 'user_filter.freezed.dart';
 part 'user_filter.g.dart';
 
 @freezed
-class UserFilter with _$UserFilter {
+abstract class UserFilter with _$UserFilter {
   const factory UserFilter({
     num? familyId,
     num? spouseId,

@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart';
@@ -60,7 +62,7 @@ class TopUpsPageState extends BaseListPageState<TopUpsPage, TopUpsState, TopUpsD
   }
 
   @override
-  AutoDisposeStateNotifierProvider<TopUpsDataNotifier, TopUpsState> get provider => topUpsDataProvider;
+  StateNotifierProvider<TopUpsDataNotifier, TopUpsState> get provider => topUpsDataProvider;
 
   @override
   List<dynamic> getFilters() {

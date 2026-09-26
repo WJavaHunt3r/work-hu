@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:csv/csv.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
@@ -93,18 +94,16 @@ class UsersDataNotifier extends BaseDataNotifier<UsersState> implements ListApiP
   Future<void> uploadUserInfo() async {
     state = state.copyWith(modelState: ModelState.loading);
     try {
-      FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+      List<PlatformFile>? pickedFile = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['csv'],
-        allowMultiple: false,
-        withData: true,
       );
 
-      if (pickedFile != null) {
-        var file = pickedFile.files.first;
+      if (pickedFile.isNotEmpty) {
+        var file = pickedFile.first;
 
-        final input = utf8.decode(file.bytes!);
-        final fields = const CsvToListConverter().convert(input);
+        final input = utf8.decode(await file.readAsBytes());
+        final fields = Csv(autoDetect: false, dynamicTyping: true).decode(input);
         var rowNb = 0;
         for (var row in fields) {
           if (rowNb != 0) {

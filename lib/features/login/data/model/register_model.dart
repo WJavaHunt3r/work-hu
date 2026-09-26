@@ -5,7 +5,7 @@ part 'register_model.g.dart';
 part 'register_model.freezed.dart';
 
 @freezed
-class RegisterModel with _$RegisterModel {
+abstract class RegisterModel with _$RegisterModel {
 
   const factory RegisterModel(
       {

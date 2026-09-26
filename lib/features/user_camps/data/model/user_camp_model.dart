@@ -7,7 +7,7 @@ part 'user_camp_model.freezed.dart';
 part 'user_camp_model.g.dart';
 
 @freezed
-class UserCampModel with _$UserCampModel {
+abstract class UserCampModel with _$UserCampModel {
   const factory UserCampModel({
     num? id,
     required UserModel userModel,

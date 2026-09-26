@@ -6,7 +6,7 @@ part 'mentor_mentee_model.freezed.dart';
 part 'mentor_mentee_model.g.dart';
 
 @freezed
-class MentorMenteeModel with _$MentorMenteeModel {
+abstract class MentorMenteeModel with _$MentorMenteeModel {
   const factory MentorMenteeModel({num? id, required UserModel mentor, required UserModel mentee}) = _MentorMenteeModel;
 
   factory MentorMenteeModel.fromJson(Map<String, dynamic> json) => _$MentorMenteeModelFromJson(json);

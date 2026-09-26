@@ -7,7 +7,7 @@ part 'user_round_model.freezed.dart';
 part 'user_round_model.g.dart';
 
 @freezed
-class UserRoundModel with _$UserRoundModel {
+abstract class UserRoundModel with _$UserRoundModel {
   const factory UserRoundModel({
     required RoundModel round,
     required UserModel user,

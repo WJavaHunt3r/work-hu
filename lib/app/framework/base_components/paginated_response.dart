@@ -5,7 +5,7 @@ part 'paginated_response.g.dart';
 part 'paginated_response.freezed.dart';
 
 @Freezed(genericArgumentFactories: true)
-class PaginatedResponse<T> with _$PaginatedResponse<T> {
+abstract class PaginatedResponse<T> with _$PaginatedResponse<T> {
 
   const factory PaginatedResponse({
     required List<T> content,
@@ -18,7 +18,7 @@ class PaginatedResponse<T> with _$PaginatedResponse<T> {
 }
 
 @freezed
-class Page with _$Page {
+abstract class Page with _$Page {
   const factory Page({
     required int totalPages,
     required int totalElements,

@@ -5,7 +5,7 @@ part 'sumup_user_model.freezed.dart';
 part 'sumup_user_model.g.dart';
 
 @freezed
-class SumupUserModel with _$SumupUserModel {
+abstract class SumupUserModel with _$SumupUserModel {
   const factory SumupUserModel(
       {required String full_name,
       required num balance,

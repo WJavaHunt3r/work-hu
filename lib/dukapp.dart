@@ -1,9 +1,11 @@
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:localization/localization.dart';
@@ -23,6 +25,17 @@ class DukApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var width = MediaQuery.sizeOf(context).width;
+
+    // Native apps use the full screen; the phone-sized frame is only for the web build.
+    if (!kIsWeb) {
+      return ScreenUtilInit(
+        designSize: const Size(360, 640),
+        minTextAdapt: true,
+        ensureScreenSize: true,
+        splitScreenMode: false,
+        builder: (context, child) => buildMaterial(ref),
+      );
+    }
 
     return FlutterWebFrame(
         backgroundColor: AppColors.backgroundColor,

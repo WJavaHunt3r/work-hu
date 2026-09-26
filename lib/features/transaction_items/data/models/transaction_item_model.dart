@@ -11,7 +11,7 @@ part 'transaction_item_model.freezed.dart';
 part 'transaction_item_model.g.dart';
 
 @freezed
-class TransactionItemModel with _$TransactionItemModel {
+abstract class TransactionItemModel with _$TransactionItemModel {
   const factory TransactionItemModel(
       {num? id,
       num? transactionId,

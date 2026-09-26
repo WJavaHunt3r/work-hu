@@ -7,7 +7,7 @@ part 'user_round_head_model.freezed.dart';
 part 'user_round_head_model.g.dart';
 
 @freezed
-class UserRoundHeadModel with _$UserRoundHeadModel {
+abstract class UserRoundHeadModel with _$UserRoundHeadModel {
   const factory UserRoundHeadModel(
       {required int onTrackCount,
       required int goalCount,

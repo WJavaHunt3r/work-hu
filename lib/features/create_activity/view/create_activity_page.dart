@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
@@ -228,7 +230,7 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
   }
 
   @override
-  AutoDisposeStateNotifierProvider<CreateActivityDataNotifier, CreateActivityState> get provider => createActivityDataProvider;
+  StateNotifierProvider<CreateActivityDataNotifier, CreateActivityState> get provider => createActivityDataProvider;
 
   @override
   BaseState get status => state.status;

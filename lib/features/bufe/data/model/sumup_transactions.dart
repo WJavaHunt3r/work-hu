@@ -8,7 +8,7 @@ part 'sumup_transactions.g.dart';
 enum EntryType { topup, purchase, unknown }
 
 @freezed
-class TopUpResponse with _$TopUpResponse {
+abstract class TopUpResponse with _$TopUpResponse {
   const factory TopUpResponse(
       {required List<TopUpEntry> items,
       @JsonKey(name: 'dukapp_id') required String dukappId,
@@ -21,7 +21,7 @@ class TopUpResponse with _$TopUpResponse {
 }
 
 @freezed
-class TopUpEntry with _$TopUpEntry {
+abstract class TopUpEntry with _$TopUpEntry {
   const factory TopUpEntry({
     required String id,
     required double amount,
@@ -35,7 +35,7 @@ class TopUpEntry with _$TopUpEntry {
 }
 
 @freezed
-class Order with _$Order {
+abstract class Order with _$Order {
   const factory Order(
       {required List<OrderEntry> items,
       @JsonKey(name: 'dukapp_id') required String dukappId,
@@ -48,7 +48,7 @@ class Order with _$Order {
 }
 
 @freezed
-class OrderItem with _$OrderItem {
+abstract class OrderItem with _$OrderItem {
   const factory OrderItem({
     required int quantity,
     required List<dynamic> modifiers,
@@ -62,7 +62,7 @@ class OrderItem with _$OrderItem {
 }
 
 @freezed
-class OrderEntry with _$OrderEntry {
+abstract class OrderEntry with _$OrderEntry {
   const factory OrderEntry({
     required int total,
     @JsonKey(name: 'items') required List<OrderItem> orderItems,
@@ -76,7 +76,7 @@ class OrderEntry with _$OrderEntry {
 }
 
 @freezed
-class DukappImages with _$DukappImages {
+abstract class DukappImages with _$DukappImages {
   const factory DukappImages({
     required String id,
     @JsonKey(name: 'image_url') required String imageUrl,

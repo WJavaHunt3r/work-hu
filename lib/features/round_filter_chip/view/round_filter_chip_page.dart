@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/widgets/base_filter_chip.dart';
 import 'package:work_hu/features/round_filter_chip/providers/round_filter_chip_provider.dart';

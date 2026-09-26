@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
 import 'package:work_hu/features/utils.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 class TransactionRowWidget extends ConsumerWidget {
   const TransactionRowWidget(
       {super.key, required this.index, required this.name, required this.value, required this.isLast});

@@ -6,7 +6,7 @@ part 'round_model.freezed.dart';
 part 'round_model.g.dart';
 
 @freezed
-class RoundModel with _$RoundModel{
+abstract class RoundModel with _$RoundModel{
   const factory RoundModel({
     required num id,
     required DateTime startDateTime,

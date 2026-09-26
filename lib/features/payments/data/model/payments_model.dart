@@ -9,7 +9,7 @@ part 'payments_model.freezed.dart';
 part 'payments_model.g.dart';
 
 @freezed
-class PaymentsModel with _$PaymentsModel {
+abstract class PaymentsModel with _$PaymentsModel {
   const factory PaymentsModel({
     num? id,
     required DateTime dateTime,

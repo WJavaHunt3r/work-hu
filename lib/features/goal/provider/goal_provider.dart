@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
@@ -71,18 +73,16 @@ class GoalDataNotifier extends BaseDataNotifier<GoalState> implements ListApiPro
   }
 
   Future<void> uploadGoalsCsv() async {
-    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+    final pickedFile = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['csv'],
-      allowMultiple: false,
-      withData: true,
     );
 
-    if (pickedFile != null) {
-      var file = pickedFile.files.first;
+    if (pickedFile.isNotEmpty) {
+      var file = pickedFile.first;
 
-      final input = utf8.decode(file.bytes!);
-      final fields = const CsvToListConverter().convert(input);
+      final input = utf8.decode(await file.readAsBytes());
+      final fields = Csv(autoDetect: false, dynamicTyping: true).decode(input);
       var seasons = await seasonRepository.getSeasons();
       var goals = [];
       var rowNb = 0;

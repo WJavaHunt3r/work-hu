@@ -5,7 +5,7 @@ part 'fra_kare_week_model.freezed.dart';
 part 'fra_kare_week_model.g.dart';
 
 @freezed
-class FraKareWeekModel with _$FraKareWeekModel {
+abstract class FraKareWeekModel with _$FraKareWeekModel {
   const factory FraKareWeekModel(
       {num? id,
       required num weekNumber,

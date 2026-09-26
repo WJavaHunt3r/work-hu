@@ -7,7 +7,7 @@ part 'user_combo_model.freezed.dart';
 part 'user_combo_model.g.dart';
 
 @freezed
-class UserComboModel with _$UserComboModel {
+abstract class UserComboModel with _$UserComboModel {
   const factory UserComboModel(
       {required num id,
         required String firstname,

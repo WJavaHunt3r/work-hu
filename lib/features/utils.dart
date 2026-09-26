@@ -23,7 +23,7 @@ import 'package:work_hu/features/season/data/model/season_model.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 
 class Utils {
-  static const FlutterSecureStorage _storage = FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));
+  static const FlutterSecureStorage _storage = FlutterSecureStorage(aOptions: AndroidOptions(enforceBiometrics: true), iOptions:IOSOptions());
 
   static Future<void> saveData(String key, String value) async {
     try {
@@ -204,30 +204,29 @@ class Utils {
         description
       ]);
     }
-    String csv = const ListToCsvConverter().convert(list);
+    String csv = Csv(autoDetect: false).encode(list);
     Uint8List bytes = Uint8List.fromList(utf8.encode(csv));
 
     if (kIsWeb) {
       await FileSaver.instance.saveFile(
         name: '${dateToString(date).replaceAll("-", "")}_${changeSpecChars(description)}',
         bytes: bytes,
-        ext: 'csv',
+        fileExtension: 'csv',
         mimeType: MimeType.csv,
       );
     } else {
       await FileSaver.instance.saveAs(
         name: '${dateToString(date).replaceAll("-", "")}_${changeSpecChars(description)}',
         bytes: bytes,
-        ext: 'csv',
+        fileExtension: 'csv',
         mimeType: MimeType.csv,
       );
     }
   }
 
   static String getMonthFromDate(DateTime date, BuildContext context) {
-    var locale = Localizations.localeOf(context);
-    var format = DateFormat("MMMM", locale.countryCode);
-    String formatted = format.format(date);
+    final locale = Localizations.localeOf(context).toString(); // "en_US" / "hu_HU"
+    final formatted = DateFormat("MMMM", locale).format(date);
     return formatted[0].toUpperCase() + formatted.substring(1);
   }
 

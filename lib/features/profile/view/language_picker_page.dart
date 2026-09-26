@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
@@ -52,7 +54,7 @@ class LanguagePickerPageState extends BasePageState<LanguagePickerPage, HomeStat
   }
 
   @override
-  AutoDisposeStateNotifierProvider<HomeDataNotifier, HomeState> get provider => homeDataProvider;
+  StateNotifierProvider<HomeDataNotifier, HomeState> get provider => homeDataProvider;
 
   @override
   BaseState get status => state.status;

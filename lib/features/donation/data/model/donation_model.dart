@@ -5,7 +5,7 @@ part 'donation_model.freezed.dart';
 part 'donation_model.g.dart';
 
 @freezed
-class DonationModel with _$DonationModel {
+abstract class DonationModel with _$DonationModel {
   const factory DonationModel({
     num? id,
     DateTime? startDateTime,

@@ -6,7 +6,7 @@ part 'camp_model.freezed.dart';
 part 'camp_model.g.dart';
 
 @freezed
-class CampModel with _$CampModel {
+abstract class CampModel with _$CampModel {
   const factory CampModel({
     num? id,
     SeasonModel? season,

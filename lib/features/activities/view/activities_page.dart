@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/src/consumer.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:riverpod/src/state_notifier_provider.dart';
+
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
@@ -29,7 +31,7 @@ class ActivitiesPage extends BaseListPage {
 
 class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityState, ActivityDataNotifier> {
   @override
-  AutoDisposeStateNotifierProvider<ActivityDataNotifier, ActivityState> get provider => activityDataProvider;
+  StateNotifierProvider<ActivityDataNotifier, ActivityState> get provider => activityDataProvider;
   late List<DateTime?> dates;
 
   @override

@@ -4,7 +4,7 @@ part 'season_model.freezed.dart';
 part 'season_model.g.dart';
 
 @freezed
-class SeasonModel with _$SeasonModel {
+abstract class SeasonModel with _$SeasonModel {
   const factory SeasonModel({
     required num id,
     required num seasonYear,

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TransactionDetailsCard extends ConsumerWidget {
   const TransactionDetailsCard({super.key});

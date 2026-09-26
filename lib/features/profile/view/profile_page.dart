@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -177,7 +179,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
   }
 
   @override
-  AutoDisposeStateNotifierProvider<ProfileDataNotifier, ProfileState> get provider => profileDataProvider;
+  StateNotifierProvider<ProfileDataNotifier, ProfileState> get provider => profileDataProvider;
 
   @override
   BaseState get status => state.status;

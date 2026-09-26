@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
@@ -12,7 +12,7 @@ import 'package:work_hu/app/widgets/error_alert_dialog.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/utils.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 class TransactionSumCard extends ConsumerWidget {
   const TransactionSumCard({super.key, required this.items});
 

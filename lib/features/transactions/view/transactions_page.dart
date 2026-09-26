@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -77,7 +79,7 @@ class TransactionPageState extends BaseListPageState<TransactionsPage, Transacti
   BaseListState get listStatus => state.listState;
 
   @override
-  AutoDisposeStateNotifierProvider<TransactionsDataNotifier, TransactionsState> get provider => transactionsDataProvider;
+  StateNotifierProvider<TransactionsDataNotifier, TransactionsState> get provider => transactionsDataProvider;
 
   // @override
   // List<BaseFilterChip> buildFilterLayout(BuildContext context, WidgetRef ref) {

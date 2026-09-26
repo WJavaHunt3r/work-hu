@@ -6,7 +6,7 @@ part 'sumup_checkout_model.freezed.dart';
 part 'sumup_checkout_model.g.dart';
 
 @freezed
-class SumupCheckoutModel with _$SumupCheckoutModel {
+abstract class SumupCheckoutModel with _$SumupCheckoutModel {
   const factory SumupCheckoutModel({
     required PaymentStatus status,
     required int amount,

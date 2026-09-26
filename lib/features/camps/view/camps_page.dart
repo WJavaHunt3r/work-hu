@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
@@ -66,7 +68,7 @@ class CampPageState extends BaseListPageState<CampPage, CampState, CampDataNotif
   BaseListState get listStatus => state.listState;
 
   @override
-  AutoDisposeStateNotifierProvider<CampDataNotifier, CampState> get provider => campsDataProvider;
+  StateNotifierProvider<CampDataNotifier, CampState> get provider => campsDataProvider;
 
   @override
   buildFloatingActionButton(BuildContext context, WidgetRef ref) {

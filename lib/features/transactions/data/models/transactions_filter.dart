@@ -9,7 +9,7 @@ part 'transactions_filter.freezed.dart';
 part 'transactions_filter.g.dart';
 
 @freezed
-class TransactionsFilter with _$TransactionsFilter {
+abstract class TransactionsFilter with _$TransactionsFilter {
   const factory TransactionsFilter({
     num? createUserId,
     String? dateFrom,

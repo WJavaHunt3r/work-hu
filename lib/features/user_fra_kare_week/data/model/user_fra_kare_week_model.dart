@@ -8,7 +8,7 @@ part 'user_fra_kare_week_model.freezed.dart';
 part 'user_fra_kare_week_model.g.dart';
 
 @freezed
-class UserFraKareWeekModel with _$UserFraKareWeekModel {
+abstract class UserFraKareWeekModel with _$UserFraKareWeekModel {
   const factory UserFraKareWeekModel(
       {required num id,
       required UserModel user,

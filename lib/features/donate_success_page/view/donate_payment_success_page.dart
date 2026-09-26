@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -190,7 +192,7 @@ class DonatePaymentSuccessStatePage
   }
 
   @override
-  AutoDisposeStateNotifierProvider<DonatePaymentSuccessDataNotifier, DonatePaymentSuccessState> get provider =>
+  StateNotifierProvider<DonatePaymentSuccessDataNotifier, DonatePaymentSuccessState> get provider =>
       donatePaymentSuccessDataProvider;
 
   @override

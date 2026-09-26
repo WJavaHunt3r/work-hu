@@ -6,7 +6,7 @@ part 'activity_filter.g.dart';
 part 'activity_filter.freezed.dart';
 
 @freezed
-class ActivityFilter with _$ActivityFilter {
+abstract class ActivityFilter with _$ActivityFilter {
   const factory ActivityFilter(
       {UserModel? createUser,
       String? description,

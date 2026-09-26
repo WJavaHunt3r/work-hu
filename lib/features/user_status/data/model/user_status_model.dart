@@ -7,7 +7,7 @@ part 'user_status_model.freezed.dart';
 part 'user_status_model.g.dart';
 
 @freezed
-class UserStatusModel with _$UserStatusModel {
+abstract class UserStatusModel with _$UserStatusModel {
   const factory UserStatusModel(
       {required num id,
       required String name,

@@ -6,8 +6,8 @@ part of 'user_round_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UserRoundModelImpl _$$UserRoundModelImplFromJson(Map<String, dynamic> json) =>
-    _$UserRoundModelImpl(
+_UserRoundModel _$UserRoundModelFromJson(Map<String, dynamic> json) =>
+    _UserRoundModel(
       round: RoundModel.fromJson(json['round'] as Map<String, dynamic>),
       user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
       samvirkPayments: (json['samvirkPayments'] as num).toInt(),
@@ -17,8 +17,7 @@ _$UserRoundModelImpl _$$UserRoundModelImplFromJson(Map<String, dynamic> json) =>
       roundMyShareGoal: json['roundMyShareGoal'] as num,
     );
 
-Map<String, dynamic> _$$UserRoundModelImplToJson(
-        _$UserRoundModelImpl instance) =>
+Map<String, dynamic> _$UserRoundModelToJson(_UserRoundModel instance) =>
     <String, dynamic>{
       'round': instance.round,
       'user': instance.user,

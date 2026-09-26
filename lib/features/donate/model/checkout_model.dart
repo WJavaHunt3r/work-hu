@@ -6,7 +6,7 @@ part 'checkout_model.freezed.dart';
 part 'checkout_model.g.dart';
 
 @freezed
-class CheckoutModel with _$CheckoutModel {
+abstract class CheckoutModel with _$CheckoutModel {
   const factory CheckoutModel(
       {required num amount,
         required String checkout_reference,
