@@ -140,7 +140,7 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
               SizedBox(height: 5.sp),
               UserComboWidget(
                 controller: employerController,
-                initValue: 281,
+                initValue: state.activity!.employerId,
                 onSuggestionSelected: (UserComboModel suggestion) {
                   ref.watch(provider.notifier).updateActivity(state.activity!.copyWith(employerId: suggestion.id));
                 },

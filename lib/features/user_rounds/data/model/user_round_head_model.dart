@@ -12,6 +12,7 @@ abstract class UserRoundHeadModel with _$UserRoundHeadModel {
       {required int onTrackCount,
       required int goalCount,
       required int churchGoal,
+        required int localMyShareGoal,
       required int toOnTrackCount}) = _UserRoundHeadModel;
 
   factory UserRoundHeadModel.fromJson(Map<String, dynamic> json) => _$UserRoundHeadModelFromJson(json);

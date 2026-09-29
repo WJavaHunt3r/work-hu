@@ -55,6 +55,7 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
         );
       }
     });
+    final pinnedHeader = buildPinnedHeader();
     return PopScope(
       canPop: widget.canPop,
       onPopInvokedWithResult: (didPop, result) {
@@ -89,21 +90,23 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (pinnedHeader != null)
+              Padding(padding: EdgeInsets.only(left: 16.sp, right: 16.sp, top: 16.sp), child: pinnedHeader),
             Expanded(
                 child: widget.canRefresh
                     ? RefreshIndicator(
                         onRefresh: () async {
                           onRefresh();
                         },
-                        child: _buildScrollView())
-                    : _buildScrollView())
+                        child: _buildScrollView(hasPinnedHeader: pinnedHeader != null))
+                    : _buildScrollView(hasPinnedHeader: pinnedHeader != null))
           ],
         ),
       ),
     );
   }
 
-  _buildScrollView() {
+  Widget _buildScrollView({required bool hasPinnedHeader}) {
     return NotificationListener<ScrollNotification>(
       onNotification: (ScrollNotification notification) {
         if (notification is ScrollUpdateNotification) {
@@ -115,7 +118,7 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 16.sp),
+          padding: EdgeInsets.only(left: 16.sp, right: 16.sp, top: hasPinnedHeader ? 0 : 16.sp, bottom: 16.sp),
           child: buildLayout(),
         ),
       ),
@@ -160,6 +163,9 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
   }
 
   Widget buildLayout();
+
+  /// Shown above the scroll view, so it stays visible while [buildLayout] scrolls.
+  Widget? buildPinnedHeader() => null;
 
   List<Widget>? buildActions(BuildContext context, WidgetRef ref) {
     return [];

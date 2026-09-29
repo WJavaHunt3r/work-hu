@@ -12,7 +12,7 @@ abstract class UserStatusState with _$UserStatusState {
   const factory UserStatusState(
       {@Default([]) List<UserStatusModel> userStatuses,
       @Default(UserStatusFilter()) UserStatusFilter filter,
-      @Default(UserRoundHeadModel(onTrackCount: 0, goalCount: 0, churchGoal: 0, toOnTrackCount: 0)) UserRoundHeadModel headData,
+      @Default(UserRoundHeadModel(onTrackCount: 0, goalCount: 0, churchGoal: 0, toOnTrackCount: 0, localMyShareGoal: 0)) UserRoundHeadModel headData,
       @Default(BaseListState()) BaseListState status}) = _UserStatusState;
 
   const UserStatusState._();

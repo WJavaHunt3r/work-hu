@@ -89,7 +89,7 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
       BaseHeaderChip(
           label: "user_status_head_on_track",
           labelValue: () async => "${state.headData.onTrackCount} / ${state.headData.goalCount}"),
-      BaseHeaderChip(label: "user_status_head_goal", labelValue: () async => "${state.headData.churchGoal}%")
+      BaseHeaderChip(label: "user_status_head_goal", labelValue: () async => "${state.headData.localMyShareGoal}%")
     ];
   }
 

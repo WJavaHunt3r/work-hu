@@ -9,8 +9,8 @@ import '../app/providers/user_provider.dart';
 @singleton
 class DioClient {
   // Override for a device on the LAN: --dart-define=API_BASE_URL=http://<mac-ip>:8990/dukapp/api
-  //static const String _baseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: "http://192.168.0.102:8990/dukapp/api"); //meló
-  static const String _baseUrl = "https://dukappservice.bcc-ktk.org/dukapp/api"; //Duka
+  static const String _baseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: "http://192.168.0.102:8990/dukapp/api"); //meló
+  //static const String _baseUrl = "https://dukappservice.bcc-ktk.org/dukapp/api"; //Duka
 
   static const String _dioContentType = 'application/json';
 

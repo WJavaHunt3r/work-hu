@@ -94,22 +94,16 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
         .toList();
   }
 
+  /// Headers, filters, sort and the reload indicator stay pinned above the scrolling list.
   @override
-  Widget buildLayout() {
-    // Also covers a first page that doesn't fill the screen, where no scroll event would ever fire.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeLoadNextPage());
-
-    final modelState = listStatus.baseStatus.modelState;
-    final isReloading = modelState.isBackgroundLoading && _requestedPage == 0 && items.isNotEmpty;
-    final isLoadingMore = modelState.isBackgroundLoading && _requestedPage > 0;
-
-    var headers = HeaderChipLayout(buildChildren: (filterContext) => buildHeaderLayout(filterContext, ref));
-    var children = buildListTiles(items) as List<Widget>;
+  Widget buildPinnedHeader() {
+    final isReloading =
+        listStatus.baseStatus.modelState.isBackgroundLoading && _requestedPage == 0 && items.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        headers,
+        HeaderChipLayout(buildChildren: (filterContext) => buildHeaderLayout(filterContext, ref)),
         FilterChipLayout(
           state: listStatus,
           buildChildren: (filterContext) => buildFilterLayout(filterContext, ref),
@@ -128,6 +122,23 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
           height: 8.sp,
           child: isReloading ? Center(child: LinearProgressIndicator(minHeight: 2.sp)) : null,
         ),
+      ],
+    );
+  }
+
+  @override
+  Widget buildLayout() {
+    // Also covers a first page that doesn't fill the screen, where no scroll event would ever fire.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeLoadNextPage());
+
+    final modelState = listStatus.baseStatus.modelState;
+    final isLoadingMore = modelState.isBackgroundLoading && _requestedPage > 0;
+
+    var children = buildListTiles(items) as List<Widget>;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
         if (items.isEmpty && modelState.isAnyLoading)
           Padding(padding: EdgeInsets.symmetric(vertical: 32.sp), child: const Center(child: CircularProgressIndicator()))
         else if (items.isEmpty && modelState.isBackgroundError)

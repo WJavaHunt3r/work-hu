@@ -14,7 +14,7 @@ abstract class StatusState with _$StatusState {
     @Default([]) List<UserModel> children,
     @Default([]) List<UserStatusModel> statuses,
     @Default([]) List<UserRoundModel> userRounds,
-    @Default(UserRoundHeadModel(onTrackCount: 0, goalCount: 0, churchGoal: 0, toOnTrackCount: 0))
+    @Default(UserRoundHeadModel(onTrackCount: 0, goalCount: 0, churchGoal: 0, toOnTrackCount: 0, localMyShareGoal: 0))
     UserRoundHeadModel userRoundHead,
     @Default([]) List<TransactionItemModel> transactions,
     @Default(BaseState()) BaseState status,
