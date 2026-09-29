@@ -1,9 +1,10 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/change_password/data/api/change_password_api.dart';
 import 'package:work_hu/features/change_password/data/repository/change_password_repository.dart';
@@ -20,7 +21,7 @@ final changePasswordDataProvider = StateNotifierProvider<ChangePasswordDataNotif
   (ref) => ChangePasswordDataNotifier(ref.read(changePasswordRepoProvider)),
 );
 
-class ChangePasswordDataNotifier extends StateNotifier<ChangePasswordState> {
+class ChangePasswordDataNotifier extends BaseDataNotifier<ChangePasswordState> {
   ChangePasswordDataNotifier(this.changePasswordRepository) : super(const ChangePasswordState()) {
     newPasswordController = TextEditingController(text: "");
     newPasswordAgainController = TextEditingController(text: "");
@@ -34,24 +35,25 @@ class ChangePasswordDataNotifier extends StateNotifier<ChangePasswordState> {
   late final TextEditingController newPasswordAgainController;
   final UserProvider userProvider = locator<UserProvider>();
 
-  Future<void> changePassword() async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      if (state.newPassword != state.newPasswordAgain) {
-        clear(false, false);
-        state = state.copyWith(modelState: ModelState.error, message: "A jelszavak nem egyeznek!");
-      } else {
-        var usr = await Utils.getData('user');
-        var pswd = await Utils.getData('password');
-        await changePasswordRepository.changePassword(usr, pswd, state.newPassword).then((e) async {
-          await Utils.saveData('password', state.newPassword);
-          userProvider.setUser(userProvider.user!.copyWith(changedPassword: true));
-        });
-        clear(true, true);
-      }
-    } on DioException catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.response?.data ?? e.message);
+  /// Returns whether the password was changed.
+  Future<bool> changePassword() async {
+    if (state.newPassword != state.newPasswordAgain) {
+      clear();
+      state = copyWithState(const BaseState(modelState: ModelState.error, message: "login_password_not_match"));
+      return false;
     }
+    var usr = await Utils.getData('user');
+    var pswd = await Utils.getData('password');
+    var newPassword = state.newPassword;
+    var result = await executeApiCall<String>(
+      () => changePasswordRepository.changePassword(usr, pswd, newPassword),
+      onSuccess: (_) async {
+        await Utils.saveData('password', newPassword);
+        userProvider.setUser(userProvider.user!.copyWith(changedPassword: true));
+        clear();
+      },
+    );
+    return result != null;
   }
 
   void _updateState() {
@@ -62,13 +64,17 @@ class ChangePasswordDataNotifier extends StateNotifier<ChangePasswordState> {
   }
 
   void setUsername(String username, String password) {
-    // usernameController.text = username;
     state = state.copyWith(username: username, password: password);
   }
 
-  void clear(bool success, bool shouldPop) {
+  void clear() {
     newPasswordController.clear();
     newPasswordAgainController.clear();
-    state = state.copyWith(newPassword: "", newPasswordAgain: "", modelState: ModelState.success);
+    state = state.copyWith(newPassword: "", newPasswordAgain: "");
+  }
+
+  @override
+  ChangePasswordState copyWithState(BaseState status) {
+    return state.copyWith(status: status);
   }
 }

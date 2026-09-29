@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
@@ -17,9 +18,8 @@ abstract class CreateTransactionsState with _$CreateTransactionsState {
     @Default("") String description,
     @Default(0) num sum,
     UserComboModel? selectedUser,
-    @Default(ModelState.empty) ModelState modelState,
     @Default(ModelState.empty) ModelState creationState,
-    @Default("") String message,
+    @Default(BaseState()) BaseState status,
   }) = _CreateTransactionsState;
 
   const CreateTransactionsState._();

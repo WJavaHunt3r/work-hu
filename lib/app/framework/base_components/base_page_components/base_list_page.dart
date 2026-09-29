@@ -23,6 +23,7 @@ abstract class BaseListPage extends BasePage {
     super.hasAppBar = true,
     super.hasHeadData = false,
     super.canPop = true,
+    super.titleArgs,
   }) : super();
 
   // final List<SortItem>? sortParameters;

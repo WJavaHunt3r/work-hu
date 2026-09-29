@@ -366,6 +366,7 @@
   "base_exit": "Kilépés",
   "base_exit_question": "Biztosan kilépsz?",
   "create_activity_user": "Felhasználó",
+  "create_transactions_samvirk_min": "Az összegnek nagyobbnak kell lennie 3000 Ft-nál",
   "create_activity_send": "Küld",
   "transfer_amount_to": "Kinek",
   "transfer_amount_title": "Küldés",

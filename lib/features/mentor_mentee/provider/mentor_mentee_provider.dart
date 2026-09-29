@@ -1,8 +1,10 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/goal/data/repository/goal_repository.dart';
 import 'package:work_hu/features/goal/provider/goal_provider.dart';
@@ -33,7 +35,7 @@ final mentorMenteeDataProvider = StateNotifierProvider.autoDispose<MentorMenteeD
   ),
 );
 
-class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
+class MentorMenteeDataNotifier extends BaseDataNotifier<MentorMenteeState> implements ListApiProvider {
   MentorMenteeDataNotifier(
     this.userRoundRepository,
     this.goalRepoProvider,
@@ -41,10 +43,9 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
     this.menteesRepository,
     this.currentUser,
   ) : super(const MentorMenteeState()) {
-    getUsers();
-    getMentorMentee();
     mentorController = TextEditingController(text: "");
     menteeController = TextEditingController(text: "");
+    list().then((_) => getUsers());
   }
 
   final UserRoundRepository userRoundRepository;
@@ -55,62 +56,59 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
   late final TextEditingController mentorController;
   late final TextEditingController menteeController;
 
-  Future<void> getMentorMentee() async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await menteesRepository.getMentorMentee().then(
-        (value) => state = state.copyWith(mentees: value, modelState: ModelState.success),
-      );
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+  @override
+  Future<void> list({filter, int? page, int? size, List<String>? sort}) async {
+    await executeApiCall<List<MentorMenteeModel>>(
+      () => menteesRepository.getMentorMentee(),
+      background: true,
+      onSuccess: (mentees) async {
+        state = state.copyWith(
+          mentees: mentees,
+          listState: state.listState.copyWith(number: 0, totalPages: 1, totalElements: mentees.length),
+        );
+      },
+    );
   }
 
   Future<void> postMentee() async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      var mentees = MentorMenteeModel(mentor: state.mentor!, mentee: state.mentee!);
-      await menteesRepository.postMentee(mentees, currentUser!.id).then((value) {
-        state = state.copyWith(message: "Mentor - Mentee successfully created!", createState: ModelState.success);
-        getMentorMentee();
+    await executeApiCall<MentorMenteeModel>(
+      () => menteesRepository.postMentee(
+        MentorMenteeModel(mentor: state.mentor!, mentee: state.mentee!),
+        currentUser!.id,
+      ),
+      onSuccess: (_) async {
         clearCreation();
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+        list(page: 0);
+      },
+    );
   }
 
   Future<void> deleteMentee(num id) async {
-    List<MentorMenteeModel> origItems = state.mentees;
-    List<MentorMenteeModel> items = [];
-    for (var a in origItems) {
-      if (a.id != id) {
-        items.add(a);
-      }
-    }
-    state = state.copyWith(mentees: items, modelState: ModelState.loading);
-    try {
-      await menteesRepository.deleteMentee(id, currentUser!.id).then((value) {
+    var origItems = state.mentees;
+    var origListState = state.listState;
+    state = state.copyWith(
+      mentees: origItems.where((m) => m.id != id).toList(),
+      listState: origListState.copyWith(totalElements: origListState.totalElements - 1),
+    );
+    await executeApiCall<String>(
+      () => menteesRepository.deleteMentee(id, currentUser!.id),
+      onError: (error) async {
         state = state.copyWith(
-          message: "Mentor - Mentee successfully deleted!",
-          modelState: ModelState.success,
-          mentees: items,
+          mentees: origItems,
+          listState: state.listState.copyWith(totalElements: origListState.totalElements),
         );
-      });
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString(), mentees: origItems);
-    }
+      },
+    );
   }
 
   Future<void> getUsers() async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await usersRepository.getUsers(null, false).then((data) {
-        state = state.copyWith(modelState: ModelState.success, createState: ModelState.empty, users: data);
-      });
-    } on DioException catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+    await executeApiCall<List<UserModel>>(
+      () => usersRepository.getUsers(null, false),
+      background: true,
+      onSuccess: (users) async {
+        state = state.copyWith(createState: ModelState.empty, users: users);
+      },
+    );
   }
 
   Future<List<UserModel>> filterUsers(String filter) async {
@@ -141,5 +139,10 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
     menteeController.text = "";
     mentorController.text = "";
     state = state.copyWith(mentor: null, mentee: null, createState: ModelState.empty);
+  }
+
+  @override
+  MentorMenteeState copyWithState(BaseState status) {
+    return state.copyWith(listState: state.listState.copyWith(baseStatus: status));
   }
 }

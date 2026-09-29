@@ -1,14 +1,15 @@
 import 'dart:convert';
 
 import 'package:csv/csv.dart';
-import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:intl/intl.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/create_transactions/data/state/create_transactions_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -35,7 +36,7 @@ final createTransactionsDataProvider =
       ),
     );
 
-class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsState> {
+class CreateTransactionsDataNotifier extends BaseDataNotifier<CreateTransactionsState> {
   CreateTransactionsDataNotifier(
     this.usersRepository,
     this.currentUser,
@@ -71,46 +72,35 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   late final FocusScopeNode usersFocusNode;
 
   Future<void> sendTransactions() async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await transactionRepository
-          .createTransaction(
-            TransactionModel(
-              name: state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK
-                  ? "${currentUser!.paceTeam!.teamName} csapat tökéletes pontszámai"
-                  : descriptionController.value.text,
-              account: state.account,
-            ),
-            currentUser?.id ?? 0,
-          )
-          .then((data) async {
-            List<TransactionItemModel> newItems = [];
-            for (var item in state.transactionItems) {
-              newItems.add(
-                item.copyWith(transactionId: data.id!, transactionDate: DateTime.parse(dateController.value.text)),
-              );
-            }
-            state = state.copyWith(transactionItems: newItems);
-            await transactionItemsRepository
-                .sendTransactions(
-                  newItems
-                      .where((element) => element.points != 0 || element.hours != 0 || element.credit != 0)
-                      .toList(),
-                )
-                .then((data) {
-                  if (state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK) {
-                    _clearAllFields();
-                    // _createTransactionItems(state.users);
-                  } else {
-                    _clearAllFields();
-                  }
-
-                  state = state.copyWith(modelState: ModelState.success, creationState: ModelState.success);
-                });
-          });
-    } on DioException catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+    await executeApiCall<String>(
+      () async {
+        var transaction = await transactionRepository.createTransaction(
+          TransactionModel(
+            name: state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK
+                ? "${currentUser!.paceTeam!.teamName} csapat tökéletes pontszámai"
+                : descriptionController.value.text,
+            account: state.account,
+          ),
+          currentUser?.id ?? 0,
+        );
+        var newItems = state.transactionItems
+            .map(
+              (item) => item.copyWith(
+                transactionId: transaction.id!,
+                transactionDate: DateTime.parse(dateController.value.text),
+              ),
+            )
+            .toList();
+        state = state.copyWith(transactionItems: newItems);
+        return transactionItemsRepository.sendTransactions(
+          newItems.where((element) => element.points != 0 || element.hours != 0 || element.credit != 0).toList(),
+        );
+      },
+      onSuccess: (_) async {
+        _clearAllFields();
+        state = state.copyWith(creationState: ModelState.success);
+      },
+    );
   }
 
   void _updateDateAndDescription() {
@@ -147,7 +137,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
 
   Future<void> addTransaction({String? description}) async {
     if (state.account == Account.SAMVIRK && num.parse(valueController.value.text) <= 3000) {
-      state = state.copyWith(modelState: ModelState.error, message: "Must be greater than 3000 HUF");
+      state = copyWithState(const BaseState(modelState: ModelState.error, message: "create_transactions_samvirk_min"));
     } else {
       var transactions = <TransactionItemModel>[];
       transactions.addAll(state.transactionItems);
@@ -172,7 +162,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
 
       var text = valueController.value.text;
       var sum = state.sum + num.parse(text.isNotEmpty ? text : "0");
-      state = state.copyWith(transactionItems: transactions, sum: sum, modelState: ModelState.empty);
+      state = state.copyWith(transactionItems: transactions, sum: sum, status: const BaseState());
       _clearAddFields();
       usersFocusNode.requestFocus();
     }
@@ -262,7 +252,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
         }
       }
     } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: "Not supported: ${e.toString()}");
+      state = copyWithState(BaseState(modelState: ModelState.error, message: "Not supported: ${e.toString()}"));
     }
   }
 
@@ -270,5 +260,10 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     descriptionController.clear();
     _clearTransactions();
     dateController.text = DateTime.now().toString();
+  }
+
+  @override
+  CreateTransactionsState copyWithState(BaseState status) {
+    return state.copyWith(status: status);
   }
 }

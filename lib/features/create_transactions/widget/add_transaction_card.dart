@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/account.dart';
-import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
@@ -19,7 +17,6 @@ class AddTransactionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var isError = ref.watch(createTransactionsDataProvider).modelState == ModelState.error;
     return BaseContainer(
       padding: EdgeInsets.all(8.sp),
       child: Row(
@@ -75,15 +72,6 @@ class AddTransactionCard extends ConsumerWidget {
               labelText: Utils.getTransactionTypeText(ref.watch(createTransactionsDataProvider).transactionType),
             ),
           ),
-          isError
-              ? Padding(
-                  padding: EdgeInsets.only(top: 8.sp, left: 8.sp, right: 8.sp),
-                  child: Text(
-                    ref.watch(createTransactionsDataProvider).message,
-                    style: const TextStyle(color: AppColors.errorRed),
-                  ),
-                )
-              : const SizedBox(),
         ],
       ),
     );

@@ -5,9 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/framework/base_components/title_provider.dart';
 import 'package:work_hu/app/widgets/base_confirm_dialog.dart';
-import 'package:work_hu/app/widgets/base_search_bar.dart';
 import 'package:work_hu/features/utils.dart';
 
 import '../../../models/mode_state.dart';
@@ -21,9 +19,13 @@ abstract class BasePage extends ConsumerStatefulWidget {
     this.leading,
     this.hasAppBar = true,
     this.canRefresh = true,
+    this.titleArgs = const [],
   });
 
   final Object title;
+
+  /// Arguments for a [title] i18n key with placeholders.
+  final List<String> titleArgs;
   final bool hasHeadData;
   final bool canPop;
   final Widget? leading;
@@ -34,6 +36,9 @@ abstract class BasePage extends ConsumerStatefulWidget {
 abstract class BasePageState<P extends BasePage, S extends dynamic, N extends StateNotifier<S>>
     extends ConsumerState<P> {
   late final ScrollController _scrollController;
+
+  /// Set while the current error has been shown, so later state changes don't reopen the dialog.
+  bool _errorShown = false;
 
   @override
   void initState() {
@@ -49,7 +54,10 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
     // The loading overlay is driven by BaseDataNotifier.executeApiCall; showing it here as well
     // unbalanced LoadingScreen's show/hide counter.
     ref.listen(provider, (previous, next) {
-      if (status.modelState.isError) {
+      if (!status.modelState.isError) {
+        _errorShown = false;
+      } else if (!_errorShown) {
+        _errorShown = true;
         Utils.showErrorDialog(context, content: status.message.i18n());
       }
     });
@@ -77,7 +85,7 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
                     : InkWell(
                         onTap: () => onRefresh(),
                         child: Text(
-                          ((widget.title) as String).i18n(),
+                          ((widget.title) as String).i18n(widget.titleArgs),
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       )),
@@ -183,130 +191,4 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
   }
 
   void onScroll() {}
-}
-
-abstract class LegacyBasePage extends ConsumerWidget {
-  const LegacyBasePage({
-    super.key,
-    required this.title,
-    this.automaticallyImplyLeading,
-    this.canPop = true,
-    this.isListView = false,
-    this.appBarTextStyle,
-    this.centerTitle,
-    this.extendBodyBehindAppBar,
-    this.leading,
-    this.hasTitleWidget,
-    this.hasSearchBar = false,
-    this.titleArgs = const [],
-    this.backgroundColor,
-  });
-
-  final String title;
-  final bool? automaticallyImplyLeading;
-  final bool canPop;
-  final bool isListView;
-  final TextStyle? appBarTextStyle;
-  final bool? centerTitle;
-  final bool? extendBodyBehindAppBar;
-  final List<String> titleArgs;
-  final Widget? leading;
-  final bool hasSearchBar;
-  final bool? hasTitleWidget;
-  final Color? backgroundColor;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return PopScope(
-      canPop: canPop,
-      onPopInvokedWithResult: (didPop, result) async => await popInvoked(context, didPop, ref),
-      child: Scaffold(
-        drawer: buildDrawer(context, ref),
-        bottomNavigationBar: buildBottomNavigationBar(context, ref),
-        extendBodyBehindAppBar: extendBodyBehindAppBar ?? false,
-        appBar: extendBodyBehindAppBar ?? false
-            ? null
-            : AppBar(
-                bottom: buildBottom(ref, context),
-                title: hasTitleWidget ?? false
-                    ? buildTitleWidget(ref)
-                    : (hasSearchBar
-                          ? buildSearchBar(ref)
-                          : Text(
-                              title.isEmpty ? ref.watch(titleDataProvider) : title.i18n(titleArgs),
-                              style: appBarTextStyle ?? const TextStyle(fontWeight: FontWeight.w800),
-                            )),
-                leading: leading,
-                centerTitle: centerTitle ?? false,
-                actions: buildActions(context, ref),
-                automaticallyImplyLeading: automaticallyImplyLeading ?? !hasSearchBar,
-              ),
-        floatingActionButton: createActionButton(context, ref),
-        floatingActionButtonLocation: setFloatingActionButtonLocation(ref),
-        resizeToAvoidBottomInset: false,
-        body:
-            buildBody(context, ref) ??
-            SizedBox.expand(
-              child: Container(
-                padding: EdgeInsets.only(
-                  left: 12.sp,
-                  right: 12.sp,
-                  top: isListView || hasSearchBar
-                      ? 0
-                      : extendBodyBehindAppBar ?? false
-                      ? 0.sp
-                      : 8.sp,
-                  bottom: 0.sp,
-                ),
-                child: buildLayout(context, ref),
-              ),
-            ),
-      ),
-    );
-  }
-
-  Widget buildLayout(BuildContext context, WidgetRef ref);
-
-  @protected
-  Widget? buildBody(BuildContext context, WidgetRef ref) {
-    return null;
-  }
-
-  List<Widget> buildActions(BuildContext context, WidgetRef ref) {
-    return [];
-  }
-
-  @protected
-  FloatingActionButtonLocation setFloatingActionButtonLocation(WidgetRef ref) {
-    return FloatingActionButtonLocation.centerFloat;
-  }
-
-  popInvoked(BuildContext context, bool didPop, WidgetRef ref) {}
-
-  NavigationDrawer? buildDrawer(BuildContext context, WidgetRef ref) {
-    return null;
-  }
-
-  Widget? createActionButton(BuildContext context, WidgetRef ref) {
-    return null;
-  }
-
-  buildBottomNavigationBar(BuildContext context, WidgetRef ref) {}
-
-  Widget buildSearchBar(WidgetRef ref) {
-    return SizedBox(
-      height: 35.sp,
-      child: BaseSearchBar(onChanged: (text) => searchBarChanged(ref, text)),
-    );
-  }
-
-  searchBarChanged(WidgetRef ref, String text) {}
-
-  Widget buildTitleWidget(WidgetRef ref) {
-    return const SizedBox();
-  }
-
-  PreferredSizeWidget? buildBottom(WidgetRef ref, BuildContext context) {
-    return null;
-  }
 }

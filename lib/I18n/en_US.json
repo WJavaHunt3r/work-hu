@@ -350,6 +350,7 @@
   "base_exit": "Exit",
   "base_exit_question": "Are you shure you want to exit?",
   "create_activity_user": "User",
+  "create_transactions_samvirk_min": "The amount must be greater than 3000 HUF",
   "create_activity_send": "Send",
   "transfer_amount_to": "To whom",
   "transfer_amount_title": "Send amount",

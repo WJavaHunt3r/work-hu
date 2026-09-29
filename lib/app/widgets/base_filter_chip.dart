@@ -111,9 +111,7 @@ class ModalBottomFilterChipState<T> extends BaseFilterChipState<T, ModalBottomFi
           backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
           onClosing: () => context.pop(),
           builder: (context) {
-            return LegacyBaseListView(
-              itemBuilder: (BuildContext context, int index) {},
-              itemCount: widget.children.length,
+            return ListView(
               children: [
                 Row(
                   children: [

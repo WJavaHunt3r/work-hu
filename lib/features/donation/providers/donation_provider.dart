@@ -1,9 +1,10 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/models/maintenance_mode.dart';
-import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
+import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/donation/data/api/donation_api.dart';
 import 'package:work_hu/features/donation/data/model/donation_model.dart';
@@ -20,7 +21,7 @@ final donationDataProvider = StateNotifierProvider.autoDispose<DonationDataNotif
   (ref) => DonationDataNotifier(ref.read(donationRepoProvider), ref.read(userDataProvider).user),
 );
 
-class DonationDataNotifier extends StateNotifier<DonationState> {
+class DonationDataNotifier extends BaseDataNotifier<DonationState> implements ListApiProvider {
   DonationDataNotifier(this.donationRepository, this.currentUser) : super(const DonationState()) {
     startDateTimeController = TextEditingController(text: DateTime.now().toString());
     endDateTimeController = TextEditingController();
@@ -31,6 +32,8 @@ class DonationDataNotifier extends StateNotifier<DonationState> {
     endDateTimeController.addListener(_updateEndDate);
     descriptionController.addListener(_updateDescription);
     descriptionNoController.addListener(_updateNoDescription);
+
+    list();
   }
 
   late final TextEditingController startDateTimeController;
@@ -40,30 +43,37 @@ class DonationDataNotifier extends StateNotifier<DonationState> {
   final DonationRepository donationRepository;
   final UserModel? currentUser;
 
-  Future<void> getDonations(DateTime? dateTime) async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await donationRepository.getDonations(dateTime).then((donations) {
+  @override
+  Future<void> list({filter, int? page, int? size, List<String>? sort}) async {
+    await executeApiCall<List<DonationModel>>(
+      () => donationRepository.getDonations(null),
+      background: true,
+      onSuccess: (donations) async {
         donations.sort((a, b) => b.endDateTime!.compareTo(a.endDateTime!));
-        state = state.copyWith(donations: donations, modelState: ModelState.success);
-      });
-    } on DioException {
-      state = state.copyWith(modelState: ModelState.error, message: "Failed to fetch donations ");
-    }
+        state = state.copyWith(
+          donations: donations,
+          listState: state.listState.copyWith(number: 0, totalPages: 1, totalElements: donations.length),
+        );
+      },
+    );
   }
 
-  Future<void> deleteDonations(num donationId, int index) async {
-    List<DonationModel> origItems = state.donations;
-    List<DonationModel> items = [...origItems];
-    items.removeWhere((a) => a.id != donationId);
-    state = state.copyWith(donations: items, modelState: ModelState.loading);
-    try {
-      await donationRepository
-          .deleteDonation(donationId)
-          .then((value) => state = state.copyWith(donations: items, modelState: ModelState.success));
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, donations: origItems);
-    }
+  Future<void> deleteDonation(num donationId) async {
+    var origItems = state.donations;
+    var origListState = state.listState;
+    state = state.copyWith(
+      donations: origItems.where((d) => d.id != donationId).toList(),
+      listState: origListState.copyWith(totalElements: origListState.totalElements - 1),
+    );
+    await executeApiCall<String>(
+      () => donationRepository.deleteDonation(donationId),
+      onError: (error) async {
+        state = state.copyWith(
+          donations: origItems,
+          listState: state.listState.copyWith(totalElements: origListState.totalElements),
+        );
+      },
+    );
   }
 
   Future<void> updateDonation(DonationModel donation) async {
@@ -73,22 +83,16 @@ class DonationDataNotifier extends StateNotifier<DonationState> {
 
   Future<void> saveDonation() async {
     var mode = state.mode;
-    state = state.copyWith(modelState: ModelState.loading);
     var donation = state.selectedDonation;
-    try {
-      if (donation != null) {
-        if (mode == MaintenanceMode.create) {
-          await donationRepository.postDonation(donation, currentUser!.id);
-        } else if (mode == MaintenanceMode.edit) {
-          await donationRepository.putDonation(donation, donation.id!);
-        }
-        state = state.copyWith(selectedDonation: null, modelState: ModelState.success);
-      } else {
-        state = state.copyWith(modelState: ModelState.error, message: "Error");
-      }
-    } catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+    if (donation == null || (mode != MaintenanceMode.create && mode != MaintenanceMode.edit)) return;
+    await executeApiCall<DonationModel>(
+      () => mode == MaintenanceMode.create
+          ? donationRepository.postDonation(donation, currentUser!.id)
+          : donationRepository.putDonation(donation, donation.id!),
+      onSuccess: (_) async {
+        state = state.copyWith(selectedDonation: null);
+      },
+    );
   }
 
   void _updateStartDate() {
@@ -125,5 +129,10 @@ class DonationDataNotifier extends StateNotifier<DonationState> {
     descriptionNoController.text = donation.descriptionNO.toString();
     startDateTimeController.text = donation.startDateTime.toString();
     endDateTimeController.text = donation.endDateTime.toString();
+  }
+
+  @override
+  DonationState copyWithState(BaseState status) {
+    return state.copyWith(listState: state.listState.copyWith(baseStatus: status));
   }
 }
