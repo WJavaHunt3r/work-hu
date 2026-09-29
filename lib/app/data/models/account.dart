@@ -1,3 +1,1 @@
-enum Account{
-  SAMVIRK, MYSHARE, OTHER;
-}
+enum Account { SAMVIRK, MYSHARE, OTHER }

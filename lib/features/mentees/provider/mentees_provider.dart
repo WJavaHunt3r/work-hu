@@ -1,6 +1,4 @@
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -15,17 +13,24 @@ import 'package:work_hu/features/user_status/providers/user_status_provider.dart
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 
-final menteesDataProvider = StateNotifierProvider.autoDispose<MenteesDataNotifier, MenteesState>((ref) => MenteesDataNotifier(
+final menteesDataProvider = StateNotifierProvider.autoDispose<MenteesDataNotifier, MenteesState>(
+  (ref) => MenteesDataNotifier(
     ref.read(userRoundsRepoProvider),
     ref.read(userStatusRepoProvider),
     ref.read(usersRepoProvider),
     ref.read(mentorMenteeRepoProvider),
-    ref.read(userDataProvider).user));
+    ref.read(userDataProvider).user,
+  ),
+);
 
 class MenteesDataNotifier extends StateNotifier<MenteesState> {
   MenteesDataNotifier(
-      this.userRoundRepository, this.userStatusRepoProvider, this.usersRepository, this.menteesRepository, this.currentUser)
-      : super(const MenteesState()) {
+    this.userRoundRepository,
+    this.userStatusRepoProvider,
+    this.usersRepository,
+    this.menteesRepository,
+    this.currentUser,
+  ) : super(const MenteesState()) {
     getMentees();
   }
 
@@ -41,10 +46,12 @@ class MenteesDataNotifier extends StateNotifier<MenteesState> {
       await menteesRepository.getMentorMentee(userId: currentUser!.id).then((mentees) async {
         List<UserGoalUserRoundModel> list = [];
         for (var mentee in mentees) {
-          await userRoundRepository
-              .fetchUserRounds(userId: mentee.mentee.id, seasonYear: DateTime.now().year)
-              .then((userRounds) async {
-            await userStatusRepoProvider.getUserStatusByUserId(mentee.mentee.id, DateTime.now().year).then((userStatus) async {
+          await userRoundRepository.fetchUserRounds(userId: mentee.mentee.id, seasonYear: DateTime.now().year).then((
+            userRounds,
+          ) async {
+            await userStatusRepoProvider.getUserStatusByUserId(mentee.mentee.id, DateTime.now().year).then((
+              userStatus,
+            ) async {
               userRounds.sort((a, b) => a.round.roundNumber.compareTo(b.round.roundNumber));
               list.add(UserGoalUserRoundModel(userStatus: userStatus, round: userRounds.last.round));
             });

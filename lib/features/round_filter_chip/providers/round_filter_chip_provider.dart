@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/framework/base_components/page_stru.dart';
@@ -14,12 +13,12 @@ import 'package:work_hu/features/rounds/data/repository/round_repository.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 
 final roundFilterChipDataProvider = StateNotifierProvider<RoundFilterChipDataNotifier, RoundFilterChipState>(
-    (ref) => RoundFilterChipDataNotifier(ref.read(roundRepoProvider)));
+  (ref) => RoundFilterChipDataNotifier(ref.read(roundRepoProvider)),
+);
 
-class RoundFilterChipDataNotifier extends BaseDataNotifier<RoundFilterChipState> implements ListApiProvider<RoundFilter> {
-  RoundFilterChipDataNotifier(
-    this.roundsRepository,
-  ) : super(const RoundFilterChipState()){
+class RoundFilterChipDataNotifier extends BaseDataNotifier<RoundFilterChipState>
+    implements ListApiProvider<RoundFilter> {
+  RoundFilterChipDataNotifier(this.roundsRepository) : super(const RoundFilterChipState()) {
     getCurrentRound();
   }
 
@@ -36,7 +35,10 @@ class RoundFilterChipDataNotifier extends BaseDataNotifier<RoundFilterChipState>
     var sort = SortBuilder()..add("createDateTime", descending: false);
     state = state.copyWith(filter: filter ?? state.filter);
     try {
-      var result = await roundsRepository.getRounds(filter: filter ?? state.filter, pageStru: PageStru(sort: sort.build()));
+      var result = await roundsRepository.getRounds(
+        filter: filter ?? state.filter,
+        pageStru: PageStru(sort: sort.build()),
+      );
       _cache[cacheKey] = result.content;
 
       return result.content;
@@ -46,10 +48,10 @@ class RoundFilterChipDataNotifier extends BaseDataNotifier<RoundFilterChipState>
   }
 
   Future<RoundModel> getCurrentRound() async {
-    if(state.currentRound != null){
+    if (state.currentRound != null) {
       return state.currentRound!;
     }
-    var round = await executeApiCall<RoundModel>(()=> roundsRepository.getCurrentRounds());
+    var round = await executeApiCall<RoundModel>(() => roundsRepository.getCurrentRounds());
 
     state = state.copyWith(currentRound: round);
     return round;

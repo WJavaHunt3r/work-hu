@@ -8,7 +8,7 @@ enum ModelState {
   backgroundLoading,
 
   /// A background request failed. No error dialog; pages show an inline retry.
-  backgroundError
+  backgroundError,
 }
 
 extension ModelStateExtension on ModelState {

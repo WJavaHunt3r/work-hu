@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/role.dart';
-import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
-import 'package:work_hu/app/widgets/work_drop_down_dearch_form_field.dart';
-import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/teams/provider/teams_provider.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
@@ -25,170 +21,157 @@ class UserDetails extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var user = ref.watch(usersDataProvider).selectedUser;
     return Dialog.fullscreen(
-        child: user == null
-            ? Scaffold(
-                body: Padding(
-                  padding: EdgeInsets.all(8.sp),
-                  child: Center(
-                    child: Text("user_no_user".i18n()),
+      child: user == null
+          ? Scaffold(
+              body: Padding(
+                padding: EdgeInsets.all(8.sp),
+                child: Center(child: Text("user_no_user".i18n())),
+              ),
+            )
+          : Scaffold(
+              appBar: AppBar(
+                leading: IconButton(icon: const Icon(Icons.close), onPressed: () => context.pop()),
+                title: Text(user.getFullName(), style: const TextStyle(fontWeight: FontWeight.w800)),
+                actions: [
+                  MaterialButton(
+                    onPressed: () => ref.read(usersDataProvider.notifier).saveUser().then((value) => context.pop(true)),
+                    child: Text("user_details_save".i18n()),
                   ),
-                ),
-              )
-            : Scaffold(
-                appBar: AppBar(
-                  leading: IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => context.pop(),
-                  ),
-                  title: Text(
-                    user.getFullName(),
-                    style: const TextStyle(fontWeight: FontWeight.w800),
-                  ),
-                  actions: [
-                    MaterialButton(
-                      onPressed: () => ref.read(usersDataProvider.notifier).saveUser().then((value) => context.pop(true)),
-                      child: Text("user_details_save".i18n()),
-                    )
-                  ],
-                ),
-                body: SingleChildScrollView(
-                  child: Form(
-                      key: _formKey,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.sp),
-                        child: Column(
+                ],
+              ),
+              body: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.sp),
+                    child: Column(
+                      children: [
+                        Row(
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: BaseTextFormField(
-                                  labelText: "user_details_lastname".i18n(),
-                                  textAlign: TextAlign.left,
-                                  initialValue: user.lastname,
-                                  onChanged: (String text) {},
-                                )),
-                                SizedBox(
-                                  width: 5.sp,
-                                ),
-                                Expanded(
-                                    child: BaseTextFormField(
-                                  labelText: "user_details_firstname".i18n(),
-                                  textAlign: TextAlign.left,
-                                  initialValue: user.firstname,
-                                  onChanged: (String text) {},
-                                )),
-                              ],
+                            Expanded(
+                              child: BaseTextFormField(
+                                labelText: "user_details_lastname".i18n(),
+                                textAlign: TextAlign.left,
+                                initialValue: user.lastname,
+                                onChanged: (String text) {},
+                              ),
                             ),
-                            BaseTextFormField(
-                              labelText: "user_details_date_of_birth".i18n(),
-                              initialValue: Utils.dateTimeToDateOnlyString(user.birthDate),
-                              onChanged: (String text) {},
+                            SizedBox(width: 5.sp),
+                            Expanded(
+                              child: BaseTextFormField(
+                                labelText: "user_details_firstname".i18n(),
+                                textAlign: TextAlign.left,
+                                initialValue: user.firstname,
+                                onChanged: (String text) {},
+                              ),
                             ),
-                            BaseTextFormField(
-                              labelText: "user_details_email".i18n(),
-                              initialValue: user.email ?? "",
-                              onChanged: (String text) => text.isNotEmpty
-                                  ? ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(email: text))
-                                  : null,
-                            ),
-                            BaseTextFormField(
-                              labelText: "user_details_phone_number".i18n(),
-                              initialValue: user.phoneNumber == null ? "" : user.phoneNumber.toString(),
-                              keyBoardType: TextInputType.number,
-                              onChanged: (String text) => text.isNotEmpty
-                                  ? ref
-                                      .watch(usersDataProvider.notifier)
-                                      .updateCurrentUser(user.copyWith(phoneNumber: num.tryParse(text) ?? 0))
-                                  : null,
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: BaseTextFormField(
-                                      enabled: false,
-                                      labelText: "user_details_myshare_credit".i18n(),
-                                      initialValue: Utils.creditFormatting(0),
-                                      keyBoardType: TextInputType.number,
-                                      onChanged: (String text) => {}),
-                                ),
-                                SizedBox(
-                                  width: 5.sp,
-                                ),
-                                Expanded(
-                                  child: BaseTextFormField(
-                                    labelText: "user_details_base_myshare_credit".i18n(),
-                                    initialValue: user.baseMyShareCredit.toString(),
-                                    keyBoardType: TextInputType.number,
-                                    onChanged: (String text) => text.isNotEmpty
-                                        ? ref
-                                            .watch(usersDataProvider.notifier)
-                                            .updateCurrentUser(user.copyWith(baseMyShareCredit: num.tryParse(text) ?? 0))
-                                        : null,
-                                  ),
-                                )
-                              ],
-                            ),
-                            // isEnabled
-                            //     ? WorkDropDownSearchFormField<TeamModel>(
-                            //         controller: TextEditingController(),
-                            //         onSuggestionSelected: (value) =>
-                            //             ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(paceTeam: value)),
-                            //         itemBuilder: (context, e) => Text(e.teamName.toString()),
-                            //         suggestionsCallback: (value) => ref.watch(teamsDataProvider).teams,
-                            //         labelText: '',
-                            //       )
-                            //     : BaseTextFormField(
-                            //         labelText: "user_details_team".i18n(),
-                            //         initialValue: user.paceTeam?.teamName ?? "",
-                            //         keyBoardType: TextInputType.number,
-                            //         enabled: false,
-                            //         onChanged: (String text) => null,
-                            //       ),
-                            Padding(
-                              padding: EdgeInsets.all(8.sp),
-                              child: DropdownButtonFormField(
-                                  dropdownColor: Theme.of(context).colorScheme.secondary,
-                                  decoration: InputDecoration(labelText: "user_details_role".i18n(), isDense: true),
-                                  value: user.role,
-                                  items: Role.values
-                                      .map((e) => DropdownMenuItem<Role>(
-                                            value: e,
-                                            child: Text(e.toString()),
-                                          ))
-                                      .toList(),
-                                  onChanged: (value) => value != null
-                                      ? ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(role: value))
-                                      : null),
-                            ),
-                            TextButton(
-                                style: ButtonStyle(
-                                  // backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
-                                  foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
-                                ),
-                                onPressed: () => ref.watch(usersDataProvider.notifier).resetUserPassword(user.id),
-                                child: Text(
-                                  "user_details_reset_password".i18n(),
-                                  style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
-                                ))
                           ],
                         ),
-                      )),
-                )));
+                        BaseTextFormField(
+                          labelText: "user_details_date_of_birth".i18n(),
+                          initialValue: Utils.dateTimeToDateOnlyString(user.birthDate),
+                          onChanged: (String text) {},
+                        ),
+                        BaseTextFormField(
+                          labelText: "user_details_email".i18n(),
+                          initialValue: user.email ?? "",
+                          onChanged: (String text) => text.isNotEmpty
+                              ? ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(email: text))
+                              : null,
+                        ),
+                        BaseTextFormField(
+                          labelText: "user_details_phone_number".i18n(),
+                          initialValue: user.phoneNumber == null ? "" : user.phoneNumber.toString(),
+                          keyBoardType: TextInputType.number,
+                          onChanged: (String text) => text.isNotEmpty
+                              ? ref
+                                    .watch(usersDataProvider.notifier)
+                                    .updateCurrentUser(user.copyWith(phoneNumber: num.tryParse(text) ?? 0))
+                              : null,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: BaseTextFormField(
+                                enabled: false,
+                                labelText: "user_details_myshare_credit".i18n(),
+                                initialValue: Utils.creditFormatting(0),
+                                keyBoardType: TextInputType.number,
+                                onChanged: (String text) => {},
+                              ),
+                            ),
+                            SizedBox(width: 5.sp),
+                            Expanded(
+                              child: BaseTextFormField(
+                                labelText: "user_details_base_myshare_credit".i18n(),
+                                initialValue: user.baseMyShareCredit.toString(),
+                                keyBoardType: TextInputType.number,
+                                onChanged: (String text) => text.isNotEmpty
+                                    ? ref
+                                          .watch(usersDataProvider.notifier)
+                                          .updateCurrentUser(user.copyWith(baseMyShareCredit: num.tryParse(text) ?? 0))
+                                    : null,
+                              ),
+                            ),
+                          ],
+                        ),
+                        // isEnabled
+                        //     ? WorkDropDownSearchFormField<TeamModel>(
+                        //         controller: TextEditingController(),
+                        //         onSuggestionSelected: (value) =>
+                        //             ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(paceTeam: value)),
+                        //         itemBuilder: (context, e) => Text(e.teamName.toString()),
+                        //         suggestionsCallback: (value) => ref.watch(teamsDataProvider).teams,
+                        //         labelText: '',
+                        //       )
+                        //     : BaseTextFormField(
+                        //         labelText: "user_details_team".i18n(),
+                        //         initialValue: user.paceTeam?.teamName ?? "",
+                        //         keyBoardType: TextInputType.number,
+                        //         enabled: false,
+                        //         onChanged: (String text) => null,
+                        //       ),
+                        Padding(
+                          padding: EdgeInsets.all(8.sp),
+                          child: DropdownButtonFormField(
+                            dropdownColor: Theme.of(context).colorScheme.secondary,
+                            decoration: InputDecoration(labelText: "user_details_role".i18n(), isDense: true),
+                            value: user.role,
+                            items: Role.values
+                                .map((e) => DropdownMenuItem<Role>(value: e, child: Text(e.toString())))
+                                .toList(),
+                            onChanged: (value) => value != null
+                                ? ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(role: value))
+                                : null,
+                          ),
+                        ),
+                        TextButton(
+                          style: ButtonStyle(
+                            // backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
+                            foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
+                          ),
+                          onPressed: () => ref.watch(usersDataProvider.notifier).resetUserPassword(user.id),
+                          child: Text(
+                            "user_details_reset_password".i18n(),
+                            style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+    );
   }
 
   createTeamsDropDownList(WidgetRef ref) {
     var list = ref
         .watch(teamsDataProvider)
         .teams
-        .map((e) => DropdownMenuItem<TeamModel>(
-              value: e,
-              child: Text(e.teamName.toString()),
-            ))
+        .map((e) => DropdownMenuItem<TeamModel>(value: e, child: Text(e.teamName.toString())))
         .toList();
-    list.add(const DropdownMenuItem(
-      value: null,
-      child: Text(""),
-    ));
+    list.add(const DropdownMenuItem(value: null, child: Text("")));
     return list;
   }
 }

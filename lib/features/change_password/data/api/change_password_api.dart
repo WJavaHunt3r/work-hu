@@ -8,8 +8,10 @@ class ChangePasswordApi {
 
   Future<dynamic> changePassword(String username, String oldPassword, String newPassword) async {
     try {
-      final res = await _dioClient.dio.post("/auth/changePassword",
-          data: {'username': username, "oldPassword": oldPassword, "newPassword": newPassword});
+      final res = await _dioClient.dio.post(
+        "/auth/changePassword",
+        data: {'username': username, "oldPassword": oldPassword, "newPassword": newPassword},
+      );
       return res.data;
     } catch (e) {
       rethrow;

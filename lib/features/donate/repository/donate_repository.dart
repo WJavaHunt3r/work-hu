@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:work_hu/features/donate/data/api/donate_api.dart';
 import 'package:work_hu/features/donate/model/checkout_model.dart';
 
-class DonateRepository{
+class DonateRepository {
   final DonateApi _donateApi;
 
   DonateRepository(this._donateApi);
@@ -25,19 +25,21 @@ class DonateRepository{
     }
   }
 
-  Future<CheckoutModel> createCheckout(
-      {required num amount,
-        required String checkoutReference,
-        required String description,
-        required String redirectUrl,
-        String? returnUrl}) async {
+  Future<CheckoutModel> createCheckout({
+    required num amount,
+    required String checkoutReference,
+    required String description,
+    required String redirectUrl,
+    String? returnUrl,
+  }) async {
     try {
       final res = await _donateApi.createCheckout(
-          returnUrl: returnUrl,
-          amount: amount,
-          checkoutReference: checkoutReference,
-          description: description,
-          redirectUrl: redirectUrl);
+        returnUrl: returnUrl,
+        amount: amount,
+        checkoutReference: checkoutReference,
+        description: description,
+        redirectUrl: redirectUrl,
+      );
       return CheckoutModel.fromJson(res);
     } on DioException {
       rethrow;

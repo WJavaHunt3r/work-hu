@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,6 +9,7 @@ final supportedLocales = [
   const Locale('en', 'US'),
   // const Locale('no', 'NO'),
 ];
+
 // Use AsyncNotifier to handle the initial async loading state
 class LocaleNotifier extends AsyncNotifier<Locale> {
   @override

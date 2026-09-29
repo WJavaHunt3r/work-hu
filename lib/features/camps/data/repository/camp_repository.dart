@@ -15,7 +15,7 @@ class CampRepository {
       final res = await _campApi.getCamps(filter: filter, pageStru: pageStru);
       final paginatedData = PaginatedResponse<CampModel>.fromJson(
         res,
-            (json) => CampModel.fromJson(json as Map<String, dynamic>),
+        (json) => CampModel.fromJson(json as Map<String, dynamic>),
       );
       return paginatedData;
     } on DioException {

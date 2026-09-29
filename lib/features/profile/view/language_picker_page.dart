@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/providers/localeProvider.dart';
@@ -37,9 +36,7 @@ class LanguagePickerPageState extends BasePageState<LanguagePickerPage, HomeStat
           var native = LocaleNamesLocalizationsDelegate.nativeLocaleNames["${e.languageCode}_${e.countryCode}"];
           return BaseListTile(
             title: Text("${localeNames.nameOf(e.languageCode)}"),
-            subtitle: Text(
-              "${native?.substring(0, native.indexOf(" ("))}",
-            ),
+            subtitle: Text("${native?.substring(0, native.indexOf(" ("))}"),
             onTap: () {
               localeNotifier.setLocale(Locale(e.languageCode, e.countryCode));
             },

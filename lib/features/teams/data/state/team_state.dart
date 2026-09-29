@@ -6,10 +6,8 @@ part 'team_state.freezed.dart';
 
 @freezed
 abstract class TeamState with _$TeamState {
-  const factory TeamState({
-    @Default([]) List<TeamModel> teams,
-    @Default(ModelState.empty) ModelState modelState,
-}) = _TeamState;
+  const factory TeamState({@Default([]) List<TeamModel> teams, @Default(ModelState.empty) ModelState modelState}) =
+      _TeamState;
 
   const TeamState._();
 }

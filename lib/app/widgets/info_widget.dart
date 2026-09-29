@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class InfoWidget extends StatelessWidget {
-  const InfoWidget(
-      {super.key, required this.infoText, required this.iconData, required this.iconColor, this.elevation = 6, this.shadowColor});
+  const InfoWidget({
+    super.key,
+    required this.infoText,
+    required this.iconData,
+    required this.iconColor,
+    this.elevation = 6,
+    this.shadowColor,
+  });
 
   final String infoText;
   final IconData iconData;
@@ -26,26 +32,18 @@ class InfoWidget extends StatelessWidget {
           child: Card(
             color: Theme.of(context).colorScheme.surfaceContainer,
             elevation: elevation,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                10,
-              ),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             child: GestureDetector(
               onTap: () {
                 Navigator.pop(context);
               },
               child: Container(
-                padding: EdgeInsets.all(
-                  16.sp,
-                ),
+                padding: EdgeInsets.all(16.sp),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainer,
                   boxShadow: shadowColor != null ? [BoxShadow(color: shadowColor!)] : null,
                   // color: const Color(0xffF7F7F7),
-                  borderRadius: BorderRadius.circular(
-                    10,
-                  ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -64,10 +62,7 @@ class InfoWidget extends StatelessWidget {
       ],
       onSelected: (value) {},
       position: PopupMenuPosition.over,
-      child: Icon(
-        iconData,
-        color: iconColor,
-      ),
+      child: Icon(iconData, color: iconColor),
     );
   }
 }

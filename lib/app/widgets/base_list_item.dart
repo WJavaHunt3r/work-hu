@@ -2,20 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BaseListTile extends StatelessWidget {
-  BaseListTile(
-      {super.key,
-      required this.isLast,
-      this.enabled = true,
-      required this.index,
-      this.onTap,
-      required this.title,
-      this.trailing,
-      this.subtitle,
-      this.tileColor,
-      this.leading,
-      this.minVerticalPadding,
-      this.contentPadding,
-      this.selected});
+  BaseListTile({
+    super.key,
+    required this.isLast,
+    this.enabled = true,
+    required this.index,
+    this.onTap,
+    required this.title,
+    this.trailing,
+    this.subtitle,
+    this.tileColor,
+    this.leading,
+    this.minVerticalPadding,
+    this.contentPadding,
+    this.selected,
+  });
 
   final EdgeInsets? contentPadding;
   final double? minVerticalPadding;
@@ -45,13 +46,14 @@ class BaseListTile extends StatelessWidget {
       tileColor: tileColor,
       trailing: trailing,
       shape: RoundedRectangleBorder(
-          borderRadius: index == 0 && isLast
-              ? BorderRadius.circular(24.sp)
-              : index == 0
-                  ? BorderRadius.only(topLeft: Radius.circular(24.sp), topRight: Radius.circular(24.sp))
-                  : isLast
-                      ? BorderRadius.only(bottomLeft: Radius.circular(24.sp), bottomRight: Radius.circular(24.sp))
-                      : BorderRadius.zero),
+        borderRadius: index == 0 && isLast
+            ? BorderRadius.circular(24.sp)
+            : index == 0
+            ? BorderRadius.only(topLeft: Radius.circular(24.sp), topRight: Radius.circular(24.sp))
+            : isLast
+            ? BorderRadius.only(bottomLeft: Radius.circular(24.sp), bottomRight: Radius.circular(24.sp))
+            : BorderRadius.zero,
+      ),
     );
   }
 }

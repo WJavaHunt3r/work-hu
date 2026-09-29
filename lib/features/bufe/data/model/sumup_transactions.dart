@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'sumup_transactions.freezed.dart';
-
 part 'sumup_transactions.g.dart';
 
 @JsonEnum(fieldRename: FieldRename.snake)
@@ -9,13 +8,14 @@ enum EntryType { topup, purchase, unknown }
 
 @freezed
 abstract class TopUpResponse with _$TopUpResponse {
-  const factory TopUpResponse(
-      {required List<TopUpEntry> items,
-      @JsonKey(name: 'dukapp_id') required String dukappId,
-      @JsonKey(name: 'customer_id') required String customerId,
-      required int offset,
-      required int limit,
-      required int total}) = _TopUpResponse;
+  const factory TopUpResponse({
+    required List<TopUpEntry> items,
+    @JsonKey(name: 'dukapp_id') required String dukappId,
+    @JsonKey(name: 'customer_id') required String customerId,
+    required int offset,
+    required int limit,
+    required int total,
+  }) = _TopUpResponse;
 
   factory TopUpResponse.fromJson(Map<String, dynamic> json) => _$TopUpResponseFromJson(json);
 }
@@ -36,13 +36,14 @@ abstract class TopUpEntry with _$TopUpEntry {
 
 @freezed
 abstract class Order with _$Order {
-  const factory Order(
-      {required List<OrderEntry> items,
-      @JsonKey(name: 'dukapp_id') required String dukappId,
-      @JsonKey(name: 'customer_id') required String customerId,
-      required num offset,
-      required num limit,
-      required num total}) = _Order;
+  const factory Order({
+    required List<OrderEntry> items,
+    @JsonKey(name: 'dukapp_id') required String dukappId,
+    @JsonKey(name: 'customer_id') required String customerId,
+    required num offset,
+    required num limit,
+    required num total,
+  }) = _Order;
 
   factory Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);
 }

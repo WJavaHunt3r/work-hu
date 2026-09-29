@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
@@ -14,7 +13,9 @@ class CreatePointsTransactionPage extends LegacyBasePage {
   Widget buildLayout(BuildContext context, WidgetRef ref) {
     Future(() {
       if (ref.read(createTransactionsDataProvider).transactionType == TransactionType.POINT) {
-        ref.watch(createTransactionsDataProvider.notifier).setTransactionTypeAndAccount(TransactionType.POINT, Account.OTHER);
+        ref
+            .watch(createTransactionsDataProvider.notifier)
+            .setTransactionTypeAndAccount(TransactionType.POINT, Account.OTHER);
       }
     });
 

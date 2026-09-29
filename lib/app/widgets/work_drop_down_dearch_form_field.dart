@@ -8,21 +8,22 @@ import 'base_list_item.dart';
 import 'base_list_view.dart';
 
 class DropDownSearchFormField<T extends Object> extends StatelessWidget {
-  const DropDownSearchFormField(
-      {super.key,
-      required this.controller,
-      required this.onSuggestionSelected,
-      required this.itemBuilder,
-      required this.suggestionsCallback,
-      required this.labelText,
-      this.enabled,
-      this.fldControl = "1",
-      this.padding = 8.0,
-      this.suffix,
-      this.prefix,
-      this.onTap,
-      required this.getLabel,
-      required this.focusNode});
+  const DropDownSearchFormField({
+    super.key,
+    required this.controller,
+    required this.onSuggestionSelected,
+    required this.itemBuilder,
+    required this.suggestionsCallback,
+    required this.labelText,
+    this.enabled,
+    this.fldControl = "1",
+    this.padding = 8.0,
+    this.suffix,
+    this.prefix,
+    this.onTap,
+    required this.getLabel,
+    required this.focusNode,
+  });
 
   final TextEditingController controller;
   final Function(T) onSuggestionSelected;
@@ -97,12 +98,15 @@ class DropDownSearchFormField<T extends Object> extends StatelessWidget {
                       shrinkWrap: true,
                       color: Theme.of(context).colorScheme.surfaceContainer,
                       children: options
-                          .map((e) => BaseListTile(
+                          .map(
+                            (e) => BaseListTile(
                               tileColor: Colors.transparent,
                               title: itemBuilder(context, e),
                               onTap: () => onSelected(e),
                               isLast: options.toList().indexOf(e) == options.length,
-                              index: options.toList().indexOf(e)))
+                              index: options.toList().indexOf(e),
+                            ),
+                          )
                           .toList(),
                     ),
                   ),

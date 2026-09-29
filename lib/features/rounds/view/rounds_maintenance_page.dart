@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
@@ -30,47 +30,47 @@ class RoundsMaintenancePageState extends BasePageState<RoundsMaintenancePage, Ro
   Widget buildLayout() {
     var round = state.selectedRound;
     return round == null
-        ? const Column(
-            children: [Text("rounds_maintenance_noneSelected")],
-          )
+        ? const Column(children: [Text("rounds_maintenance_noneSelected")])
         : Column(
             children: [
               Row(
                 children: [
                   BaseTextFormField(
-                      labelText: "rounds_maintenance_roundNumber".i18n(),
-                      controller: TextEditingController(text: state.selectedRound?.roundNumber.toString())),
+                    labelText: "rounds_maintenance_roundNumber".i18n(),
+                    controller: TextEditingController(text: state.selectedRound?.roundNumber.toString()),
+                  ),
                   BaseTextFormField(
-                      labelText: "rounds_maintenance_season".i18n(),
-                      controller: TextEditingController(text: state.selectedRound?.season.seasonYear.toString())),
+                    labelText: "rounds_maintenance_season".i18n(),
+                    controller: TextEditingController(text: state.selectedRound?.season.seasonYear.toString()),
+                  ),
                 ],
               ),
-              const Spacer(
-                flex: 1,
-              ),
+              const Spacer(flex: 1),
               Row(
                 children: [
                   BaseTextFormField(
-                      labelText: "rounds_maintenance_startDate".i18n(),
-                      controller: TextEditingController(text: state.selectedRound?.startDateTime.toString())),
+                    labelText: "rounds_maintenance_startDate".i18n(),
+                    controller: TextEditingController(text: state.selectedRound?.startDateTime.toString()),
+                  ),
                   BaseTextFormField(
-                      labelText: "rounds_maintenance_endDate".i18n(),
-                      controller: TextEditingController(text: state.selectedRound?.endDateTime.toString())),
+                    labelText: "rounds_maintenance_endDate".i18n(),
+                    controller: TextEditingController(text: state.selectedRound?.endDateTime.toString()),
+                  ),
                 ],
               ),
-              const Spacer(
-                flex: 1,
-              ),
+              const Spacer(flex: 1),
               Row(
                 children: [
                   BaseTextFormField(
-                      labelText: "rounds_maintenance_localGoal".i18n(),
-                      controller: TextEditingController(text: state.selectedRound?.localMyShareGoal.toString())),
+                    labelText: "rounds_maintenance_localGoal".i18n(),
+                    controller: TextEditingController(text: state.selectedRound?.localMyShareGoal.toString()),
+                  ),
                   BaseTextFormField(
-                      labelText: "rounds_maintenance_goal".i18n(),
-                      controller: TextEditingController(text: state.selectedRound?.myShareGoal.toString())),
+                    labelText: "rounds_maintenance_goal".i18n(),
+                    controller: TextEditingController(text: state.selectedRound?.myShareGoal.toString()),
+                  ),
                 ],
-              )
+              ),
             ],
           );
   }

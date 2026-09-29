@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 
 class ErrorAlertDialog extends StatelessWidget {
@@ -12,22 +10,22 @@ class ErrorAlertDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: AlertDialog(
-            // backgroundColor: AppColors.white,
-            title: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.errorRed, fontWeight: FontWeight.bold),
-            ),
-            actionsAlignment: MainAxisAlignment.center,
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text(
-                    "OK",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ))
-            ],
-            content: content));
+      child: AlertDialog(
+        // backgroundColor: AppColors.white,
+        title: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: AppColors.errorRed, fontWeight: FontWeight.bold),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("OK", style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+        content: content,
+      ),
+    );
   }
 }

@@ -5,8 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
@@ -14,9 +12,7 @@ import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/create_transactions/data/state/create_transactions_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/round_filter_chip/data/state/round_filter_chip_state.dart';
 import 'package:work_hu/features/round_filter_chip/providers/round_filter_chip_provider.dart';
-import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
@@ -28,18 +24,25 @@ import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 import 'package:work_hu/features/utils.dart';
 
-final createTransactionsDataProvider = StateNotifierProvider.autoDispose<CreateTransactionsDataNotifier, CreateTransactionsState>(
-    (ref) => CreateTransactionsDataNotifier(
+final createTransactionsDataProvider =
+    StateNotifierProvider.autoDispose<CreateTransactionsDataNotifier, CreateTransactionsState>(
+      (ref) => CreateTransactionsDataNotifier(
         ref.read(usersRepoProvider),
         ref.read(userDataProvider).user,
         ref.read(transactionsRepoProvider),
         ref.read(transactionItemsRepoProvider),
-        ref.read(roundFilterChipDataProvider.notifier)));
+        ref.read(roundFilterChipDataProvider.notifier),
+      ),
+    );
 
 class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsState> {
   CreateTransactionsDataNotifier(
-      this.usersRepository, this.currentUser, this.transactionRepository, this.transactionItemsRepository, this.roundDataNotifier)
-      : super(const CreateTransactionsState()) {
+    this.usersRepository,
+    this.currentUser,
+    this.transactionRepository,
+    this.transactionItemsRepository,
+    this.roundDataNotifier,
+  ) : super(const CreateTransactionsState()) {
     valueController = TextEditingController(text: "");
     userController = TextEditingController(text: "");
     exchangeController = TextEditingController(text: "33");
@@ -72,33 +75,39 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     try {
       await transactionRepository
           .createTransaction(
-              TransactionModel(
-                name: state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK
-                    ? "${currentUser!.paceTeam!.teamName} csapat tökéletes pontszámai"
-                    : descriptionController.value.text,
-                account: state.account,
-              ),
-              currentUser?.id ?? 0)
+            TransactionModel(
+              name: state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK
+                  ? "${currentUser!.paceTeam!.teamName} csapat tökéletes pontszámai"
+                  : descriptionController.value.text,
+              account: state.account,
+            ),
+            currentUser?.id ?? 0,
+          )
           .then((data) async {
-        List<TransactionItemModel> newItems = [];
-        for (var item in state.transactionItems) {
-          newItems.add(item.copyWith(transactionId: data.id!, transactionDate: DateTime.parse(dateController.value.text)));
-        }
-        state = state.copyWith(transactionItems: newItems);
-        await transactionItemsRepository
-            .sendTransactions(
-                newItems.where((element) => element.points != 0 || element.hours != 0 || element.credit != 0).toList())
-            .then((data) {
-          if (state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK) {
-            _clearAllFields();
-            // _createTransactionItems(state.users);
-          } else {
-            _clearAllFields();
-          }
+            List<TransactionItemModel> newItems = [];
+            for (var item in state.transactionItems) {
+              newItems.add(
+                item.copyWith(transactionId: data.id!, transactionDate: DateTime.parse(dateController.value.text)),
+              );
+            }
+            state = state.copyWith(transactionItems: newItems);
+            await transactionItemsRepository
+                .sendTransactions(
+                  newItems
+                      .where((element) => element.points != 0 || element.hours != 0 || element.credit != 0)
+                      .toList(),
+                )
+                .then((data) {
+                  if (state.account == Account.OTHER && state.transactionType == TransactionType.BMM_PERFECT_WEEK) {
+                    _clearAllFields();
+                    // _createTransactionItems(state.users);
+                  } else {
+                    _clearAllFields();
+                  }
 
-          state = state.copyWith(modelState: ModelState.success, creationState: ModelState.success);
-        });
-      });
+                  state = state.copyWith(modelState: ModelState.success, creationState: ModelState.success);
+                });
+          });
     } on DioException catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
@@ -106,7 +115,9 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
 
   void _updateDateAndDescription() {
     state = state.copyWith(
-        transactionDate: DateTime.tryParse(dateController.value.text), description: descriptionController.value.text);
+      transactionDate: DateTime.tryParse(dateController.value.text),
+      description: descriptionController.value.text,
+    );
   }
 
   setTransactionTypeAndAccount(TransactionType transactionType, Account account) {
@@ -116,13 +127,15 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   update({required num userId, double? hours, double? points, num? credits}) {
     TransactionItemModel? transactionItem = state.transactionItems.firstWhere((t) => t.userId == userId);
     var newItem = transactionItem.copyWith(
-        hours: hours ?? transactionItem.hours,
-        points: points ?? transactionItem.points,
-        credit: credits ?? transactionItem.credit);
+      hours: hours ?? transactionItem.hours,
+      points: points ?? transactionItem.points,
+      credit: credits ?? transactionItem.credit,
+    );
 
     state = state.copyWith(
-        transactionItems: state.transactionItems.map((e) => e.userId == userId ? newItem : e).toList(),
-        creationState: ModelState.empty);
+      transactionItems: state.transactionItems.map((e) => e.userId == userId ? newItem : e).toList(),
+      creationState: ModelState.empty,
+    );
   }
 
   void _createTransactionItems(List<UserComboModel> users) {
@@ -138,22 +151,24 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
     } else {
       var transactions = <TransactionItemModel>[];
       transactions.addAll(state.transactionItems);
-      transactions.add(TransactionItemModel(
-        transactionId: 0,
-        transactionDate: DateUtils.dateOnly(state.transactionDate ?? DateTime.now()),
-        description: state.description,
-        userId: state.selectedUser!.id,
-        userName: state.selectedUser!.comboText,
-        createUserId: currentUser!.id,
-        roundId: (await roundDataNotifier.getCurrentRound()).id,
-        points: state.transactionType != TransactionType.CREDIT && state.transactionType != TransactionType.HOURS
-            ? double.tryParse(valueController.value.text) ?? 0
-            : 0,
-        transactionType: state.transactionType,
-        account: state.account,
-        credit: state.transactionType == TransactionType.CREDIT ? num.tryParse(valueController.value.text) ?? 0 : 0,
-        hours: state.transactionType == TransactionType.HOURS ? double.tryParse(valueController.value.text) ?? 0 : 0,
-      ));
+      transactions.add(
+        TransactionItemModel(
+          transactionId: 0,
+          transactionDate: DateUtils.dateOnly(state.transactionDate ?? DateTime.now()),
+          description: state.description,
+          userId: state.selectedUser!.id,
+          userName: state.selectedUser!.comboText,
+          createUserId: currentUser!.id,
+          roundId: (await roundDataNotifier.getCurrentRound()).id,
+          points: state.transactionType != TransactionType.CREDIT && state.transactionType != TransactionType.HOURS
+              ? double.tryParse(valueController.value.text) ?? 0
+              : 0,
+          transactionType: state.transactionType,
+          account: state.account,
+          credit: state.transactionType == TransactionType.CREDIT ? num.tryParse(valueController.value.text) ?? 0 : 0,
+          hours: state.transactionType == TransactionType.HOURS ? double.tryParse(valueController.value.text) ?? 0 : 0,
+        ),
+      );
 
       var text = valueController.value.text;
       var sum = state.sum + num.parse(text.isNotEmpty ? text : "0");
@@ -177,7 +192,10 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
   }
 
   bool isEmpty() {
-    return state.transactionItems.indexWhere((element) => element.points != 0 || element.hours != 0 || element.credit != 0) < 0;
+    return state.transactionItems.indexWhere(
+          (element) => element.points != 0 || element.hours != 0 || element.credit != 0,
+        ) <
+        0;
   }
 
   _clearAddFields() {
@@ -211,10 +229,7 @@ class CreateTransactionsDataNotifier extends StateNotifier<CreateTransactionsSta
 
   Future<void> uploadSamvirkCsv() async {
     try {
-      List<PlatformFile> pickedFile = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['csv']
-      );
+      List<PlatformFile> pickedFile = await FilePicker.pickFiles(type: FileType.custom, allowedExtensions: ['csv']);
 
       if (pickedFile.isNotEmpty) {
         var file = pickedFile.first;

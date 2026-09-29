@@ -1,10 +1,6 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
@@ -25,12 +21,14 @@ final activityApiProvider = Provider<ActivityApi>((ref) => ActivityApi());
 final activityRepoProvider = Provider<ActivityRepository>((ref) => ActivityRepository(ref.read(activityApiProvider)));
 
 final activityDataProvider = StateNotifierProvider.autoDispose<ActivityDataNotifier, ActivityState>(
-    (ref) => ActivityDataNotifier(ref.read(activityRepoProvider)));
+  (ref) => ActivityDataNotifier(ref.read(activityRepoProvider)),
+);
 
 class ActivityDataNotifier extends BaseDataNotifier<ActivityState> implements ListApiProvider<ActivityFilter> {
-  ActivityDataNotifier(
-    this.activityRepository,
-  ) : super(ActivityState(filter: ActivityFilter(referenceDate: DateTime(DateTime.now().year, DateTime.now().month, 1)))) {
+  ActivityDataNotifier(this.activityRepository)
+    : super(
+        ActivityState(filter: ActivityFilter(referenceDate: DateTime(DateTime.now().year, DateTime.now().month, 1))),
+      ) {
     list();
   }
 
@@ -43,21 +41,29 @@ class ActivityDataNotifier extends BaseDataNotifier<ActivityState> implements Li
     state = state.copyWith(filter: filter ?? state.filter);
 
     await executeApiCall<PaginatedResponse<ActivityModel>>(
-        () => activityRepository.getActivities(
-            registeredInMyShare: state.filter.registeredInMyShare,
-            responsibleId: user!.isAdmin() ? state.filter.responsible?.id : user!.id,
-            createUserId: user!.isAdmin() ? state.filter.createUser?.id : user!.id,
-            referenceDate: state.filter.referenceDate,
-            searchText: state.filter.description,
-            employerId: user!.isAdmin() ? state.filter.employer?.id : user!.id,
-            page: page ?? state.status.number,
-            size: size ?? state.status.size,
-            sort: sort.build()), background: true, onSuccess: (data) async {
-      state = state.copyWith(
-          activities:  data.page.number == 0 ? data.content : [...state.activities, ...data.content],
-          status: state.status
-              .copyWith(totalElements: data.page.totalElements, totalPages: data.page.totalPages, number: data.page.number));
-    });
+      () => activityRepository.getActivities(
+        registeredInMyShare: state.filter.registeredInMyShare,
+        responsibleId: user!.isAdmin() ? state.filter.responsible?.id : user!.id,
+        createUserId: user!.isAdmin() ? state.filter.createUser?.id : user!.id,
+        referenceDate: state.filter.referenceDate,
+        searchText: state.filter.description,
+        employerId: user!.isAdmin() ? state.filter.employer?.id : user!.id,
+        page: page ?? state.status.number,
+        size: size ?? state.status.size,
+        sort: sort.build(),
+      ),
+      background: true,
+      onSuccess: (data) async {
+        state = state.copyWith(
+          activities: data.page.number == 0 ? data.content : [...state.activities, ...data.content],
+          status: state.status.copyWith(
+            totalElements: data.page.totalElements,
+            totalPages: data.page.totalPages,
+            number: data.page.number,
+          ),
+        );
+      },
+    );
   }
 
   Future<void> deleteActivity(num id) async {
@@ -69,9 +75,12 @@ class ActivityDataNotifier extends BaseDataNotifier<ActivityState> implements Li
   }
 
   Future<void> putActivity(ActivityModel activity) async {
-    executeApiCall(() => activityRepository.putActivity(activity, activity.id!), onSuccess: (data) async {
-      list();
-    });
+    executeApiCall(
+      () => activityRepository.putActivity(activity, activity.id!),
+      onSuccess: (data) async {
+        list();
+      },
+    );
   }
 
   Future<void> registerActivityInTeams(num id) async {

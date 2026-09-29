@@ -1,26 +1,36 @@
 {
   "project_info": {
-    "project_number": "869032340127",
-    "project_id": "dukapp-96b7d",
-    "storage_bucket": "dukapp-96b7d.firebasestorage.app"
+    "project_number": "470140408680",
+    "project_id": "dukapp-494509",
+    "storage_bucket": "dukapp-494509.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:869032340127:android:aa446d92ae988a0c6890aa",
+        "mobilesdk_app_id": "1:470140408680:android:c215a93d629be226d3fcdd",
         "android_client_info": {
           "package_name": "com.ktk.dukapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "470140408680-vvsu3rjroghr7suq603r4eek5lec5bds.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAE4Us85_-NBaNCpQu33mfc1mmqKazvdFQ"
+          "current_key": "AIzaSyDQXASgsIJtFhnwXtg9uJPEoeoni7BL-5o"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "470140408680-vvsu3rjroghr7suq603r4eek5lec5bds.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

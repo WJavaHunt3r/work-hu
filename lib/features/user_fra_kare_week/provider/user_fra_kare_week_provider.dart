@@ -1,6 +1,5 @@
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/user_fra_kare_week/data/api/user_fra_kare_week_api.dart';
@@ -10,23 +9,26 @@ import 'package:work_hu/features/user_fra_kare_week/data/state/user_fra_kare_wee
 
 final userFraKareWeekApiProvider = Provider<UserFraKareWeekApi>((ref) => UserFraKareWeekApi());
 
-final userFraKareWeekRepoProvider =
-    Provider<UserFraKareWeekRepository>((ref) => UserFraKareWeekRepository(ref.read(userFraKareWeekApiProvider)));
+final userFraKareWeekRepoProvider = Provider<UserFraKareWeekRepository>(
+  (ref) => UserFraKareWeekRepository(ref.read(userFraKareWeekApiProvider)),
+);
 
-final userFraKareWeekDataProvider = StateNotifierProvider.autoDispose<UserFraKareWeekDataNotifier, UserFraKareWeekState>(
-    (ref) => UserFraKareWeekDataNotifier(ref.read(userFraKareWeekRepoProvider)));
+final userFraKareWeekDataProvider =
+    StateNotifierProvider.autoDispose<UserFraKareWeekDataNotifier, UserFraKareWeekState>(
+      (ref) => UserFraKareWeekDataNotifier(ref.read(userFraKareWeekRepoProvider)),
+    );
 
 class UserFraKareWeekDataNotifier extends StateNotifier<UserFraKareWeekState> {
-  UserFraKareWeekDataNotifier(
-    this.fraKareWeekRepository,
-  ) : super(const UserFraKareWeekState()) {}
+  UserFraKareWeekDataNotifier(this.fraKareWeekRepository) : super(const UserFraKareWeekState()) {}
 
   final UserFraKareWeekRepository fraKareWeekRepository;
 
   Future<void> getFraKareWeeks() async {
     state = state.copyWith(modelState: ModelState.loading);
     try {
-      await fraKareWeekRepository.getFraKareWeeks(weekNumber: state.weekNumber, teamId: state.selectedTeamId).then((data) async {
+      await fraKareWeekRepository.getFraKareWeeks(weekNumber: state.weekNumber, teamId: state.selectedTeamId).then((
+        data,
+      ) async {
         state = state.copyWith(streaks: data, modelState: ModelState.success);
       });
     } catch (e) {
@@ -43,7 +45,9 @@ class UserFraKareWeekDataNotifier extends StateNotifier<UserFraKareWeekState> {
     edits.addAll({userWeek.id: userWeek.copyWith(listened: listened)});
 
     state = state.copyWith(
-        edits: edits, streaks: streaks.map((e) => e.id == userWeek.id ? e.copyWith(listened: listened) : e).toList());
+      edits: edits,
+      streaks: streaks.map((e) => e.id == userWeek.id ? e.copyWith(listened: listened) : e).toList(),
+    );
   }
 
   Future<void> saveUserFraKareWeeks() async {

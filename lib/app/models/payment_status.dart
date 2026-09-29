@@ -1,6 +1,1 @@
-enum PaymentStatus{
-  FAILED,
-  PENDING,
-  PAID,
-  EXPIRED
-}
+enum PaymentStatus { FAILED, PENDING, PAID, EXPIRED }

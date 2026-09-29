@@ -7,10 +7,11 @@ part 'round_filter_chip_state.freezed.dart';
 
 @freezed
 abstract class RoundFilterChipState with _$RoundFilterChipState {
-  const factory RoundFilterChipState(
-      {@Default(RoundFilter()) RoundFilter filter,
-      RoundModel? currentRound,
-      @Default(BaseListState()) BaseListState status}) = _RoundFilterChipState;
+  const factory RoundFilterChipState({
+    @Default(RoundFilter()) RoundFilter filter,
+    RoundModel? currentRound,
+    @Default(BaseListState()) BaseListState status,
+  }) = _RoundFilterChipState;
 
   const RoundFilterChipState._();
 }

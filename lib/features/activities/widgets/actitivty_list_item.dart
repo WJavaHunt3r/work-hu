@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -14,8 +13,13 @@ import 'package:work_hu/features/activities/data/model/activity_model.dart';
 import 'package:work_hu/features/activities/providers/avtivity_provider.dart';
 
 class ActivityListItem extends ConsumerWidget {
-  const ActivityListItem(
-      {required this.isLast, required this.index, required this.current, super.key, required this.onIconPressed});
+  const ActivityListItem({
+    required this.isLast,
+    required this.index,
+    required this.current,
+    super.key,
+    required this.onIconPressed,
+  });
 
   final ActivityModel current;
   final int index;
@@ -39,84 +43,73 @@ class ActivityListItem extends ConsumerWidget {
           contentPadding: EdgeInsets.zero,
           leading: Container(
             padding: EdgeInsets.all(8.sp),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainer,
-              shape: BoxShape.circle,
+            decoration: BoxDecoration(color: theme.colorScheme.surfaceContainer, shape: BoxShape.circle),
+            child: Icon(
+              current.transactionType == TransactionType.HOURS ? Icons.person_3_outlined : Icons.home_outlined,
+              color: theme.colorScheme.primary,
             ),
-            child: Icon(current.transactionType == TransactionType.HOURS ? Icons.person_3_outlined : Icons.home_outlined,
-                color: theme.colorScheme.primary),
           ),
-          title: Text(
-            current.description,
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          trailing: !current.registeredInApp &&
+          title: Text(current.description, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          trailing:
+              !current.registeredInApp &&
                   !current.registeredInMyShare &&
                   !current.registeredInTeams &&
-                  ([current.createUserId, current.responsibleId, current.employerId].contains(user.id) || user.isAdmin())
+                  ([current.createUserId, current.responsibleId, current.employerId].contains(user.id) ||
+                      user.isAdmin())
               ? IconButton(
                   onPressed: () => context
                       .push("/profile/activities/${current.id}/edit")
                       .then((value) => ref.read(activityDataProvider.notifier).list(page: 0)),
-                  icon: const Icon(Icons.edit_outlined))
+                  icon: const Icon(Icons.edit_outlined),
+                )
               : user.isAdmin() && !current.registeredInApp
-                  ? IconButton(
-                      icon: const Icon(Icons.send_outlined),
-                      onPressed: () => onIconPressed(),
-                    )
-                  : user.isAdmin() && !current.registeredInMyShare && current.transactionType != TransactionType.POINT
-                      ? MaterialButton(
-                          child: const Image(
-                            image: AssetImage("assets/img/myshare-logo.png"),
-                            fit: BoxFit.fitWidth,
-                          ),
-                          onPressed: () => onIconPressed(),
-                        )
-                      : user.isAdmin() && current.registeredInMyShare && current.registeredInApp && !current.registeredInTeams
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.group,
-                                size: 25.sp,
-                                color: Colors.deepPurple,
-                              ),
-                              onPressed: () => onIconPressed(),
-                            )
-                          : current.registeredInMyShare && current.registeredInApp ||
-                                  current.registeredInApp && current.transactionType == TransactionType.POINT
-                              ? const Icon(
-                                  Icons.done_outline,
-                                  color: AppColors.primaryGreen,
-                                )
-                              : null,
+              ? IconButton(icon: const Icon(Icons.send_outlined), onPressed: () => onIconPressed())
+              : user.isAdmin() && !current.registeredInMyShare && current.transactionType != TransactionType.POINT
+              ? MaterialButton(
+                  child: const Image(image: AssetImage("assets/img/myshare-logo.png"), fit: BoxFit.fitWidth),
+                  onPressed: () => onIconPressed(),
+                )
+              : user.isAdmin() && current.registeredInMyShare && current.registeredInApp && !current.registeredInTeams
+              ? IconButton(
+                  icon: Icon(Icons.group, size: 25.sp, color: Colors.deepPurple),
+                  onPressed: () => onIconPressed(),
+                )
+              : current.registeredInMyShare && current.registeredInApp ||
+                    current.registeredInApp && current.transactionType == TransactionType.POINT
+              ? const Icon(Icons.done_outline, color: AppColors.primaryGreen)
+              : null,
           // isThreeLine: true,
           subtitle: Column(
             children: [
               Row(
                 children: [
                   Expanded(
-                      child: Text(
-                    "${"activity_when_where".i18n()}: ${DateFormat('yyyy, MMM dd', ref.read(localeProvider).value?.languageCode).format(current.activityDateTime)} - ${current.employerName}",
-                    overflow: TextOverflow.ellipsis,
-                  )),
+                    child: Text(
+                      "${"activity_when_where".i18n()}: ${DateFormat('yyyy, MMM dd', ref.read(localeProvider).value?.languageCode).format(current.activityDateTime)} - ${current.employerName}",
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ],
               ),
               Row(
                 children: [
                   Expanded(
-                      child: Text(
-                    "${"activity_responsible".i18n()}: ${current.responsibleName}",
-                    overflow: TextOverflow.ellipsis,
-                  )),
+                    child: Text(
+                      "${"activity_responsible".i18n()}: ${current.responsibleName}",
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ],
               ),
               if (!user.isUser())
                 Row(
                   children: [
                     Expanded(
-                        child: Text(
-                      "${"activity_create_user".i18n()}: ${current.createUserName}",
-                      overflow: TextOverflow.ellipsis,
-                    )),
+                      child: Text(
+                        "${"activity_create_user".i18n()}: ${current.createUserName}",
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
             ],

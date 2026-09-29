@@ -7,14 +7,15 @@ part 'mentor_mentee_state.freezed.dart';
 
 @freezed
 abstract class MentorMenteeState with _$MentorMenteeState {
-  const factory MentorMenteeState(
-      {@Default([]) List<MentorMenteeModel> mentees,
-        @Default(ModelState.empty) ModelState modelState,
-        UserModel? mentor,
-        UserModel? mentee,
-        @Default(ModelState.empty) ModelState createState,
-        @Default([]) List<UserModel> users,
-        @Default("") String message}) = _MentorMenteeState;
+  const factory MentorMenteeState({
+    @Default([]) List<MentorMenteeModel> mentees,
+    @Default(ModelState.empty) ModelState modelState,
+    UserModel? mentor,
+    UserModel? mentee,
+    @Default(ModelState.empty) ModelState createState,
+    @Default([]) List<UserModel> users,
+    @Default("") String message,
+  }) = _MentorMenteeState;
 
   const MentorMenteeState._();
 }

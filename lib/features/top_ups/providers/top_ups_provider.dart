@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/locator.dart';
@@ -14,10 +13,11 @@ import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/top_ups/data/state/top_ups_state.dart';
 
-final topUpsDataProvider =
-    StateNotifierProvider.autoDispose<TopUpsDataNotifier, TopUpsState>((ref) => TopUpsDataNotifier(ref.watch(bufeRepoProvider)));
+final topUpsDataProvider = StateNotifierProvider.autoDispose<TopUpsDataNotifier, TopUpsState>(
+  (ref) => TopUpsDataNotifier(ref.watch(bufeRepoProvider)),
+);
 
-class TopUpsDataNotifier extends BaseDataNotifier<TopUpsState> implements ListApiProvider<num>{
+class TopUpsDataNotifier extends BaseDataNotifier<TopUpsState> implements ListApiProvider<num> {
   TopUpsDataNotifier(this._bufeRepository) : super(const TopUpsState()) {
     if (currentUser != null) {
       list(filter: currentUser!.id);
@@ -29,17 +29,24 @@ class TopUpsDataNotifier extends BaseDataNotifier<TopUpsState> implements ListAp
 
   @override
   Future<void> list({num? filter, int? page, int? size, List<String>? sort}) async {
-    await executeApiCall<TopUpResponse?>(() => _bufeRepository.getPayments(userId: filter ?? 0), background: true, onSuccess: (data) async {
-      state = state.copyWith(
+    await executeApiCall<TopUpResponse?>(
+      () => _bufeRepository.getPayments(userId: filter ?? 0),
+      background: true,
+      onSuccess: (data) async {
+        state = state.copyWith(
           topUps: data?.items ?? [],
-          listStatus:
-              state.listStatus.copyWith(totalElements: data?.total ?? 0, size: data?.limit ?? 0, number: data?.offset ?? 0));
-    });
+          listStatus: state.listStatus.copyWith(
+            totalElements: data?.total ?? 0,
+            size: data?.limit ?? 0,
+            number: data?.offset ?? 0,
+          ),
+        );
+      },
+    );
   }
 
   @override
   TopUpsState copyWithState(BaseState status) {
     return state.copyWith(listStatus: state.listStatus.copyWith(baseStatus: status));
   }
-
 }

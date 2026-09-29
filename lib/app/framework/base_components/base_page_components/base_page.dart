@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
@@ -14,14 +13,15 @@ import 'package:work_hu/features/utils.dart';
 import '../../../models/mode_state.dart';
 
 abstract class BasePage extends ConsumerStatefulWidget {
-  const BasePage(
-      {super.key,
-      required this.title,
-      this.hasHeadData = false,
-      this.canPop = true,
-      this.leading,
-      this.hasAppBar = true,
-      this.canRefresh = true});
+  const BasePage({
+    super.key,
+    required this.title,
+    this.hasHeadData = false,
+    this.canPop = true,
+    this.leading,
+    this.hasAppBar = true,
+    this.canRefresh = true,
+  });
 
   final Object title;
   final bool hasHeadData;
@@ -31,7 +31,8 @@ abstract class BasePage extends ConsumerStatefulWidget {
   final bool canRefresh;
 }
 
-abstract class BasePageState<P extends BasePage, S extends dynamic, N extends StateNotifier<S>> extends ConsumerState<P> {
+abstract class BasePageState<P extends BasePage, S extends dynamic, N extends StateNotifier<S>>
+    extends ConsumerState<P> {
   late final ScrollController _scrollController;
 
   @override
@@ -49,10 +50,7 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
     // unbalanced LoadingScreen's show/hide counter.
     ref.listen(provider, (previous, next) {
       if (status.modelState.isError) {
-        Utils.showErrorDialog(
-          context,
-          content: status.message.i18n(),
-        );
+        Utils.showErrorDialog(context, content: status.message.i18n());
       }
     });
     final pinnedHeader = buildPinnedHeader();
@@ -78,8 +76,10 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
                     ? widget.title as Widget
                     : InkWell(
                         onTap: () => onRefresh(),
-                        child: Text(((widget.title) as String).i18n(),
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                        child: Text(
+                          ((widget.title) as String).i18n(),
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                        ),
                       )),
                 leadingWidth: widget.leading == null ? null : 80.sp,
                 leading: widget.leading,
@@ -91,15 +91,20 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
           mainAxisSize: MainAxisSize.min,
           children: [
             if (pinnedHeader != null)
-              Padding(padding: EdgeInsets.only(left: 16.sp, right: 16.sp, top: 16.sp), child: pinnedHeader),
+              Padding(
+                padding: EdgeInsets.only(left: 16.sp, right: 16.sp, top: 16.sp),
+                child: pinnedHeader,
+              ),
             Expanded(
-                child: widget.canRefresh
-                    ? RefreshIndicator(
-                        onRefresh: () async {
-                          onRefresh();
-                        },
-                        child: _buildScrollView(hasPinnedHeader: pinnedHeader != null))
-                    : _buildScrollView(hasPinnedHeader: pinnedHeader != null))
+              child: widget.canRefresh
+                  ? RefreshIndicator(
+                      onRefresh: () async {
+                        onRefresh();
+                      },
+                      child: _buildScrollView(hasPinnedHeader: pinnedHeader != null),
+                    )
+                  : _buildScrollView(hasPinnedHeader: pinnedHeader != null),
+            ),
           ],
         ),
       ),
@@ -181,20 +186,21 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
 }
 
 abstract class LegacyBasePage extends ConsumerWidget {
-  const LegacyBasePage(
-      {super.key,
-      required this.title,
-      this.automaticallyImplyLeading,
-      this.canPop = true,
-      this.isListView = false,
-      this.appBarTextStyle,
-      this.centerTitle,
-      this.extendBodyBehindAppBar,
-      this.leading,
-      this.hasTitleWidget,
-      this.hasSearchBar = false,
-      this.titleArgs = const [],
-      this.backgroundColor});
+  const LegacyBasePage({
+    super.key,
+    required this.title,
+    this.automaticallyImplyLeading,
+    this.canPop = true,
+    this.isListView = false,
+    this.appBarTextStyle,
+    this.centerTitle,
+    this.extendBodyBehindAppBar,
+    this.leading,
+    this.hasTitleWidget,
+    this.hasSearchBar = false,
+    this.titleArgs = const [],
+    this.backgroundColor,
+  });
 
   final String title;
   final bool? automaticallyImplyLeading;
@@ -212,46 +218,51 @@ abstract class LegacyBasePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return PopScope(
-        canPop: canPop,
-        onPopInvokedWithResult: (didPop, result) async => await popInvoked(context, didPop, ref),
-        child: Scaffold(
-            drawer: buildDrawer(context, ref),
-            bottomNavigationBar: buildBottomNavigationBar(context, ref),
-            extendBodyBehindAppBar: extendBodyBehindAppBar ?? false,
-            appBar: extendBodyBehindAppBar ?? false
-                ? null
-                : AppBar(
-                    bottom: buildBottom(ref, context),
-                    title: hasTitleWidget ?? false
-                        ? buildTitleWidget(ref)
-                        : (hasSearchBar
-                            ? buildSearchBar(ref)
-                            : Text(
-                                title.isEmpty ? ref.watch(titleDataProvider) : title.i18n(titleArgs),
-                                style: appBarTextStyle ?? const TextStyle(fontWeight: FontWeight.w800),
-                              )),
-                    leading: leading,
-                    centerTitle: centerTitle ?? false,
-                    actions: buildActions(context, ref),
-                    automaticallyImplyLeading: automaticallyImplyLeading ?? !hasSearchBar,
-                  ),
-            floatingActionButton: createActionButton(context, ref),
-            floatingActionButtonLocation: setFloatingActionButtonLocation(ref),
-            resizeToAvoidBottomInset: false,
-            body: buildBody(context, ref) ??
-                SizedBox.expand(
-                  child: Container(
-                      padding: EdgeInsets.only(
-                          left: 12.sp,
-                          right: 12.sp,
-                          top: isListView || hasSearchBar
-                              ? 0
-                              : extendBodyBehindAppBar ?? false
-                                  ? 0.sp
-                                  : 8.sp,
-                          bottom: 0.sp),
-                      child: buildLayout(context, ref)),
-                )));
+      canPop: canPop,
+      onPopInvokedWithResult: (didPop, result) async => await popInvoked(context, didPop, ref),
+      child: Scaffold(
+        drawer: buildDrawer(context, ref),
+        bottomNavigationBar: buildBottomNavigationBar(context, ref),
+        extendBodyBehindAppBar: extendBodyBehindAppBar ?? false,
+        appBar: extendBodyBehindAppBar ?? false
+            ? null
+            : AppBar(
+                bottom: buildBottom(ref, context),
+                title: hasTitleWidget ?? false
+                    ? buildTitleWidget(ref)
+                    : (hasSearchBar
+                          ? buildSearchBar(ref)
+                          : Text(
+                              title.isEmpty ? ref.watch(titleDataProvider) : title.i18n(titleArgs),
+                              style: appBarTextStyle ?? const TextStyle(fontWeight: FontWeight.w800),
+                            )),
+                leading: leading,
+                centerTitle: centerTitle ?? false,
+                actions: buildActions(context, ref),
+                automaticallyImplyLeading: automaticallyImplyLeading ?? !hasSearchBar,
+              ),
+        floatingActionButton: createActionButton(context, ref),
+        floatingActionButtonLocation: setFloatingActionButtonLocation(ref),
+        resizeToAvoidBottomInset: false,
+        body:
+            buildBody(context, ref) ??
+            SizedBox.expand(
+              child: Container(
+                padding: EdgeInsets.only(
+                  left: 12.sp,
+                  right: 12.sp,
+                  top: isListView || hasSearchBar
+                      ? 0
+                      : extendBodyBehindAppBar ?? false
+                      ? 0.sp
+                      : 8.sp,
+                  bottom: 0.sp,
+                ),
+                child: buildLayout(context, ref),
+              ),
+            ),
+      ),
+    );
   }
 
   Widget buildLayout(BuildContext context, WidgetRef ref);
@@ -283,7 +294,10 @@ abstract class LegacyBasePage extends ConsumerWidget {
   buildBottomNavigationBar(BuildContext context, WidgetRef ref) {}
 
   Widget buildSearchBar(WidgetRef ref) {
-    return SizedBox(height: 35.sp, child: BaseSearchBar(onChanged: (text) => searchBarChanged(ref, text)));
+    return SizedBox(
+      height: 35.sp,
+      child: BaseSearchBar(onChanged: (text) => searchBarChanged(ref, text)),
+    );
   }
 
   searchBarChanged(WidgetRef ref, String text) {}

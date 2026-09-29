@@ -7,15 +7,24 @@ class UserFraKareWeekApi {
 
   UserFraKareWeekApi();
 
-  Future<List<dynamic>> getUserFraKareWeeks(num? userId, num? weekNumber, bool? listened, num? teamId, num? year) async {
+  Future<List<dynamic>> getUserFraKareWeeks(
+    num? userId,
+    num? weekNumber,
+    bool? listened,
+    num? teamId,
+    num? year,
+  ) async {
     try {
-      final res = await _dioClient.dio.get("/userFraKareWeek", queryParameters: {
-        "userId": userId,
-        "weekNumber": weekNumber,
-        "listened": listened,
-        "teamId": teamId,
-        "seasonYear": year
-      });
+      final res = await _dioClient.dio.get(
+        "/userFraKareWeek",
+        queryParameters: {
+          "userId": userId,
+          "weekNumber": weekNumber,
+          "listened": listened,
+          "teamId": teamId,
+          "seasonYear": year,
+        },
+      );
       return res.data;
     } catch (e) {
       rethrow;

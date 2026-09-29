@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/payment_status.dart';
@@ -15,39 +14,50 @@ import 'package:work_hu/features/payments/providers/payments_provider.dart';
 
 final donatePaymentSuccessDataProvider =
     StateNotifierProvider.autoDispose<DonatePaymentSuccessDataNotifier, DonatePaymentSuccessState>(
-        (ref) => DonatePaymentSuccessDataNotifier(ref.read(paymentRepoProvider), ref.read(donateRepoProvider)));
+      (ref) => DonatePaymentSuccessDataNotifier(ref.read(paymentRepoProvider), ref.read(donateRepoProvider)),
+    );
 
 class DonatePaymentSuccessDataNotifier extends BaseDataNotifier<DonatePaymentSuccessState> {
-  DonatePaymentSuccessDataNotifier(this.paymentRepository, this.donateRepository) : super(const DonatePaymentSuccessState()) {}
+  DonatePaymentSuccessDataNotifier(this.paymentRepository, this.donateRepository)
+    : super(const DonatePaymentSuccessState()) {}
 
   final PaymentRepository paymentRepository;
   final DonateRepository donateRepository;
 
   Future<void> refreshPayment({required String checkoutReference}) async {
-    executeApiCall<List<PaymentsModel>>(() => paymentRepository.getPayments(checkoutReference: checkoutReference),
-        onSuccess: (data) async {
-      if (data.length != 1) {
-        state = state.copyWith(status: const BaseState(modelState: ModelState.error, message: "donate_error"));
-      } else {
-        var payment = data[0];
-        executeApiCall<CheckoutModel>(() => donateRepository.getCheckout(checkoutId: payment.checkoutId),
+    executeApiCall<List<PaymentsModel>>(
+      () => paymentRepository.getPayments(checkoutReference: checkoutReference),
+      onSuccess: (data) async {
+        if (data.length != 1) {
+          state = state.copyWith(
+            status: const BaseState(modelState: ModelState.error, message: "donate_error"),
+          );
+        } else {
+          var payment = data[0];
+          executeApiCall<CheckoutModel>(
+            () => donateRepository.getCheckout(checkoutId: payment.checkoutId),
             onSuccess: (checkout) async {
-          state = state.copyWith(payment: checkout);
-          if (checkout.status == PaymentStatus.PAID && payment.status != PaymentStatus.PAID) {
-            await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.PAID), payment.id!);
-          } else if (checkout.status == PaymentStatus.PENDING) {
-            var newPayment = await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.EXPIRED), payment.id!);
-            await donateRepository.deleteCheckout(checkoutId: payment.checkoutId);
-            copyWithModelState(ModelState.success);
-          } else if (checkout.status == PaymentStatus.FAILED) {
-            await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.FAILED), payment.id!);
-            copyWithModelState(ModelState.error);
-          } else {
-            copyWithModelState(ModelState.success);
-          }
-        });
-      }
-    });
+              state = state.copyWith(payment: checkout);
+              if (checkout.status == PaymentStatus.PAID && payment.status != PaymentStatus.PAID) {
+                await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.PAID), payment.id!);
+              } else if (checkout.status == PaymentStatus.PENDING) {
+                var newPayment = await paymentRepository.putPayment(
+                  payment.copyWith(status: PaymentStatus.EXPIRED),
+                  payment.id!,
+                );
+                await donateRepository.deleteCheckout(checkoutId: payment.checkoutId);
+                copyWithModelState(ModelState.success);
+              } else if (checkout.status == PaymentStatus.FAILED) {
+                await paymentRepository.putPayment(payment.copyWith(status: PaymentStatus.FAILED), payment.id!);
+                copyWithModelState(ModelState.error);
+              } else {
+                copyWithModelState(ModelState.success);
+              }
+            },
+          );
+        }
+      },
+    );
   }
 
   @override

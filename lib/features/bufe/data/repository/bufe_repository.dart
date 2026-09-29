@@ -46,30 +46,42 @@ class BufeRepository {
     }
   }
 
-  Future<dynamic> transferAmount(
-      {required String userId,
-      required String toId,
-      required num amount,
-      required String externalReferance,
-      String? message}) async {
+  Future<dynamic> transferAmount({
+    required String userId,
+    required String toId,
+    required num amount,
+    required String externalReferance,
+    String? message,
+  }) async {
     try {
       final res = await _bufeApi.transferAmount(
-          message: message, amount: amount, fromDukappId: userId, toDukappId: toId, externalReference: externalReferance);
+        message: message,
+        amount: amount,
+        fromDukappId: userId,
+        toDukappId: toId,
+        externalReference: externalReferance,
+      );
       return res;
     } on DioException {
       rethrow;
     }
   }
 
-  Future<SumupCreateCheckoutResponse> createSumupCheckout(
-      {required num amount,
-      required String description,
-      required num dukappId,
-      required String redirectUrl,
-      String? returnUrl}) async {
+  Future<SumupCreateCheckoutResponse> createSumupCheckout({
+    required num amount,
+    required String description,
+    required num dukappId,
+    required String redirectUrl,
+    String? returnUrl,
+  }) async {
     try {
       final res = await _bufeApi.createSumupCheckout(
-          returnUrl: returnUrl, amount: amount, dukappId: dukappId, description: description, redirectUrl: redirectUrl);
+        returnUrl: returnUrl,
+        amount: amount,
+        dukappId: dukappId,
+        description: description,
+        redirectUrl: redirectUrl,
+      );
       return SumupCreateCheckoutResponse.fromJson(res);
     } on DioException {
       rethrow;

@@ -4,38 +4,38 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 
 class BaseTextFormField extends StatefulWidget {
-  const BaseTextFormField(
-      {super.key,
-      this.initialValue,
-      required this.labelText,
-      this.hintText,
-      this.enabled = true,
-      this.onChanged,
-      this.textAlign = TextAlign.left,
-      this.keyBoardType = TextInputType.text,
-      this.autofocus = false,
-      this.controller,
-      this.autofillHints,
-      this.focusNode,
-      this.textStyle,
-      this.textInputAction,
-      this.obscureText = false,
-      this.validator,
-      this.fillColor,
-      this.onFieldSubmitted,
-      this.isPasswordField = false,
-      this.suffix,
-      this.prefix,
-      this.inputFormatter,
-      this.fldControl,
-      this.onTap,
-      this.maxLines = 1,
-      this.fontSize,
-      this.isHighLighted = false,
-      this.onEditingComplete,
-      this.onTapOutside,
-      this.padding})
-      : assert(initialValue != Widget);
+  const BaseTextFormField({
+    super.key,
+    this.initialValue,
+    required this.labelText,
+    this.hintText,
+    this.enabled = true,
+    this.onChanged,
+    this.textAlign = TextAlign.left,
+    this.keyBoardType = TextInputType.text,
+    this.autofocus = false,
+    this.controller,
+    this.autofillHints,
+    this.focusNode,
+    this.textStyle,
+    this.textInputAction,
+    this.obscureText = false,
+    this.validator,
+    this.fillColor,
+    this.onFieldSubmitted,
+    this.isPasswordField = false,
+    this.suffix,
+    this.prefix,
+    this.inputFormatter,
+    this.fldControl,
+    this.onTap,
+    this.maxLines = 1,
+    this.fontSize,
+    this.isHighLighted = false,
+    this.onEditingComplete,
+    this.onTapOutside,
+    this.padding,
+  }) : assert(initialValue != Widget);
 
   final Object? initialValue;
   final String labelText;
@@ -98,9 +98,13 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.labelText.i18n(),
-                style:
-                    theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant)),
+            Text(
+              widget.labelText.i18n(),
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
             SizedBox(height: 8.sp),
             TextFormField(
               autofillHints: widget.autofillHints,
@@ -119,9 +123,13 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
                 filled: true,
                 fillColor: theme.colorScheme.surface,
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.sp), borderSide: BorderSide(color: theme.colorScheme.outlineVariant)),
+                  borderRadius: BorderRadius.circular(8.sp),
+                  borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
+                ),
                 focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.sp), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.sp)),
+                  borderRadius: BorderRadius.circular(8.sp),
+                  borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.sp),
+                ),
                 prefixIcon: widget.prefix,
                 suffixIcon: widget.isPasswordField
                     ? IconButton(
@@ -131,14 +139,16 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
                     : widget.suffix,
               ),
               onChanged: widget.onChanged != null ? (String text) => widget.onChanged!(text) : null,
-              onFieldSubmitted: widget.onFieldSubmitted != null ? (String text) => widget.onFieldSubmitted!(text) : null,
+              onFieldSubmitted: widget.onFieldSubmitted != null
+                  ? (String text) => widget.onFieldSubmitted!(text)
+                  : null,
               // onEditingComplete: widget.onEditingComplete != null ? () => widget.onEditingComplete!() : null,
               onTapOutside: (event) => widget.onTapOutside?.call(),
               validator: widget.fldControl != "3"
                   ? null
                   : (String? text) => widget.validator != null
-                      ? widget.validator!(text)
-                      : (text == null || text.isEmpty ? "base_is_required".i18n() : null),
+                        ? widget.validator!(text)
+                        : (text == null || text.isEmpty ? "base_is_required".i18n() : null),
               onTap: widget.onTap,
               maxLines: widget.maxLines,
             ),
@@ -192,10 +202,7 @@ class ThreeDigitDecimalFormatter extends TextInputFormatter {
   static final RegExp _decimalExp = RegExp(r'^[0-9]*([\,]?[0-9]{0,3})?$');
 
   @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     // 1. If the new value is empty, allow it.
     if (newValue.text.isEmpty) {
       return newValue;
@@ -223,10 +230,7 @@ class NoDecimalFormatter extends TextInputFormatter {
   static final RegExp _decimalExp = RegExp(r'^[0-9]*$');
 
   @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     // 1. If the new value is empty, allow it.
     if (newValue.text.isEmpty) {
       return newValue;
@@ -242,16 +246,11 @@ class NoDecimalFormatter extends TextInputFormatter {
     // revert to the old value, effectively blocking the invalid input.
     return oldValue;
   }
-
-
 }
 
 class CommaToDotFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue,
-      ) {
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     // Kicseréljük az összes vesszőt pontra a bejövő szövegben
     String truncated = newValue.text.replaceFirst(',', '.');
 

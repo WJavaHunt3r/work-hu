@@ -3,27 +3,24 @@ import 'dart:math';
 
 import 'package:convert/convert.dart';
 import 'package:csv/csv.dart';
-import 'package:excel/excel.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart';
 import 'package:pointycastle/api.dart';
-import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/widgets/error_dialog.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
-import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/rounds/data/model/round_model.dart';
-import 'package:work_hu/features/season/data/model/season_model.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 
 class Utils {
-  static const FlutterSecureStorage _storage = FlutterSecureStorage(aOptions: AndroidOptions(enforceBiometrics: true), iOptions:IOSOptions());
+  static const FlutterSecureStorage _storage = FlutterSecureStorage(
+    aOptions: AndroidOptions(enforceBiometrics: true),
+    iOptions: IOSOptions(),
+  );
 
   static Future<void> saveData(String key, String value) async {
     try {
@@ -81,7 +78,11 @@ class Utils {
   static String getTransactionTypeText(TransactionType? transactionType, [bool long = true]) {
     if (transactionType == TransactionType.POINT) {
       return long ? "base_text_points".i18n() : "base_text_points_short".i18n();
-    } else if ([TransactionType.HOURS, TransactionType.DUKA_MUNKA, TransactionType.DUKA_MUNKA_2000].contains(transactionType)) {
+    } else if ([
+      TransactionType.HOURS,
+      TransactionType.DUKA_MUNKA,
+      TransactionType.DUKA_MUNKA_2000,
+    ].contains(transactionType)) {
       return long ? "base_text_hours".i18n() : "base_text_hours_short".i18n();
     } else if (transactionType == TransactionType.CREDIT) {
       return long ? "base_text_credits".i18n() : "base_text_credits_short".i18n();
@@ -184,8 +185,22 @@ class Utils {
   }
 
   static Future<void> createCreditCsv(
-      List<TransactionItemModel> items, DateTime date, String description, List<UserModel> users) async {
-    var headers = ["UserId", "Age", "Name", "LastName", "ClubId", "ClubName", "Amount", "ClubTransactionDate", "Description"];
+    List<TransactionItemModel> items,
+    DateTime date,
+    String description,
+    List<UserModel> users,
+  ) async {
+    var headers = [
+      "UserId",
+      "Age",
+      "Name",
+      "LastName",
+      "ClubId",
+      "ClubName",
+      "Amount",
+      "ClubTransactionDate",
+      "Description",
+    ];
 
     List<List<dynamic>> list = [];
     list.add(headers);
@@ -201,7 +216,7 @@ class Utils {
         "BUK Vácduka",
         transaction.credit,
         '${date.day}/${date.month}/${date.year}',
-        description
+        description,
       ]);
     }
     String csv = Csv(autoDetect: false).encode(list);

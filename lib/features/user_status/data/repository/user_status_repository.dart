@@ -11,8 +11,10 @@ class UserStatusRepository {
 
   UserStatusRepository(this._userStatusApi);
 
-  Future<PaginatedResponse<UserStatusModel>> getUserStatuses(
-      {required UserStatusFilter filter, required PageStru pageStru}) async {
+  Future<PaginatedResponse<UserStatusModel>> getUserStatuses({
+    required UserStatusFilter filter,
+    required PageStru pageStru,
+  }) async {
     try {
       final res = await _userStatusApi.getUserStatuses(filter: filter, pageStru: pageStru);
       final paginatedData = PaginatedResponse<UserStatusModel>.fromJson(

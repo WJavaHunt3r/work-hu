@@ -25,7 +25,7 @@ abstract class BaseListPage extends BasePage {
     super.canPop = true,
   }) : super();
 
-// final List<SortItem>? sortParameters;
+  // final List<SortItem>? sortParameters;
 }
 
 abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N extends StateNotifier<S>>
@@ -75,7 +75,8 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
 
   List<dynamic> buildListTiles(List<dynamic> listItems) {
     return listItems
-        .map((e) => Slidable(
+        .map(
+          (e) => Slidable(
             enabled: canDelete(e),
             endActionPane: ActionPane(
               extentRatio: 0.3,
@@ -90,15 +91,16 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
                 ),
               ],
             ),
-            child: buildListTile(e)))
+            child: buildListTile(e),
+          ),
+        )
         .toList();
   }
 
   /// Headers, filters, sort and the reload indicator stay pinned above the scrolling list.
   @override
   Widget buildPinnedHeader() {
-    final isReloading =
-        listStatus.baseStatus.modelState.isBackgroundLoading && _requestedPage == 0 && items.isNotEmpty;
+    final isReloading = listStatus.baseStatus.modelState.isBackgroundLoading && _requestedPage == 0 && items.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -140,7 +142,10 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
       mainAxisSize: MainAxisSize.min,
       children: [
         if (items.isEmpty && modelState.isAnyLoading)
-          Padding(padding: EdgeInsets.symmetric(vertical: 32.sp), child: const Center(child: CircularProgressIndicator()))
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 32.sp),
+            child: const Center(child: CircularProgressIndicator()),
+          )
         else if (items.isEmpty && modelState.isBackgroundError)
           _buildRetry()
         else if (items.isEmpty)
@@ -154,15 +159,20 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
         else ...[
           buildListLayout(context, ref) ??
               BaseListView(
-                  hasBottomPadding: !isLoadingMore && !modelState.isBackgroundError,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: children),
+                hasBottomPadding: !isLoadingMore && !modelState.isBackgroundError,
+                physics: const NeverScrollableScrollPhysics(),
+                children: children,
+              ),
           if (isLoadingMore)
             Padding(
               padding: EdgeInsets.only(top: 16.sp, bottom: 80.sp),
               child: Center(
-                  child: SizedBox(
-                      width: 24.sp, height: 24.sp, child: CircularProgressIndicator(strokeWidth: 2.sp))),
+                child: SizedBox(
+                  width: 24.sp,
+                  height: 24.sp,
+                  child: CircularProgressIndicator(strokeWidth: 2.sp),
+                ),
+              ),
             ),
           if (modelState.isBackgroundError) _buildRetry(),
         ],
@@ -219,9 +229,10 @@ abstract class BaseListPageState<P extends BaseListPage, S extends dynamic, N ex
 
   void _deleteConfirmation(e) {
     showDialog(
-        context: context,
-        builder: (context) =>
-            BaseConfirmDialog(title: "base_delete".i18n(), content: "base_delete_question", onConfirm: () => onDelete(e)));
+      context: context,
+      builder: (context) =>
+          BaseConfirmDialog(title: "base_delete".i18n(), content: "base_delete_question", onConfirm: () => onDelete(e)),
+    );
   }
 
   onDelete(e) {}
@@ -243,13 +254,14 @@ class FilterChipLayout extends StatelessWidget {
 
   final List<dynamic> filterValues;
 
-  const FilterChipLayout(
-      {super.key,
-      required this.buildChildren,
-      this.onSelected,
-      required this.listLength,
-      required this.filterValues,
-      required this.state});
+  const FilterChipLayout({
+    super.key,
+    required this.buildChildren,
+    this.onSelected,
+    required this.listLength,
+    required this.filterValues,
+    required this.state,
+  });
 
   final int listLength;
   final BaseListState state;
@@ -289,6 +301,7 @@ class HeaderChipLayout extends StatelessWidget {
             runSpacing: 12.sp,
             runAlignment: WrapAlignment.center,
             alignment: WrapAlignment.start,
-            children: [...widgets]);
+            children: [...widgets],
+          );
   }
 }

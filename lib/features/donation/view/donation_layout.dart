@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -38,16 +37,18 @@ class _DonationsState extends ConsumerState<DonationsLayout> {
       children: [
         RefreshIndicator(
           onRefresh: () async => ref.read(donationDataProvider.notifier).getDonations(null),
-          child: Column(children: [
-            Expanded(
+          child: Column(
+            children: [
+              Expanded(
                 child: LegacyBaseListView(
-              itemBuilder: (BuildContext context, int index) {
-                var current = donations[index];
-                var startDateString = Utils.dateToString( current.startDateTime!);
-                var endDateString = Utils.dateToString(current.endDateTime!);
-                return Dismissible(
-                    key: UniqueKey(),
-                    onDismissed: (direction) => showDialog(
+                  itemBuilder: (BuildContext context, int index) {
+                    var current = donations[index];
+                    var startDateString = Utils.dateToString(current.startDateTime!);
+                    var endDateString = Utils.dateToString(current.endDateTime!);
+                    return Dismissible(
+                      key: UniqueKey(),
+                      onDismissed: (direction) =>
+                          showDialog(
                             context: context,
                             builder: (buildContext) {
                               return ConfirmAlertDialog(
@@ -55,46 +56,51 @@ class _DonationsState extends ConsumerState<DonationsLayout> {
                                 title: "delete".i18n(),
                                 content: Text("donation_delete_warning".i18n(), textAlign: TextAlign.center),
                               );
-                            })
-                        .then((confirmed) => confirmed != null && confirmed
-                            ? ref.read(donationDataProvider.notifier).deleteDonations(current.id!, index)
-                            : null),
-                    dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
-                    child: Card(
-                      margin: const EdgeInsets.all(0),
-                      child: BaseListTile(
-                        isLast: donations.length - 1 == index,
-                        index: index,
-                        onTap: () {
-                          showDialog(
+                            },
+                          ).then(
+                            (confirmed) => confirmed != null && confirmed
+                                ? ref.read(donationDataProvider.notifier).deleteDonations(current.id!, index)
+                                : null,
+                          ),
+                      dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
+                      child: Card(
+                        margin: const EdgeInsets.all(0),
+                        child: BaseListTile(
+                          isLast: donations.length - 1 == index,
+                          index: index,
+                          onTap: () {
+                            showDialog(
                               barrierDismissible: false,
                               context: context,
-                              builder: (context) => DonationMaintenance(
-                                    mode: MaintenanceMode.create,
-                                    donation: current,
-                                  )).then((value) => ref.watch(donationDataProvider.notifier).getDonations(null));
-                        },
-                        leading: Icon(
-                          isDonationOpen(current.startDateTime!, current.endDateTime!) ? Icons.lock_open : Icons.lock_outline,
-                          color: isDonationOpen(current.startDateTime!, current.endDateTime!) ? Colors.green : Colors.red,
+                              builder: (context) =>
+                                  DonationMaintenance(mode: MaintenanceMode.create, donation: current),
+                            ).then((value) => ref.watch(donationDataProvider.notifier).getDonations(null));
+                          },
+                          leading: Icon(
+                            isDonationOpen(current.startDateTime!, current.endDateTime!)
+                                ? Icons.lock_open
+                                : Icons.lock_outline,
+                            color: isDonationOpen(current.startDateTime!, current.endDateTime!)
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [Text(current.description.toString()), Text(current.sum.toString())],
+                          ),
+                          subtitle: Text("$startDateString - $endDateString"),
                         ),
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(current.description.toString()),
-                            Text(current.sum.toString())
-                          ],
-                        ),
-                        subtitle: Text("$startDateString - $endDateString"),
                       ),
-                    ));
-              },
-              itemCount: donations.length,
-              shadowColor: Colors.transparent,
-              cardBackgroundColor: Colors.transparent,
-              children: const [],
-            ))
-          ]),
+                    );
+                  },
+                  itemCount: donations.length,
+                  shadowColor: Colors.transparent,
+                  cardBackgroundColor: Colors.transparent,
+                  children: const [],
+                ),
+              ),
+            ],
+          ),
         ),
         Positioned(
           bottom: 20.sp,
@@ -103,12 +109,13 @@ class _DonationsState extends ConsumerState<DonationsLayout> {
             heroTag: UniqueKey(),
             onPressed: () {
               showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (context) => DonationMaintenance(
-                        mode: MaintenanceMode.create,
-                        donation: DonationModel(startDateTime: DateTime.now()),
-                      )).then((value) => ref.watch(donationDataProvider.notifier).getDonations(null));
+                barrierDismissible: false,
+                context: context,
+                builder: (context) => DonationMaintenance(
+                  mode: MaintenanceMode.create,
+                  donation: DonationModel(startDateTime: DateTime.now()),
+                ),
+              ).then((value) => ref.watch(donationDataProvider.notifier).getDonations(null));
             },
             child: const Icon(Icons.add),
           ),
@@ -117,7 +124,7 @@ class _DonationsState extends ConsumerState<DonationsLayout> {
           const Dialog(
             backgroundColor: Colors.transparent,
             child: Center(child: CircularProgressIndicator()),
-          )
+          ),
       ],
     );
   }

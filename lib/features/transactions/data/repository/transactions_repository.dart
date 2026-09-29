@@ -28,8 +28,10 @@ class TransactionRepository {
     }
   }
 
-  Future<PaginatedResponse<TransactionModel>> getTransactions(
-      {required TransactionsFilter filter, required PageStru pageStru}) async {
+  Future<PaginatedResponse<TransactionModel>> getTransactions({
+    required TransactionsFilter filter,
+    required PageStru pageStru,
+  }) async {
     try {
       final res = await _transactionApi.getTransactions(filter: filter, pageStru: pageStru);
       final paginatedData = PaginatedResponse<TransactionModel>.fromJson(

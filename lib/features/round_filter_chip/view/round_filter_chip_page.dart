@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/widgets/base_filter_chip.dart';
 import 'package:work_hu/features/round_filter_chip/providers/round_filter_chip_provider.dart';
@@ -23,14 +21,15 @@ class RoundFilterChipPageState extends ConsumerState<RoundFilterChipPage> {
   Widget build(BuildContext context) {
     var state = ref.watch(roundFilterChipDataProvider);
     return DialogFilterChip<RoundModel>(
-        label: "round_months",
-        showDelete: false,
-        labelValue: (round) =>
-            round == null ? "" : "${round.startDateTime.year} - ${Utils.getMonthFromDate(round.startDateTime, context)}",
-        onDeleted: () => widget.onSelected(null),
-        initialValue: state.currentRound,
-        onItemSelected: (e) => widget.onSelected(e),
-        children: () async => ref.read(roundFilterChipDataProvider.notifier).list(),
-        title: (round) => Text("${round.startDateTime.year} - ${Utils.getMonthFromDate(round.startDateTime, context)}"));
+      label: "round_months",
+      showDelete: false,
+      labelValue: (round) =>
+          round == null ? "" : "${round.startDateTime.year} - ${Utils.getMonthFromDate(round.startDateTime, context)}",
+      onDeleted: () => widget.onSelected(null),
+      initialValue: state.currentRound,
+      onItemSelected: (e) => widget.onSelected(e),
+      children: () async => ref.read(roundFilterChipDataProvider.notifier).list(),
+      title: (round) => Text("${round.startDateTime.year} - ${Utils.getMonthFromDate(round.startDateTime, context)}"),
+    );
   }
 }

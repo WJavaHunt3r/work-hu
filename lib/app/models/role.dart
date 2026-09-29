@@ -1,3 +1,1 @@
-enum Role {
-  USER, TEAM_LEADER, ADMIN
-}
+enum Role { USER, TEAM_LEADER, ADMIN }

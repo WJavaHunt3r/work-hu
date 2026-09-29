@@ -6,10 +6,11 @@ part 'fra_kare_week_state.freezed.dart';
 
 @freezed
 abstract class FraKareWeekState with _$FraKareWeekState {
-  const factory FraKareWeekState(
-      {@Default([]) List<FraKareWeekModel> weeks,
-      @Default(ModelState.empty) ModelState modelState,
-      @Default("") String message}) = _FraKareWeekkState;
+  const factory FraKareWeekState({
+    @Default([]) List<FraKareWeekModel> weeks,
+    @Default(ModelState.empty) ModelState modelState,
+    @Default("") String message,
+  }) = _FraKareWeekkState;
 
   const FraKareWeekState._();
 }

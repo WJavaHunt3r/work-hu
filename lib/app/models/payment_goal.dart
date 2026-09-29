@@ -1,5 +1,1 @@
-enum PaymentGoal{
-  DONATION,
-  BUFE,
-  OTHER
-}
+enum PaymentGoal { DONATION, BUFE, OTHER }

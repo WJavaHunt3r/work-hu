@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/goal/data/repository/goal_repository.dart';
@@ -12,7 +11,6 @@ import 'package:work_hu/features/mentor_mentee/data/api/mentor_mentee_api.dart';
 import 'package:work_hu/features/mentor_mentee/data/model/mentor_mentee_model.dart';
 import 'package:work_hu/features/mentor_mentee/data/repository/mentor_mentee_repository.dart';
 import 'package:work_hu/features/mentor_mentee/data/state/mentor_mentee_state.dart';
-import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:work_hu/features/user_rounds/data/repository/user_round_repository.dart';
 import 'package:work_hu/features/user_rounds/providers/user_rounds_provider.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
@@ -21,17 +19,28 @@ import 'package:work_hu/features/utils.dart';
 
 final mentorMenteeApiProvider = Provider<MentorMenteeApi>((ref) => MentorMenteeApi());
 
-final mentorMenteeRepoProvider =
-    Provider<MentorMenteeRepository>((ref) => MentorMenteeRepository(ref.read(mentorMenteeApiProvider)));
+final mentorMenteeRepoProvider = Provider<MentorMenteeRepository>(
+  (ref) => MentorMenteeRepository(ref.read(mentorMenteeApiProvider)),
+);
 
-final mentorMenteeDataProvider = StateNotifierProvider.autoDispose<MentorMenteeDataNotifier, MentorMenteeState>((ref) =>
-    MentorMenteeDataNotifier(ref.read(userRoundsRepoProvider), ref.read(goalRepoProvider), ref.read(usersRepoProvider),
-        ref.read(mentorMenteeRepoProvider), ref.read(userDataProvider).user));
+final mentorMenteeDataProvider = StateNotifierProvider.autoDispose<MentorMenteeDataNotifier, MentorMenteeState>(
+  (ref) => MentorMenteeDataNotifier(
+    ref.read(userRoundsRepoProvider),
+    ref.read(goalRepoProvider),
+    ref.read(usersRepoProvider),
+    ref.read(mentorMenteeRepoProvider),
+    ref.read(userDataProvider).user,
+  ),
+);
 
 class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
   MentorMenteeDataNotifier(
-      this.userRoundRepository, this.goalRepoProvider, this.usersRepository, this.menteesRepository, this.currentUser)
-      : super(const MentorMenteeState()) {
+    this.userRoundRepository,
+    this.goalRepoProvider,
+    this.usersRepository,
+    this.menteesRepository,
+    this.currentUser,
+  ) : super(const MentorMenteeState()) {
     getUsers();
     getMentorMentee();
     mentorController = TextEditingController(text: "");
@@ -49,9 +58,9 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
   Future<void> getMentorMentee() async {
     state = state.copyWith(modelState: ModelState.loading);
     try {
-      await menteesRepository
-          .getMentorMentee()
-          .then((value) => state = state.copyWith(mentees: value, modelState: ModelState.success));
+      await menteesRepository.getMentorMentee().then(
+        (value) => state = state.copyWith(mentees: value, modelState: ModelState.success),
+      );
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
     }
@@ -83,7 +92,10 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
     try {
       await menteesRepository.deleteMentee(id, currentUser!.id).then((value) {
         state = state.copyWith(
-            message: "Mentor - Mentee successfully deleted!", modelState: ModelState.success, mentees: items);
+          message: "Mentor - Mentee successfully deleted!",
+          modelState: ModelState.success,
+          mentees: items,
+        );
       });
     } catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString(), mentees: origItems);
@@ -94,11 +106,7 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
     state = state.copyWith(modelState: ModelState.loading);
     try {
       await usersRepository.getUsers(null, false).then((data) {
-        state = state.copyWith(
-          modelState: ModelState.success,
-          createState: ModelState.empty,
-          users: data,
-        );
+        state = state.copyWith(modelState: ModelState.success, createState: ModelState.empty, users: data);
       });
     } on DioException catch (e) {
       state = state.copyWith(modelState: ModelState.error, message: e.toString());
@@ -107,9 +115,13 @@ class MentorMenteeDataNotifier extends StateNotifier<MentorMenteeState> {
 
   Future<List<UserModel>> filterUsers(String filter) async {
     var filtered = state.users
-        .where((u) =>
-            Utils.changeSpecChars(u.firstname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
-            Utils.changeSpecChars(u.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())))
+        .where(
+          (u) =>
+              Utils.changeSpecChars(
+                u.firstname.toLowerCase(),
+              ).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
+              Utils.changeSpecChars(u.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())),
+        )
         .toList();
     filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
     return filtered;

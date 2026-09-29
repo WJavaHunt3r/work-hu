@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/style/app_colors.dart';
 
 class ConfirmAlertDialog extends StatelessWidget {
   const ConfirmAlertDialog({super.key, required this.onConfirm, required this.title, required this.content, this.icon});
@@ -14,25 +12,17 @@ class ConfirmAlertDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-        title: Text(
-          title,
-          textAlign: TextAlign.center,
+      title: Text(title, textAlign: TextAlign.center),
+      icon: icon,
+      actionsAlignment: MainAxisAlignment.spaceEvenly,
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text("cancel".i18n())),
+        FilledButton(
+          onPressed: onConfirm,
+          child: Text("confirm".i18n(), style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
         ),
-        icon: icon,
-        actionsAlignment: MainAxisAlignment.spaceEvenly,
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                "cancel".i18n(),
-              )),
-          FilledButton(
-              onPressed: onConfirm,
-              child: Text(
-                "confirm".i18n(),
-                style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
-              ))
-        ],
-        content: content);
+      ],
+      content: content,
+    );
   }
 }

@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:localization/localization.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/mode_state.dart';
@@ -24,7 +24,8 @@ final loginApiProvider = Provider<LoginApi>((ref) => LoginApi());
 final loginRepoProvider = Provider<LoginRepository>((ref) => LoginRepository(ref.read(loginApiProvider)));
 
 final loginDataProvider = StateNotifierProvider.autoDispose<LoginDataNotifier, LoginState>(
-    (ref) => LoginDataNotifier(ref.read(loginRepoProvider), ref.read(donationRepoProvider)));
+  (ref) => LoginDataNotifier(ref.read(loginRepoProvider), ref.read(donationRepoProvider)),
+);
 
 class LoginDataNotifier extends BaseDataNotifier<LoginState> {
   LoginDataNotifier(this._loginRepository, this._donationRepository) : super(const LoginState()) {
@@ -43,57 +44,78 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
   }
 
   Future<void> login({required String usr, required String pswd, required keepLogedIn}) async {
-    executeApiCall<Map<String, dynamic>>(() => _loginRepository.login(usr.trim(), pswd.trim()), onSuccess: (data) async {
-      await Utils.saveData("jwt_token", data['token']);
-      await Utils.saveData("refresh_token", data['refreshToken']);
-      await Utils.saveData("keep_logged_in", keepLogedIn.toString());
+    executeApiCall<Map<String, dynamic>>(
+      () => _loginRepository.login(usr.trim(), pswd.trim()),
+      onSuccess: (data) async {
+        await Utils.saveData("jwt_token", data['token']);
+        await Utils.saveData("refresh_token", data['refreshToken']);
+        await Utils.saveData("keep_logged_in", keepLogedIn.toString());
 
-      userProvider.setToken(data['token']);
-      executeApiCall(() => _loginRepository.getProfile().then((userData) async {
+        userProvider.setToken(data['token']);
+        executeApiCall(
+          () => _loginRepository.getProfile().then((userData) async {
             userProvider.setUser(userData);
-          }));
-    }, onError: (e) async {
-      copyWithState(BaseState(modelState: ModelState.error, message: "login_email_password_wrong".i18n()));
-    });
+          }),
+        );
+      },
+      onError: (e) async {
+        copyWithState(BaseState(modelState: ModelState.error, message: "login_email_password_wrong".i18n()));
+      },
+    );
   }
 
-  Future<void> register(
-      {required String firstName,
-      required String lastName,
-      required String email,
-      required String pswd,
-      required String pswdAgain,
-      required bool keepLogedIn}) async {
+  Future<void> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String pswd,
+    required String pswdAgain,
+    required bool keepLogedIn,
+  }) async {
     if (pswd != pswdAgain) {
       copyWithState(BaseState(modelState: ModelState.error, message: "login_password_not_match".i18n()));
       return;
     }
     executeApiCall<Map<String, dynamic>>(
-        () => _loginRepository.register(
-            RegisterModel(firstname: firstName.trim(), email: email.trim(), password: pswd.trim(), lastname: lastName.trim())),
-        onSuccess: (data) async {
-      await Utils.saveData("jwt_token", data['token']);
-      await Utils.saveData("refresh_token", data['refreshToken']);
-      await Utils.saveData("keep_logged_in", keepLogedIn.toString());
+      () => _loginRepository.register(
+        RegisterModel(
+          firstname: firstName.trim(),
+          email: email.trim(),
+          password: pswd.trim(),
+          lastname: lastName.trim(),
+        ),
+      ),
+      onSuccess: (data) async {
+        await Utils.saveData("jwt_token", data['token']);
+        await Utils.saveData("refresh_token", data['refreshToken']);
+        await Utils.saveData("keep_logged_in", keepLogedIn.toString());
 
-      userProvider.setToken(data['token']);
-      executeApiCall(() => _loginRepository.getProfile().then((userData) async {
+        userProvider.setToken(data['token']);
+        executeApiCall(
+          () => _loginRepository.getProfile().then((userData) async {
             userProvider.setUser(userData);
-          }));
-    });
+          }),
+        );
+      },
+    );
   }
 
   Future<void> signInWithGoogle(String idToken) async {
     try {
-      executeApiCall<Map<String, dynamic>>(() => _loginRepository.loginWithGoogle(idToken), onSuccess: (data) async {
-        await Utils.saveData("jwt_token", data['token']);
-        await Utils.saveData("refresh_token", data['refreshToken']);
-        await Utils.saveData("keep_logged_in", "true");
-        userProvider.setToken(data['token']);
-        executeApiCall(() => _loginRepository.getUserByUsername(data['username']).then((userData) async {
+      executeApiCall<Map<String, dynamic>>(
+        () => _loginRepository.loginWithGoogle(idToken),
+        onSuccess: (data) async {
+          await Utils.saveData("jwt_token", data['token']);
+          await Utils.saveData("refresh_token", data['refreshToken']);
+          await Utils.saveData("keep_logged_in", "true");
+          userProvider.setToken(data['token']);
+          executeApiCall(
+            () => _loginRepository.getUserByUsername(data['username']).then((userData) async {
               userProvider.setUser(userData);
-            }));
-      });
+            }),
+          );
+        },
+      );
     } catch (error) {
       print("Google Sign-In Error: $error");
     }
@@ -160,10 +182,14 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
   Future<void> isAlive() async {
     try {
       await _loginRepository.isAlive().then((data) {
-        state = state.copyWith(status: const BaseState(modelState: ModelState.success, message: ""));
+        state = state.copyWith(
+          status: const BaseState(modelState: ModelState.success, message: ""),
+        );
       });
     } catch (e) {
-      state = state.copyWith(status: const BaseState(modelState: ModelState.error, message: "server_down"));
+      state = state.copyWith(
+        status: const BaseState(modelState: ModelState.error, message: "server_down"),
+      );
     }
   }
 }

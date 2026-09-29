@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:work_hu/app/models/app_theme_mode.dart';
-
 
 // A StateNotifier that holds and manages the AppThemeMode
 class ThemeModeNotifier extends StateNotifier<AppThemeMode> {
@@ -44,8 +42,7 @@ class ThemeModeNotifier extends StateNotifier<AppThemeMode> {
   }
 
   Future<void> changeTheme() async {
-    switch(state){
-
+    switch (state) {
       case AppThemeMode.system:
         break;
       case AppThemeMode.light:

@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
@@ -18,7 +17,8 @@ final donationApiProvider = Provider<DonationsApi>((ref) => DonationsApi());
 final donationRepoProvider = Provider<DonationRepository>((ref) => DonationRepository(ref.read(donationApiProvider)));
 
 final donationDataProvider = StateNotifierProvider.autoDispose<DonationDataNotifier, DonationState>(
-    (ref) => DonationDataNotifier(ref.read(donationRepoProvider), ref.read(userDataProvider).user));
+  (ref) => DonationDataNotifier(ref.read(donationRepoProvider), ref.read(userDataProvider).user),
+);
 
 class DonationDataNotifier extends StateNotifier<DonationState> {
   DonationDataNotifier(this.donationRepository, this.currentUser) : super(const DonationState()) {
@@ -93,22 +93,30 @@ class DonationDataNotifier extends StateNotifier<DonationState> {
 
   void _updateStartDate() {
     state = state.copyWith(
-        selectedDonation: state.selectedDonation
-            ?.copyWith(startDateTime: DateTime.tryParse(startDateTimeController.value.text) ?? DateTime.now()));
+      selectedDonation: state.selectedDonation?.copyWith(
+        startDateTime: DateTime.tryParse(startDateTimeController.value.text) ?? DateTime.now(),
+      ),
+    );
   }
 
   void _updateEndDate() {
     state = state.copyWith(
-        selectedDonation:
-            state.selectedDonation?.copyWith(endDateTime: DateTime.tryParse(endDateTimeController.value.text) ?? DateTime.now()));
+      selectedDonation: state.selectedDonation?.copyWith(
+        endDateTime: DateTime.tryParse(endDateTimeController.value.text) ?? DateTime.now(),
+      ),
+    );
   }
 
   void _updateDescription() {
-    state = state.copyWith(selectedDonation: state.selectedDonation?.copyWith(description: descriptionController.value.text));
+    state = state.copyWith(
+      selectedDonation: state.selectedDonation?.copyWith(description: descriptionController.value.text),
+    );
   }
 
   void _updateNoDescription() {
-    state = state.copyWith(selectedDonation: state.selectedDonation?.copyWith(descriptionNO: descriptionNoController.value.text));
+    state = state.copyWith(
+      selectedDonation: state.selectedDonation?.copyWith(descriptionNO: descriptionNoController.value.text),
+    );
   }
 
   void preset(DonationModel donation, MaintenanceMode mode) {

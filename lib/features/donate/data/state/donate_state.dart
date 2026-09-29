@@ -8,16 +8,16 @@ part 'donate_state.freezed.dart';
 
 @freezed
 abstract class DonateState with _$DonateState {
-  const factory DonateState(
-      {
-        String? base64,
-        String? checkoutId,
-        DonationModel? donation,
-        PaymentsModel? payment,
-        String? hosted_url,
-        @Default(0) num amount,
-        @Default(ModelState.empty) ModelState paymentState,
-        @Default(BaseState()) BaseState status}) = _DonateState;
+  const factory DonateState({
+    String? base64,
+    String? checkoutId,
+    DonationModel? donation,
+    PaymentsModel? payment,
+    String? hosted_url,
+    @Default(0) num amount,
+    @Default(ModelState.empty) ModelState paymentState,
+    @Default(BaseState()) BaseState status,
+  }) = _DonateState;
 
   const DonateState._();
 }

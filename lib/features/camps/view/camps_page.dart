@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:localization/localization.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/models/maintenance_mode.dart';
@@ -32,8 +32,11 @@ class CampPageState extends BaseListPageState<CampPage, CampState, CampDataNotif
       index: index,
       onTap: () async {
         await ref.read(campsDataProvider.notifier).presetCamp(item, MaintenanceMode.edit);
-        showDialog(barrierDismissible: false, context: context, builder: (context) => CampsMaintenance())
-            .then((value) => value != null && value == true ? ref.read(campsDataProvider.notifier).list(page: 0) : null);
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => CampsMaintenance(),
+        ).then((value) => value != null && value == true ? ref.read(campsDataProvider.notifier).list(page: 0) : null);
       },
       title: Text(item.campName!),
       subtitle: Column(
@@ -75,8 +78,11 @@ class CampPageState extends BaseListPageState<CampPage, CampState, CampDataNotif
     return FloatingActionButton(
       onPressed: () async {
         await ref.read(campsDataProvider.notifier).presetCamp(const CampModel(), MaintenanceMode.create);
-        showDialog(barrierDismissible: false, context: context, builder: (context) => CampsMaintenance())
-            .then((value) => value != null && value == true ? ref.read(campsDataProvider.notifier).list(page: 0) : null);
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => CampsMaintenance(),
+        ).then((value) => value != null && value == true ? ref.read(campsDataProvider.notifier).list(page: 0) : null);
       },
       child: const Icon(Icons.add),
     );

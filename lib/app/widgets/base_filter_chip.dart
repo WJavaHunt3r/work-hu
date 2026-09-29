@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -18,14 +17,15 @@ abstract class BaseFilterChip<T> extends ConsumerStatefulWidget {
   final T? initialValue;
   final Function(T) onItemSelected;
 
-  const BaseFilterChip(
-      {super.key,
-      required this.label,
-      required this.labelValue,
-      required this.onDeleted,
-      required this.onItemSelected,
-      this.showDelete = true,
-      this.initialValue});
+  const BaseFilterChip({
+    super.key,
+    required this.label,
+    required this.labelValue,
+    required this.onDeleted,
+    required this.onItemSelected,
+    this.showDelete = true,
+    this.initialValue,
+  });
 }
 
 abstract class BaseFilterChipState<T, W extends BaseFilterChip<T>> extends ConsumerState<W> {
@@ -54,23 +54,24 @@ abstract class BaseFilterChipState<T, W extends BaseFilterChip<T>> extends Consu
     return Padding(
       padding: EdgeInsets.only(right: 8.sp),
       child: FilterChip(
-          selectedColor: Theme.of(context).colorScheme.primaryContainer,
-          label: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text("header_label".i18n([widget.label.i18n(), labelValue ?? ""])),
-              Visibility(visible: !isActive, child: const Icon(Icons.arrow_drop_down)),
-            ],
-          ),
-          onDeleted: !isActive || widget.showDelete == false
-              ? null
-              : () {
-                  selectedItem = null;
-                  widget.onDeleted();
-                },
-          selected: labelValue != null && labelValue != "",
-          showCheckmark: false,
-          onSelected: (bool value) => onSelected(value)),
+        selectedColor: Theme.of(context).colorScheme.primaryContainer,
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("header_label".i18n([widget.label.i18n(), labelValue ?? ""])),
+            Visibility(visible: !isActive, child: const Icon(Icons.arrow_drop_down)),
+          ],
+        ),
+        onDeleted: !isActive || widget.showDelete == false
+            ? null
+            : () {
+                selectedItem = null;
+                widget.onDeleted();
+              },
+        selected: labelValue != null && labelValue != "",
+        showCheckmark: false,
+        onSelected: (bool value) => onSelected(value),
+      ),
     );
   }
 
@@ -104,63 +105,66 @@ class ModalBottomFilterChipState<T> extends BaseFilterChipState<T, ModalBottomFi
   @override
   void onSelected(bool value) {
     showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return BottomSheet(
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-              onClosing: () => context.pop(),
-              builder: (context) {
-                return LegacyBaseListView(
-                    itemBuilder: (BuildContext context, int index) {},
-                    itemCount: widget.children.length,
+      context: context,
+      builder: (BuildContext context) {
+        return BottomSheet(
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+          onClosing: () => context.pop(),
+          builder: (context) {
+            return LegacyBaseListView(
+              itemBuilder: (BuildContext context, int index) {},
+              itemCount: widget.children.length,
+              children: [
+                Row(
+                  children: [
+                    IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.close)),
+                    Text(widget.label.i18n()),
+                  ],
+                ),
+                RadioGroup<T>(
+                  onChanged: (e) {
+                    {
+                      if (e != null) {
+                        selectedItem = e;
+                        widget.onItemSelected(e);
+                        context.pop();
+                      }
+                    }
+                  },
+                  groupValue: selectedItem,
+                  child: Column(
                     children: [
-                      Row(
-                        children: [
-                          IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.close)),
-                          Text(widget.label.i18n())
-                        ],
+                      ...widget.children.map(
+                        (e) => ListTile(
+                          title: widget.title(e),
+                          leading: Radio<T>(value: e),
+                        ),
                       ),
-                      RadioGroup<T>(
-                          onChanged: (e) {
-                            {
-                              if (e != null) {
-                                selectedItem = e;
-                                widget.onItemSelected(e);
-                                context.pop();
-                              }
-                            }
-                          },
-                          groupValue: selectedItem,
-                          child: Column(
-                            children: [
-                              ...widget.children.map((e) => ListTile(
-                                    title: widget.title(e),
-                                    leading: Radio<T>(
-                                      value: e,
-                                    ),
-                                  )),
-                            ],
-                          )),
-                      SizedBox(
-                        height: 10.sp,
-                      )
-                    ]);
-              });
-        });
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10.sp),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 }
 
 class DialogFilterChip<T> extends BaseFilterChip<T> {
-  const DialogFilterChip(
-      {super.key,
-      required super.label,
-      required super.labelValue,
-      required super.onDeleted,
-      super.showDelete,
-      super.initialValue,
-      required super.onItemSelected,
-      required this.children,
-      required this.title});
+  const DialogFilterChip({
+    super.key,
+    required super.label,
+    required super.labelValue,
+    required super.onDeleted,
+    super.showDelete,
+    super.initialValue,
+    required super.onItemSelected,
+    required this.children,
+    required this.title,
+  });
 
   final Future<Iterable<T>> Function() children;
   final Widget Function(T) title;
@@ -175,16 +179,17 @@ class DialogFilterChipState<T> extends BaseFilterChipState<T, DialogFilterChip<T
   @override
   void onSelected(bool value) {
     showDialog(
-        context: context,
-        builder: (dialogContext) {
-          return Dialog.fullscreen(
-              child: Scaffold(
+      context: context,
+      builder: (dialogContext) {
+        return Dialog.fullscreen(
+          child: Scaffold(
             appBar: AppBar(
-                title: Row(
-              children: [
-                Text(widget.label.i18n([":"]), style: Theme.of(dialogContext).textTheme.titleMedium)
-              ],
-            )),
+              title: Row(
+                children: [
+                  Text(widget.label.i18n([":"]), style: Theme.of(dialogContext).textTheme.titleMedium),
+                ],
+              ),
+            ),
             body: SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.all(12.sp),
@@ -201,25 +206,29 @@ class DialogFilterChipState<T> extends BaseFilterChipState<T, DialogFilterChip<T
                     return BaseListView(
                       physics: const NeverScrollableScrollPhysics(),
                       children: items
-                          .map((e) => BaseListTile(
-                                selected: selectedItem == e || widget.initialValue == e,
-                                title: widget.title(e),
-                                onTap: () {
-                                  selectedItem = e;
-                                  Navigator.of(context).pop();
-                                  widget.onItemSelected(e);
-                                },
-                                isLast: items.indexOf(e) == items.length,
-                                index: items.indexOf(e),
-                              ))
+                          .map(
+                            (e) => BaseListTile(
+                              selected: selectedItem == e || widget.initialValue == e,
+                              title: widget.title(e),
+                              onTap: () {
+                                selectedItem = e;
+                                Navigator.of(context).pop();
+                                widget.onItemSelected(e);
+                              },
+                              isLast: items.indexOf(e) == items.length,
+                              index: items.indexOf(e),
+                            ),
+                          )
                           .toList(),
                     );
                   },
                 ),
               ),
             ),
-          ));
-        });
+          ),
+        );
+      },
+    );
   }
 }
 

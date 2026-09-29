@@ -6,7 +6,7 @@ part 'round_model.freezed.dart';
 part 'round_model.g.dart';
 
 @freezed
-abstract class RoundModel with _$RoundModel{
+abstract class RoundModel with _$RoundModel {
   const factory RoundModel({
     required num id,
     required DateTime startDateTime,
@@ -19,8 +19,8 @@ abstract class RoundModel with _$RoundModel{
     required DateTime freezeDateTime,
     required bool activeRound,
     TeamModel? winnerTeam,
-    required num localMyShareGoal
-}) = _RoundModel;
+    required num localMyShareGoal,
+  }) = _RoundModel;
 
   factory RoundModel.fromJson(Map<String, dynamic> json) => _$RoundModelFromJson(json);
 }

@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/payment_status.dart';
@@ -13,7 +12,8 @@ import 'package:work_hu/features/payments/data/repository/payments_repository.da
 import 'package:work_hu/features/payments/providers/payments_provider.dart';
 
 final paymentSuccessDataProvider = StateNotifierProvider.autoDispose<PaymentSuccessDataNotifier, PaymentSuccessState>(
-    (ref) => PaymentSuccessDataNotifier(ref.read(paymentRepoProvider), ref.read(bufeRepoProvider)));
+  (ref) => PaymentSuccessDataNotifier(ref.read(paymentRepoProvider), ref.read(bufeRepoProvider)),
+);
 
 class PaymentSuccessDataNotifier extends BaseDataNotifier<PaymentSuccessState> {
   PaymentSuccessDataNotifier(this.paymentRepository, this.bufeRepository) : super(const PaymentSuccessState()) {}
@@ -22,13 +22,15 @@ class PaymentSuccessDataNotifier extends BaseDataNotifier<PaymentSuccessState> {
   final BufeRepository bufeRepository;
 
   Future<void> refreshSumupPayment({required String checkoutReference}) async {
-    executeApiCall<SumupCheckoutModel>(() => bufeRepository.getSumupCheckout(checkoutId: checkoutReference),
-        onSuccess: (data) async {
-      state = state.copyWith(payment: data);
-      if (data.status != PaymentStatus.PAID) {
-        copyWithModelState(ModelState.error);
-      }
-    });
+    executeApiCall<SumupCheckoutModel>(
+      () => bufeRepository.getSumupCheckout(checkoutId: checkoutReference),
+      onSuccess: (data) async {
+        state = state.copyWith(payment: data);
+        if (data.status != PaymentStatus.PAID) {
+          copyWithModelState(ModelState.error);
+        }
+      },
+    );
   }
 
   @override

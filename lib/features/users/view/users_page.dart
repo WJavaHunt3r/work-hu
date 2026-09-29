@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
@@ -30,13 +29,14 @@ class UsersPageState extends BaseListPageState<UsersPage, UsersState, UsersDataN
       onTap: () {
         ref.read(usersDataProvider.notifier).getUser(item.id);
         showGeneralDialog(
-            barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-            barrierColor: Theme.of(context).colorScheme.primary,
-            transitionDuration: const Duration(milliseconds: 200),
-            context: context,
-            pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
-              return UserDetails();
-            }).then((value) => value == true ? ref.read(usersDataProvider.notifier).list(page: 0) : null);
+          barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+          barrierColor: Theme.of(context).colorScheme.primary,
+          transitionDuration: const Duration(milliseconds: 200),
+          context: context,
+          pageBuilder: (BuildContext context, Animation animation, Animation secondaryAnimation) {
+            return UserDetails();
+          },
+        ).then((value) => value == true ? ref.read(usersDataProvider.notifier).list(page: 0) : null);
       },
     );
   }

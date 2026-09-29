@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -34,114 +33,119 @@ class PaymentMaintenanceState extends ConsumerState<PaymentMaintenance> {
 
   @override
   Widget build(BuildContext context) {
-    var payment = ref
-        .watch(paymentDataProvider)
-        .selectedPayment;
+    var payment = ref.watch(paymentDataProvider).selectedPayment;
     return Dialog.fullscreen(
-        child: Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                ref.read(paymentDataProvider.notifier).getPayment(null);
-                context.pop();
-              },
-            ),
-            title: Text(
-              "payments_view".i18n(),
-              style: const TextStyle(fontWeight: FontWeight.w800),
-            ),
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              ref.read(paymentDataProvider.notifier).getPayment(null);
+              context.pop();
+            },
           ),
-          body: payment == null
-              ? Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: ListView.builder(
-              itemCount: 5, // Adjust the count based on your needs
-              itemBuilder: (context, index) {
-                return TextFormField();
-              },
-            ),
-          )
-              : Stack(
-            children: [
-              Form(
-                  key: _formKey,
-                  child: Padding(
-                    padding: EdgeInsets.all(8.sp),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                                child: BaseTextFormField(
-                                    labelText: "payments_description".i18n(),
-                                    enabled: false,
-                                    initialValue: payment.description)),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: BaseTextFormField(
-                                    enabled: false,
-                                    labelText: "payments_amount".i18n(),
-                                    initialValue: "${payment.amount.toString()} Ft")),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: BaseTextFormField(
-                                  enabled: false,
-                                  labelText: "payments_date".i18n(),
-                                  initialValue: payment.dateTime.toString(),
-                                )),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: BaseTextFormField(
-                                  enabled: false,
-                                  labelText: "payments_status".i18n(),
-                                  initialValue: payment.status.toString(),
-                                )),
-                            if (payment.status == PaymentStatus.PENDING)
-                              IconButton(
-                                  onPressed: () => ref.watch(paymentDataProvider.notifier).refreshPayment(payment),
-                                  icon: const Icon(Icons.refresh))
-                          ],
-                        ),
-                        if (payment.paymentGoal == PaymentGoal.DONATION)
+          title: Text("payments_view".i18n(), style: const TextStyle(fontWeight: FontWeight.w800)),
+        ),
+        body: payment == null
+            ? Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: ListView.builder(
+                  itemCount: 5, // Adjust the count based on your needs
+                  itemBuilder: (context, index) {
+                    return TextFormField();
+                  },
+                ),
+              )
+            : Stack(
+                children: [
+                  Form(
+                    key: _formKey,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.sp),
+                      child: Column(
+                        children: [
                           Row(
                             children: [
                               Expanded(
                                 child: BaseTextFormField(
+                                  labelText: "payments_description".i18n(),
                                   enabled: false,
-                                  initialValue: payment.donation?.description,
-                                  textInputAction: TextInputAction.next,
-                                  labelText: "payments_donation".i18n(),
+                                  initialValue: payment.description,
                                 ),
                               ),
                             ],
                           ),
-                        if (payment.user != null)
                           Row(
                             children: [
                               Expanded(
                                 child: BaseTextFormField(
-                                    enabled: false,
-                                    initialValue: payment.user!.getFullName(),
-                                    labelText: "payments_user".i18n()),
+                                  enabled: false,
+                                  labelText: "payments_amount".i18n(),
+                                  initialValue: "${payment.amount.toString()} Ft",
+                                ),
                               ),
                             ],
-                          )
-                      ],
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: BaseTextFormField(
+                                  enabled: false,
+                                  labelText: "payments_date".i18n(),
+                                  initialValue: payment.dateTime.toString(),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: BaseTextFormField(
+                                  enabled: false,
+                                  labelText: "payments_status".i18n(),
+                                  initialValue: payment.status.toString(),
+                                ),
+                              ),
+                              if (payment.status == PaymentStatus.PENDING)
+                                IconButton(
+                                  onPressed: () => ref.watch(paymentDataProvider.notifier).refreshPayment(payment),
+                                  icon: const Icon(Icons.refresh),
+                                ),
+                            ],
+                          ),
+                          if (payment.paymentGoal == PaymentGoal.DONATION)
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: BaseTextFormField(
+                                    enabled: false,
+                                    initialValue: payment.donation?.description,
+                                    textInputAction: TextInputAction.next,
+                                    labelText: "payments_donation".i18n(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (payment.user != null)
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: BaseTextFormField(
+                                    enabled: false,
+                                    initialValue: payment.user!.getFullName(),
+                                    labelText: "payments_user".i18n(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
                     ),
-                  )),
-            ],
-          ),
-        ));
+                  ),
+                ],
+              ),
+      ),
+    );
   }
 }

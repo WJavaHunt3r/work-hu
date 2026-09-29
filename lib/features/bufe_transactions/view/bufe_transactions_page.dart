@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/providers/localeProvider.dart';
@@ -15,9 +15,7 @@ import 'package:work_hu/features/utils.dart';
 import '../../../app/widgets/base_list_item.dart';
 
 class BufeTransactionsPage extends BaseListPage {
-  const BufeTransactionsPage({
-    super.key,
-  }) : super(title: 'bufe_transactions_title');
+  const BufeTransactionsPage({super.key}) : super(title: 'bufe_transactions_title');
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -38,15 +36,18 @@ class BufeTransactionsPageState
       leading: IconBox(icon: item.locationName == "Büfé" ? Icons.coffee_outlined : Icons.shopping_bag_outlined),
       title: Text(item.locationName, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(Utils.dateFormating(item.date, locale), style: theme.textTheme.bodySmall),
-      trailing: Text("- ${Utils.creditFormatting(item.total)}",
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+      trailing: Text(
+        "- ${Utils.creditFormatting(item.total)}",
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+      ),
       isLast: index == state.orders.length - 1,
       index: index,
       onTap: () => showDialog(
-          context: context,
-          builder: (context) {
-            return BufeTransactionItemsPage(items: item.orderItems);
-          }),
+        context: context,
+        builder: (context) {
+          return BufeTransactionItemsPage(items: item.orderItems);
+        },
+      ),
     );
   }
 

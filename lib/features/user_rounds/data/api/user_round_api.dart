@@ -8,8 +8,10 @@ class UserRoundApi {
 
   Future<List<dynamic>> listUserRounds([num? userId, num? roundId, num? seasonYear, num? paceTeam]) async {
     try {
-      final res = await _dioClient.dio.get("/paceUserRound",
-          queryParameters: {"userId": userId, "roundId": roundId, "seasonYear": seasonYear, "paceTeamId": paceTeam});
+      final res = await _dioClient.dio.get(
+        "/paceUserRound",
+        queryParameters: {"userId": userId, "roundId": roundId, "seasonYear": seasonYear, "paceTeamId": paceTeam},
+      );
       return res.data;
     } catch (e) {
       rethrow;

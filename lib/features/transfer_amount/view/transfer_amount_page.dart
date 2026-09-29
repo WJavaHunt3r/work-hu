@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
@@ -15,9 +15,7 @@ import 'package:work_hu/features/user_combo/view/user_combo.dart';
 import 'package:work_hu/features/utils.dart';
 
 class TransferAmountPage extends BasePage {
-  const TransferAmountPage({
-    super.key,
-  }) : super(title: 'transfer_amount_title');
+  const TransferAmountPage({super.key}) : super(title: 'transfer_amount_title');
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -25,128 +23,134 @@ class TransferAmountPage extends BasePage {
   }
 }
 
-class TransferAmountPageState extends BasePageState<TransferAmountPage, TransferAmountState, TransferAmountDataNotifier> {
+class TransferAmountPageState
+    extends BasePageState<TransferAmountPage, TransferAmountState, TransferAmountDataNotifier> {
   final TextEditingController _amountController = TextEditingController(text: "0");
   final TextEditingController userController = TextEditingController(text: "");
 
   @override
   void initState() {
     super.initState();
-    _amountController.addListener(() => ref.read(provider.notifier).setAmount(int.tryParse(_amountController.text) ?? 0));
+    _amountController.addListener(
+      () => ref.read(provider.notifier).setAmount(int.tryParse(_amountController.text) ?? 0),
+    );
   }
 
   @override
   Widget buildLayout() {
     final theme = Theme.of(context);
     return SingleChildScrollView(
-        child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        BaseContainer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          BaseContainer(
             width: double.infinity,
             child: Column(
               children: [
-                Text('transfer_amount_balance'.i18n(),
-                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.outline)),
+                Text(
+                  'transfer_amount_balance'.i18n(),
+                  style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.outline),
+                ),
                 SizedBox(height: 12.sp),
-                Text(Utils.creditFormatting(state.account?.balance ?? 0),
-                    style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  Utils.creditFormatting(state.account?.balance ?? 0),
+                  style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
               ],
-            )),
+            ),
+          ),
 
-        SizedBox(height: 16.sp),
-        // Amount Input Card
-        BaseContainer(
-          child: Form(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                UserComboWidget(
+          SizedBox(height: 16.sp),
+          // Amount Input Card
+          BaseContainer(
+            child: Form(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  UserComboWidget(
                     controller: userController,
                     onSuggestionSelected: (suggestion) {
                       ref.read(provider.notifier).setSelectedUser(suggestion);
                     },
                     fldControl: "3",
-                    labelText: "transfer_amount_to".i18n()),
-                SizedBox(
-                  height: 8.sp,
-                ),
-                Text('top_up_enter_amount'.i18n(), style: theme.textTheme.labelLarge),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12.sp),
-                  child: TextField(
-                    controller: _amountController,
-                    keyboardType: TextInputType.number,
-                    style: theme.textTheme.displaySmall?.copyWith(
+                    labelText: "transfer_amount_to".i18n(),
+                  ),
+                  SizedBox(height: 8.sp),
+                  Text('top_up_enter_amount'.i18n(), style: theme.textTheme.labelLarge),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12.sp),
+                    child: TextField(
+                      controller: _amountController,
+                      keyboardType: TextInputType.number,
+                      style: theme.textTheme.displaySmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: state.amount > (state.account?.balance ?? 0)
                             ? Theme.of(context).colorScheme.error
-                            : Theme.of(context).colorScheme.primary),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      prefixText: 'Ft     ',
-                      prefixStyle: Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+                            : Theme.of(context).colorScheme.primary,
+                      ),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        prefixText: 'Ft     ',
+                        prefixStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 20.sp),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [1000, 2000, 5000].map((amt) {
-                    bool isSelected = _amountController.text == amt.toString();
-                    return _AmountPresetButton(
-                      label: '$amt Ft',
-                      isSelected: isSelected,
-                      onTap: () => _amountController.text = amt.toString(),
-                    );
-                  }).toList(),
-                ),
-              ],
+                  SizedBox(height: 20.sp),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [1000, 2000, 5000].map((amt) {
+                      bool isSelected = _amountController.text == amt.toString();
+                      return _AmountPresetButton(
+                        label: '$amt Ft',
+                        isSelected: isSelected,
+                        onTap: () => _amountController.text = amt.toString(),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
 
-        SizedBox(height: 16.sp),
-        SizedBox(
-          width: double.infinity,
-          height: 56.sp,
-          child: FilledButton(
-            onPressed: state.selectedUser == null || state.amount > (state.account?.balance ?? 0)
-                ? null
-                : () {
-                    ref.watch(provider.notifier).transfer(amount: int.tryParse(_amountController.text) ?? 0).then((value) async {
-                      if (state.status.modelState.isSuccess && context.mounted) {
-                        showDialog(
+          SizedBox(height: 16.sp),
+          SizedBox(
+            width: double.infinity,
+            height: 56.sp,
+            child: FilledButton(
+              onPressed: state.selectedUser == null || state.amount > (state.account?.balance ?? 0)
+                  ? null
+                  : () {
+                      ref.watch(provider.notifier).transfer(amount: int.tryParse(_amountController.text) ?? 0).then((
+                        value,
+                      ) async {
+                        if (state.status.modelState.isSuccess && context.mounted) {
+                          showDialog(
                             context: context,
                             builder: (context) {
                               return BaseAlertDialog(
-                                  cancelVisible: false,
-                                  title: "transfer_success_title".i18n(),
-                                  content: Text("transfer_success_content".i18n()),
-                                  onTap: () => null);
-                            }).then((value) => Navigator.of(context).pop(true));
-                      }
-                    });
-                  },
-            child: Text(
-              'top_up_confirm_amount'.i18n(),
-              style: Theme.of(context).textTheme.bodyLarge,
+                                cancelVisible: false,
+                                title: "transfer_success_title".i18n(),
+                                content: Text("transfer_success_content".i18n()),
+                                onTap: () => null,
+                              );
+                            },
+                          ).then((value) => Navigator.of(context).pop(true));
+                        }
+                      });
+                    },
+              child: Text('top_up_confirm_amount'.i18n(), style: Theme.of(context).textTheme.bodyLarge),
             ),
           ),
-        ),
-        SizedBox(height: 16.sp),
-        Center(
-          child: Text(
-            'top_up_immediate'.i18n(),
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall,
+          SizedBox(height: 16.sp),
+          Center(
+            child: Text('top_up_immediate'.i18n(), textAlign: TextAlign.center, style: theme.textTheme.bodySmall),
           ),
-        ),
-      ],
-    ));
+        ],
+      ),
+    );
   }
 
   @override
@@ -192,8 +196,13 @@ class _PaymentTile extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _PaymentTile(
-      {required this.title, required this.subtitle, required this.icon, required this.isSelected, required this.onTap});
+  const _PaymentTile({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -205,19 +214,13 @@ class _PaymentTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12.sp),
-          border: Border.all(
-            color: isSelected ? theme.colorScheme.primary : Colors.transparent,
-            width: 2,
-          ),
+          border: Border.all(color: isSelected ? theme.colorScheme.primary : Colors.transparent, width: 2),
         ),
         child: Row(
           children: [
             Container(
               padding: EdgeInsets.all(8.sp),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface,
-                borderRadius: BorderRadius.circular(8.sp),
-              ),
+              decoration: BoxDecoration(color: theme.colorScheme.onSurface, borderRadius: BorderRadius.circular(8.sp)),
               child: Icon(icon, color: theme.colorScheme.surface),
             ),
             SizedBox(width: 16),

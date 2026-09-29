@@ -1,6 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
@@ -20,15 +20,22 @@ import '../../../app/framework/base_components/page_stru.dart';
 
 final transactionsApiProvider = Provider<TransactionApi>((ref) => TransactionApi());
 
-final transactionsRepoProvider =
-    Provider<TransactionRepository>((ref) => TransactionRepository(ref.read(transactionsApiProvider)));
+final transactionsRepoProvider = Provider<TransactionRepository>(
+  (ref) => TransactionRepository(ref.read(transactionsApiProvider)),
+);
 
-final transactionsDataProvider = StateNotifierProvider.autoDispose<TransactionsDataNotifier, TransactionsState>((ref) =>
-    TransactionsDataNotifier(ref.read(transactionsRepoProvider), ref.read(userDataProvider).user, ref.read(roundRepoProvider)));
+final transactionsDataProvider = StateNotifierProvider.autoDispose<TransactionsDataNotifier, TransactionsState>(
+  (ref) => TransactionsDataNotifier(
+    ref.read(transactionsRepoProvider),
+    ref.read(userDataProvider).user,
+    ref.read(roundRepoProvider),
+  ),
+);
 
-class TransactionsDataNotifier extends BaseDataNotifier<TransactionsState> implements ListApiProvider<TransactionsFilter> {
+class TransactionsDataNotifier extends BaseDataNotifier<TransactionsState>
+    implements ListApiProvider<TransactionsFilter> {
   TransactionsDataNotifier(this.transactionRepository, this.currentUser, this.roundRepository)
-      : super(const TransactionsState(listState: BaseListState(sort: ["createDateTime,desc"]))){
+    : super(const TransactionsState(listState: BaseListState(sort: ["createDateTime,desc"]))) {
     list();
   }
 
@@ -39,17 +46,26 @@ class TransactionsDataNotifier extends BaseDataNotifier<TransactionsState> imple
   @override
   Future<void> list({TransactionsFilter? filter, int? page, int? size, List<String>? sort}) async {
     await executeApiCall<PaginatedResponse<TransactionModel>>(
-        () => transactionRepository.getTransactions(
-            filter: filter ?? state.filter,
-            pageStru: PageStru(
-                page: page ?? state.listState.number,
-                size: size ?? state.listState.size,
-                sort: sort ?? state.listState.sort)), background: true, onSuccess: (data) async {
-      state = state.copyWith(
+      () => transactionRepository.getTransactions(
+        filter: filter ?? state.filter,
+        pageStru: PageStru(
+          page: page ?? state.listState.number,
+          size: size ?? state.listState.size,
+          sort: sort ?? state.listState.sort,
+        ),
+      ),
+      background: true,
+      onSuccess: (data) async {
+        state = state.copyWith(
           transactions: page == 0 ? data.content : [...state.transactions, ...data.content],
-          listState: state.listState
-              .copyWith(totalElements: data.page.totalElements, totalPages: data.page.totalPages, number: data.page.number));
-    });
+          listState: state.listState.copyWith(
+            totalElements: data.page.totalElements,
+            totalPages: data.page.totalPages,
+            number: data.page.number,
+          ),
+        );
+      },
+    );
   }
 
   Future<void> deleteTransaction(num id, int index) async {
@@ -61,7 +77,6 @@ class TransactionsDataNotifier extends BaseDataNotifier<TransactionsState> imple
       state = state.copyWith(transactions: items);
     });
   }
-
 
   @override
   TransactionsState copyWithState(BaseState status) {

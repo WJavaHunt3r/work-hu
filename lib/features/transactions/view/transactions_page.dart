@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/providers/localeProvider.dart';
-import 'package:work_hu/app/widgets/base_filter_chip.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
 import 'package:work_hu/features/transactions/data/state/transactions_state.dart';
@@ -35,11 +34,7 @@ class TransactionPageState extends BaseListPageState<TransactionsPage, Transacti
       onTap: () {
         context.push("/admin/transactions/${item.id}").then((value) => list());
       },
-      leading: Image.asset(
-        setLeadingIcon(item),
-        fit: BoxFit.fitWidth,
-        width: 15.sp,
-      ),
+      leading: Image.asset(setLeadingIcon(item), fit: BoxFit.fitWidth, width: 15.sp),
       title: Text(item.name),
       subtitle: Text(Utils.dateFormating(item.createDateTime, ref.read(localeProvider).value?.countryCode)),
       trailing: Text(item.transactionCount.toString()),

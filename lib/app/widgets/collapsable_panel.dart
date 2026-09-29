@@ -12,12 +12,13 @@ class CollapsablePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseContainer(
       padding: EdgeInsets.all(8.sp),
-        child: ExpansionPanelList(
-          materialGapSize: 0.sp,
-          expansionCallback: expansionCallback,
-          elevation: 0,
-          dividerColor: Colors.white,
-          children: panels,
-        ));
+      child: ExpansionPanelList(
+        materialGapSize: 0.sp,
+        expansionCallback: expansionCallback,
+        elevation: 0,
+        dividerColor: Colors.white,
+        children: panels,
+      ),
+    );
   }
 }

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/locator.dart';
@@ -14,8 +13,10 @@ import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
 import 'package:work_hu/features/bufe_transactions/data/state/bufe_transactions_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 
-final bufeTransactionsDataProvider = StateNotifierProvider.autoDispose<BufeTransactionsDataNotifier, BufeTransactionsState>(
-    (ref) => BufeTransactionsDataNotifier(ref.watch(bufeRepoProvider)));
+final bufeTransactionsDataProvider =
+    StateNotifierProvider.autoDispose<BufeTransactionsDataNotifier, BufeTransactionsState>(
+      (ref) => BufeTransactionsDataNotifier(ref.watch(bufeRepoProvider)),
+    );
 
 class BufeTransactionsDataNotifier extends BaseDataNotifier<BufeTransactionsState> implements ListApiProvider<num> {
   BufeTransactionsDataNotifier(this._bufeRepository) : super(const BufeTransactionsState()) {
@@ -29,13 +30,24 @@ class BufeTransactionsDataNotifier extends BaseDataNotifier<BufeTransactionsStat
 
   @override
   Future<void> list({num? filter, int? page, int? size, List<String>? sort}) async {
-    await executeApiCall<Order?>(() => _bufeRepository.getOrders(userId: filter ?? 0, page: page ?? state.listStatus.number ,
-        limit: size ?? state.listStatus.size), background: true, onSuccess: (data) async {
-      state = state.copyWith(
+    await executeApiCall<Order?>(
+      () => _bufeRepository.getOrders(
+        userId: filter ?? 0,
+        page: page ?? state.listStatus.number,
+        limit: size ?? state.listStatus.size,
+      ),
+      background: true,
+      onSuccess: (data) async {
+        state = state.copyWith(
           orders: data?.items ?? [],
           listStatus: state.listStatus.copyWith(
-              totalElements: data?.total.toInt() ?? 0, size: data?.limit.toInt() ?? 0, number: data?.offset.toInt() ?? 0));
-    });
+            totalElements: data?.total.toInt() ?? 0,
+            size: data?.limit.toInt() ?? 0,
+            number: data?.offset.toInt() ?? 0,
+          ),
+        );
+      },
+    );
   }
 
   @override

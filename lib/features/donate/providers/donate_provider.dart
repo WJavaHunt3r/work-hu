@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/payment_goal.dart';
@@ -26,15 +26,18 @@ final donateApiProvider = Provider<DonateApi>((ref) => DonateApi());
 
 final donateRepoProvider = Provider<DonateRepository>((ref) => DonateRepository(ref.read(donateApiProvider)));
 
-final donateDataProvider = StateNotifierProvider.autoDispose<DonateDataNotifier, DonateState>((ref) => DonateDataNotifier(
+final donateDataProvider = StateNotifierProvider.autoDispose<DonateDataNotifier, DonateState>(
+  (ref) => DonateDataNotifier(
     ref.read(donateRepoProvider),
     ref.read(donationRepoProvider),
     ref.read(paymentRepoProvider),
-    ref.read(userDataProvider).user));
+    ref.read(userDataProvider).user,
+  ),
+);
 
 class DonateDataNotifier extends BaseDataNotifier<DonateState> {
   DonateDataNotifier(this.donateRepository, this.donationRepository, this.paymentRepository, this.currentUser)
-      : super(const DonateState());
+    : super(const DonateState());
 
   final DonateRepository donateRepository;
   final DonationRepository donationRepository;
@@ -42,40 +45,51 @@ class DonateDataNotifier extends BaseDataNotifier<DonateState> {
   final UserModel? currentUser;
 
   Future<void> getDonation(num id) async {
-    executeApiCall<DonationModel>(() => donationRepository.getDonation(id), onSuccess: (data) async {
-      state = state.copyWith(donation: data);
-    });
+    executeApiCall<DonationModel>(
+      () => donationRepository.getDonation(id),
+      onSuccess: (data) async {
+        state = state.copyWith(donation: data);
+      },
+    );
   }
 
   Future<void> createCheckout(int amount) async {
     var reference = "donation_${state.donation!.id!}_${UniqueKey().toString().replaceAll("#", "")}";
     var response = await donateRepository.createCheckout(
-        amount: amount,
-        checkoutReference: reference,
-        description: state.donation!.description!,
-        redirectUrl: "donate/${state.donation!.id}/success/$reference");
+      amount: amount,
+      checkoutReference: reference,
+      description: state.donation!.description!,
+      redirectUrl: "donate/${state.donation!.id}/success/$reference",
+    );
 
     var payment = PaymentsModel(
-        paymentGoal: PaymentGoal.DONATION,
-        dateTime: DateTime.now(),
-        description: response.description,
-        amount: response.amount,
-        checkoutReference: response.checkout_reference,
-        checkoutId: response.id,
-        status: response.status,
-        donation: state.donation);
+      paymentGoal: PaymentGoal.DONATION,
+      dateTime: DateTime.now(),
+      description: response.description,
+      amount: response.amount,
+      checkoutReference: response.checkout_reference,
+      checkoutId: response.id,
+      status: response.status,
+      donation: state.donation,
+    );
 
     var paymentResponse = await paymentRepository.postPayment(payment);
 
-    var json = {"checkoutId": response.id, "description": state.donation!.description, "locale": "hu-HU", "amount": state.amount};
+    var json = {
+      "checkoutId": response.id,
+      "description": state.donation!.description,
+      "locale": "hu-HU",
+      "amount": state.amount,
+    };
 
     String base64String = base64Encode(utf8.encode(jsonEncode(json)));
     state = state.copyWith(
-        hosted_url: response.hosted_checkout_url,
-        base64: base64String,
-        payment: paymentResponse,
-        checkoutId: response.id,
-        status: const BaseState(modelState: ModelState.success));
+      hosted_url: response.hosted_checkout_url,
+      base64: base64String,
+      payment: paymentResponse,
+      checkoutId: response.id,
+      status: const BaseState(modelState: ModelState.success),
+    );
   }
 
   Future<void> savePayment() async {

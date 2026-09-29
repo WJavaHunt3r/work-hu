@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
@@ -16,14 +15,16 @@ import 'package:work_hu/features/transaction_items/data/repository/transaction_i
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
 import 'package:work_hu/features/user_transactions/data/model/user_transactions_state.dart';
 
-final userTransactionsDataProvider = StateNotifierProvider.autoDispose<UserTransactionsDataNotifier, UserTransactionsState>(
-    (ref) => UserTransactionsDataNotifier(ref.read(transactionItemsRepoProvider), ref.read(activityItemsRepoProvider)));
+final userTransactionsDataProvider =
+    StateNotifierProvider.autoDispose<UserTransactionsDataNotifier, UserTransactionsState>(
+      (ref) =>
+          UserTransactionsDataNotifier(ref.read(transactionItemsRepoProvider), ref.read(activityItemsRepoProvider)),
+    );
 
-class UserTransactionsDataNotifier extends BaseDataNotifier<UserTransactionsState> implements ListApiProvider<DateTime> {
-  UserTransactionsDataNotifier(
-    this.transactionItemsRepository,
-    this.activityItemsRepository,
-  ) : super(const UserTransactionsState());
+class UserTransactionsDataNotifier extends BaseDataNotifier<UserTransactionsState>
+    implements ListApiProvider<DateTime> {
+  UserTransactionsDataNotifier(this.transactionItemsRepository, this.activityItemsRepository)
+    : super(const UserTransactionsState());
 
   final TransactionItemsRepository transactionItemsRepository;
   final UserModel currentUser = locator<UserProvider>().user!;
@@ -41,18 +42,24 @@ class UserTransactionsDataNotifier extends BaseDataNotifier<UserTransactionsStat
   Future<void> list({DateTime? filter, int? page, int? size, List<String>? sort}) async {
     if (state.userId != null) {
       await executeApiCall<PaginatedResponse<TransactionItemModel>>(
-          () => transactionItemsRepository.getTransactionItems(
-              filter: TransactionItemsFilter(
-                userId: state.userId,
-              ),
-              page: page ?? state.listState.number,
-              size: size ?? state.listState.size,
-              sort: ["transactionDate,desc"]), background: true, onSuccess: ((data) async {
-        state = state.copyWith(
+        () => transactionItemsRepository.getTransactionItems(
+          filter: TransactionItemsFilter(userId: state.userId),
+          page: page ?? state.listState.number,
+          size: size ?? state.listState.size,
+          sort: ["transactionDate,desc"],
+        ),
+        background: true,
+        onSuccess: ((data) async {
+          state = state.copyWith(
             transactionItems: data.page.number == 0 ? data.content : [...state.transactionItems, ...data.content],
-            listState: state.listState
-                .copyWith(totalElements: data.page.totalElements, totalPages: data.page.totalPages, number: data.page.number));
-      }));
+            listState: state.listState.copyWith(
+              totalElements: data.page.totalElements,
+              totalPages: data.page.totalPages,
+              number: data.page.number,
+            ),
+          );
+        }),
+      );
 
       await activityItemsRepository
           .getActivityItems(registeredInApp: false, userId: state.userId)

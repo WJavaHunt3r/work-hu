@@ -15,9 +15,7 @@ Widget buildGoogleSignInButton({
       onPressed: onPressed,
       icon: const Icon(Icons.g_mobiledata, size: 32),
       label: Text((isLogin ? 'login_google_sign_in' : 'login_google_sign_up').i18n()),
-      style: OutlinedButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-      ),
+      style: OutlinedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
     ),
   );
 }

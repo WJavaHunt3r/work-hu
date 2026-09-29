@@ -1,12 +1,12 @@
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
@@ -24,9 +24,8 @@ import 'package:work_hu/features/home/providers/home_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
 class HomePage extends BasePage {
-  HomePage({
-    super.key,
-  }) : super(hasAppBar: false, title: 'home_brand_name', leading: Image.asset('/assets/icons/dukapp_icon_round.png'));
+  HomePage({super.key})
+    : super(hasAppBar: false, title: 'home_brand_name', leading: Image.asset('/assets/icons/dukapp_icon_round.png'));
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -48,24 +47,36 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
         Row(
           children: [
             Expanded(
-                child: _buildActionCard(theme,
-                    title: 'home_send_money'.i18n(), subtitle: 'home_send_subtitle'.i18n(), icon: Icons.send, onTap: () {
-              context.push("/balance/transfer").then((e) {
-                if (e != null && e == true) {
-                  ref.read(provider.notifier).getAccount();
-                }
-              });
-            }, color: Theme.of(context).colorScheme.primary, cardColor: Theme.of(context).colorScheme.primaryContainer)),
+              child: _buildActionCard(
+                theme,
+                title: 'home_send_money'.i18n(),
+                subtitle: 'home_send_subtitle'.i18n(),
+                icon: Icons.send,
+                onTap: () {
+                  context.push("/balance/transfer").then((e) {
+                    if (e != null && e == true) {
+                      ref.read(provider.notifier).getAccount();
+                    }
+                  });
+                },
+                color: Theme.of(context).colorScheme.primary,
+                cardColor: Theme.of(context).colorScheme.primaryContainer,
+              ),
+            ),
             SizedBox(width: 24.sp),
             Expanded(
-                child: _buildActionCard(theme, onTap: () {
-              context.push("/balance/topUps");
-            },
-                    title: 'home_bills'.i18n(),
-                    subtitle: 'home_bills_subtitle'.i18n(),
-                    icon: Icons.receipt_long,
-                    color: Theme.of(context).colorScheme.tertiary,
-                    cardColor: Theme.of(context).colorScheme.tertiaryContainer)),
+              child: _buildActionCard(
+                theme,
+                onTap: () {
+                  context.push("/balance/topUps");
+                },
+                title: 'home_bills'.i18n(),
+                subtitle: 'home_bills_subtitle'.i18n(),
+                icon: Icons.receipt_long,
+                color: Theme.of(context).colorScheme.tertiary,
+                cardColor: Theme.of(context).colorScheme.tertiaryContainer,
+              ),
+            ),
           ],
         ),
         SizedBox(height: 16.sp),
@@ -95,10 +106,15 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
     return BaseContainer(
       child: Column(
         children: [
-          Text('home_balance_title'.i18n(), style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.outline)),
+          Text(
+            'home_balance_title'.i18n(),
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.outline),
+          ),
           SizedBox(height: 12.sp),
-          Text(Utils.creditFormatting(state.account?.balance ?? 0),
-              style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            Utils.creditFormatting(state.account?.balance ?? 0),
+            style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
           SizedBox(height: 24.sp),
           Row(
             children: [
@@ -126,19 +142,21 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildActionCard(ThemeData theme,
-      {required String title,
-      required String subtitle,
-      required IconData icon,
-      required Color color,
-      required Color cardColor,
-      Function? onTap}) {
+  Widget _buildActionCard(
+    ThemeData theme, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required Color cardColor,
+    Function? onTap,
+  }) {
     return GestureDetector(
       onTap: () {
         onTap?.call();
@@ -146,18 +164,18 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
       child: Container(
         padding: EdgeInsets.all(20.sp),
         height: 180.sp,
-        decoration:
-            BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(24.sp), border: BoxBorder.all(color: color)),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(24.sp),
+          border: BoxBorder.all(color: color),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               padding: EdgeInsets.all(10.sp),
               decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-              child: Icon(
-                icon,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
+              child: Icon(icon, color: Theme.of(context).colorScheme.onPrimary),
             ),
             const Spacer(),
             Text(title, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
@@ -173,12 +191,16 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('home_recent_transactions'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          'home_recent_transactions'.i18n(),
+          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        ),
         TextButton(
-            onPressed: () {
-              context.push("/balance/transactions");
-            },
-            child: Text('home_see_all'.i18n(), style: TextStyle(color: theme.colorScheme.primary))),
+          onPressed: () {
+            context.push("/balance/transactions");
+          },
+          child: Text('home_see_all'.i18n(), style: TextStyle(color: theme.colorScheme.primary)),
+        ),
       ],
     );
   }
@@ -191,21 +213,31 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
             padding: EdgeInsets.zero,
             child: Column(
               children: state.orders
-                  .map((e) => _transactionItem(
+                  .map(
+                    (e) => _transactionItem(
                       theme,
                       e.locationName,
                       e.date,
                       e.total,
                       e.locationName == "Büfé" ? Icons.coffee_outlined : Icons.shopping_bag_outlined,
                       state.orders.indexOf(e),
-                      e.orderItems))
+                      e.orderItems,
+                    ),
+                  )
                   .toList(),
             ),
           );
   }
 
   Widget _transactionItem(
-      ThemeData theme, String name, DateTime date, num amount, IconData icon, int index, List<OrderItem> orderItems) {
+    ThemeData theme,
+    String name,
+    DateTime date,
+    num amount,
+    IconData icon,
+    int index,
+    List<OrderItem> orderItems,
+  ) {
     final locale = ref.watch(localeProvider).value?.toString() ?? 'en_US';
 
     // 2. Use the locale in the DateFormat constructor
@@ -214,15 +246,18 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
       leading: IconBox(icon: icon),
       title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(formattedDate, style: theme.textTheme.bodySmall),
-      trailing: Text("- ${Utils.creditFormatting(amount)}",
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+      trailing: Text(
+        "- ${Utils.creditFormatting(amount)}",
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+      ),
       isLast: index == state.orders.length - 1,
       index: index,
       onTap: () => showDialog(
-          context: context,
-          builder: (context) {
-            return BufeTransactionItemsPage(items: orderItems);
-          }),
+        context: context,
+        builder: (context) {
+          return BufeTransactionItemsPage(items: orderItems);
+        },
+      ),
     );
   }
 
@@ -234,26 +269,27 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
 
   _showQrCode(BuildContext context) {
     showDialog(
-        context: context,
-        barrierColor: Theme.of(context).colorScheme.surfaceContainer.withAlpha(200),
-        builder: (buildContext) {
-          return BaseAlertDialog(
-            title: "home_barcode".i18n(),
-            content: BaseContainer(
-              color: Colors.white,
-              height: 200.sp,
-              child: BarcodeWidget(
-                width: double.infinity,
-                barcode: Barcode.code128(),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.black),
-                data: state.account?.customer_code ?? "",
-              ),
+      context: context,
+      barrierColor: Theme.of(context).colorScheme.surfaceContainer.withAlpha(200),
+      builder: (buildContext) {
+        return BaseAlertDialog(
+          title: "home_barcode".i18n(),
+          content: BaseContainer(
+            color: Colors.white,
+            height: 200.sp,
+            child: BarcodeWidget(
+              width: double.infinity,
+              barcode: Barcode.code128(),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.black),
+              data: state.account?.customer_code ?? "",
             ),
-            cancelVisible: false,
-            confirmVisible: false,
-            onTap: () {},
-          );
-        });
+          ),
+          cancelVisible: false,
+          confirmVisible: false,
+          onTap: () {},
+        );
+      },
+    );
   }
 
   Widget _buildWelcomeTitle(ThemeData theme) {
@@ -263,10 +299,12 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('home_welcome_title'.i18n([locator<UserProvider>().user!.firstname]),
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            'home_welcome_title'.i18n([locator<UserProvider>().user!.firstname]),
+            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
           SizedBox(height: 8.sp),
-          Text('home_welcome_subtitle'.i18n(), style: theme.textTheme.bodyMedium)
+          Text('home_welcome_subtitle'.i18n(), style: theme.textTheme.bodyMedium),
         ],
       ),
     );
@@ -279,8 +317,8 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
         Text('home_donations'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
         SizedBox(height: 16.sp),
         Column(
-            children: state.donations.map((e) {
-          return BaseContainer(
+          children: state.donations.map((e) {
+            return BaseContainer(
               width: double.infinity,
               height: 150.sp,
               child: Column(
@@ -288,16 +326,20 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                      ref.watch(localeProvider).value == const Locale("hu", "HU")
-                          ? e.description.toString()
-                          : e.descriptionNO.toString(),
-                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    ref.watch(localeProvider).value == const Locale("hu", "HU")
+                        ? e.description.toString()
+                        : e.descriptionNO.toString(),
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  ),
                   Text(
-                      "${DateFormat('MMM dd, yyyy • HH:mm').format(e.startDateTime!)} - ${DateFormat('MMM dd, yyyy • HH:mm').format(e.endDateTime!)}"),
-                  FilledButton(onPressed: () => context.push("/donate/${e.id}"), child: Text("home_donate".i18n()))
+                    "${DateFormat('MMM dd, yyyy • HH:mm').format(e.startDateTime!)} - ${DateFormat('MMM dd, yyyy • HH:mm').format(e.endDateTime!)}",
+                  ),
+                  FilledButton(onPressed: () => context.push("/donate/${e.id}"), child: Text("home_donate".i18n())),
                 ],
-              ));
-        }).toList()),
+              ),
+            );
+          }).toList(),
+        ),
         SizedBox(height: 16.sp),
       ],
     );
@@ -305,26 +347,35 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
 
   _buildFamilyAccounts(ThemeData theme) {
     var items = state.familiyAccounts;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('home_family_members'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-      SizedBox(height: 16.sp),
-      BaseListView(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('home_family_members'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        SizedBox(height: 16.sp),
+        BaseListView(
           hasBottomPadding: false,
           physics: const NeverScrollableScrollPhysics(),
           children: items
-              .map((e) => BaseListTile(
+              .map(
+                (e) => BaseListTile(
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(e.full_name),
-                      Text(Utils.creditFormatting(e.balance),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold))
+                      Text(
+                        Utils.creditFormatting(e.balance),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                   isLast: items.indexOf(e) == items.length - 1,
-                  index: items.indexOf(e)))
-              .toList())
-    ]);
+                  index: items.indexOf(e),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
   }
 
   @override
@@ -350,10 +401,12 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
           child: PageView(
             onPageChanged: (index) => setState(() => _saleImageIndex = index),
             children: images
-                .map((i) => ClipRRect(
-                      borderRadius: BorderRadius.circular(24.sp),
-                      child: Image.network(i.imageUrl, width: double.infinity, fit: BoxFit.cover),
-                    ))
+                .map(
+                  (i) => ClipRRect(
+                    borderRadius: BorderRadius.circular(24.sp),
+                    child: Image.network(i.imageUrl, width: double.infinity, fit: BoxFit.cover),
+                  ),
+                )
                 .toList(),
           ),
         ),
@@ -362,17 +415,18 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
-                images.length,
-                (index) => AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      margin: EdgeInsets.symmetric(horizontal: 3.sp),
-                      width: index == _saleImageIndex ? 16.sp : 6.sp,
-                      height: 6.sp,
-                      decoration: BoxDecoration(
-                        color: index == _saleImageIndex ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
-                        borderRadius: BorderRadius.circular(3.sp),
-                      ),
-                    )),
+              images.length,
+              (index) => AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: EdgeInsets.symmetric(horizontal: 3.sp),
+                width: index == _saleImageIndex ? 16.sp : 6.sp,
+                height: 6.sp,
+                decoration: BoxDecoration(
+                  color: index == _saleImageIndex ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(3.sp),
+                ),
+              ),
+            ),
           ),
         ],
         SizedBox(height: 24.sp),

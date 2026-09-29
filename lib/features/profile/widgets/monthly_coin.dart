@@ -36,7 +36,7 @@ class _MonthlyCoinsState extends State<MonthlyCoins> with TickerProviderStateMix
           coin(month: "Szept", points: widget.roundPoints[1]),
           coin(month: "Okt", points: widget.roundPoints[2]),
           coin(month: "Nov", points: widget.roundPoints[3]),
-          coin(month: "Dec", points: widget.roundPoints[4])
+          coin(month: "Dec", points: widget.roundPoints[4]),
         ],
       ),
     );
@@ -44,35 +44,30 @@ class _MonthlyCoinsState extends State<MonthlyCoins> with TickerProviderStateMix
 
   Widget coin({required String month, required num points}) {
     return Expanded(
-        child: SizedBox(
-      height: 110.sp,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 4.sp),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              month,
-              overflow: TextOverflow.ellipsis,
-            ),
-            points == 0
-                ? const Image(
-                    image: AssetImage(
-                      "assets/img/PACE_Coin_Blank_Static.png",
+      child: SizedBox(
+        height: 110.sp,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4.sp),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(month, overflow: TextOverflow.ellipsis),
+              points == 0
+                  ? const Image(image: AssetImage("assets/img/PACE_Coin_Blank_Static.png"), fit: BoxFit.fitWidth)
+                  : Gif(
+                      controller: _controller,
+                      autostart: Autostart.loop,
+                      onFetchCompleted: () {
+                        // _controller.reset();
+                        _controller.forward();
+                      },
+                      image: AssetImage("assets/img/${"PACE_Coin_Buk_${points}_Spin_540px.gif"}"),
+                      fit: BoxFit.fitWidth,
                     ),
-                    fit: BoxFit.fitWidth)
-                : Gif(
-                    controller: _controller,
-                    autostart: Autostart.loop,
-                    onFetchCompleted: () {
-                      // _controller.reset();
-                      _controller.forward();
-                    },
-                    image: AssetImage("assets/img/${"PACE_Coin_Buk_${points}_Spin_540px.gif"}"),
-                    fit: BoxFit.fitWidth),
-          ],
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }

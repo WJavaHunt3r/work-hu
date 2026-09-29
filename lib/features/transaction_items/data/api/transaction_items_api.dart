@@ -7,21 +7,28 @@ class TransactionItemsApi {
 
   TransactionItemsApi();
 
-  Future<dynamic> getTransactionItems(
-      {TransactionItemsFilter? filter, required int page, required int size, required List<String> sort}) async {
+  Future<dynamic> getTransactionItems({
+    TransactionItemsFilter? filter,
+    required int page,
+    required int size,
+    required List<String> sort,
+  }) async {
     try {
-      final res = await _dioClient.dio.get("/transactionItem", queryParameters: {
-        "transactionId": filter?.transactionId,
-        "userId": filter?.userId,
-        "roundId": filter?.roundId,
-        "seasonYear": filter?.seasonYear,
-        "startDate": filter?.startDate,
-        "endDate": filter?.endDate,
-        "transactionType": filter?.transactionType,
-        "page": page,
-        "size": size,
-        "sort": sort
-      });
+      final res = await _dioClient.dio.get(
+        "/transactionItem",
+        queryParameters: {
+          "transactionId": filter?.transactionId,
+          "userId": filter?.userId,
+          "roundId": filter?.roundId,
+          "seasonYear": filter?.seasonYear,
+          "startDate": filter?.startDate,
+          "endDate": filter?.endDate,
+          "transactionType": filter?.transactionType,
+          "page": page,
+          "size": size,
+          "sort": sort,
+        },
+      );
       return res.data;
     } catch (e) {
       rethrow;
@@ -39,7 +46,10 @@ class TransactionItemsApi {
 
   Future<dynamic> deleteTransactionItem(num transactionItemId, num userId) async {
     try {
-      final res = await _dioClient.dio.delete("/transactionItem/$transactionItemId", queryParameters: {"userId": userId});
+      final res = await _dioClient.dio.delete(
+        "/transactionItem/$transactionItemId",
+        queryParameters: {"userId": userId},
+      );
       return res.data;
     } catch (e) {
       rethrow;

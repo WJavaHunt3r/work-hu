@@ -10,12 +10,10 @@ class UserCampApi {
 
   Future<List<dynamic>> getUserCamps(num? seasonYear, num? userId, num? campId, bool? participates) async {
     try {
-      final res = await _dioClient.dio.get("/userCamp", queryParameters: {
-        "seasonYear": seasonYear,
-        "userId": userId,
-        "campId": campId,
-        "participates": participates
-      });
+      final res = await _dioClient.dio.get(
+        "/userCamp",
+        queryParameters: {"seasonYear": seasonYear, "userId": userId, "campId": campId, "participates": participates},
+      );
       return res.data;
     } catch (e) {
       rethrow;

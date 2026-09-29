@@ -13,7 +13,11 @@ class MentorMenteeApi extends BaseApi {
 
   Future<dynamic> postMentorMentee(MentorMenteeModel menteesModel, num? userId) async {
     try {
-      final res = await dioClient.dio.post("/mentorMentee", data: menteesModel.toJson(), queryParameters: {'userId': userId});
+      final res = await dioClient.dio.post(
+        "/mentorMentee",
+        data: menteesModel.toJson(),
+        queryParameters: {'userId': userId},
+      );
       return res.data;
     } catch (e) {
       rethrow;

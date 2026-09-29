@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
@@ -61,28 +59,33 @@ class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityStat
       current: item,
       onIconPressed: () {
         showDialog(
-            context: context,
-            builder: (context) => BaseConfirmDialog(
-                onConfirm: () {},
-                title: !item.registeredInApp
-                    ? "activities_register_confirm_title".i18n()
-                    : !item.registeredInMyShare
-                        ? "activities_confirm_register_in_myshare_title".i18n()
-                        : item.registeredInMyShare && item.registeredInApp && !item.registeredInTeams
-                            ? "activities_confirm_register_in_teams_title".i18n()
-                            : "base_confirm_title".i18n(),
-                content: !item.registeredInApp
-                    ? "activities_confirm_activity_register_question".i18n()
-                    : !item.registeredInMyShare
-                        ? "activities_confirm_register_in_myshare_question".i18n()
-                        : item.registeredInMyShare && item.registeredInApp && !item.registeredInTeams
-                            ? "activities_confirm_register_in_teams_question".i18n()
-                            : "base_confirm_question".i18n())).then((r) {
+          context: context,
+          builder: (context) => BaseConfirmDialog(
+            onConfirm: () {},
+            title: !item.registeredInApp
+                ? "activities_register_confirm_title".i18n()
+                : !item.registeredInMyShare
+                ? "activities_confirm_register_in_myshare_title".i18n()
+                : item.registeredInMyShare && item.registeredInApp && !item.registeredInTeams
+                ? "activities_confirm_register_in_teams_title".i18n()
+                : "base_confirm_title".i18n(),
+            content: !item.registeredInApp
+                ? "activities_confirm_activity_register_question".i18n()
+                : !item.registeredInMyShare
+                ? "activities_confirm_register_in_myshare_question".i18n()
+                : item.registeredInMyShare && item.registeredInApp && !item.registeredInTeams
+                ? "activities_confirm_register_in_teams_question".i18n()
+                : "base_confirm_question".i18n(),
+          ),
+        ).then((r) {
           if (r != null && r == true) {
             if (!item.registeredInApp) {
               ref.read(activityDataProvider.notifier).registerActivity(item.id!).then((r) => list());
             } else if (!item.registeredInMyShare && item.transactionType != TransactionType.POINT) {
-              ref.read(activityDataProvider.notifier).putActivity(item.copyWith(registeredInMyShare: true)).then((r) => list());
+              ref
+                  .read(activityDataProvider.notifier)
+                  .putActivity(item.copyWith(registeredInMyShare: true))
+                  .then((r) => list());
             } else if (item.registeredInMyShare && item.registeredInApp && !item.registeredInTeams) {
               ref.read(activityDataProvider.notifier).registerActivityInTeams(item.id!).then((r) => list());
             }
@@ -104,9 +107,12 @@ class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityStat
         SizedBox(height: 16.sp),
         if (notRegistered.isNotEmpty) _buildNotRegistered(theme, buildListTiles(notRegistered.toList())),
         if (registered.isNotEmpty)
-          Text('activities_registered'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            'activities_registered'.i18n(),
+            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
         SizedBox(height: 16.sp),
-        ...buildListTiles(registered.toList())
+        ...buildListTiles(registered.toList()),
       ],
     );
   }
@@ -121,7 +127,10 @@ class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityStat
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('activities_not_registered'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          'activities_not_registered'.i18n(),
+          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        ),
         SizedBox(height: 16.sp),
         ...notRegistered,
       ],
@@ -137,15 +146,16 @@ class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityStat
   List<BaseFilterChip> buildFilterLayout(BuildContext context, WidgetRef ref) {
     return [
       DialogFilterChip<DateTime?>(
-          label: "activity_reference_date",
-          showDelete: false,
-          labelValue: (date) =>
-              "${date?.year ?? state.filter.referenceDate?.year} - ${Utils.getMonthFromDate(date ?? state.filter.referenceDate!, context)}",
-          onDeleted: () => list(filter: state.filter.copyWith(referenceDate: null)),
-          initialValue: state.filter.referenceDate,
-          onItemSelected: (e) => list(filter: state.filter.copyWith(referenceDate: e)),
-          children: () async => dates,
-          title: (date) => date == null ? Text("") : Text("${date.year} - ${Utils.getMonthFromDate(date, context)}"))
+        label: "activity_reference_date",
+        showDelete: false,
+        labelValue: (date) =>
+            "${date?.year ?? state.filter.referenceDate?.year} - ${Utils.getMonthFromDate(date ?? state.filter.referenceDate!, context)}",
+        onDeleted: () => list(filter: state.filter.copyWith(referenceDate: null)),
+        initialValue: state.filter.referenceDate,
+        onItemSelected: (e) => list(filter: state.filter.copyWith(referenceDate: e)),
+        children: () async => dates,
+        title: (date) => date == null ? Text("") : Text("${date.year} - ${Utils.getMonthFromDate(date, context)}"),
+      ),
     ];
   }
 
@@ -163,8 +173,10 @@ class ActivitiesPageState extends BaseListPageState<ActivitiesPage, ActivityStat
   @override
   Widget? buildFloatingActionButton(BuildContext context, WidgetRef ref) {
     return FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () =>
-            context.push("/profile/activities/createActivity").then((value) => value != null && value == true ? list() : null));
+      child: const Icon(Icons.add),
+      onPressed: () => context
+          .push("/profile/activities/createActivity")
+          .then((value) => value != null && value == true ? list() : null),
+    );
   }
 }

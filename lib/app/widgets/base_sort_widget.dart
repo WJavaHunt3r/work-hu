@@ -49,25 +49,25 @@ class BaseSortWidgetState extends State<BaseSortWidget> {
             offset: const Offset(0, 50),
             itemBuilder: (context) {
               return sortParameters
-                  .map((e) => PopupMenuItem<SortItem>(
-                        value: e,
-                        child: Row(
-                          children: [
-                            Text(
-                              "${e.label.i18n()} ${e.descending ? "base_filter_desc".i18n() : "base_filter_asc".i18n()}",
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                            const Spacer(),
-                            if (e.label == selected?.label && e.descending == selected?.descending)
-                              const Icon(
-                                Icons.check,
-                                color: Colors.white,
-                              )
-                          ],
-                        ),
-                      ))
+                  .map(
+                    (e) => PopupMenuItem<SortItem>(
+                      value: e,
+                      child: Row(
+                        children: [
+                          Text(
+                            "${e.label.i18n()} ${e.descending ? "base_filter_desc".i18n() : "base_filter_asc".i18n()}",
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                          const Spacer(),
+                          if (e.label == selected?.label && e.descending == selected?.descending)
+                            const Icon(Icons.check, color: Colors.white),
+                        ],
+                      ),
+                    ),
+                  )
                   .toList();
-            });
+            },
+          );
   }
 }
 

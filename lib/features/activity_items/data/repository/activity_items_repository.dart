@@ -9,25 +9,27 @@ class ActivityItemsRepository {
 
   ActivityItemsRepository(this._activityItemsApi);
 
-  Future<PaginatedResponse<ActivityItemsModel>> getActivityItems(
-      {num? activityId,
-      num? userId,
-      num? roundId,
-      bool? registeredInApp,
-      String? searchText,
-      int? size,
-      int? page,
-      SortBuilder? sort}) async {
+  Future<PaginatedResponse<ActivityItemsModel>> getActivityItems({
+    num? activityId,
+    num? userId,
+    num? roundId,
+    bool? registeredInApp,
+    String? searchText,
+    int? size,
+    int? page,
+    SortBuilder? sort,
+  }) async {
     try {
       final res = await _activityItemsApi.getActivityItems(
-          activityId: activityId,
-          userId: userId,
-          registeredInApp: registeredInApp,
-          roundId: roundId,
-          searchText: searchText,
-          size: size,
-          page: page,
-          sort: sort);
+        activityId: activityId,
+        userId: userId,
+        registeredInApp: registeredInApp,
+        roundId: roundId,
+        searchText: searchText,
+        size: size,
+        page: page,
+        sort: sort,
+      );
       final paginatedData = PaginatedResponse<ActivityItemsModel>.fromJson(
         res,
         (json) => ActivityItemsModel.fromJson(json as Map<String, dynamic>),

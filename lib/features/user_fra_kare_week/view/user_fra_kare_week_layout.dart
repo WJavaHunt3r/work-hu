@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -17,29 +16,27 @@ class UserFraKareWeekLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var streaks = ref.watch(userFraKareWeekDataProvider).streaks;
-    return Stack(children: [
-      Column(
-        children: [
-          Expanded(
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Expanded(
               child: LegacyBaseListView(
-            itemCount: streaks.length,
-            itemBuilder: (BuildContext context, int index) {
-              var item = streaks[index];
-              return SelectionRow(
-                fraKareWeek: item,
-                isLast: index == streaks.length - 1,
-                index: index,
-              );
-            },
-            children: const [],
-          )),
-          Row(
-            children: [
-              Expanded(
+                itemCount: streaks.length,
+                itemBuilder: (BuildContext context, int index) {
+                  var item = streaks[index];
+                  return SelectionRow(fraKareWeek: item, isLast: index == streaks.length - 1, index: index);
+                },
+                children: const [],
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
                   child: Padding(
-                padding: EdgeInsets.only(bottom: 8.sp, top: 4.sp),
-                child: TextButton(
-                    onPressed: () => showDialog(
+                    padding: EdgeInsets.only(bottom: 8.sp, top: 4.sp),
+                    child: TextButton(
+                      onPressed: () => showDialog(
                         barrierDismissible: false,
                         context: context,
                         builder: (BuildContext context) {
@@ -51,25 +48,29 @@ class UserFraKareWeekLayout extends ConsumerWidget {
                             },
                             content: Text("user_fra_fare_week_save_question".i18n(), textAlign: TextAlign.center),
                           );
-                        }),
-                    style: ButtonStyle(
-                      side: WidgetStateBorderSide.resolveWith(
-                        (states) => BorderSide(color: AppColors.primary, width: 2.sp),
+                        },
                       ),
-                      backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
+                      style: ButtonStyle(
+                        side: WidgetStateBorderSide.resolveWith(
+                          (states) => BorderSide(color: AppColors.primary, width: 2.sp),
+                        ),
+                        backgroundColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
+                      ),
+                      child: Text(
+                        "user_fra_fare_week_save".i18n(),
+                        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800),
+                      ),
                     ),
-                    child: Text("user_fra_fare_week_save".i18n(),
-                        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w800))),
-              ))
-            ],
-          )
-        ],
-      ),
-      ref.watch(userFraKareWeekDataProvider).modelState == ModelState.loading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : const SizedBox(),
-    ]);
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        ref.watch(userFraKareWeekDataProvider).modelState == ModelState.loading
+            ? const Center(child: CircularProgressIndicator())
+            : const SizedBox(),
+      ],
+    );
   }
 }

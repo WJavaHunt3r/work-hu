@@ -1,4 +1,3 @@
-
 enum TransactionType {
   HOURS("Fizetős"),
   CREDIT("Kredit"),

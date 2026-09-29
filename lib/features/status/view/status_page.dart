@@ -1,12 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
@@ -48,8 +48,10 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('status_local_status'.i18n(),
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  'status_local_status'.i18n(),
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 4.sp),
                   decoration: BoxDecoration(
@@ -58,7 +60,10 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
                   ),
                   child: Text(
                     'status_monthly_goal'.i18n([Utils.percentFormatting(state.userRoundHead.localMyShareGoal)]),
-                    style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.primary),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                    ),
                   ),
                 ),
               ],
@@ -68,21 +73,23 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
               children: [
                 Expanded(
                   child: _OnTrackStatus(
-                      title: "status_local_on_track_title".i18n(),
-                      data: "status_local_on_track_data".i18n([state.userRoundHead.onTrackCount.toString()]),
-                      subData: "status_local_on_track_subData".i18n([state.userRoundHead.goalCount.toString()]),
-                      icon: Icons.stacked_line_chart),
+                    title: "status_local_on_track_title".i18n(),
+                    data: "status_local_on_track_data".i18n([state.userRoundHead.onTrackCount.toString()]),
+                    subData: "status_local_on_track_subData".i18n([state.userRoundHead.goalCount.toString()]),
+                    icon: Icons.stacked_line_chart,
+                  ),
                 ),
                 SizedBox(width: 16.sp),
                 Expanded(
                   child: _OnTrackStatus(
-                      title: "status_local_required_title".i18n(),
-                      data: "status_local_required_data".i18n([state.userRoundHead.toOnTrackCount.toString()]),
-                      subData: "status_local_required_subData".i18n([state.userRoundHead.churchGoal.toString()]),
-                      icon: Icons.stars),
-                )
+                    title: "status_local_required_title".i18n(),
+                    data: "status_local_required_data".i18n([state.userRoundHead.toOnTrackCount.toString()]),
+                    subData: "status_local_required_subData".i18n([state.userRoundHead.churchGoal.toString()]),
+                    icon: Icons.stars,
+                  ),
+                ),
               ],
-            )
+            ),
           ],
         ),
         SizedBox(height: 16.sp),
@@ -105,8 +112,9 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("status_goal".i18n([Utils.creditFormatting(child.goal).toString()])),
-                          Text("status_monthly_goal"
-                              .i18n([Utils.percentFormatting(state.userRoundHead.localMyShareGoal)])),
+                          Text(
+                            "status_monthly_goal".i18n([Utils.percentFormatting(state.userRoundHead.localMyShareGoal)]),
+                          ),
                         ],
                       ),
                     ),
@@ -114,22 +122,21 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(Utils.creditFormatting(child.transactions),
-                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        Text(
+                          Utils.creditFormatting(child.transactions),
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
                         child.onTrack
                             ? Row(
                                 children: [
-                                  Icon(
-                                    Icons.done_outline,
-                                    size: 24.sp,
-                                  ),
-                                  const Text(
-                                    "On Track",
-                                  )
+                                  Icon(Icons.done_outline, size: 24.sp),
+                                  const Text("On Track"),
                                 ],
                               )
-                            : Text('status_to_onTrack'.i18n([Utils.creditFormatting(child.toOnTrack).toString()]),
-                                style: theme.textTheme.bodySmall),
+                            : Text(
+                                'status_to_onTrack'.i18n([Utils.creditFormatting(child.toOnTrack).toString()]),
+                                style: theme.textTheme.bodySmall,
+                              ),
                       ],
                     ),
                     SizedBox(height: 8.sp),
@@ -142,13 +149,15 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
                         isLast: false,
                         contentPadding: EdgeInsets.only(top: 12.sp),
                         index: 2,
-                        title: Text('status_recent_transactions'.i18n(),
-                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        title: Text(
+                          'status_recent_transactions'.i18n(),
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
                         onTap: () {
                           context.push('/status/transactions/${child.userId}');
                         },
                         trailing: Icon(Icons.arrow_forward_ios, size: 16.sp),
-                      )
+                      ),
                   ],
                 ),
               ),
@@ -218,23 +227,29 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('status_recent_transactions'.i18n(),
-                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                    'status_recent_transactions'.i18n(),
+                    style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ),
                   TextButton(
-                      onPressed: () {
-                        context.push('/status/transactions/${locator<UserProvider>().user!.id}');
-                      },
-                      child: Text('status_view_all'.i18n(), style: TextStyle(color: colorScheme.primary))),
+                    onPressed: () {
+                      context.push('/status/transactions/${locator<UserProvider>().user!.id}');
+                    },
+                    child: Text('status_view_all'.i18n(), style: TextStyle(color: colorScheme.primary)),
+                  ),
                 ],
               ),
               SizedBox(height: 12.sp),
-              ...state.transactions.map((e) => TransactionTile(
+              ...state.transactions.map(
+                (e) => TransactionTile(
                   title: e.description,
                   date: Utils.dateFormating(e.transactionDate),
                   amount: Utils.creditFormatting(e.credit),
-                  transactionType: e.transactionType))
+                  transactionType: e.transactionType,
+                ),
+              ),
             ],
-          )
+          ),
 
         //
         // // Transaction List
@@ -268,24 +283,28 @@ class _OnTrackStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseContainer(
-        child: Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-                child: Text(title,
-                    maxLines: 3,
-                    overflow: TextOverflow.visible,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold))),
-            IconBox(icon: icon),
-          ],
-        ),
-        SizedBox(height: 8.sp),
-        Text(data, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-        Text(subData, style: Theme.of(context).textTheme.bodySmall),
-      ],
-    ));
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 3,
+                  overflow: TextOverflow.visible,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
+              IconBox(icon: icon),
+            ],
+          ),
+          SizedBox(height: 8.sp),
+          Text(data, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+          Text(subData, style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+    );
   }
 }
 
@@ -316,10 +335,7 @@ class _GoalProgressBar extends StatelessWidget {
               child: Container(
                 width: 3.sp,
                 height: 16.sp,
-                decoration: BoxDecoration(
-                  color: colorScheme.onSurface,
-                  borderRadius: BorderRadius.circular(2.sp),
-                ),
+                decoration: BoxDecoration(color: colorScheme.onSurface, borderRadius: BorderRadius.circular(2.sp)),
               ),
             ),
         ],

@@ -9,26 +9,30 @@ class ActivityItemsApi {
 
   ActivityItemsApi();
 
-  Future<dynamic> getActivityItems(
-      {num? activityId,
-      num? userId,
-      num? roundId,
-      bool? registeredInApp,
-      String? searchText,
-      int? size,
-      int? page,
-      SortBuilder? sort}) async {
+  Future<dynamic> getActivityItems({
+    num? activityId,
+    num? userId,
+    num? roundId,
+    bool? registeredInApp,
+    String? searchText,
+    int? size,
+    int? page,
+    SortBuilder? sort,
+  }) async {
     try {
-      final res = await _dioClient.dio.get("/activityItem", queryParameters: {
-        "activityId": activityId,
-        "userId": userId,
-        "roundId": roundId,
-        "registeredInApp": registeredInApp,
-        "searchText": searchText,
-        "size": size,
-        "page": page,
-        "sort": sort?.build()
-      });
+      final res = await _dioClient.dio.get(
+        "/activityItem",
+        queryParameters: {
+          "activityId": activityId,
+          "userId": userId,
+          "roundId": roundId,
+          "registeredInApp": registeredInApp,
+          "searchText": searchText,
+          "size": size,
+          "page": page,
+          "sort": sort?.build(),
+        },
+      );
       return res.data;
     } catch (e) {
       rethrow;
@@ -64,8 +68,11 @@ class ActivityItemsApi {
 
   Future<dynamic> putActivityItems(ActivityItemsModel activityItem, num activityItemId) async {
     try {
-      final res =
-          await _dioClient.dio.put("/activityItem", queryParameters: {"activityItemId": activityItemId}, data: activityItem);
+      final res = await _dioClient.dio.put(
+        "/activityItem",
+        queryParameters: {"activityItemId": activityItemId},
+        data: activityItem,
+      );
       return res.data;
     } catch (e) {
       rethrow;

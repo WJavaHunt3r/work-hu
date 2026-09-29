@@ -9,13 +9,14 @@ part 'users_state.freezed.dart';
 
 @freezed
 abstract class UsersState with _$UsersState {
-  const factory UsersState(
-      {@Default([]) List<UserComboModel> users,
-      UserModel? selectedUser,
-      @Default(UserFilter(churchId: 1)) UserFilter filter,
-      @Default(BaseListState()) BaseListState listState,
-      @Default(ModelState.empty) ModelState modelState,
-      @Default("") String message}) = _UsersState;
+  const factory UsersState({
+    @Default([]) List<UserComboModel> users,
+    UserModel? selectedUser,
+    @Default(UserFilter(churchId: 1)) UserFilter filter,
+    @Default(BaseListState()) BaseListState listState,
+    @Default(ModelState.empty) ModelState modelState,
+    @Default("") String message,
+  }) = _UsersState;
 
   const UsersState._();
 }

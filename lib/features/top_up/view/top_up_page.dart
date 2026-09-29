@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
@@ -13,9 +13,7 @@ import 'package:work_hu/features/top_up/data/state/top_up_state.dart';
 import 'package:work_hu/features/top_up/providers/top_up_provider.dart';
 
 class TopUpPage extends BasePage {
-  TopUpPage({
-    super.key,
-  }) : super(title: 'top_up_title');
+  TopUpPage({super.key}) : super(title: 'top_up_title');
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -34,83 +32,81 @@ class TopUpPageState extends BasePageState<TopUpPage, TopUpState, TopUpDataNotif
   Widget buildLayout() {
     final theme = Theme.of(context);
     return SingleChildScrollView(
-        child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 32.sp),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 32.sp),
 
-        // Amount Input Card
-        BaseContainer(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('top_up_enter_amount'.i18n(), style: theme.textTheme.labelLarge),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.sp),
-                child: TextField(
-                  controller: _amountController,
-                  keyboardType: TextInputType.number,
-                  style: theme.textTheme.displaySmall
-                      ?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    prefixText: 'Ft     ',
-                    prefixStyle: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+          // Amount Input Card
+          BaseContainer(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('top_up_enter_amount'.i18n(), style: theme.textTheme.labelLarge),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12.sp),
+                  child: TextField(
+                    controller: _amountController,
+                    keyboardType: TextInputType.number,
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      prefixText: 'Ft     ',
+                      prefixStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20.sp),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [1000, 2000, 5000].map((amt) {
-                  bool isSelected = _amountController.text == amt.toString();
-                  return _AmountPresetButton(
-                    label: '$amt Ft',
-                    isSelected: isSelected,
-                    onTap: () => _updateAmount(amt),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-        ),
-
-        SizedBox(height: 40.sp),
-        SizedBox(
-          width: double.infinity,
-          height: 56.sp,
-          child: FilledButton(
-            onPressed: () {
-              if ((num.tryParse(_amountController.text) ?? 0) != 0) {
-                ref.watch(provider.notifier).topUp(amount: int.tryParse(_amountController.text) ?? 0).then((value) async {
-                  if (status.modelState.isSuccess && state.hostedUrl != null && state.hostedUrl!.isNotEmpty) {
-                    Uri uri = Uri.parse(state.hostedUrl.toString());
-                    if (!await launchUrl(uri, mode: LaunchMode.inAppWebView, webOnlyWindowName: "_self")) {
-                      throw Exception('top_up_failed_to_launch'.i18n([uri.toString()]));
-                    }
-                  }
-                });
-              }
-            },
-            child: Text(
-              'top_up_confirm_amount'.i18n(),
-              style: Theme.of(context).textTheme.bodyLarge,
+                SizedBox(height: 20.sp),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [1000, 2000, 5000].map((amt) {
+                    bool isSelected = _amountController.text == amt.toString();
+                    return _AmountPresetButton(
+                      label: '$amt Ft',
+                      isSelected: isSelected,
+                      onTap: () => _updateAmount(amt),
+                    );
+                  }).toList(),
+                ),
+              ],
             ),
           ),
-        ),
-        SizedBox(height: 16.sp),
-        Center(
-          child: Text(
-            'top_up_immediate'.i18n(),
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall,
+
+          SizedBox(height: 40.sp),
+          SizedBox(
+            width: double.infinity,
+            height: 56.sp,
+            child: FilledButton(
+              onPressed: () {
+                if ((num.tryParse(_amountController.text) ?? 0) != 0) {
+                  ref.watch(provider.notifier).topUp(amount: int.tryParse(_amountController.text) ?? 0).then((
+                    value,
+                  ) async {
+                    if (status.modelState.isSuccess && state.hostedUrl != null && state.hostedUrl!.isNotEmpty) {
+                      Uri uri = Uri.parse(state.hostedUrl.toString());
+                      if (!await launchUrl(uri, mode: LaunchMode.inAppWebView, webOnlyWindowName: "_self")) {
+                        throw Exception('top_up_failed_to_launch'.i18n([uri.toString()]));
+                      }
+                    }
+                  });
+                }
+              },
+              child: Text('top_up_confirm_amount'.i18n(), style: Theme.of(context).textTheme.bodyLarge),
+            ),
           ),
-        ),
-      ],
-    ));
+          SizedBox(height: 16.sp),
+          Center(
+            child: Text('top_up_immediate'.i18n(), textAlign: TextAlign.center, style: theme.textTheme.bodySmall),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -156,8 +152,13 @@ class _PaymentTile extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _PaymentTile(
-      {required this.title, required this.subtitle, required this.icon, required this.isSelected, required this.onTap});
+  const _PaymentTile({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -169,19 +170,13 @@ class _PaymentTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12.sp),
-          border: Border.all(
-            color: isSelected ? theme.colorScheme.primary : Colors.transparent,
-            width: 2,
-          ),
+          border: Border.all(color: isSelected ? theme.colorScheme.primary : Colors.transparent, width: 2),
         ),
         child: Row(
           children: [
             Container(
               padding: EdgeInsets.all(8.sp),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface,
-                borderRadius: BorderRadius.circular(8.sp),
-              ),
+              decoration: BoxDecoration(color: theme.colorScheme.onSurface, borderRadius: BorderRadius.circular(8.sp)),
               child: Icon(icon, color: theme.colorScheme.surface),
             ),
             SizedBox(width: 16.sp),

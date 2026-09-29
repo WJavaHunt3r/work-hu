@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:work_hu/features/login/widgets/google_sign_in_button.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
@@ -17,18 +16,16 @@ import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/features/login/data/state/login_state.dart';
 import 'package:work_hu/features/login/providers/login_provider.dart';
+import 'package:work_hu/features/login/widgets/google_sign_in_button.dart';
 import 'package:work_hu/features/utils.dart';
 
 class LoginPage extends BasePage {
-  LoginPage({
-    super.key,
-  }) : super(
-            title: 'login_brand_name',
-            leading: Padding(
-              padding: EdgeInsets.all(4.sp),
-              child: Image.asset('assets/icons/dukapp_icon_round.png'),
-            ),
-            canRefresh: false);
+  LoginPage({super.key})
+    : super(
+        title: 'login_brand_name',
+        leading: Padding(padding: EdgeInsets.all(4.sp), child: Image.asset('assets/icons/dukapp_icon_round.png')),
+        canRefresh: false,
+      );
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -51,7 +48,10 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
           Icon(Icons.wifi_off_outlined, size: 32.sp, color: theme.colorScheme.error),
           Text('server_down'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
           SizedBox(height: 16.sp),
-          IconButton(onPressed: () => ref.read(provider.notifier).isAlive(), icon: Icon(Icons.refresh, size: 32.sp)),
+          IconButton(
+            onPressed: () => ref.read(provider.notifier).isAlive(),
+            icon: Icon(Icons.refresh, size: 32.sp),
+          ),
           SizedBox(height: 24.sp),
           _buildPageFooter(theme),
         ],
@@ -75,8 +75,8 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
       children: [
         Text('home_donations'.i18n(), style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
         Column(
-            children: state.donations.map((e) {
-          return BaseContainer(
+          children: state.donations.map((e) {
+            return BaseContainer(
               width: double.infinity,
               height: 150.sp,
               child: Column(
@@ -84,16 +84,20 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                      ref.watch(localeProvider).value == const Locale("hu", "HU")
-                          ? e.description.toString()
-                          : e.descriptionNO.toString(),
-                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    ref.watch(localeProvider).value == const Locale("hu", "HU")
+                        ? e.description.toString()
+                        : e.descriptionNO.toString(),
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  ),
                   Text(
-                      "${DateFormat('MMM dd, yyyy • HH:mm').format(e.startDateTime!)} - ${DateFormat('MMM dd, yyyy • HH:mm').format(e.endDateTime!)}"),
-                  FilledButton(onPressed: () => context.push("/donate/${e.id}"), child: Text("home_donate".i18n()))
+                    "${DateFormat('MMM dd, yyyy • HH:mm').format(e.startDateTime!)} - ${DateFormat('MMM dd, yyyy • HH:mm').format(e.endDateTime!)}",
+                  ),
+                  FilledButton(onPressed: () => context.push("/donate/${e.id}"), child: Text("home_donate".i18n())),
                 ],
-              ));
-        }).toList()),
+              ),
+            );
+          }).toList(),
+        ),
         SizedBox(height: 16.sp),
       ],
     );
@@ -120,8 +124,9 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
               child: Text(
                 currentLocale.languageCode.toUpperCase(),
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.bold),
+                  color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             );
           },
@@ -130,7 +135,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
           },
           itemCount: supportedLocales.length,
         ),
-      )
+      ),
     ];
   }
 
@@ -140,10 +145,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
     return BaseContainer(
       child: Column(
         children: [
-          Text(
-            'login_welcome_title'.i18n(),
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
+          Text('login_welcome_title'.i18n(), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           SizedBox(height: 8.sp),
           Text(
             'login_welcome_subtitle'.i18n(),
@@ -152,10 +154,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
           SizedBox(height: 24.sp),
           _buildToggleButtons(theme),
           SizedBox(height: 24.sp),
-          Form(
-            key: _formKey,
-            child: _isLogin ? _buildLoginForms() : _buildRegisterForms(),
-          ),
+          Form(key: _formKey, child: _isLogin ? _buildLoginForms() : _buildRegisterForms()),
           SizedBox(height: 12.sp),
           _buildRememberMeRow(theme),
           SizedBox(height: 24.sp),
@@ -179,35 +178,36 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
 
   _buildLoginForms() {
     return AutofillGroup(
-        key: const ValueKey('login_autofill_group'),
-        child: Column(
-      children: [
-        BaseTextFormField(
-          controller: emailController,
-          keyBoardType: TextInputType.emailAddress,
-          // Flutter web only uses the first hint (as the input's id/name/autocomplete); password
-          // managers pair "username" with "current-password".
-          autofillHints: const [AutofillHints.username],
-          textInputAction: TextInputAction.next,
-          fldControl: "3",
-          labelText: "login_email_label",
-          hintText: "login_email_hint",
-        ),
-        SizedBox(height: 16.sp),
-        BaseTextFormField(
-          controller: passwordController,
-          textInputAction: TextInputAction.send,
-          autofillHints: const [AutofillHints.password],
-          isPasswordField: true,
-          fldControl: "3",
-          labelText: "login_password_label",
-          hintText: "login_password_hint",
-          onFieldSubmitted: (t) {
-            login();
-          },
-        ),
-      ],
-    ));
+      key: const ValueKey('login_autofill_group'),
+      child: Column(
+        children: [
+          BaseTextFormField(
+            controller: emailController,
+            keyBoardType: TextInputType.emailAddress,
+            // Flutter web only uses the first hint (as the input's id/name/autocomplete); password
+            // managers pair "username" with "current-password".
+            autofillHints: const [AutofillHints.username],
+            textInputAction: TextInputAction.next,
+            fldControl: "3",
+            labelText: "login_email_label",
+            hintText: "login_email_hint",
+          ),
+          SizedBox(height: 16.sp),
+          BaseTextFormField(
+            controller: passwordController,
+            textInputAction: TextInputAction.send,
+            autofillHints: const [AutofillHints.password],
+            isPasswordField: true,
+            fldControl: "3",
+            labelText: "login_password_label",
+            hintText: "login_password_hint",
+            onFieldSubmitted: (t) {
+              login();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   void login() {
@@ -215,96 +215,106 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
       TextInput.finishAutofillContext(shouldSave: true);
       _isLogin
           ? ref
-              .read(loginDataProvider.notifier)
-              .login(usr: emailController.text, pswd: passwordController.text, keepLogedIn: _rememberMe)
-          : ref.read(loginDataProvider.notifier).register(
-              keepLogedIn: _rememberMe,
-              lastName: lastNameController.text,
-              email: emailController.text,
-              firstName: firstNameController.text,
-              pswd: passwordController.text,
-              pswdAgain: passwordAgainController.text);
+                .read(loginDataProvider.notifier)
+                .login(usr: emailController.text, pswd: passwordController.text, keepLogedIn: _rememberMe)
+          : ref
+                .read(loginDataProvider.notifier)
+                .register(
+                  keepLogedIn: _rememberMe,
+                  lastName: lastNameController.text,
+                  email: emailController.text,
+                  firstName: firstNameController.text,
+                  pswd: passwordController.text,
+                  pswdAgain: passwordAgainController.text,
+                );
     }
   }
 
   _buildRegisterForms() {
     return AutofillGroup(
-        key: const ValueKey('login_register_group'),
-        child: Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: BaseTextFormField(
-                fldControl: "3",
-                autofillHints: const [AutofillHints.givenName],
-                controller: firstNameController,
-                labelText: "login_firstname_label",
-                hintText: "login_firstname_hint",
+      key: const ValueKey('login_register_group'),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: BaseTextFormField(
+                  fldControl: "3",
+                  autofillHints: const [AutofillHints.givenName],
+                  controller: firstNameController,
+                  labelText: "login_firstname_label",
+                  hintText: "login_firstname_hint",
+                ),
               ),
-            ),
-            SizedBox(width: 16.sp),
-            Expanded(
-              child: BaseTextFormField(
-                fldControl: "3",
-                autofillHints: const [AutofillHints.familyName],
-                controller: lastNameController,
-                labelText: "login_lastname_label",
-                hintText: "login_lastname_hint",
+              SizedBox(width: 16.sp),
+              Expanded(
+                child: BaseTextFormField(
+                  fldControl: "3",
+                  autofillHints: const [AutofillHints.familyName],
+                  controller: lastNameController,
+                  labelText: "login_lastname_label",
+                  hintText: "login_lastname_hint",
+                ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 16.sp),
-        BaseTextFormField(
-          fldControl: "3",
-          keyBoardType: TextInputType.emailAddress,
-          autofillHints: const [AutofillHints.username],
-          controller: emailController,
-          labelText: "login_email_label",
-          hintText: "login_email_hint",
-          validator: (text) {
-            if (text == null || text.isEmpty) {
-              return "base_is_required".i18n();
-            }
-            if (!text.contains("@")) {
-              return "login_email_error".i18n();
-            }
-            return null;
-          },
-        ),
-        SizedBox(height: 16.sp),
-        BaseTextFormField(
-          fldControl: "3",
-          controller: passwordController,
-          autofillHints: const [AutofillHints.newPassword],
-          isPasswordField: true,
-          labelText: "login_password_label",
-          hintText: "login_password_hint",
-        ),
-        SizedBox(height: 16.sp),
-        BaseTextFormField(
-          isPasswordField: true,
-          autofillHints: const [AutofillHints.newPassword],
-          controller: passwordAgainController,
-          labelText: "login_password_again_label",
-          hintText: "login_password_again_hint",
-        ),
-      ],
-    ));
+            ],
+          ),
+          SizedBox(height: 16.sp),
+          BaseTextFormField(
+            fldControl: "3",
+            keyBoardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.username],
+            controller: emailController,
+            labelText: "login_email_label",
+            hintText: "login_email_hint",
+            validator: (text) {
+              if (text == null || text.isEmpty) {
+                return "base_is_required".i18n();
+              }
+              if (!text.contains("@")) {
+                return "login_email_error".i18n();
+              }
+              return null;
+            },
+          ),
+          SizedBox(height: 16.sp),
+          BaseTextFormField(
+            fldControl: "3",
+            controller: passwordController,
+            autofillHints: const [AutofillHints.newPassword],
+            isPasswordField: true,
+            labelText: "login_password_label",
+            hintText: "login_password_hint",
+          ),
+          SizedBox(height: 16.sp),
+          BaseTextFormField(
+            isPasswordField: true,
+            autofillHints: const [AutofillHints.newPassword],
+            controller: passwordAgainController,
+            labelText: "login_password_again_label",
+            hintText: "login_password_again_hint",
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildToggleButtons(ThemeData theme) {
     return Container(
       padding: EdgeInsets.all(2.sp),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12.sp),
-      ),
+      decoration: BoxDecoration(color: theme.colorScheme.surface, borderRadius: BorderRadius.circular(12.sp)),
       child: Row(
         children: [
-          Expanded(child: _toggleItem(theme, 'login_toggle_login'.i18n(), _isLogin, () => setState(() => _isLogin = true))),
-          Expanded(child: _toggleItem(theme, 'login_toggle_register'.i18n(), !_isLogin, () => setState(() => _isLogin = false))),
+          Expanded(
+            child: _toggleItem(theme, 'login_toggle_login'.i18n(), _isLogin, () => setState(() => _isLogin = true)),
+          ),
+          Expanded(
+            child: _toggleItem(
+              theme,
+              'login_toggle_register'.i18n(),
+              !_isLogin,
+              () => setState(() => _isLogin = false),
+            ),
+          ),
         ],
       ),
     );
@@ -346,22 +356,25 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
         ),
         if (_isLogin)
           TextButton(
-              onPressed: () {
-                if (emailController.text.isEmpty) {
-                  Utils.showErrorDialog(context, content: 'login_reset_empty_username'.i18n());
-                } else {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) => ConfirmAlertDialog(
-                          onConfirm: () => ref
-                              .read(loginDataProvider.notifier)
-                              .sendNewPassword(emailController.text)
-                              .then((r) => context.pop()),
-                          title: 'login_reset_password_confirm_title'.i18n(),
-                          content: Text("login_reset_password_question".i18n())));
-                }
-              },
-              child: Text('login_forgot_password'.i18n(), style: TextStyle(color: theme.colorScheme.onSurface))),
+            onPressed: () {
+              if (emailController.text.isEmpty) {
+                Utils.showErrorDialog(context, content: 'login_reset_empty_username'.i18n());
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => ConfirmAlertDialog(
+                    onConfirm: () => ref
+                        .read(loginDataProvider.notifier)
+                        .sendNewPassword(emailController.text)
+                        .then((r) => context.pop()),
+                    title: 'login_reset_password_confirm_title'.i18n(),
+                    content: Text("login_reset_password_question".i18n()),
+                  ),
+                );
+              }
+            },
+            child: Text('login_forgot_password'.i18n(), style: TextStyle(color: theme.colorScheme.onSurface)),
+          ),
       ],
     );
   }
@@ -374,8 +387,10 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
           login();
         },
         label: Icon(Icons.arrow_forward, size: 18.sp),
-        icon: Text(_isLogin ? 'login_login_button'.i18n() : 'login_register_button'.i18n(),
-            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+        icon: Text(
+          _isLogin ? 'login_login_button'.i18n() : 'login_register_button'.i18n(),
+          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -385,8 +400,9 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
       children: [
         Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
         Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.sp),
-            child: Text('login_divider_text'.i18n(), style: theme.textTheme.labelSmall)),
+          padding: EdgeInsets.symmetric(horizontal: 16.sp),
+          child: Text('login_divider_text'.i18n(), style: theme.textTheme.labelSmall),
+        ),
         Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
       ],
     );
@@ -412,12 +428,13 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
       children: [
         Text('login_no_account'.i18n()),
         GestureDetector(
-            onTap: () {
-              setState(() {
-                _isLogin = false;
-              });
-            },
-            child: Text('login_create_account'.i18n(), style: const TextStyle(fontWeight: FontWeight.bold))),
+          onTap: () {
+            setState(() {
+              _isLogin = false;
+            });
+          },
+          child: Text('login_create_account'.i18n(), style: const TextStyle(fontWeight: FontWeight.bold)),
+        ),
       ],
     );
   }
@@ -452,8 +469,11 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
           ],
         ),
         SizedBox(height: 32.sp),
-        Text('login_copyright'.i18n(),
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline), textAlign: TextAlign.center),
+        Text(
+          'login_copyright'.i18n(),
+          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline),
+          textAlign: TextAlign.center,
+        ),
       ],
     );
   }

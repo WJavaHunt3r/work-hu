@@ -1,21 +1,20 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'team_model.freezed.dart';
-
 part 'team_model.g.dart';
 
 @freezed
 abstract class TeamModel with _$TeamModel {
-  const factory TeamModel(
-      {required num id,
-      required num teamLeaderId,
-      required String teamName,
-      required double coins,
-      String? color,
-        String? startColor,
-        String? endColor,
-      String? iconAssetPath}) = _TeamModel;
+  const factory TeamModel({
+    required num id,
+    required num teamLeaderId,
+    required String teamName,
+    required double coins,
+    String? color,
+    String? startColor,
+    String? endColor,
+    String? iconAssetPath,
+  }) = _TeamModel;
 
-  factory TeamModel.fromJson(Map<String, dynamic> json) =>
-      _$TeamModelFromJson(json);
+  factory TeamModel.fromJson(Map<String, dynamic> json) => _$TeamModelFromJson(json);
 }

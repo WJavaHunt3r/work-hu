@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -53,73 +52,85 @@ final _shellNavigatorStatusKey = GlobalKey<NavigatorState>(debugLabel: 'shellSta
 final routerProvider = Provider<GoRouter>((ref) {
   final userNotifier = ref.watch(userDataProvider);
   return GoRouter(
-      refreshListenable: userNotifier,
-      navigatorKey: navigatorKey,
-      initialLocation: "/status",
-      routes: [
-        GoRoute(
-          path: '/login',
-          builder: (context, state) => LoginPage(),
-        ),
+    refreshListenable: userNotifier,
+    navigatorKey: navigatorKey,
+    initialLocation: "/status",
+    routes: [
+      GoRoute(path: '/login', builder: (context, state) => LoginPage()),
 
-        // --- PROTECTED ROUTES (With Bottom Bar) ---
-        StatefulShellRoute.indexedStack(
-          builder: (context, state, navigationShell) {
-            return ScaffoldWithNestedNavigation(navigationShell: navigationShell);
-          },
-          branches: [
-            // Branch 1: User Status (The default page after login)
-            StatefulShellBranch(
-              navigatorKey: _shellNavigatorHomeKey,
-              routes: [
-                GoRoute(path: '/balance', builder: (context, state) => HomePage(), routes: [
+      // --- PROTECTED ROUTES (With Bottom Bar) ---
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return ScaffoldWithNestedNavigation(navigationShell: navigationShell);
+        },
+        branches: [
+          // Branch 1: User Status (The default page after login)
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorHomeKey,
+            routes: [
+              GoRoute(
+                path: '/balance',
+                builder: (context, state) => HomePage(),
+                routes: [
                   GoRoute(path: "topUps", builder: (BuildContext context, GoRouterState state) => const TopUpsPage()),
-                  GoRoute(path: "transfer", builder: (BuildContext context, GoRouterState state) => const TransferAmountPage()),
                   GoRoute(
-                      path: "transactions", builder: (BuildContext context, GoRouterState state) => const BufeTransactionsPage()),
-                ]),
-              ],
-            ),
-            StatefulShellBranch(
-              navigatorKey: _shellNavigatorStatusKey,
-              routes: [
-                GoRoute(path: '/status', builder: (context, state) => StatusPage(), routes: [
+                    path: "transfer",
+                    builder: (BuildContext context, GoRouterState state) => const TransferAmountPage(),
+                  ),
+                  GoRoute(
+                    path: "transactions",
+                    builder: (BuildContext context, GoRouterState state) => const BufeTransactionsPage(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorStatusKey,
+            routes: [
+              GoRoute(
+                path: '/status',
+                builder: (context, state) => StatusPage(),
+                routes: [
                   GoRoute(
                     path: 'transactions/:id',
                     pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(
-                        child: UserTransactionsPage(
-                      userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-                    )),
+                      child: UserTransactionsPage(userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+                    ),
                   ),
-                ]),
-              ],
-            ),
-            // Branch 2: Profile
-            StatefulShellBranch(
-              navigatorKey: _shellNavigatorProfileKey,
-              routes: [
-                GoRoute(path: '/profile', builder: (context, state) => const ProfilePage(), routes: [
+                ],
+              ),
+            ],
+          ),
+          // Branch 2: Profile
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorProfileKey,
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfilePage(),
+                routes: [
                   GoRoute(
-                      path: "activities",
-                      builder: (BuildContext context, GoRouterState state) => const ActivitiesPage(),
-                      routes: [
-                        GoRoute(
-                          path: ':id/items',
-                          builder: (BuildContext context, GoRouterState state) {
-                            return ActivityItemsPage(activityId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
-                          },
-                        ),
-                        GoRoute(
-                          path: 'createActivity',
-                          builder: (BuildContext context, GoRouterState state) => const CreateActivityPage(),
-                        ),
-                        GoRoute(
-                          path: ':id/edit',
-                          builder: (BuildContext context, GoRouterState state) => CreateActivityPage(
-                            id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-                          ),
-                        ),
-                      ]),
+                    path: "activities",
+                    builder: (BuildContext context, GoRouterState state) => const ActivitiesPage(),
+                    routes: [
+                      GoRoute(
+                        path: ':id/items',
+                        builder: (BuildContext context, GoRouterState state) {
+                          return ActivityItemsPage(activityId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
+                        },
+                      ),
+                      GoRoute(
+                        path: 'createActivity',
+                        builder: (BuildContext context, GoRouterState state) => const CreateActivityPage(),
+                      ),
+                      GoRoute(
+                        path: ':id/edit',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            CreateActivityPage(id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+                      ),
+                    ],
+                  ),
                   GoRoute(
                     path: 'theme',
                     pageBuilder: (context, state) {
@@ -156,144 +167,151 @@ final routerProvider = Provider<GoRouter>((ref) {
                       );
                     },
                   ),
-                ]),
-              ],
-            ),
-
-            // Branch 3: Admin
-            StatefulShellBranch(
-              navigatorKey: _shellNavigatorAdminKey,
-              routes: [
-                GoRoute(
-                  path: '/admin',
-                  builder: (context, state) => const AdminPage(),
-                ),
-              ],
-            ),
-          ],
-        ),
-        GoRoute(
-          path: '/tos',
-          builder: (context, state) => const ToSPage(),
-        ),
-        GoRoute(
-          path: '/privacy',
-          builder: (context, state) => const PrivacyPolicy(),
-        ),
-        GoRoute(path: "/balance/topUp", builder: (BuildContext context, GoRouterState state) => TopUpPage(), routes: [
-          GoRoute(
-              path: "success/:checkout_reference",
-              builder: (BuildContext context, GoRouterState state) {
-                return PaymentSuccessPage(
-                  checkoutReference: state.pathParameters["checkout_reference"],
-                );
-              }),
-        ]),
-        GoRoute(
-            path: "/donate/:id",
-            builder: (BuildContext context, GoRouterState state) => DonatePage(
-                  id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
-                ),
-            routes: [
-              GoRoute(
-                  path: "success/:checkout_reference",
-                  builder: (BuildContext context, GoRouterState state) {
-                    return DonatePaymentSuccessPage(
-                      checkoutReference: state.pathParameters["checkout_reference"],
-                    );
-                  }),
-            ]),
-
-        GoRoute(
-            path: '/change-password',
-            builder: (BuildContext context, GoRouterState state) {
-              return const ChangePasswordPage();
-            }),
-        GoRoute(
-            path: "/admin/createTransaction",
-            builder: (BuildContext context, GoRouterState state) => const CreateTransactionPage()),
-        GoRoute(
-            path: "/admin/fraKareWeeks",
-            builder: (BuildContext context, GoRouterState state) => const FraKareWeekPage(),
-            routes: [
-              GoRoute(
-                  path: ":id",
-                  builder: (BuildContext context, GoRouterState state) =>
-                      UserFraKareWeekPage(weekNumber: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0))
-            ]),
-        GoRoute(
-            path: "/admin/createSamvirkTransaction",
-            builder: (BuildContext context, GoRouterState state) => const CreateSamvirkTransactionPage()),
-        GoRoute(
-            path: "/admin/createPointsTransaction",
-            builder: (BuildContext context, GoRouterState state) => const CreatePointsTransactionPage()),
-        GoRoute(path: "/admin/userStatus", builder: (BuildContext context, GoRouterState state) => const UserStatusPage()),
-        GoRoute(path: "/admin/users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
-        GoRoute(path: "/admin/goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
-        GoRoute(path: "/admin/rounds", builder: (BuildContext context, GoRouterState state) => const RoundsPage()),
-        GoRoute(
-            path: "/admin/rounds/maintenance",
-            builder: (BuildContext context, GoRouterState state) {
-              var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
-              return RoundsMaintenancePage(
-                id:  map != null ? map["id"] : null,
-              );
-            }),
-        GoRoute(path: "/admin/donations", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
-        GoRoute(path: "/admin/camps", builder: (BuildContext context, GoRouterState state) => const CampPage()),
-        GoRoute(
-            path: "/admin/payments",
-            builder: (BuildContext context, GoRouterState state) {
-              var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
-              return PaymentsPage(
-                donationId: map != null ? map["donationId"] : null,
-                userId: map != null ? map["userId"] : null,
-              );
-            }),
-        GoRoute(path: "/admin/mentorMentees", builder: (BuildContext context, GoRouterState state) => const MentorMenteesPage()),
-        GoRoute(
-            path: "/admin/transactions",
-            builder: (BuildContext context, GoRouterState state) => const TransactionsPage(),
-            routes: [
-              GoRoute(
-                path: ':id',
-                builder: (BuildContext context, GoRouterState state) {
-                  return TransactionItemsPage(transactionId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
-                },
+                ],
               ),
-            ]),
+            ],
+          ),
 
-        GoRoute(
-          path: '/mentees',
-          builder: (BuildContext context, GoRouterState state) {
-            return const MenteesPage();
-          },
-        ),
-      ],
-      redirect: (BuildContext context, GoRouterState state) async {
-        var user = userNotifier.user;
-        final bool loggedIn = user != null;
+          // Branch 3: Admin
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorAdminKey,
+            routes: [GoRoute(path: '/admin', builder: (context, state) => const AdminPage())],
+          ),
+        ],
+      ),
+      GoRoute(path: '/tos', builder: (context, state) => const ToSPage()),
+      GoRoute(path: '/privacy', builder: (context, state) => const PrivacyPolicy()),
+      GoRoute(
+        path: "/balance/topUp",
+        builder: (BuildContext context, GoRouterState state) => TopUpPage(),
+        routes: [
+          GoRoute(
+            path: "success/:checkout_reference",
+            builder: (BuildContext context, GoRouterState state) {
+              return PaymentSuccessPage(checkoutReference: state.pathParameters["checkout_reference"]);
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: "/donate/:id",
+        builder: (BuildContext context, GoRouterState state) =>
+            DonatePage(id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+        routes: [
+          GoRoute(
+            path: "success/:checkout_reference",
+            builder: (BuildContext context, GoRouterState state) {
+              return DonatePaymentSuccessPage(checkoutReference: state.pathParameters["checkout_reference"]);
+            },
+          ),
+        ],
+      ),
 
-        // Use startsWith to catch sub-routes like /donate/12/success/...
-        final bool isPublicRoute = state.matchedLocation.startsWith('/login') ||
-            state.matchedLocation.startsWith('/tos') ||
-            state.matchedLocation.startsWith('/privacy') ||
-            state.matchedLocation.startsWith('/donate'); // Crucial for your success page
+      GoRoute(
+        path: '/change-password',
+        builder: (BuildContext context, GoRouterState state) {
+          return const ChangePasswordPage();
+        },
+      ),
+      GoRoute(
+        path: "/admin/createTransaction",
+        builder: (BuildContext context, GoRouterState state) => const CreateTransactionPage(),
+      ),
+      GoRoute(
+        path: "/admin/fraKareWeeks",
+        builder: (BuildContext context, GoRouterState state) => const FraKareWeekPage(),
+        routes: [
+          GoRoute(
+            path: ":id",
+            builder: (BuildContext context, GoRouterState state) =>
+                UserFraKareWeekPage(weekNumber: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: "/admin/createSamvirkTransaction",
+        builder: (BuildContext context, GoRouterState state) => const CreateSamvirkTransactionPage(),
+      ),
+      GoRoute(
+        path: "/admin/createPointsTransaction",
+        builder: (BuildContext context, GoRouterState state) => const CreatePointsTransactionPage(),
+      ),
+      GoRoute(
+        path: "/admin/userStatus",
+        builder: (BuildContext context, GoRouterState state) => const UserStatusPage(),
+      ),
+      GoRoute(path: "/admin/users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
+      GoRoute(path: "/admin/goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
+      GoRoute(path: "/admin/rounds", builder: (BuildContext context, GoRouterState state) => const RoundsPage()),
+      GoRoute(
+        path: "/admin/rounds/maintenance",
+        builder: (BuildContext context, GoRouterState state) {
+          var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
+          return RoundsMaintenancePage(id: map != null ? map["id"] : null);
+        },
+      ),
+      GoRoute(path: "/admin/donations", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
+      GoRoute(path: "/admin/camps", builder: (BuildContext context, GoRouterState state) => const CampPage()),
+      GoRoute(
+        path: "/admin/payments",
+        builder: (BuildContext context, GoRouterState state) {
+          var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
+          return PaymentsPage(
+            donationId: map != null ? map["donationId"] : null,
+            userId: map != null ? map["userId"] : null,
+          );
+        },
+      ),
+      GoRoute(
+        path: "/admin/mentorMentees",
+        builder: (BuildContext context, GoRouterState state) => const MentorMenteesPage(),
+      ),
+      GoRoute(
+        path: "/admin/transactions",
+        builder: (BuildContext context, GoRouterState state) => const TransactionsPage(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (BuildContext context, GoRouterState state) {
+              return TransactionItemsPage(transactionId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
+            },
+          ),
+        ],
+      ),
 
-        if (loggedIn && !user.changedPassword) {
-          return '/change-password';
-        }
+      GoRoute(
+        path: '/mentees',
+        builder: (BuildContext context, GoRouterState state) {
+          return const MenteesPage();
+        },
+      ),
+    ],
+    redirect: (BuildContext context, GoRouterState state) async {
+      var user = userNotifier.user;
+      final bool loggedIn = user != null;
 
-        // If the user isn't logged in AND it's not a public route, kick to login
-        if (!loggedIn && !isPublicRoute) {
-          return '/login';
-        }
+      // Use startsWith to catch sub-routes like /donate/12/success/...
+      final bool isPublicRoute =
+          state.matchedLocation.startsWith('/login') ||
+          state.matchedLocation.startsWith('/tos') ||
+          state.matchedLocation.startsWith('/privacy') ||
+          state.matchedLocation.startsWith('/donate'); // Crucial for your success page
 
-        if (loggedIn && state.matchedLocation == '/') {
-          return '/status';
-        }
-        return null;
-      });
+      if (loggedIn && !user.changedPassword) {
+        return '/change-password';
+      }
+
+      // If the user isn't logged in AND it's not a public route, kick to login
+      if (!loggedIn && !isPublicRoute) {
+        return '/login';
+      }
+
+      if (loggedIn && state.matchedLocation == '/') {
+        return '/status';
+      }
+      return null;
+    },
+  );
 });
 
 List<String> teamLeaderScreens = ["/admin", "/admin/userStatus", "/admin/fraKareWeeks", "/admin/fraKareWeeks/"];
@@ -344,36 +362,43 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
   }
 
   List<BottomNavigationBarItem> userScreens() => <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.account_balance_wallet),
-            icon: const Icon(Icons.account_balance_wallet_outlined),
-            label: 'nav_bar_home'.i18n()),
-        BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.bar_chart_outlined),
-            icon: const Icon(Icons.bar_chart_outlined),
-            label: 'nav_bar_status'.i18n()),
-        BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.person_2_rounded),
-            icon: const Icon(Icons.person_2_outlined),
-            label: 'nav_bar_profile'.i18n()),
-      ];
+    BottomNavigationBarItem(
+      activeIcon: const Icon(Icons.account_balance_wallet),
+      icon: const Icon(Icons.account_balance_wallet_outlined),
+      label: 'nav_bar_home'.i18n(),
+    ),
+    BottomNavigationBarItem(
+      activeIcon: const Icon(Icons.bar_chart_outlined),
+      icon: const Icon(Icons.bar_chart_outlined),
+      label: 'nav_bar_status'.i18n(),
+    ),
+    BottomNavigationBarItem(
+      activeIcon: const Icon(Icons.person_2_rounded),
+      icon: const Icon(Icons.person_2_outlined),
+      label: 'nav_bar_profile'.i18n(),
+    ),
+  ];
 
   List<BottomNavigationBarItem> adminScreens() => <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.account_balance_wallet),
-            icon: const Icon(Icons.account_balance_wallet_outlined),
-            label: 'nav_bar_home'.i18n()),
-        BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.bar_chart_outlined),
-            icon: const Icon(Icons.bar_chart_outlined),
-            label: 'nav_bar_status'.i18n()),
-        BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.person_2_rounded),
-            icon: const Icon(Icons.person_2_outlined),
-            label: 'nav_bar_profile'.i18n()),
-        BottomNavigationBarItem(
-            activeIcon: const Icon(Icons.admin_panel_settings),
-            icon: const Icon(Icons.admin_panel_settings_outlined),
-            label: 'nav_bar_admin'.i18n())
-      ];
+    BottomNavigationBarItem(
+      activeIcon: const Icon(Icons.account_balance_wallet),
+      icon: const Icon(Icons.account_balance_wallet_outlined),
+      label: 'nav_bar_home'.i18n(),
+    ),
+    BottomNavigationBarItem(
+      activeIcon: const Icon(Icons.bar_chart_outlined),
+      icon: const Icon(Icons.bar_chart_outlined),
+      label: 'nav_bar_status'.i18n(),
+    ),
+    BottomNavigationBarItem(
+      activeIcon: const Icon(Icons.person_2_rounded),
+      icon: const Icon(Icons.person_2_outlined),
+      label: 'nav_bar_profile'.i18n(),
+    ),
+    BottomNavigationBarItem(
+      activeIcon: const Icon(Icons.admin_panel_settings),
+      icon: const Icon(Icons.admin_panel_settings_outlined),
+      label: 'nav_bar_admin'.i18n(),
+    ),
+  ];
 }

@@ -18,10 +18,7 @@ class _GoldenCardState extends State<GoldenCard> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 5),
-    )..repeat();
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 5))..repeat();
   }
 
   @override
@@ -47,17 +44,14 @@ class _GoldenCardState extends State<GoldenCard> with SingleTickerProviderStateM
             ],
             stops: [0.1, 0.5, 0.9],
           ),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.2),
-            width: 2.0,
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.2), width: 2.0),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.3),
               blurRadius: 30.0,
               spreadRadius: 5.0,
               offset: const Offset(0, 10),
-            )
+            ),
           ],
         ),
         child: Stack(
@@ -76,10 +70,7 @@ class _GoldenCardState extends State<GoldenCard> with SingleTickerProviderStateM
                       gradient: RadialGradient(
                         center: Alignment.center,
                         radius: 1.0, // Large radius
-                        colors: [
-                          Colors.white.withOpacity(0.4),
-                          Colors.white.withOpacity(0.0),
-                        ],
+                        colors: [Colors.white.withOpacity(0.4), Colors.white.withOpacity(0.0)],
                         stops: const [0.0, 0.6],
                       ),
                     ),

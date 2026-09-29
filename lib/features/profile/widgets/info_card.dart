@@ -14,19 +14,21 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkResponse(
-        overlayColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
-        radius: 8.sp,
-        onTap: onTap,
-        child: Card(
-          elevation: 0,
-          child: Container(
-              margin: EdgeInsets.zero,
-              decoration: decoration,
-              height: height,
-              width: width,
-              color: decoration == null ? Colors.transparent : null,
-              padding: EdgeInsets.all(padding ?? 20.sp),
-              child: Center(child: child)),
-        ));
+      overlayColor: WidgetStateColor.resolveWith((states) => Colors.transparent),
+      radius: 8.sp,
+      onTap: onTap,
+      child: Card(
+        elevation: 0,
+        child: Container(
+          margin: EdgeInsets.zero,
+          decoration: decoration,
+          height: height,
+          width: width,
+          color: decoration == null ? Colors.transparent : null,
+          padding: EdgeInsets.all(padding ?? 20.sp),
+          child: Center(child: child),
+        ),
+      ),
+    );
   }
 }

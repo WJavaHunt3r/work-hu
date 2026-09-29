@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 
 class BaseAlertDialog extends StatelessWidget {
@@ -34,11 +32,16 @@ class BaseAlertDialog extends StatelessWidget {
         if (cancelVisible)
           OutlinedButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text("base_cancel".i18n(), style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red)),
+            child: Text(
+              "base_cancel".i18n(),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.red),
+            ),
           ),
         if (confirmVisible)
           FilledButton(
-            style: Theme.of(context).filledButtonTheme.style?.copyWith(backgroundColor: WidgetStatePropertyAll(Colors.green)),
+            style: Theme.of(
+              context,
+            ).filledButtonTheme.style?.copyWith(backgroundColor: WidgetStatePropertyAll(Colors.green)),
             onPressed: () {
               onTap();
               if (canPop) Navigator.of(context).pop(true);

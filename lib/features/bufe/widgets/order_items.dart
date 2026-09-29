@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
@@ -25,25 +24,16 @@ class OrderItems extends LegacyBasePage {
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("bufe_order_date".i18n()),
-                    Text("${order?.date}"),
-                  ],
+                  children: [Text("bufe_order_date".i18n()), Text("${order?.date}")],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("bufe_order_sum".i18n()),
-                    Text("${order?.total} Ft"),
-                  ],
+                  children: [Text("bufe_order_sum".i18n()), Text("${order?.total} Ft")],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("bufe_order_loc".i18n()),
-                    Text(order?.locationName ?? ""),
-                  ],
-                )
+                  children: [Text("bufe_order_loc".i18n()), Text(order?.locationName ?? "")],
+                ),
               ],
             ),
           ),
@@ -57,10 +47,7 @@ class OrderItems extends LegacyBasePage {
                     isLast: index == items.length - 1,
                     index: index,
                     title: Text("${items[index].productName} * ${items[index].quantity}"),
-                    trailing: Text(
-                      "${items[index].totalPrice} Ft",
-                      style: TextStyle(fontSize: 16.sp),
-                    ),
+                    trailing: Text("${items[index].totalPrice} Ft", style: TextStyle(fontSize: 16.sp)),
                     subtitle: Text("Egység ár: ${items[index].unitPrice} Ft"),
                     // trailing: Text("${items[index].amount} Ft"),
                   );

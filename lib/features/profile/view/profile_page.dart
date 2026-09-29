@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
@@ -53,10 +53,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
           child: Column(
             children: [
               SizedBox(height: 16.sp),
-              Text(
-                user!.getFullName(),
-                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-              ),
+              Text(user!.getFullName(), style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
               SizedBox(height: 4.sp),
             ],
           ),
@@ -112,10 +109,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
           children: [
             SettingsTile(label: 'profile_password_security'.i18n(), icon: Icons.shield_outlined, index: 0),
             const Divider(height: 1),
-            SettingsTile(
-              label: 'profile_notifications'.i18n(),
-              icon: Icons.notifications_none,
-            ),
+            SettingsTile(label: 'profile_notifications'.i18n(), icon: Icons.notifications_none),
             const Divider(height: 1),
             SettingsTile(
               label: 'profile_language'.i18n(),
@@ -127,12 +121,13 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
             ),
             const Divider(height: 1),
             SettingsTile(
-                label: 'profile_dark_mode'.i18n(),
-                icon: Icons.dark_mode_outlined,
-                trailingText: AppThemeMode.getThemeModeLocale(currentThemeMode).i18n(),
-                onTap: () {
-                  context.push('/profile/theme');
-                }),
+              label: 'profile_dark_mode'.i18n(),
+              icon: Icons.dark_mode_outlined,
+              trailingText: AppThemeMode.getThemeModeLocale(currentThemeMode).i18n(),
+              onTap: () {
+                context.push('/profile/theme');
+              },
+            ),
             const Divider(height: 1),
             SettingsTile(label: 'profile_help_support'.i18n(), icon: Icons.help_outline, isLast: true),
           ],
@@ -153,10 +148,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
               foregroundColor: colorScheme.error, // Strong red
             ),
             icon: const Icon(Icons.logout),
-            label: Text(
-              'profile_logout'.i18n(),
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            label: Text('profile_logout'.i18n(), style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
         ),
 
@@ -166,11 +158,12 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FutureBuilder<PackageInfo>(
-                future: PackageInfo.fromPlatform(),
-                builder: (context, data) {
-                  if (!data.hasData) return const Text(" ");
-                  return Text("profile_version".i18n([data.data!.version]));
-                }),
+              future: PackageInfo.fromPlatform(),
+              builder: (context, data) {
+                if (!data.hasData) return const Text(" ");
+                return Text("profile_version".i18n([data.data!.version]));
+              },
+            ),
           ],
         ),
         SizedBox(height: 32.sp),

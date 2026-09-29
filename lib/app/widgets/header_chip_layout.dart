@@ -16,13 +16,7 @@ class HeaderChipLayout extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      children: [
-                        ...widgets,
-                      ],
-                    ),
+                    child: ListView(scrollDirection: Axis.horizontal, shrinkWrap: true, children: [...widgets]),
                   ),
                 ],
               ),

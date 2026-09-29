@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/data/models/account.dart';
@@ -37,13 +36,14 @@ class TransactionItemsPageState
     item as TransactionItemModel;
     bool isLast = items.indexOf(item) == items.length - 1;
     return BaseListTile(
-        isLast: isLast,
-        index: items.indexOf(item),
-        title: Text(item.userName),
-        trailing: Text(
-          createTrailingText(item),
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
-        ));
+      isLast: isLast,
+      index: items.indexOf(item),
+      title: Text(item.userName),
+      trailing: Text(
+        createTrailingText(item),
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
+      ),
+    );
   }
 
   String createTrailingText(TransactionItemModel current) {
@@ -90,10 +90,14 @@ class TransactionItemsPageState
             transaction == null ? "" : "${transaction.name} - ${Utils.dateFormating(transaction.createDateTime)}",
       ),
       BaseHeaderChip(
-          label: "transaction_items_transactionType",
-          labelValue: () async => Utils.getTransactionTypeText(transaction?.transactionType)),
+        label: "transaction_items_transactionType",
+        labelValue: () async => Utils.getTransactionTypeText(transaction?.transactionType),
+      ),
       if (transaction?.account == Account.MYSHARE)
-        BaseHeaderChip(label: "transaction_items_account", labelValue: () async => transaction?.transactionType?.name ?? ""),
+        BaseHeaderChip(
+          label: "transaction_items_account",
+          labelValue: () async => transaction?.transactionType?.name ?? "",
+        ),
     ];
   }
 

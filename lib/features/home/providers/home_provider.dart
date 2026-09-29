@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
@@ -19,14 +18,14 @@ import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 
 final homeDataProvider = StateNotifierProvider.autoDispose<HomeDataNotifier, HomeState>(
-    (ref) => HomeDataNotifier(ref.watch(bufeRepoProvider), ref.read(donationRepoProvider), ref.read(usersRepoProvider)));
+  (ref) => HomeDataNotifier(ref.watch(bufeRepoProvider), ref.read(donationRepoProvider), ref.read(usersRepoProvider)),
+);
 
 class HomeDataNotifier extends BaseDataNotifier<HomeState> {
   HomeDataNotifier(this._bufeRepository, this._donationRepository, this._usersRepository) : super(const HomeState()) {
     if (_currentUser != null) {
       getAccount();
       getDonations();
-
     }
   }
 
@@ -37,53 +36,69 @@ class HomeDataNotifier extends BaseDataNotifier<HomeState> {
 
   Future<void> getAccount() async {
     var userId = _currentUser!.id;
-    executeApiCall<SumupUserModel>(() => _bufeRepository.getAccount(userId), onSuccess: (data) async {
-      state = state.copyWith(account: data);
-      getFamily(userId);
-      getOrders(userId);
-      getImages();
-    }, onError: (data) async {
-      if (data.contains("404")) {
-        executeApiCall<SumupUserModel>(
+    executeApiCall<SumupUserModel>(
+      () => _bufeRepository.getAccount(userId),
+      onSuccess: (data) async {
+        state = state.copyWith(account: data);
+        getFamily(userId);
+        getOrders(userId);
+        getImages();
+      },
+      onError: (data) async {
+        if (data.contains("404")) {
+          executeApiCall<SumupUserModel>(
             () => _bufeRepository.createCustomer(
-                fullname: _currentUser!.getFullName(),
-                dukappId: _currentUser!.id,
-                email: _currentUser!.email ?? ""), onSuccess: (data) async {
-          state = state.copyWith(account: data);
-          getOrders(userId);
-        });
-      }
-    });
+              fullname: _currentUser!.getFullName(),
+              dukappId: _currentUser!.id,
+              email: _currentUser!.email ?? "",
+            ),
+            onSuccess: (data) async {
+              state = state.copyWith(account: data);
+              getOrders(userId);
+            },
+          );
+        }
+      },
+    );
   }
 
   FutureOr<void> getOrders(num userId) async {
-    executeApiCall<Order?>(() => _bufeRepository.getOrders(userId: userId, limit: 10), onSuccess: (data) async {
-      if (data != null) {
-        state = state.copyWith(orders: data.items);
-      }
-    });
+    executeApiCall<Order?>(
+      () => _bufeRepository.getOrders(userId: userId, limit: 10),
+      onSuccess: (data) async {
+        if (data != null) {
+          state = state.copyWith(orders: data.items);
+        }
+      },
+    );
   }
 
   FutureOr<void> getImages() async {
-    executeApiCall<List<DukappImages>>(() => _bufeRepository.getDukappImages(), onSuccess: (data) async {
-      state = state.copyWith(dukappImages: data);
-    });
+    executeApiCall<List<DukappImages>>(
+      () => _bufeRepository.getDukappImages(),
+      onSuccess: (data) async {
+        state = state.copyWith(dukappImages: data);
+      },
+    );
   }
 
   FutureOr<void> getFamily(num userId) async {
-    executeApiCall<List<UserModel>?>(() => _usersRepository.getChildren(userId), onSuccess: (data) async {
-      if (data != null) {
-        executeApiCall<String?>(() async {
-          state = state.copyWith(familiyAccounts: []);
-          for (var user in data) {
-            _bufeRepository.getAccount(user.id).then((r) {
-              state = state.copyWith(familiyAccounts: [...state.familiyAccounts, r]);
-            });
-          }
-          return "Success";
-        });
-      }
-    });
+    executeApiCall<List<UserModel>?>(
+      () => _usersRepository.getChildren(userId),
+      onSuccess: (data) async {
+        if (data != null) {
+          executeApiCall<String?>(() async {
+            state = state.copyWith(familiyAccounts: []);
+            for (var user in data) {
+              _bufeRepository.getAccount(user.id).then((r) {
+                state = state.copyWith(familiyAccounts: [...state.familiyAccounts, r]);
+              });
+            }
+            return "Success";
+          });
+        }
+      },
+    );
   }
 
   @override

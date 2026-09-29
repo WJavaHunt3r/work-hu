@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' ;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_header_chip.dart';
-import 'package:work_hu/features/round_filter_chip/providers/round_filter_chip_provider.dart';
-import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/user_status/data/model/user_status_model.dart';
 import 'package:work_hu/features/user_status/data/state/user_status_state.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
@@ -41,42 +39,26 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
       isLast: isLast,
       index: index,
       minVerticalPadding: 0,
-      title: Text(
-        item.name,
-      ),
+      title: Text(item.name),
       leading: item.localOnTrack
-          ? Icon(
-              Icons.done_outline,
-              size: 24.sp,
-            )
-          : Icon(
-              Icons.close_rounded,
-              color: Theme.of(context).colorScheme.error,
-              size: 24.sp,
-            ),
+          ? Icon(Icons.done_outline, size: 24.sp)
+          : Icon(Icons.close_rounded, color: Theme.of(context).colorScheme.error, size: 24.sp),
       subtitle: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           item.localOnTrack
-              ? const Text(
-                  "On Track",
-                )
+              ? const Text("On Track")
               : Text("myshare_status_to_be_local_ontrack_short".i18n([Utils.creditFormatting(item.toLocalOnTrack)])),
           item.onTrack
-              ? const Text(
-                  "On Track",
-                )
+              ? const Text("On Track")
               : Text("myshare_status_to_be_ontrack_short".i18n([Utils.creditFormatting(item.toOnTrack)])),
-          Text("${"myshare_status_goal".i18n([
-                Utils.creditFormatting(item.goal)
-              ])} - ${"myshare_status_status".i18n()}: ${Utils.creditFormatting(item.transactions)}")
+          Text(
+            "${"myshare_status_goal".i18n([Utils.creditFormatting(item.goal)])} - ${"myshare_status_status".i18n()}: ${Utils.creditFormatting(item.transactions)}",
+          ),
         ],
       ),
-      trailing: Text(
-        "${Utils.percentFormat.format(userStatus)}%",
-        style: Theme.of(context).textTheme.bodyLarge,
-      ),
+      trailing: Text("${Utils.percentFormat.format(userStatus)}%", style: Theme.of(context).textTheme.bodyLarge),
       tileColor: item.localOnTrack
           ? Theme.of(context).colorScheme.primaryContainer
           : Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -87,9 +69,10 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
   List<Widget> buildHeaderLayout(BuildContext context, WidgetRef ref) {
     return [
       BaseHeaderChip(
-          label: "user_status_head_on_track",
-          labelValue: () async => "${state.headData.onTrackCount} / ${state.headData.goalCount}"),
-      BaseHeaderChip(label: "user_status_head_goal", labelValue: () async => "${state.headData.localMyShareGoal}%")
+        label: "user_status_head_on_track",
+        labelValue: () async => "${state.headData.onTrackCount} / ${state.headData.goalCount}",
+      ),
+      BaseHeaderChip(label: "user_status_head_goal", labelValue: () async => "${state.headData.localMyShareGoal}%"),
     ];
   }
 

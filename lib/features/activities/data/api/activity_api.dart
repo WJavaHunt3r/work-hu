@@ -1,4 +1,3 @@
-import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 
@@ -9,30 +8,34 @@ class ActivityApi {
 
   ActivityApi();
 
-  Future<dynamic> getActivities(
-      {num? responsibleId,
-      num? employerId,
-      num? createUserId,
-      bool? registeredInApp,
-      bool? registeredInMyShare,
-      String? searchText,
-      String? referenceDate,
-      required int page,
-      required int size,
-      required List<String> sort}) async {
+  Future<dynamic> getActivities({
+    num? responsibleId,
+    num? employerId,
+    num? createUserId,
+    bool? registeredInApp,
+    bool? registeredInMyShare,
+    String? searchText,
+    String? referenceDate,
+    required int page,
+    required int size,
+    required List<String> sort,
+  }) async {
     try {
-      final res = await _dioClient.dio.get("/activity", queryParameters: {
-        "responsibleId": responsibleId,
-        "employerId": employerId,
-        "createUserId": createUserId,
-        "registeredInApp": registeredInApp,
-        "registeredInMyShare": registeredInMyShare,
-        "referenceDate": referenceDate,
-        "searchText": searchText,
-        "page": page,
-        "size": size,
-        "sort": sort
-      });
+      final res = await _dioClient.dio.get(
+        "/activity",
+        queryParameters: {
+          "responsibleId": responsibleId,
+          "employerId": employerId,
+          "createUserId": createUserId,
+          "registeredInApp": registeredInApp,
+          "registeredInMyShare": registeredInMyShare,
+          "referenceDate": referenceDate,
+          "searchText": searchText,
+          "page": page,
+          "size": size,
+          "sort": sort,
+        },
+      );
       return res.data;
     } catch (e) {
       rethrow;
@@ -59,8 +62,10 @@ class ActivityApi {
 
   Future<dynamic> registerActivityInTeams(num activityId, num userId) async {
     try {
-      final res = await _dioClient.dio
-          .post("/activity/$activityId/registerInTeams", queryParameters: {"activityId": activityId, "userId": userId});
+      final res = await _dioClient.dio.post(
+        "/activity/$activityId/registerInTeams",
+        queryParameters: {"activityId": activityId, "userId": userId},
+      );
       return res.data;
     } catch (e) {
       rethrow;

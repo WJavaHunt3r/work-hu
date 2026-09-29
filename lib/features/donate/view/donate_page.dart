@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
@@ -40,28 +39,21 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
     final theme = Theme.of(context);
     return state.donation == null
         ? Column(
-            children: [
-              Expanded(child: Center(child: CircularProgressIndicator())),
-            ],
+            children: [Expanded(child: Center(child: CircularProgressIndicator()))],
           )
         : Column(
             children: [
-              const SizedBox(
-                height: 40,
-              ),
+              const SizedBox(height: 40),
               Text(
-                  ref.watch(localeProvider).value == const Locale("hu", "HU")
-                      ? state.donation!.description.toString()
-                      : state.donation!.descriptionNO.toString(),
-                  style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(
-                height: 40,
+                ref.watch(localeProvider).value == const Locale("hu", "HU")
+                    ? state.donation!.description.toString()
+                    : state.donation!.descriptionNO.toString(),
+                style: theme.textTheme.displayMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
+              const SizedBox(height: 40),
               _buildDonateCard(theme),
-              const SizedBox(
-                height: 40,
-              ),
-              _buildConfirmButton(theme)
+              const SizedBox(height: 40),
+              _buildConfirmButton(theme),
             ],
           );
   }
@@ -105,15 +97,17 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
             child: TextField(
               controller: _amountController,
               keyboardType: TextInputType.number,
-              style: theme.textTheme.displaySmall
-                  ?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+              style: theme.textTheme.displaySmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 prefixText: 'Ft     ',
-                prefixStyle: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+                prefixStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ),
           ),
@@ -122,11 +116,7 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [2000, 5000, 10000].map((amt) {
               bool isSelected = _amountController.text == amt.toString();
-              return _AmountPresetButton(
-                label: '$amt Ft',
-                isSelected: isSelected,
-                onTap: () => _updateAmount(amt),
-              );
+              return _AmountPresetButton(label: '$amt Ft', isSelected: isSelected, onTap: () => _updateAmount(amt));
             }).toList(),
           ),
         ],

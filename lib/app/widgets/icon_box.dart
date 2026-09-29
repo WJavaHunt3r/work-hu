@@ -10,10 +10,7 @@ class IconBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(10.sp),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withAlpha(25),
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withAlpha(25), shape: BoxShape.circle),
       child: Icon(icon, color: Theme.of(context).colorScheme.primary),
     );
   }

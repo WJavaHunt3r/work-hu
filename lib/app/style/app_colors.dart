@@ -28,17 +28,9 @@ class AppColors {
   static const greenRowBgColor = Color(0xAA99FF99);
   static const yellowRowBgColor = Color(0xAAFFFF72);
 
-  static final List<Color> listColors = [
-    Colors.grey.shade100,
-    Colors.grey.shade200,
-    Colors.grey.shade300,
-  ];
+  static final List<Color> listColors = [Colors.grey.shade100, Colors.grey.shade200, Colors.grey.shade300];
 
-  static final List<Color> customerListColors = [
-    Colors.blue.shade100,
-    Colors.blue.shade200,
-    Colors.blue.shade300,
-  ];
+  static final List<Color> customerListColors = [Colors.blue.shade100, Colors.blue.shade200, Colors.blue.shade300];
 
   static var secondaryGray = Colors.grey.shade900;
 }

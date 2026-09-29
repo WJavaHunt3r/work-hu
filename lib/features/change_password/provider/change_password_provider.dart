@@ -1,9 +1,7 @@
-import 'dart:math';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
@@ -14,11 +12,13 @@ import 'package:work_hu/features/utils.dart';
 
 final changePasswordApiProvider = Provider<ChangePasswordApi>((ref) => ChangePasswordApi());
 
-final changePasswordRepoProvider =
-    Provider<ChangePasswordRepository>((ref) => ChangePasswordRepository(ref.read(changePasswordApiProvider)));
+final changePasswordRepoProvider = Provider<ChangePasswordRepository>(
+  (ref) => ChangePasswordRepository(ref.read(changePasswordApiProvider)),
+);
 
 final changePasswordDataProvider = StateNotifierProvider<ChangePasswordDataNotifier, ChangePasswordState>(
-    (ref) => ChangePasswordDataNotifier(ref.read(changePasswordRepoProvider)));
+  (ref) => ChangePasswordDataNotifier(ref.read(changePasswordRepoProvider)),
+);
 
 class ChangePasswordDataNotifier extends StateNotifier<ChangePasswordState> {
   ChangePasswordDataNotifier(this.changePasswordRepository) : super(const ChangePasswordState()) {

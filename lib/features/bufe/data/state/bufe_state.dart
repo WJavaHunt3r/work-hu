@@ -7,14 +7,15 @@ part 'bufe_state.freezed.dart';
 
 @freezed
 abstract class BufeState with _$BufeState {
-  const factory BufeState(
-      {@Default([]) List<TopUpEntry> payments,
-      SumupUserModel? account,
-      @Default([]) List<OrderEntry> orders,
-      @Default([]) List<OrderItem> orderItems,
-      OrderEntry? selectedOrder,
-      @Default(ModelState.empty) ModelState modelState,
-      @Default("") String message}) = _BufeState;
+  const factory BufeState({
+    @Default([]) List<TopUpEntry> payments,
+    SumupUserModel? account,
+    @Default([]) List<OrderEntry> orders,
+    @Default([]) List<OrderItem> orderItems,
+    OrderEntry? selectedOrder,
+    @Default(ModelState.empty) ModelState modelState,
+    @Default("") String message,
+  }) = _BufeState;
 
   const BufeState._();
 }

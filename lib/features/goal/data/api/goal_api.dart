@@ -21,8 +21,10 @@ class GoalApi {
 
   Future<dynamic> getGoalByUserAndSeasonYear(num userId, num seasonYear) async {
     try {
-      final res = await _dioClient.dio
-          .get("/goal/userSeasonGoal", queryParameters: {"userId": userId, "seasonYear": seasonYear});
+      final res = await _dioClient.dio.get(
+        "/goal/userSeasonGoal",
+        queryParameters: {"userId": userId, "seasonYear": seasonYear},
+      );
       return res.data;
     } catch (e) {
       rethrow;

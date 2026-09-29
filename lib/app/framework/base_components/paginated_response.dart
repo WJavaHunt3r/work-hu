@@ -1,32 +1,20 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'paginated_response.g.dart';
-
 part 'paginated_response.freezed.dart';
+part 'paginated_response.g.dart';
 
 @Freezed(genericArgumentFactories: true)
 abstract class PaginatedResponse<T> with _$PaginatedResponse<T> {
-
-  const factory PaginatedResponse({
-    required List<T> content,
-    required Page page
-  }) = _PaginatedResponse;
+  const factory PaginatedResponse({required List<T> content, required Page page}) = _PaginatedResponse;
 
   factory PaginatedResponse.fromJson(Map<String, dynamic> json, T Function(Object?) fromJsonT) =>
       _$PaginatedResponseFromJson(json, fromJsonT);
-
 }
 
 @freezed
 abstract class Page with _$Page {
-  const factory Page({
-    required int totalPages,
-    required int totalElements,
-    required int number,
-    required int size,
-}) = _Page;
+  const factory Page({required int totalPages, required int totalElements, required int number, required int size}) =
+      _Page;
 
-  factory Page.fromJson(Map<String, dynamic> json) =>
-      _$PageFromJson(json);
-
+  factory Page.fromJson(Map<String, dynamic> json) => _$PageFromJson(json);
 }

@@ -15,18 +15,21 @@ class AdminCard extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-            child: InkResponse(
-                onTap: onTap,
-                child: Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: Container(
-                      color: backgroundColor ?? AppColors.primary,
-                      height: 80.sp,
-                      child: Padding(
-                        padding: EdgeInsets.all(0.sp),
-                        child: child ?? Image(image: AssetImage(imageAsset), fit: BoxFit.fitWidth, height: 100.sp),
-                      )),
-                )))
+          child: InkResponse(
+            onTap: onTap,
+            child: Card(
+              clipBehavior: Clip.antiAlias,
+              child: Container(
+                color: backgroundColor ?? AppColors.primary,
+                height: 80.sp,
+                child: Padding(
+                  padding: EdgeInsets.all(0.sp),
+                  child: child ?? Image(image: AssetImage(imageAsset), fit: BoxFit.fitWidth, height: 100.sp),
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }

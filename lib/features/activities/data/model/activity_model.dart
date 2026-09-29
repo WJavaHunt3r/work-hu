@@ -1,31 +1,30 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
-import 'package:work_hu/features/login/data/model/user_model.dart';
 
 part 'activity_model.freezed.dart';
-
 part 'activity_model.g.dart';
 
 @freezed
 abstract class ActivityModel with _$ActivityModel {
-  const factory ActivityModel(
-      {num? id,
-      DateTime? createDateTime,
-      required num createUserId,
-      required String createUserName,
-      required String description,
-      required DateTime activityDateTime,
-      required num employerId,
-      required String employerName,
-      required num responsibleId,
-      required String responsibleName,
-      num? activityId,
-      required bool registeredInApp,
-      required bool registeredInMyShare,
-      required bool registeredInTeams,
-      required TransactionType transactionType,
-      required Account account}) = _ActivityModel;
+  const factory ActivityModel({
+    num? id,
+    DateTime? createDateTime,
+    required num createUserId,
+    required String createUserName,
+    required String description,
+    required DateTime activityDateTime,
+    required num employerId,
+    required String employerName,
+    required num responsibleId,
+    required String responsibleName,
+    num? activityId,
+    required bool registeredInApp,
+    required bool registeredInMyShare,
+    required bool registeredInTeams,
+    required TransactionType transactionType,
+    required Account account,
+  }) = _ActivityModel;
 
   factory ActivityModel.fromJson(Map<String, dynamic> json) => _$ActivityModelFromJson(json);
 }

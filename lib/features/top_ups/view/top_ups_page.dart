@@ -1,11 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:localization/localization.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/providers/localeProvider.dart';
@@ -18,9 +17,7 @@ import '../../../app/widgets/base_list_item.dart';
 import '../data/state/top_ups_state.dart';
 
 class TopUpsPage extends BaseListPage {
-  const TopUpsPage({
-    super.key,
-  }) : super(title: 'top_ups_title');
+  const TopUpsPage({super.key}) : super(title: 'top_ups_title');
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -45,10 +42,10 @@ class TopUpsPageState extends BaseListPageState<TopUpsPage, TopUpsState, TopUpsD
         children: [
           Text(
             '${item.amount > 0 ? "+" : ""}${Utils.creditFormatting(item.amount)}',
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium
-                ?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
           Text(
             'Bal: ${Utils.creditFormatting(item.balanceAfter)}',

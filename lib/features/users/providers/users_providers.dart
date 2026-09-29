@@ -4,11 +4,10 @@ import 'dart:developer';
 import 'package:csv/csv.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
-import 'package:work_hu/app/framework/base_components/page_stru.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/app/models/mode_state.dart';
@@ -20,14 +19,14 @@ import 'package:work_hu/features/user_combo/data/model/user_filter.dart';
 import 'package:work_hu/features/users/data/api/users_api.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/data/state/users_state.dart';
-import 'package:work_hu/features/utils.dart';
 
 final usersApiProvider = Provider<UsersApi>((ref) => UsersApi());
 
 final usersRepoProvider = Provider<UsersRepository>((ref) => UsersRepository(ref.read(usersApiProvider)));
 
 final usersDataProvider = StateNotifierProvider.autoDispose<UsersDataNotifier, UsersState>(
-    (ref) => UsersDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider).user));
+  (ref) => UsersDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider).user),
+);
 
 class UsersDataNotifier extends BaseDataNotifier<UsersState> implements ListApiProvider<UserFilter> {
   UsersDataNotifier(this.usersRepository, this.currentUser) : super(const UsersState()) {
@@ -49,16 +48,24 @@ class UsersDataNotifier extends BaseDataNotifier<UsersState> implements ListApiP
       ..add("firstname", descending: false);
     // _cache[cacheKey] = result.content;
     await executeApiCall<PaginatedResponse<UserComboModel>>(
-        () => usersRepository.fetchByQuery(
-            filter: filter ?? state.filter,
-            page: page ?? state.listState.number,
-            size: size ?? state.listState.size,
-            sort: sort), background: true, onSuccess: (data) async {
-      state = state.copyWith(
+      () => usersRepository.fetchByQuery(
+        filter: filter ?? state.filter,
+        page: page ?? state.listState.number,
+        size: size ?? state.listState.size,
+        sort: sort,
+      ),
+      background: true,
+      onSuccess: (data) async {
+        state = state.copyWith(
           users: page == 0 ? data.content : [...state.users, ...data.content],
-          listState: state.listState
-              .copyWith(totalElements: data.page.totalElements, totalPages: data.page.totalPages, number: data.page.number));
-    });
+          listState: state.listState.copyWith(
+            totalElements: data.page.totalElements,
+            totalPages: data.page.totalPages,
+            number: data.page.number,
+          ),
+        );
+      },
+    );
   }
 
   Future<void> resetUserPassword(num userId) async {
@@ -94,10 +101,7 @@ class UsersDataNotifier extends BaseDataNotifier<UsersState> implements ListApiP
   Future<void> uploadUserInfo() async {
     state = state.copyWith(modelState: ModelState.loading);
     try {
-      List<PlatformFile>? pickedFile = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['csv'],
-      );
+      List<PlatformFile>? pickedFile = await FilePicker.pickFiles(type: FileType.custom, allowedExtensions: ['csv']);
 
       if (pickedFile.isNotEmpty) {
         var file = pickedFile.first;
@@ -111,8 +115,9 @@ class UsersDataNotifier extends BaseDataNotifier<UsersState> implements ListApiP
             try {
               var user = await usersRepository.getUserById(num.tryParse(field[0]) ?? 0);
               var email = field[6].toString().isNotEmpty ? field[6] : null;
-              var phoneNumber =
-                  field[6].toString().isNotEmpty ? num.tryParse(field[5].toString().substring(1).replaceAll(" ", "")) ?? 0 : 0;
+              var phoneNumber = field[6].toString().isNotEmpty
+                  ? num.tryParse(field[5].toString().substring(1).replaceAll(" ", "")) ?? 0
+                  : 0;
 
               var newUser = user.copyWith(email: email, phoneNumber: phoneNumber == 0 ? null : phoneNumber);
 
@@ -133,13 +138,15 @@ class UsersDataNotifier extends BaseDataNotifier<UsersState> implements ListApiP
   @override
   UsersState copyWithState(BaseState status) {
     return state.copyWith(listState: state.listState.copyWith(baseStatus: status));
-
   }
 
-  Future<void> getUser(num id)async {
+  Future<void> getUser(num id) async {
     state = state.copyWith(selectedUser: null);
-    await executeApiCall<UserModel>(()=> usersRepository.getUserById(id), onSuccess: (user)async{
-      state = state.copyWith(selectedUser: user);
-    });
+    await executeApiCall<UserModel>(
+      () => usersRepository.getUserById(id),
+      onSuccess: (user) async {
+        state = state.copyWith(selectedUser: user);
+      },
+    );
   }
 }

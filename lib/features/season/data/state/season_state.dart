@@ -6,10 +6,11 @@ part 'season_state.freezed.dart';
 
 @freezed
 abstract class SeasonState with _$SeasonState {
-  const factory SeasonState(
-      {@Default([]) List<SeasonModel> seasons,
-      @Default(ModelState.empty) ModelState modelState,
-      @Default("") String message}) = _SeasonState;
+  const factory SeasonState({
+    @Default([]) List<SeasonModel> seasons,
+    @Default(ModelState.empty) ModelState modelState,
+    @Default("") String message,
+  }) = _SeasonState;
 
   const SeasonState._();
 }

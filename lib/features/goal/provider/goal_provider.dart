@@ -2,10 +2,9 @@ import 'dart:convert';
 
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
@@ -24,7 +23,6 @@ import 'package:work_hu/features/season/data/repository/season_repository.dart';
 import 'package:work_hu/features/season/provider/season_provider.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
-import 'package:work_hu/features/utils.dart';
 
 import '../../../app/providers/base_provider.dart';
 
@@ -32,22 +30,29 @@ final goalApiProvider = Provider<GoalApi>((ref) => GoalApi());
 
 final goalRepoProvider = Provider<GoalRepository>((ref) => GoalRepository(ref.read(goalApiProvider)));
 
-final goalDataProvider = StateNotifierProvider.autoDispose<GoalDataNotifier, GoalState>((ref) => GoalDataNotifier(
-    ref.read(goalRepoProvider), ref.read(usersRepoProvider), ref.read(seasonRepoProvider), ref.read(userDataProvider).user));
+final goalDataProvider = StateNotifierProvider.autoDispose<GoalDataNotifier, GoalState>(
+  (ref) => GoalDataNotifier(
+    ref.read(goalRepoProvider),
+    ref.read(usersRepoProvider),
+    ref.read(seasonRepoProvider),
+    ref.read(userDataProvider).user,
+  ),
+);
 
 class GoalDataNotifier extends BaseDataNotifier<GoalState> implements ListApiProvider<GoalFilter> {
-  GoalDataNotifier(
-    this.goalRepository,
-    this.usersRepository,
-    this.seasonRepository,
-    this.currentUserProvider,
-  ) : super(GoalState(
-            filter: GoalFilter(seasonYear: DateTime.now().year),
-            listState: BaseListState(
-                sort: (SortBuilder()
+  GoalDataNotifier(this.goalRepository, this.usersRepository, this.seasonRepository, this.currentUserProvider)
+    : super(
+        GoalState(
+          filter: GoalFilter(seasonYear: DateTime.now().year),
+          listState: BaseListState(
+            sort:
+                (SortBuilder()
                       ..add("user.lastname", descending: false)
                       ..add("user.firstname", descending: false))
-                    .build()))) {
+                    .build(),
+          ),
+        ),
+      ) {
     list();
   }
 
@@ -59,24 +64,30 @@ class GoalDataNotifier extends BaseDataNotifier<GoalState> implements ListApiPro
   @override
   Future<void> list({GoalFilter? filter, int? page, int? size, List<String>? sort}) async {
     await executeApiCall<PaginatedResponse<GoalModel>>(
-        () => goalRepository.getGoals(
-            filter: filter ?? state.filter,
-            pageStru: PageStru(
-                page: page ?? state.listState.number,
-                size: size ?? state.listState.size,
-                sort: sort ?? state.listState.sort)), background: true, onSuccess: (data) async {
-      state = state.copyWith(
+      () => goalRepository.getGoals(
+        filter: filter ?? state.filter,
+        pageStru: PageStru(
+          page: page ?? state.listState.number,
+          size: size ?? state.listState.size,
+          sort: sort ?? state.listState.sort,
+        ),
+      ),
+      background: true,
+      onSuccess: (data) async {
+        state = state.copyWith(
           goals: page == 0 ? data.content : [...state.goals, ...data.content],
-          listState: state.listState
-              .copyWith(totalElements: data.page.totalElements, totalPages: data.page.totalPages, number: data.page.number));
-    });
+          listState: state.listState.copyWith(
+            totalElements: data.page.totalElements,
+            totalPages: data.page.totalPages,
+            number: data.page.number,
+          ),
+        );
+      },
+    );
   }
 
   Future<void> uploadGoalsCsv() async {
-    final pickedFile = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['csv'],
-    );
+    final pickedFile = await FilePicker.pickFiles(type: FileType.custom, allowedExtensions: ['csv']);
 
     if (pickedFile.isNotEmpty) {
       var file = pickedFile.first;
@@ -94,9 +105,10 @@ class GoalDataNotifier extends BaseDataNotifier<GoalState> implements ListApiPro
               var goal = row[6];
               if (goal != 0) {
                 GoalModel goalModel = GoalModel(
-                    goal: goal,
-                    userId: user.id,
-                    seasonYear: seasons.firstWhere((s) => s.seasonYear == DateTime.now().year).seasonYear);
+                  goal: goal,
+                  userId: user.id,
+                  seasonYear: seasons.firstWhere((s) => s.seasonYear == DateTime.now().year).seasonYear,
+                );
                 goals.add(goalModel);
               }
             }
@@ -114,11 +126,15 @@ class GoalDataNotifier extends BaseDataNotifier<GoalState> implements ListApiPro
     List<GoalModel> origItems = state.goals;
     List<GoalModel> items = [...origItems];
     items.removeWhere((a) => a.id != goalId);
-    executeApiCall(() => goalRepository.deleteGoal(goalId, currentUserProvider!.id), onSuccess: (data) async {
-      state = state.copyWith(goals: items);
-    }, onError: (error) async {
-      state = state.copyWith(goals: origItems);
-    });
+    executeApiCall(
+      () => goalRepository.deleteGoal(goalId, currentUserProvider!.id),
+      onSuccess: (data) async {
+        state = state.copyWith(goals: items);
+      },
+      onError: (error) async {
+        state = state.copyWith(goals: origItems);
+      },
+    );
   }
 
   Future<void> updateGoal(GoalModel goal) async {
@@ -139,9 +155,11 @@ class GoalDataNotifier extends BaseDataNotifier<GoalState> implements ListApiPro
   }
 
   Future<void> presetGoal(GoalModel goal, MaintenanceMode mode) async {
-     if (goal.seasonYear == null) {
+    if (goal.seasonYear == null) {
       await seasonRepository.getSeasons().then(
-          (value) => goal = goal.copyWith(seasonYear: value.firstWhere((s) => s.seasonYear == DateTime.now().year).seasonYear));
+        (value) =>
+            goal = goal.copyWith(seasonYear: value.firstWhere((s) => s.seasonYear == DateTime.now().year).seasonYear),
+      );
     } else {}
     state = state.copyWith(selectedGoal: goal, mode: mode);
   }

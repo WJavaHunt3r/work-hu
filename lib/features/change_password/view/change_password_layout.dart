@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -17,69 +16,74 @@ class ChangePasswordLayout extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Stack(children: [
-      Padding(
+    return Stack(
+      children: [
+        Padding(
           padding: EdgeInsets.all(8.sp),
           child: Form(
-              key: _formKey,
-              child: AutofillGroup(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    BaseTextFormField(
-                      obscureText: true,
-                      isPasswordField: true,
-                      controller: ref.watch(changePasswordDataProvider.notifier).newPasswordController,
-                      textInputAction: TextInputAction.next,
-                      onFieldSubmitted: (text) => newPasswordNode.requestFocus(),
-                      labelText: "change_password_new_password".i18n(),
-                    ),
-                    BaseTextFormField(
-                      obscureText: true,
-                      focusNode: newPasswordNode,
-                      isPasswordField: true,
-                      controller: ref.watch(changePasswordDataProvider.notifier).newPasswordAgainController,
-                      textInputAction: TextInputAction.go,
-                      labelText: "change_password_new_password_again".i18n(),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 4.sp),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FilledButton(
-                              onPressed: () => ref
-                                  .read(changePasswordDataProvider.notifier)
-                                  .changePassword()
-                                  .then((value) => ref.read(changePasswordDataProvider).modelState == ModelState.success
-                                      ? context.canPop()
+            key: _formKey,
+            child: AutofillGroup(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  BaseTextFormField(
+                    obscureText: true,
+                    isPasswordField: true,
+                    controller: ref.watch(changePasswordDataProvider.notifier).newPasswordController,
+                    textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (text) => newPasswordNode.requestFocus(),
+                    labelText: "change_password_new_password".i18n(),
+                  ),
+                  BaseTextFormField(
+                    obscureText: true,
+                    focusNode: newPasswordNode,
+                    isPasswordField: true,
+                    controller: ref.watch(changePasswordDataProvider.notifier).newPasswordAgainController,
+                    textInputAction: TextInputAction.go,
+                    labelText: "change_password_new_password_again".i18n(),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 4.sp),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FilledButton(
+                          onPressed: () => ref
+                              .read(changePasswordDataProvider.notifier)
+                              .changePassword()
+                              .then(
+                                (value) => ref.read(changePasswordDataProvider).modelState == ModelState.success
+                                    ? context.canPop()
                                           ? context.pop(true)
                                           : context.push("/login")
-                                      : null),
-                              child: Text(
-                                "change_password_change_action".i18n(),
-                                // style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.white),
-                              )),
-                        ],
-                      ),
+                                    : null,
+                              ),
+                          child: Text(
+                            "change_password_change_action".i18n(),
+                            // style: const TextStyle(fontWeight: FontWeight.w800, color: AppColors.white),
+                          ),
+                        ),
+                      ],
                     ),
-                    ref.watch(changePasswordDataProvider).modelState == ModelState.error
-                        ? Center(
-                            child: Text(
-                              ref.watch(changePasswordDataProvider).message,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(color: AppColors.errorRed),
-                            ),
-                          )
-                        : const SizedBox(),
-                  ],
-                ),
-              ))),
-      ref.watch(changePasswordDataProvider).modelState == ModelState.loading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : const SizedBox()
-    ]);
+                  ),
+                  ref.watch(changePasswordDataProvider).modelState == ModelState.error
+                      ? Center(
+                          child: Text(
+                            ref.watch(changePasswordDataProvider).message,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: AppColors.errorRed),
+                          ),
+                        )
+                      : const SizedBox(),
+                ],
+              ),
+            ),
+          ),
+        ),
+        ref.watch(changePasswordDataProvider).modelState == ModelState.loading
+            ? const Center(child: CircularProgressIndicator())
+            : const SizedBox(),
+      ],
+    );
   }
 }

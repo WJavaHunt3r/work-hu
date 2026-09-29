@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:work_hu/features/donation/data/api/donation_api.dart';
 import 'package:work_hu/features/donation/data/model/donation_model.dart';
-import 'package:work_hu/features/utils.dart';
 
 class DonationRepository {
   final DonationsApi _donationApi;

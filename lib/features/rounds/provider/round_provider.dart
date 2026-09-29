@@ -1,6 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/framework/base_components/page_stru.dart';
@@ -17,12 +17,13 @@ final roundApiProvider = Provider<RoundApi>((ref) => RoundApi());
 
 final roundRepoProvider = Provider<RoundRepository>((ref) => RoundRepository(ref.read(roundApiProvider)));
 
-final roundDataProvider =
-    StateNotifierProvider.autoDispose<RoundsDataNotifier, RoundsState>((ref) => RoundsDataNotifier(ref.read(roundRepoProvider)));
+final roundDataProvider = StateNotifierProvider.autoDispose<RoundsDataNotifier, RoundsState>(
+  (ref) => RoundsDataNotifier(ref.read(roundRepoProvider)),
+);
 
 class RoundsDataNotifier extends BaseDataNotifier<RoundsState> implements ListApiProvider<RoundFilter> {
   RoundsDataNotifier(this.roundRepository)
-      : super(RoundsState(filter: RoundFilter(activeRound: true, seasonYear: DateTime.now().year))) {
+    : super(RoundsState(filter: RoundFilter(activeRound: true, seasonYear: DateTime.now().year))) {
     list();
   }
 
@@ -32,15 +33,22 @@ class RoundsDataNotifier extends BaseDataNotifier<RoundsState> implements ListAp
   Future<void> list({RoundFilter? filter, int? page, int? size, List<String>? sort}) async {
     var sort = SortBuilder()..add("startDateTime", descending: true);
     await executeApiCall<PaginatedResponse<RoundModel>>(
-        (() => roundRepository.getRounds(
-            filter: filter ?? state.filter,
-            pageStru: PageStru(page: page ?? state.status.number, size: size ?? state.status.size, sort: sort.build()))),
-        background: true, onSuccess: (data) async {
-      state = state.copyWith(
+      (() => roundRepository.getRounds(
+        filter: filter ?? state.filter,
+        pageStru: PageStru(page: page ?? state.status.number, size: size ?? state.status.size, sort: sort.build()),
+      )),
+      background: true,
+      onSuccess: (data) async {
+        state = state.copyWith(
           rounds: page == 0 ? data.content : [...state.rounds, ...data.content],
-          status: state.status
-              .copyWith(totalElements: data.page.totalElements, totalPages: data.page.totalPages, number: data.page.number));
-    });
+          status: state.status.copyWith(
+            totalElements: data.page.totalElements,
+            totalPages: data.page.totalPages,
+            number: data.page.number,
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -49,8 +57,11 @@ class RoundsDataNotifier extends BaseDataNotifier<RoundsState> implements ListAp
   }
 
   Future<void> getRound(id) async {
-    executeApiCall<RoundModel>(() => roundRepository.getRound(id), onSuccess: (data) async {
-      state = state.copyWith(selectedRound: data);
-    });
+    executeApiCall<RoundModel>(
+      () => roundRepository.getRound(id),
+      onSuccess: (data) async {
+        state = state.copyWith(selectedRound: data);
+      },
+    );
   }
 }

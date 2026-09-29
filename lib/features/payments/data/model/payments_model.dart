@@ -5,7 +5,6 @@ import 'package:work_hu/features/donation/data/model/donation_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 
 part 'payments_model.freezed.dart';
-
 part 'payments_model.g.dart';
 
 @freezed
@@ -21,8 +20,7 @@ abstract class PaymentsModel with _$PaymentsModel {
     required PaymentGoal paymentGoal,
     UserModel? user,
     UserModel? recipient,
-    DonationModel? donation
-
+    DonationModel? donation,
   }) = _PaymentsModel;
 
   factory PaymentsModel.fromJson(Map<String, dynamic> json) => _$PaymentsModelFromJson(json);

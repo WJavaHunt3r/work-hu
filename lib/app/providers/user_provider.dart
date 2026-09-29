@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:injectable/injectable.dart';
 import 'package:work_hu/api/dio_client.dart';
 import 'package:work_hu/app/locator.dart';
@@ -85,9 +84,11 @@ class UserProvider extends ChangeNotifier {
     // Uses the interceptor-free Dio: logout is also called from inside DioClient's queued error
     // interceptor, where a request through the main Dio would deadlock or loop on 401.
     try {
-      await _dio.plainDio.post('/auth/logout',
-          queryParameters: {"refreshToken": refreshToken},
-          options: Options(headers: {if (token.isNotEmpty) 'Authorization': 'Bearer $token'}));
+      await _dio.plainDio.post(
+        '/auth/logout',
+        queryParameters: {"refreshToken": refreshToken},
+        options: Options(headers: {if (token.isNotEmpty) 'Authorization': 'Bearer $token'}),
+      );
     } catch (_) {
       // The local session is already cleared; a failed server-side revoke is not fatal.
     }

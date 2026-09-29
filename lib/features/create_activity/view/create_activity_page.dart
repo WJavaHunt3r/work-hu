@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
+import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
@@ -21,12 +21,13 @@ import 'package:work_hu/features/user_combo/view/user_combo.dart';
 import 'package:work_hu/features/utils.dart';
 
 class CreateActivityPage extends BasePage {
-  const CreateActivityPage(
-      {super.title = "create_activity_new_activity_viewname",
-      super.key,
-      super.canPop = false,
-      super.canRefresh = false,
-      this.id});
+  const CreateActivityPage({
+    super.title = "create_activity_new_activity_viewname",
+    super.key,
+    super.canPop = false,
+    super.canRefresh = false,
+    this.id,
+  });
 
   final num? id;
 
@@ -36,7 +37,8 @@ class CreateActivityPage extends BasePage {
   }
 }
 
-class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateActivityState, CreateActivityDataNotifier> {
+class CreateActivityPageState
+    extends BasePageState<CreateActivityPage, CreateActivityState, CreateActivityDataNotifier> {
   static final _formKey = GlobalKey<FormState>();
   late final TextEditingController hoursController;
   late final TextEditingController defaultHourController;
@@ -61,10 +63,18 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
     valueFocusNode = FocusNode();
     usersFocusNode = FocusScopeNode();
 
-    dateController.addListener(() => ref.watch(provider.notifier).updateActivity(
-        state.activity!.copyWith(activityDateTime: DateTime.tryParse(dateController.value.text) ?? DateTime.now())));
-    descriptionController.addListener(() =>
-        ref.watch(provider.notifier).updateActivity(state.activity!.copyWith(description: descriptionController.value.text)));
+    dateController.addListener(
+      () => ref
+          .watch(provider.notifier)
+          .updateActivity(
+            state.activity!.copyWith(activityDateTime: DateTime.tryParse(dateController.value.text) ?? DateTime.now()),
+          ),
+    );
+    descriptionController.addListener(
+      () => ref
+          .watch(provider.notifier)
+          .updateActivity(state.activity!.copyWith(description: descriptionController.value.text)),
+    );
     hoursController.addListener(() => ref.read(provider.notifier).updateHours(hoursController.value.text));
     userController.addListener(() => _scrollToTop());
 
@@ -102,115 +112,117 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
               SizedBox(height: 5.sp),
               if (state.activity!.description.isNotEmpty) _buildRegistrationCard(theme),
               SizedBox(height: 5.sp),
-              if (state.activity!.description.isNotEmpty) _buildRegistrationListCard(theme)
+              if (state.activity!.description.isNotEmpty) _buildRegistrationListCard(theme),
             ],
           );
   }
 
   _buildDetails(ThemeData theme) {
     return BaseContainer(
-        padding: EdgeInsets.all(8.sp),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BaseTextFormField(
-                controller: dateController,
-                autofocus: true,
-                textInputAction: TextInputAction.next,
-                labelText: "create_activity_activity_date".i18n(),
-                suffix: IconButton(
-                  onPressed: () => _selectDate(context, ref),
-                  icon: const Icon(Icons.calendar_month),
-                ),
-              ),
-              SizedBox(height: 5.sp),
-              BaseTextFormField(
-                controller: descriptionController,
-                labelText: "create_activity_description".i18n(),
-                validator: (text) {
-                  if (text == null || text.isEmpty) {
-                    return 'create_activity_description_error'.i18n();
-                  }
-                  return null;
-                },
-                textInputAction: TextInputAction.next,
-              ),
-              SizedBox(height: 5.sp),
-              UserComboWidget(
-                controller: employerController,
-                initValue: state.activity!.employerId,
-                onSuggestionSelected: (UserComboModel suggestion) {
-                  ref.watch(provider.notifier).updateActivity(state.activity!.copyWith(employerId: suggestion.id));
-                },
-                labelText: "create_activity_employer".i18n(),
-              ),
-              UserComboWidget(
-                controller: responsibleController,
-                initValue: state.activity!.responsibleId,
-                onSuggestionSelected: (UserComboModel suggestion) {
-                  ref.watch(provider.notifier).updateActivity(state.activity!.copyWith(responsibleId: suggestion.id));
-                },
-                labelText: "create_activity_responsible".i18n(),
-              ),
-              SizedBox(height: 5.sp),
-              state.activity!.employerId == 281
-                  ? Padding(
-                      padding: EdgeInsets.all(8.sp),
-                      child: LayoutBuilder(builder: (context, constraints) {
+      padding: EdgeInsets.all(8.sp),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BaseTextFormField(
+              controller: dateController,
+              autofocus: true,
+              textInputAction: TextInputAction.next,
+              labelText: "create_activity_activity_date".i18n(),
+              suffix: IconButton(onPressed: () => _selectDate(context, ref), icon: const Icon(Icons.calendar_month)),
+            ),
+            SizedBox(height: 5.sp),
+            BaseTextFormField(
+              controller: descriptionController,
+              labelText: "create_activity_description".i18n(),
+              validator: (text) {
+                if (text == null || text.isEmpty) {
+                  return 'create_activity_description_error'.i18n();
+                }
+                return null;
+              },
+              textInputAction: TextInputAction.next,
+            ),
+            SizedBox(height: 5.sp),
+            UserComboWidget(
+              controller: employerController,
+              initValue: state.activity!.employerId,
+              onSuggestionSelected: (UserComboModel suggestion) {
+                ref.watch(provider.notifier).updateActivity(state.activity!.copyWith(employerId: suggestion.id));
+              },
+              labelText: "create_activity_employer".i18n(),
+            ),
+            UserComboWidget(
+              controller: responsibleController,
+              initValue: state.activity!.responsibleId,
+              onSuggestionSelected: (UserComboModel suggestion) {
+                ref.watch(provider.notifier).updateActivity(state.activity!.copyWith(responsibleId: suggestion.id));
+              },
+              labelText: "create_activity_responsible".i18n(),
+            ),
+            SizedBox(height: 5.sp),
+            state.activity!.employerId == 281
+                ? Padding(
+                    padding: EdgeInsets.all(8.sp),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
                         return Container(
                           constraints: constraints,
                           child: DropdownButtonFormField(
-                              alignment: AlignmentDirectional.topStart,
-                              borderRadius: BorderRadius.all(Radius.circular(8.sp)),
-                              decoration: InputDecoration(
-                                labelText: "create_activity_transaction_type".i18n(),
-                                filled: true,
-                                fillColor: theme.colorScheme.surface,
-                                enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8.sp),
-                                    borderSide: BorderSide(color: theme.colorScheme.outlineVariant)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8.sp),
-                                    borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.sp)),
+                            alignment: AlignmentDirectional.topStart,
+                            borderRadius: BorderRadius.all(Radius.circular(8.sp)),
+                            decoration: InputDecoration(
+                              labelText: "create_activity_transaction_type".i18n(),
+                              filled: true,
+                              fillColor: theme.colorScheme.surface,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.sp),
+                                borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
                               ),
-                              initialValue: state.activity!.transactionType,
-                              items: [TransactionType.DUKA_MUNKA_2000, TransactionType.DUKA_MUNKA]
-                                  .map((e) => DropdownMenuItem<TransactionType>(
-                                        value: e,
-                                        child: Text(e.name),
-                                      ))
-                                  .toList(),
-                              onChanged: (value) => value != null ? ref.watch(provider.notifier).updateAccount(value) : null),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.sp),
+                                borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.sp),
+                              ),
+                            ),
+                            initialValue: state.activity!.transactionType,
+                            items: [
+                              TransactionType.DUKA_MUNKA_2000,
+                              TransactionType.DUKA_MUNKA,
+                            ].map((e) => DropdownMenuItem<TransactionType>(value: e, child: Text(e.name))).toList(),
+                            onChanged: (value) =>
+                                value != null ? ref.watch(provider.notifier).updateAccount(value) : null,
+                          ),
                         );
-                      }),
-                    )
-                  : const SizedBox(),
-              SizedBox(
-                width: 140.sp,
-                child: BaseTextFormField(
-                  controller: defaultHourController,
-                  inputFormatter: CommaToDotFormatter(),
-                  keyBoardType: const TextInputType.numberWithOptions(decimal: true),
-                  textInputAction: TextInputAction.next,
-                  labelText: "create_activity_default_hour".i18n(),
-                ),
+                      },
+                    ),
+                  )
+                : const SizedBox(),
+            SizedBox(
+              width: 140.sp,
+              child: BaseTextFormField(
+                controller: defaultHourController,
+                inputFormatter: CommaToDotFormatter(),
+                keyBoardType: const TextInputType.numberWithOptions(decimal: true),
+                textInputAction: TextInputAction.next,
+                labelText: "create_activity_default_hour".i18n(),
               ),
-              state.activity!.description.isEmpty
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "create_activity_description_error".i18n(),
-                          style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.error),
-                        ),
-                      ],
-                    )
-                  : const SizedBox(),
-            ],
-          ),
-        ));
+            ),
+            state.activity!.description.isEmpty
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "create_activity_description_error".i18n(),
+                        style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.error),
+                      ),
+                    ],
+                  )
+                : const SizedBox(),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _selectDate(BuildContext context, WidgetRef ref) async {
@@ -221,7 +233,10 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
       lastDate: DateTime(DateTime.now().year + 1),
     );
     if (date != null && context.mounted) {
-      final TimeOfDay? time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(DateTime.now()));
+      final TimeOfDay? time = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+      );
       if (time != null) {
         var dateTime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
         dateController.text = dateTime.toString();
@@ -251,49 +266,49 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
 
   _buildRegistrationCard(ThemeData theme) {
     return BaseContainer(
-        padding: EdgeInsets.all(8.sp),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Expanded(
-              child: UserComboWidget(
-                key: _fieldKey,
-                controller: userController,
-                focusNode: usersFocusNode,
-                onSuggestionSelected: (UserComboModel suggestion) {
-                  ref.read(provider.notifier).updateSelectedUser(suggestion);
-                  valueFocusNode.requestFocus();
-                },
-                labelText: "create_activity_user".i18n(),
-              ),
+      padding: EdgeInsets.all(8.sp),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+            child: UserComboWidget(
+              key: _fieldKey,
+              controller: userController,
+              focusNode: usersFocusNode,
+              onSuggestionSelected: (UserComboModel suggestion) {
+                ref.read(provider.notifier).updateSelectedUser(suggestion);
+                valueFocusNode.requestFocus();
+              },
+              labelText: "create_activity_user".i18n(),
             ),
-            SizedBox(width: 10.sp),
-            SizedBox(
-              width: 140.sp,
-              child: BaseTextFormField(
-                controller: hoursController,
-                inputFormatter: CommaToDotFormatter(),
-                keyBoardType: const TextInputType.numberWithOptions(decimal: true),
-                focusNode: valueFocusNode,
-                suffix: Padding(
-                  padding: EdgeInsets.zero,
-                  child: FilledButton(
-                      onPressed: state.selectedUser != null && state.hours != null
-                          ? () {
-                              addRegistration();
-                            }
-                          : null,
-                      child: const Icon(
-                        Icons.add,
-                      )),
+          ),
+          SizedBox(width: 10.sp),
+          SizedBox(
+            width: 140.sp,
+            child: BaseTextFormField(
+              controller: hoursController,
+              inputFormatter: CommaToDotFormatter(),
+              keyBoardType: const TextInputType.numberWithOptions(decimal: true),
+              focusNode: valueFocusNode,
+              suffix: Padding(
+                padding: EdgeInsets.zero,
+                child: FilledButton(
+                  onPressed: state.selectedUser != null && state.hours != null
+                      ? () {
+                          addRegistration();
+                        }
+                      : null,
+                  child: const Icon(Icons.add),
                 ),
-                textInputAction: TextInputAction.go,
-                onFieldSubmitted: state.selectedUser != null && state.hours != null ? (text) => addRegistration() : null,
-                labelText: Utils.getTransactionTypeText(TransactionType.HOURS),
               ),
+              textInputAction: TextInputAction.go,
+              onFieldSubmitted: state.selectedUser != null && state.hours != null ? (text) => addRegistration() : null,
+              labelText: Utils.getTransactionTypeText(TransactionType.HOURS),
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 
   addRegistration() {
@@ -305,65 +320,69 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
   _buildSummaryCard(ThemeData theme) {
     var sum = state.sum;
     return BaseContainer(
-        padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 8.sp),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Text("create_activity_count".i18n()),
-                Text(
-                  state.activityItems.length.toStringAsFixed(0),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                )
-              ],
-            ),
-            Row(
-              children: [
-                Text("create_activity_sum".i18n([Utils.getTransactionTypeText(state.activity!.transactionType, false)])),
-                Text(
-                  sum % 1 == 0 ? sum.toStringAsFixed(0) : sum.toStringAsFixed(1),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(state.activity!.account == Account.MYSHARE && TransactionType.HOURS == (state.activity!.transactionType)
+      padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 8.sp),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Text("create_activity_count".i18n()),
+              Text(state.activityItems.length.toStringAsFixed(0), style: const TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Row(
+            children: [
+              Text("create_activity_sum".i18n([Utils.getTransactionTypeText(state.activity!.transactionType, false)])),
+              Text(
+                sum % 1 == 0 ? sum.toStringAsFixed(0) : sum.toStringAsFixed(1),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                state.activity!.account == Account.MYSHARE && TransactionType.HOURS == (state.activity!.transactionType)
                     ? " (${(sum * 3000).toInt()} Ft)"
                     : TransactionType.DUKA_MUNKA_2000 == (state.activity!.transactionType)
-                        ? " (${(sum * 2000).toInt()} Ft)"
-                        : state.activity!.account == Account.MYSHARE &&
-                                state.activity!.transactionType == TransactionType.DUKA_MUNKA
-                            ? " (${(sum * 1000).toInt()} Ft)"
-                            : "")
-              ],
-            ),
-            FilledButton(
-                onPressed: () => ref.watch(provider.notifier).isEmpty()
-                    ? showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (BuildContext context) {
-                          return ErrorAlertDialog(title: "create_activity_warning".i18n());
-                        })
-                    : showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return ConfirmAlertDialog(
-                                onConfirm: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                                title: "create_confirm_activity_send".i18n(),
-                                content: Text("create_confirm_activity_send_question".i18n(), textAlign: TextAlign.center),
-                              );
-                            })
-                        .then((value) => value != null && value == true
-                            ? ref
-                                .read(provider.notifier)
-                                .sendActivity()
-                                .then((r) => state.status.modelState.isSuccess ? Navigator.of(context).pop() : null)
-                            : null),
-                child: Text("create_activity_send".i18n()))
-          ],
-        ));
+                    ? " (${(sum * 2000).toInt()} Ft)"
+                    : state.activity!.account == Account.MYSHARE &&
+                          state.activity!.transactionType == TransactionType.DUKA_MUNKA
+                    ? " (${(sum * 1000).toInt()} Ft)"
+                    : "",
+              ),
+            ],
+          ),
+          FilledButton(
+            onPressed: () => ref.watch(provider.notifier).isEmpty()
+                ? showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (BuildContext context) {
+                      return ErrorAlertDialog(title: "create_activity_warning".i18n());
+                    },
+                  )
+                : showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return ConfirmAlertDialog(
+                        onConfirm: () {
+                          Navigator.of(context).pop(true);
+                        },
+                        title: "create_confirm_activity_send".i18n(),
+                        content: Text("create_confirm_activity_send_question".i18n(), textAlign: TextAlign.center),
+                      );
+                    },
+                  ).then(
+                    (value) => value != null && value == true
+                        ? ref
+                              .read(provider.notifier)
+                              .sendActivity()
+                              .then((r) => state.status.modelState.isSuccess ? Navigator.of(context).pop() : null)
+                        : null,
+                  ),
+            child: Text("create_activity_send".i18n()),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildRegistrationListCard(ThemeData theme) {
@@ -374,20 +393,21 @@ class CreateActivityPageState extends BasePageState<CreateActivityPage, CreateAc
           ? const SizedBox()
           : Column(
               children: items.map((e) {
-              var user = e.userName;
-              return Material(
-                surfaceTintColor: Colors.transparent,
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(24.sp),
-                child: RegistrationRowWidget(
-                  name: user,
-                  index: items.indexOf(e),
-                  isLast: items.indexOf(e) == items.length - 1,
-                  value: e.hours,
-                  onTap: () {},
-                ),
-              );
-            }).toList()),
+                var user = e.userName;
+                return Material(
+                  surfaceTintColor: Colors.transparent,
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(24.sp),
+                  child: RegistrationRowWidget(
+                    name: user,
+                    index: items.indexOf(e),
+                    isLast: items.indexOf(e) == items.length - 1,
+                    value: e.hours,
+                    onTap: () {},
+                  ),
+                );
+              }).toList(),
+            ),
     );
   }
 

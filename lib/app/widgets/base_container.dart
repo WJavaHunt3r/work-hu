@@ -16,25 +16,29 @@ class BaseContainer extends StatelessWidget {
     return GestureDetector(
       onTap: () => onTap?.call(),
       child: Container(
-          padding: padding ?? EdgeInsets.all(24.sp),
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-              color: color ?? Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(24.sp),
-              boxShadow: Theme.of(context).brightness == Brightness.dark
-                  ? null
-                  : [
-                      BoxShadow(
-                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-                          blurRadius: 5.sp,
-                          spreadRadius: 2.sp)
-                    ]),
-          child: Material(
-              surfaceTintColor: Colors.transparent,
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(24.sp),
-              child: child)),
+        padding: padding ?? EdgeInsets.all(24.sp),
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: color ?? Theme.of(context).colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(24.sp),
+          boxShadow: Theme.of(context).brightness == Brightness.dark
+              ? null
+              : [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                    blurRadius: 5.sp,
+                    spreadRadius: 2.sp,
+                  ),
+                ],
+        ),
+        child: Material(
+          surfaceTintColor: Colors.transparent,
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(24.sp),
+          child: child,
+        ),
+      ),
     );
   }
 }

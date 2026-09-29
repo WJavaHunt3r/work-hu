@@ -49,12 +49,7 @@ class PrivacyPolicy extends StatelessWidget {
             ),
 
             // Usage Section (Dark Card)
-            _buildDarkSection(
-              context: context,
-              theme: theme,
-              titleKey: 'pp_usage_title',
-              contentKey: 'pp_usage_body',
-            ),
+            _buildDarkSection(context: context, theme: theme, titleKey: 'pp_usage_title', contentKey: 'pp_usage_body'),
 
             // Rights Section (Dark Card)
             _buildDarkSection(
@@ -76,15 +71,9 @@ class PrivacyPolicy extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Text(
-                    'pp_contact_us'.i18n(),
-                    style: TextStyle(color: colorScheme.onSurfaceVariant),
-                  ),
+                  Text('pp_contact_us'.i18n(), style: TextStyle(color: colorScheme.onSurfaceVariant)),
                   SizedBox(height: 20.sp),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: Text('pp_delete_account_btn'.i18n()),
-                  ),
+                  ElevatedButton(onPressed: () {}, child: Text('pp_delete_account_btn'.i18n())),
                 ],
               ),
             ),

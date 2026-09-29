@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/models/mode_state.dart';
@@ -21,29 +20,33 @@ class MentorMenteeLayout extends ConsumerWidget {
           children: [
             Expanded(
               child: RefreshIndicator(
-                  onRefresh: () async => ref.read(mentorMenteeDataProvider.notifier).getMentorMentee(),
-                  child: LegacyBaseListView(
-                      cardBackgroundColor: Colors.transparent,
-                      itemBuilder: (context, index) {
-                        var current = items[index];
-                        return Dismissible(
-                            key: UniqueKey(),
-                            onDismissed: (direction) =>
-                                ref.watch(mentorMenteeDataProvider.notifier).deleteMentee(current.id!),
-                            dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
-                            child: Card(
-                              margin: const EdgeInsets.all(0),
-                              child: BaseListTile(
-                                  isLast: items.length - 1 == index,
-                                  index: index,
-                                  title: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [Text(current.mentor.getFullName()), Text(current.mentee.getFullName())],
-                                  )),
-                            ));
-                      },
-                      itemCount: items.length,
-                      children: const [])),
+                onRefresh: () async => ref.read(mentorMenteeDataProvider.notifier).getMentorMentee(),
+                child: LegacyBaseListView(
+                  cardBackgroundColor: Colors.transparent,
+                  itemBuilder: (context, index) {
+                    var current = items[index];
+                    return Dismissible(
+                      key: UniqueKey(),
+                      onDismissed: (direction) =>
+                          ref.watch(mentorMenteeDataProvider.notifier).deleteMentee(current.id!),
+                      dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
+                      child: Card(
+                        margin: const EdgeInsets.all(0),
+                        child: BaseListTile(
+                          isLast: items.length - 1 == index,
+                          index: index,
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [Text(current.mentor.getFullName()), Text(current.mentee.getFullName())],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  itemCount: items.length,
+                  children: const [],
+                ),
+              ),
             ),
           ],
         ),
@@ -54,7 +57,10 @@ class MentorMenteeLayout extends ConsumerWidget {
             child: const Icon(Icons.add),
             onPressed: () {
               showDialog(
-                  barrierDismissible: false, context: context, builder: (context) => const CreateMentorMenteeDialog());
+                barrierDismissible: false,
+                context: context,
+                builder: (context) => const CreateMentorMenteeDialog(),
+              );
             },
           ),
         ),
@@ -63,12 +69,9 @@ class MentorMenteeLayout extends ConsumerWidget {
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
                 surfaceTintColor: Colors.transparent,
-                content: Column(
-                  children: [
-                    Center(child: CircularProgressIndicator()),
-                  ],
-                ))
-            : const SizedBox()
+                content: Column(children: [Center(child: CircularProgressIndicator())]),
+              )
+            : const SizedBox(),
       ],
     );
   }

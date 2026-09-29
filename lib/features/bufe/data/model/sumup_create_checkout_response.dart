@@ -1,8 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:work_hu/app/models/payment_status.dart';
 
 part 'sumup_create_checkout_response.freezed.dart';
-
 part 'sumup_create_checkout_response.g.dart';
 
 @freezed
@@ -15,5 +13,6 @@ abstract class SumupCreateCheckoutResponse with _$SumupCreateCheckoutResponse {
     required String status,
   }) = _SumupCreateCheckoutResponse;
 
-  factory SumupCreateCheckoutResponse.fromJson(Map<String, dynamic> json) => _$SumupCreateCheckoutResponseFromJson(json);
+  factory SumupCreateCheckoutResponse.fromJson(Map<String, dynamic> json) =>
+      _$SumupCreateCheckoutResponseFromJson(json);
 }

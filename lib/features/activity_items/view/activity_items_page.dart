@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
@@ -26,7 +25,8 @@ class ActivityItemsPage extends BaseListPage {
   }
 }
 
-class ActivityItemsPageState extends BaseListPageState<ActivityItemsPage, ActivityItemsState, ActivityItemsDataNotifier> {
+class ActivityItemsPageState
+    extends BaseListPageState<ActivityItemsPage, ActivityItemsState, ActivityItemsDataNotifier> {
   @override
   void postInit(WidgetRef ref) {
     ref.read(provider.notifier).getActivity(widget.activityId);
@@ -43,9 +43,7 @@ class ActivityItemsPageState extends BaseListPageState<ActivityItemsPage, Activi
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp),
       ),
       title: Row(
-        children: [
-          Text(item.userName, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
+        children: [Text(item.userName, style: const TextStyle(fontWeight: FontWeight.bold))],
       ),
       subtitle: Text(dateString),
       isLast: items.indexOf(item) == items.length - 1,
@@ -70,8 +68,10 @@ class ActivityItemsPageState extends BaseListPageState<ActivityItemsPage, Activi
     return state.activity != null && !state.activity!.registeredInApp
         ? [
             IconButton(
-                onPressed: () => ref.read(provider.notifier).registerActivity().then((r) => Navigator.of(context).pop(true)),
-                icon: const Icon(Icons.send_outlined))
+              onPressed: () =>
+                  ref.read(provider.notifier).registerActivity().then((r) => Navigator.of(context).pop(true)),
+              icon: const Icon(Icons.send_outlined),
+            ),
           ]
         : null;
   }
@@ -87,7 +87,10 @@ class ActivityItemsPageState extends BaseListPageState<ActivityItemsPage, Activi
       ),
       BaseHeaderChip(label: "activity_items_employer", labelValue: () async => activity?.employerName ?? ""),
       BaseHeaderChip(label: "activity_items_responsible", labelValue: () async => activity?.responsibleName ?? ""),
-      BaseHeaderChip(label: "activity_items_transactionType", labelValue: () async => activity?.transactionType.name ?? ""),
+      BaseHeaderChip(
+        label: "activity_items_transactionType",
+        labelValue: () async => activity?.transactionType.name ?? "",
+      ),
       if (locator<UserProvider>().user!.isAdmin())
         BaseHeaderChip(label: "activity_items_created_by", labelValue: () async => activity?.createUserName ?? ""),
     ];
@@ -97,10 +100,7 @@ class ActivityItemsPageState extends BaseListPageState<ActivityItemsPage, Activi
   Widget? buildFloatingActionButton(BuildContext context, WidgetRef ref) {
     return FloatingActionButton(
       onPressed: () => ref.watch(provider.notifier).createCreditCsv(),
-      child: const Image(
-        image: AssetImage("assets/img/myshare-logo.png"),
-        fit: BoxFit.fitWidth,
-      ),
+      child: const Image(image: AssetImage("assets/img/myshare-logo.png"), fit: BoxFit.fitWidth),
     );
   }
 

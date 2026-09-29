@@ -1,10 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/framework/base_components/base_api.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/router_provider.dart';
@@ -47,9 +43,12 @@ abstract class BaseDataNotifier<S> extends StateNotifier<S> {
         state = copyWithModelState(ModelState.empty);
         await onError.call(message);
       } else {
-        state = copyWithState(BaseState(
+        state = copyWithState(
+          BaseState(
             modelState: background ? ModelState.backgroundError : ModelState.error,
-            message: background ? message : "api_unknown_error".i18n()));
+            message: background ? message : "api_unknown_error".i18n(),
+          ),
+        );
       }
       return null;
     }

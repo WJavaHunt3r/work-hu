@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'donation_model.freezed.dart';
-
 part 'donation_model.g.dart';
 
 @freezed
@@ -12,7 +11,7 @@ abstract class DonationModel with _$DonationModel {
     DateTime? endDateTime,
     String? description,
     String? descriptionNO,
-    num? sum
+    num? sum,
   }) = _DonationModel;
 
   factory DonationModel.fromJson(Map<String, dynamic> json) => _$DonationModelFromJson(json);

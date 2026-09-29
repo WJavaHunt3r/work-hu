@@ -8,8 +8,13 @@ class TransactionTile extends StatelessWidget {
   final String title, date, amount;
   final TransactionType transactionType;
 
-  const TransactionTile(
-      {super.key, required this.title, required this.date, required this.amount, required this.transactionType});
+  const TransactionTile({
+    super.key,
+    required this.title,
+    required this.date,
+    required this.amount,
+    required this.transactionType,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +24,9 @@ class TransactionTile extends StatelessWidget {
         padding: EdgeInsets.all(12.sp),
         child: ListTile(
           contentPadding: EdgeInsets.zero,
-          leading:
-              IconBox(icon: transactionType == TransactionType.CREDIT ? Icons.monetization_on_outlined : Icons.task_outlined),
+          leading: IconBox(
+            icon: transactionType == TransactionType.CREDIT ? Icons.monetization_on_outlined : Icons.task_outlined,
+          ),
           title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
           subtitle: Text(date, style: Theme.of(context).textTheme.bodySmall),
           trailing: Text(amount, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -29,4 +35,3 @@ class TransactionTile extends StatelessWidget {
     );
   }
 }
-

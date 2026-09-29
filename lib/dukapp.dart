@@ -1,11 +1,9 @@
-
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:localization/localization.dart';
@@ -39,25 +37,24 @@ class DukApp extends ConsumerWidget {
     }
 
     return FlutterWebFrame(
-        backgroundColor: AppColors.backgroundColor,
-        builder: (context) {
-          return ScreenUtilInit(
-              designSize: const Size(360, 640),
-              minTextAdapt: true,
-              ensureScreenSize: true,
-              enableScaleText: () => true,
-              enableScaleWH: () => width > 500 ? false : true,
-              splitScreenMode: false,
-              builder: (context, child) {
-                return Center(
-                    child: ClipRect(
-                        child: SizedBox(
-                  width: 500,
-                  child: buildMaterial(ref),
-                )));
-              });
-        },
-        maximumSize: const Size(500, 1000));
+      backgroundColor: AppColors.backgroundColor,
+      builder: (context) {
+        return ScreenUtilInit(
+          designSize: const Size(360, 640),
+          minTextAdapt: true,
+          ensureScreenSize: true,
+          enableScaleText: () => true,
+          enableScaleWH: () => width > 500 ? false : true,
+          splitScreenMode: false,
+          builder: (context, child) {
+            return Center(
+              child: ClipRect(child: SizedBox(width: 500, child: buildMaterial(ref))),
+            );
+          },
+        );
+      },
+      maximumSize: const Size(500, 1000),
+    );
   }
 
   buildMaterial(WidgetRef ref) {

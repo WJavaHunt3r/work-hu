@@ -7,11 +7,12 @@ part 'user_camp_state.freezed.dart';
 
 @freezed
 abstract class UserCampState with _$UserCampState {
-  const factory UserCampState(
-      {@Default([]) List<UserCampModel> userCamps,
-        @Default(BaseListState()) BaseListState listState,
-      @Default(ModelState.empty) ModelState modelState,
-      @Default("") String message}) = _UserCampState;
+  const factory UserCampState({
+    @Default([]) List<UserCampModel> userCamps,
+    @Default(BaseListState()) BaseListState listState,
+    @Default(ModelState.empty) ModelState modelState,
+    @Default("") String message,
+  }) = _UserCampState;
 
   const UserCampState._();
 }

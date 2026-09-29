@@ -6,21 +6,25 @@ class DonateApi {
 
   DonateApi();
 
-  Future<dynamic> createCheckout(
-      {required num amount,
-      required String checkoutReference,
-      required String description,
-      required String redirectUrl,
-      String? returnUrl}) async {
+  Future<dynamic> createCheckout({
+    required num amount,
+    required String checkoutReference,
+    required String description,
+    required String redirectUrl,
+    String? returnUrl,
+  }) async {
     try {
-      final res = await _dioClient.dio.post("/checkouts", data: {
-        "checkout_reference": checkoutReference,
-        "amount": amount,
-        "description": description,
-        "currency": "HUF",
-        "redirect_url": redirectUrl,
-        "return_url": returnUrl
-      });
+      final res = await _dioClient.dio.post(
+        "/checkouts",
+        data: {
+          "checkout_reference": checkoutReference,
+          "amount": amount,
+          "description": description,
+          "currency": "HUF",
+          "redirect_url": redirectUrl,
+          "return_url": returnUrl,
+        },
+      );
       return res.data;
     } catch (e) {
       rethrow;

@@ -3,7 +3,6 @@ import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/rounds/data/model/round_model.dart';
 
 part 'user_round_model.freezed.dart';
-
 part 'user_round_model.g.dart';
 
 @freezed

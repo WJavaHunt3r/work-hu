@@ -3,31 +3,30 @@ import 'package:work_hu/app/models/role.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 
 part 'user_model.freezed.dart';
-
 part 'user_model.g.dart';
 
 @freezed
 abstract class UserModel with _$UserModel {
-  const factory UserModel(
-      {required num id,
-      required String firstname,
-      required String lastname,
-      DateTime? birthDate,
-      TeamModel? paceTeam,
-      required Role role,
-      num? myShareID,
-      num? baseMyShareCredit,
-      num? currentMyShareCredit,
-      required bool changedPassword,
-      num? familyId,
-      num? spouseId,
-      num? phoneNumber,
-      num? bufeId,
-      num? points,
-      String? email}) = _UserModel;
+  const factory UserModel({
+    required num id,
+    required String firstname,
+    required String lastname,
+    DateTime? birthDate,
+    TeamModel? paceTeam,
+    required Role role,
+    num? myShareID,
+    num? baseMyShareCredit,
+    num? currentMyShareCredit,
+    required bool changedPassword,
+    num? familyId,
+    num? spouseId,
+    num? phoneNumber,
+    num? bufeId,
+    num? points,
+    String? email,
+  }) = _UserModel;
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 
   const UserModel._();
 
@@ -36,7 +35,7 @@ abstract class UserModel with _$UserModel {
   }
 
   num getAge() {
-    if(birthDate == null){
+    if (birthDate == null) {
       return 0;
     }
     return (DateTime.now().difference(birthDate!).inDays / 365).ceil() - 1;

@@ -6,10 +6,11 @@ part 'mentees_state.freezed.dart';
 
 @freezed
 abstract class MenteesState with _$MenteesState {
-  const factory MenteesState(
-      {@Default([]) List<UserGoalUserRoundModel> menteesStatus,
-      @Default(ModelState.empty) ModelState modelState,
-      @Default("") String message}) = _MenteesState;
+  const factory MenteesState({
+    @Default([]) List<UserGoalUserRoundModel> menteesStatus,
+    @Default(ModelState.empty) ModelState modelState,
+    @Default("") String message,
+  }) = _MenteesState;
 
   const MenteesState._();
 }

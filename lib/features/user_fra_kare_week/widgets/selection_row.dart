@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
@@ -16,11 +15,15 @@ class SelectionRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return BaseListTile(
-      leading: Text(fraKareWeek.user.getFullName(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp)),
+      leading: Text(
+        fraKareWeek.user.getFullName(),
+        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
+      ),
       trailing: Checkbox(
-          value: fraKareWeek.listened,
-          onChanged: (changed) =>
-              ref.read(userFraKareWeekDataProvider.notifier).setUserFraKareWeeks(fraKareWeek, changed ?? false)),
+        value: fraKareWeek.listened,
+        onChanged: (changed) =>
+            ref.read(userFraKareWeekDataProvider.notifier).setUserFraKareWeeks(fraKareWeek, changed ?? false),
+      ),
       isLast: isLast,
       index: index,
       title: SizedBox(),

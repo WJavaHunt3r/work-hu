@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
@@ -18,11 +17,8 @@ class PaymentFilter extends LegacyBasePage {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                      child: BaseTextFormField(
-                    labelText: 'payments_filter_dateFrom',
-                  )),
-                  Expanded(child: BaseTextFormField(labelText: 'payments_filter_dateTo'))
+                  Expanded(child: BaseTextFormField(labelText: 'payments_filter_dateFrom')),
+                  Expanded(child: BaseTextFormField(labelText: 'payments_filter_dateTo')),
                 ],
               ),
             ],
@@ -31,12 +27,13 @@ class PaymentFilter extends LegacyBasePage {
         Row(
           children: [
             Expanded(
-                child: Padding(
-              padding: EdgeInsets.all(16.sp),
-              child: TextButton(onPressed: () => (), child: const Text("base_text_search")),
-            ))
+              child: Padding(
+                padding: EdgeInsets.all(16.sp),
+                child: TextButton(onPressed: () => (), child: const Text("base_text_search")),
+              ),
+            ),
           ],
-        )
+        ),
       ],
     );
   }

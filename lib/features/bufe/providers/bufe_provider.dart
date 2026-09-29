@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/models/mode_state.dart';
@@ -12,8 +13,9 @@ final bufeApiProvider = Provider<BufeApi>((ref) => BufeApi());
 
 final bufeRepoProvider = Provider<BufeRepository>((ref) => BufeRepository(ref.read(bufeApiProvider)));
 
-final bufeDataProvider =
-    StateNotifierProvider<BufeDataNotifier, BufeState>((ref) => BufeDataNotifier(ref.read(bufeRepoProvider)));
+final bufeDataProvider = StateNotifierProvider<BufeDataNotifier, BufeState>(
+  (ref) => BufeDataNotifier(ref.read(bufeRepoProvider)),
+);
 
 class BufeDataNotifier extends StateNotifier<BufeState> {
   BufeDataNotifier(this.bufeRepository) : super(const BufeState()) {

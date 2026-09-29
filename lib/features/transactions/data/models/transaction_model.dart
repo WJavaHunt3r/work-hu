@@ -3,18 +3,18 @@ import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 
 part 'transaction_model.freezed.dart';
-
 part 'transaction_model.g.dart';
 
 @freezed
 abstract class TransactionModel with _$TransactionModel {
-  const factory TransactionModel(
-      {num? id,
-      required String name,
-      DateTime? createDateTime,
-      num? transactionCount,
-      TransactionType? transactionType,
-      required Account account}) = _TransactionModel;
+  const factory TransactionModel({
+    num? id,
+    required String name,
+    DateTime? createDateTime,
+    num? transactionCount,
+    TransactionType? transactionType,
+    required Account account,
+  }) = _TransactionModel;
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) => _$TransactionModelFromJson(json);
 }

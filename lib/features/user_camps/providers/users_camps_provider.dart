@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -14,7 +13,8 @@ final userCampApiProvider = Provider<UserCampApi>((ref) => UserCampApi());
 final userCampRepoProvider = Provider<UserCampRepository>((ref) => UserCampRepository(ref.read(userCampApiProvider)));
 
 final userCampDataProvider = StateNotifierProvider.autoDispose<UserCampDataNotifier, UserCampState>(
-    (ref) => UserCampDataNotifier(ref.read(userCampRepoProvider), ref.read(userDataProvider).user));
+  (ref) => UserCampDataNotifier(ref.read(userCampRepoProvider), ref.read(userDataProvider).user),
+);
 
 class UserCampDataNotifier extends StateNotifier<UserCampState> {
   UserCampDataNotifier(this.userCampRepository, this.currentUser) : super(const UserCampState()) {
@@ -27,11 +27,7 @@ class UserCampDataNotifier extends StateNotifier<UserCampState> {
   Future<void> getUserCamps() async {
     state = state.copyWith(modelState: ModelState.loading);
     try {
-      await userCampRepository
-          .getUserCamps(
-        seasonYear: DateTime.now().year,
-      )
-          .then((value) {
+      await userCampRepository.getUserCamps(seasonYear: DateTime.now().year).then((value) {
         // value.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
         // state = state.copyWith(userCamp: value, filtered: value, modelState: ModelState.success);
       });

@@ -1,9 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/season/data/model/season_model.dart';
 
 part 'goal_model.freezed.dart';
-
 part 'goal_model.g.dart';
 
 @freezed

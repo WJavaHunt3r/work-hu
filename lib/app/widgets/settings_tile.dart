@@ -11,17 +11,21 @@ class SettingsTile extends StatelessWidget {
   final bool isLast;
   final int index;
 
-  const SettingsTile(
-      {required this.label, required this.icon, this.trailingText, this.onTap, this.isLast = false, this.index = 1});
+  const SettingsTile({
+    required this.label,
+    required this.icon,
+    this.trailingText,
+    this.onTap,
+    this.isLast = false,
+    this.index = 1,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return BaseListTile(
       contentPadding: EdgeInsets.all(18.sp),
-      leading: IconBox(
-        icon: icon,
-      ),
+      leading: IconBox(icon: icon),
       title: Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,

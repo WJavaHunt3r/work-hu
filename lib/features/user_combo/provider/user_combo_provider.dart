@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
 import 'package:work_hu/app/framework/base_components/sort_builder.dart';
@@ -13,13 +12,12 @@ import 'package:work_hu/features/user_combo/data/state/user_combo_state.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
 
-final userComboDataProvider =
-    StateNotifierProvider<UserComboDataNotifier, UserComboState>((ref) => UserComboDataNotifier(ref.read(usersRepoProvider)));
+final userComboDataProvider = StateNotifierProvider<UserComboDataNotifier, UserComboState>(
+  (ref) => UserComboDataNotifier(ref.read(usersRepoProvider)),
+);
 
 class UserComboDataNotifier extends BaseDataNotifier<UserComboState> implements ListApiProvider<UserFilter> {
-  UserComboDataNotifier(
-    this.usersRepository,
-  ) : super(const UserComboState());
+  UserComboDataNotifier(this.usersRepository) : super(const UserComboState());
 
   final UsersRepository usersRepository;
   final Map<String, List<UserComboModel>> _cache = {};
@@ -37,7 +35,11 @@ class UserComboDataNotifier extends BaseDataNotifier<UserComboState> implements 
     state = state.copyWith(filter: filter ?? state.filter);
     try {
       var result = await usersRepository.fetchByQuery(
-          filter: filter ?? state.filter, page: page, size: size, sort: sort);
+        filter: filter ?? state.filter,
+        page: page,
+        size: size,
+        sort: sort,
+      );
       // _cache[cacheKey] = result.content;
 
       return result.content;
@@ -52,19 +54,18 @@ class UserComboDataNotifier extends BaseDataNotifier<UserComboState> implements 
   }
 
   Future<UserComboModel?> getUser({required num id}) async {
-    var result = await executeApiCall<UserModel>(
-      () => usersRepository.getUserById(id),
-    );
+    var result = await executeApiCall<UserModel>(() => usersRepository.getUserById(id));
 
     if (result != null) {
       var data = result as UserModel;
       return UserComboModel(
-          id: data.id,
-          comboText: "${data.getFullName()} - ${data.getAge().toInt()}",
-          firstname: data.firstname,
-          lastname: data.lastname,
-          age: data.getAge().toInt(),
-          churchName: "");
+        id: data.id,
+        comboText: "${data.getFullName()} - ${data.getAge().toInt()}",
+        firstname: data.firstname,
+        lastname: data.lastname,
+        age: data.getAge().toInt(),
+        churchName: "",
+      );
     }
     return null;
   }
