@@ -14,6 +14,7 @@ import 'package:work_hu/app/providers/router_provider.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/style/app_style.dart';
+import 'package:work_hu/app/update/web_update_checker.dart';
 
 import 'app/providers/authInitProvider.dart';
 import 'app/providers/localeProvider.dart';
@@ -90,6 +91,7 @@ class DukApp extends ConsumerWidget {
           darkTheme: theme.globalDarkTheme,
           themeMode: AppThemeMode.getThemeMode(appThemeMode),
           routerConfig: router,
+          builder: (context, child) => WebUpdateChecker(child: child!),
           locale: currentLocale,
           supportedLocales: supportedLocales,
           localizationsDelegates: [

@@ -45,7 +45,24 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('status_local_status'.i18n(), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('status_local_status'.i18n(),
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 4.sp),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withAlpha(25),
+                    borderRadius: BorderRadius.circular(20.sp),
+                  ),
+                  child: Text(
+                    'status_monthly_goal'.i18n([Utils.percentFormatting(state.userRoundHead.localMyShareGoal)]),
+                    style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.primary),
+                  ),
+                ),
+              ],
+            ),
             SizedBox(height: 8.sp),
             Row(
               children: [
@@ -84,7 +101,14 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
                         Utils.percentFormatting(child.status * 100),
                         style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text("status_goal".i18n([Utils.creditFormatting(child.goal).toString()])),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("status_goal".i18n([Utils.creditFormatting(child.goal).toString()])),
+                          Text("status_monthly_goal"
+                              .i18n([Utils.percentFormatting(state.userRoundHead.localMyShareGoal)])),
+                        ],
+                      ),
                     ),
                     SizedBox(height: 20.sp),
                     Row(
@@ -109,12 +133,9 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
                       ],
                     ),
                     SizedBox(height: 8.sp),
-                    LinearProgressIndicator(
+                    _GoalProgressBar(
                       value: max(0, double.tryParse(child.status.toString()) ?? 0),
-                      minHeight: 10.sp,
-                      borderRadius: BorderRadius.circular(10.sp),
-                      backgroundColor: colorScheme.primary.withOpacity(0.1),
-                      color: colorScheme.primary,
+                      goal: state.userRoundHead.localMyShareGoal / 100,
                     ),
                     if (child.userId != locator<UserProvider>().user!.id)
                       BaseListTile(
@@ -254,7 +275,7 @@ class _OnTrackStatus extends StatelessWidget {
           children: [
             Expanded(
                 child: Text(title,
-                    maxLines: 2,
+                    maxLines: 3,
                     overflow: TextOverflow.visible,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold))),
             IconBox(icon: icon),
@@ -265,6 +286,45 @@ class _OnTrackStatus extends StatelessWidget {
         Text(subData, style: Theme.of(context).textTheme.bodySmall),
       ],
     ));
+  }
+}
+
+class _GoalProgressBar extends StatelessWidget {
+  final double value;
+  final double goal;
+
+  const _GoalProgressBar({required this.value, required this.goal});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return LayoutBuilder(
+      builder: (context, constraints) => Stack(
+        clipBehavior: Clip.none,
+        children: [
+          LinearProgressIndicator(
+            value: value,
+            minHeight: 10.sp,
+            borderRadius: BorderRadius.circular(10.sp),
+            backgroundColor: colorScheme.primary.withOpacity(0.1),
+            color: colorScheme.primary,
+          ),
+          if (goal > 0 && goal < 1)
+            Positioned(
+              left: constraints.maxWidth * goal - 1.5.sp,
+              top: -3.sp,
+              child: Container(
+                width: 3.sp,
+                height: 16.sp,
+                decoration: BoxDecoration(
+                  color: colorScheme.onSurface,
+                  borderRadius: BorderRadius.circular(2.sp),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 
