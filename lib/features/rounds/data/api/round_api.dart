@@ -1,5 +1,5 @@
 import 'package:work_hu/api/dio_client.dart';
-import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/rounds/data/model/round_filter.dart';
 import 'package:work_hu/features/rounds/data/model/round_model.dart';
@@ -9,9 +9,12 @@ class RoundApi {
 
   RoundApi();
 
-  Future<dynamic> getRounds({required RoundFilter filter, required PageStru pageStru}) async {
+  Future<dynamic> getRounds(ListQuery<RoundFilter> query, int page) async {
     try {
-      final res = await _dioClient.dio.get("/round", queryParameters: {...filter.toJson(), ...pageStru.toJson()});
+      final res = await _dioClient.dio.get(
+        "/round",
+        queryParameters: {...query.filter.toJson(), ...query.pageParams(page)},
+      );
       return res.data;
     } catch (e) {
       rethrow;

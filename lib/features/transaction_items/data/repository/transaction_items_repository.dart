@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/transaction_items/data/api/transaction_items_api.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
@@ -10,14 +11,12 @@ class TransactionItemsRepository {
 
   TransactionItemsRepository(this._transactionItemsApi);
 
-  Future<PaginatedResponse<TransactionItemModel>> getTransactionItems({
-    TransactionItemsFilter? filter,
-    required int page,
-    required int size,
-    required List<String> sort,
+  Future<PaginatedResponse<TransactionItemModel>> getTransactionItems(
+    ListQuery<TransactionItemsFilter> query, {
+    int page = 0,
   }) async {
     try {
-      final res = await _transactionItemsApi.getTransactionItems(filter: filter, page: page, size: size, sort: sort);
+      final res = await _transactionItemsApi.getTransactionItems(query, page);
       final paginatedData = PaginatedResponse<TransactionItemModel>.fromJson(
         res,
         (json) => TransactionItemModel.fromJson(json as Map<String, dynamic>),

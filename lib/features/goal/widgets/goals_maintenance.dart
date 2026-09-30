@@ -19,8 +19,8 @@ class GoalsMaintenance extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(goalDataProvider).mode;
-    final GoalModel goal = ref.watch(goalDataProvider).selectedGoal;
+    final mode = ref.watch(goalMaintenanceProvider).mode;
+    final GoalModel goal = ref.watch(goalMaintenanceProvider).selectedGoal;
     var year = goal.seasonYear;
     return Dialog.fullscreen(
       child: Scaffold(
@@ -29,7 +29,7 @@ class GoalsMaintenance extends ConsumerWidget {
           title: Text("${mode}_goal".i18n(), style: const TextStyle(fontWeight: FontWeight.w800)),
           actions: [
             MaterialButton(
-              onPressed: () => ref.read(goalDataProvider.notifier).saveGoal().then((value) => context.pop(true)),
+              onPressed: () => ref.read(goalMaintenanceProvider.notifier).saveGoal().then((value) => context.pop(true)),
               child: const Text("Save"),
             ),
           ],
@@ -39,7 +39,7 @@ class GoalsMaintenance extends ConsumerWidget {
             : Form(
                 key: _formKey,
                 onPopInvoked: (pop) =>
-                    ref.read(goalDataProvider.notifier).presetGoal(const GoalModel(goal: 0), MaintenanceMode.create),
+                    ref.read(goalMaintenanceProvider.notifier).presetGoal(const GoalModel(goal: 0), MaintenanceMode.create),
                 child: Padding(
                   padding: EdgeInsets.all(8.sp),
                   child: Column(
@@ -52,7 +52,7 @@ class GoalsMaintenance extends ConsumerWidget {
                               controller: userController,
                               fldControl: mode == MaintenanceMode.create ? "3" : "1",
                               onSuggestionSelected: (UserComboModel suggestion) => ref
-                                  .watch(goalDataProvider.notifier)
+                                  .watch(goalMaintenanceProvider.notifier)
                                   .updateGoal(goal.copyWith(userId: suggestion.id, username: suggestion.lastname)),
                               labelText: "goal_maintenance_user".i18n(),
                             ),
@@ -78,7 +78,7 @@ class GoalsMaintenance extends ConsumerWidget {
                               keyBoardType: TextInputType.number,
                               onChanged: (String text) => text.isNotEmpty
                                   ? ref
-                                        .watch(goalDataProvider.notifier)
+                                        .watch(goalMaintenanceProvider.notifier)
                                         .updateGoal(goal.copyWith(goal: num.tryParse(text) ?? 0))
                                   : null,
                             ),

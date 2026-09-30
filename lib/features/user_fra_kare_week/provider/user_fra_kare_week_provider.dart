@@ -1,13 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
-import 'package:work_hu/app/providers/base_provider.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_notifier.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_state.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/user_fra_kare_week/data/api/user_fra_kare_week_api.dart';
 import 'package:work_hu/features/user_fra_kare_week/data/model/user_fra_kare_week_model.dart';
 import 'package:work_hu/features/user_fra_kare_week/data/repository/user_fra_kare_week_repository.dart';
-import 'package:work_hu/features/user_fra_kare_week/data/state/user_fra_kare_week_state.dart';
+
+typedef UserFraKareWeekFilter = ({num weekNumber, num? teamId});
 
 final userFraKareWeekApiProvider = Provider<UserFraKareWeekApi>((ref) => UserFraKareWeekApi());
 
@@ -15,66 +17,43 @@ final userFraKareWeekRepoProvider = Provider<UserFraKareWeekRepository>(
   (ref) => UserFraKareWeekRepository(ref.read(userFraKareWeekApiProvider)),
 );
 
-final userFraKareWeekDataProvider =
-    StateNotifierProvider.autoDispose<UserFraKareWeekDataNotifier, UserFraKareWeekState>(
-      (ref) => UserFraKareWeekDataNotifier(ref.read(userFraKareWeekRepoProvider)),
+/// Who listened in one week, by week number.
+final userFraKareWeekDataProvider = StateNotifierProvider.autoDispose
+    .family<UserFraKareWeekDataNotifier, PagedState<UserFraKareWeekModel, UserFraKareWeekFilter>, num>(
+      (ref, weekNumber) => UserFraKareWeekDataNotifier(ref.read(userFraKareWeekRepoProvider), weekNumber),
     );
 
-class UserFraKareWeekDataNotifier extends BaseDataNotifier<UserFraKareWeekState> implements ListApiProvider {
-  UserFraKareWeekDataNotifier(this.fraKareWeekRepository) : super(const UserFraKareWeekState());
+class UserFraKareWeekDataNotifier extends PagedListNotifier<UserFraKareWeekModel, UserFraKareWeekFilter> {
+  UserFraKareWeekDataNotifier(this.fraKareWeekRepository, num weekNumber)
+    : super(ListQuery(filter: (weekNumber: weekNumber, teamId: null)));
 
   final UserFraKareWeekRepository fraKareWeekRepository;
 
+  /// Checkbox changes not saved yet, by id.
+  final Map<num, UserFraKareWeekModel> _edits = {};
+
+  /// Not paged by the server: returns the whole week at once.
   @override
-  Future<void> list({filter, int? page, int? size, List<String>? sort}) async {
-    await executeApiCall<List<UserFraKareWeekModel>>(
-      () => fraKareWeekRepository.getFraKareWeeks(weekNumber: state.weekNumber, teamId: state.selectedTeamId),
-      background: true,
-      onSuccess: (streaks) async {
-        state = state.copyWith(
-          streaks: streaks,
-          listState: state.listState.copyWith(number: 0, totalPages: 1, totalElements: streaks.length),
-        );
-      },
-    );
-  }
+  Future<PaginatedResponse<UserFraKareWeekModel>> fetch(ListQuery<UserFraKareWeekFilter> query, int page) async =>
+      PaginatedResponse.all(
+        await fraKareWeekRepository.getFraKareWeeks(weekNumber: query.filter.weekNumber, teamId: query.filter.teamId),
+      );
 
   void setUserFraKareWeeks(UserFraKareWeekModel userWeek, bool listened) {
-    var streaks = state.streaks;
-    var edits = {...?state.edits};
-    if (edits.containsKey(userWeek.id)) {
-      edits.remove(userWeek.id);
-    }
-    edits.addAll({userWeek.id: userWeek.copyWith(listened: listened)});
-
-    state = state.copyWith(
-      edits: edits,
-      streaks: streaks.map((e) => e.id == userWeek.id ? e.copyWith(listened: listened) : e).toList(),
-    );
+    _edits[userWeek.id] = userWeek.copyWith(listened: listened);
+    updateItems((items) => [for (final e in items) e.id == userWeek.id ? e.copyWith(listened: listened) : e]);
   }
 
   Future<void> saveUserFraKareWeeks() async {
-    var edits = state.edits?.values.toList() ?? [];
+    final edits = _edits.values.toList();
     await executeApiCall<bool>(() async {
       for (var streak in edits) {
         await fraKareWeekRepository.putFraKareWeek(streak.listened, streak.id);
       }
       return true;
-    });
+    }, onSuccess: (_) async => _edits.clear());
   }
 
-  setSelectedFilter(TeamModel? team) {
-    state = state.copyWith(selectedTeamId: team == null ? 0 : team.id);
-    list();
-  }
-
-  setWeekNumber(num week) {
-    state = state.copyWith(weekNumber: week);
-    list();
-  }
-
-  @override
-  UserFraKareWeekState copyWithState(BaseState status) {
-    return state.copyWith(listState: state.listState.copyWith(baseStatus: status));
-  }
+  Future<void> setSelectedFilter(TeamModel? team) =>
+      setFilter((weekNumber: state.query.filter.weekNumber, teamId: team == null ? 0 : team.id));
 }

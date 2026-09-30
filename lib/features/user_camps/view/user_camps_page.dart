@@ -1,11 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
+import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/user_camps/data/model/user_camp_model.dart';
+import 'package:work_hu/features/utils.dart';
 
-import '../data/state/user_camp_state.dart';
 import '../providers/users_camps_provider.dart';
 
 class UserCampsPage extends BaseListPage {
@@ -17,18 +17,18 @@ class UserCampsPage extends BaseListPage {
   }
 }
 
-class UserCampPageState extends BaseListPageState<UserCampsPage, UserCampState, UserCampDataNotifier> {
+class UserCampPageState extends PagedListPageState<UserCampsPage, UserCampModel, int, UserCampDataNotifier> {
   @override
-  StateNotifierProvider<UserCampDataNotifier, UserCampState> get provider => userCampDataProvider;
+  get provider => userCampDataProvider;
 
   @override
-  List<dynamic> getFilters() {
-    return [];
+  Widget buildListTile(UserCampModel item, int index) {
+    return BaseListTile(
+      isLast: index == items.length - 1,
+      index: index,
+      title: Text(item.userModel.getFullName()),
+      subtitle: Text(item.campModel.campName ?? ""),
+      trailing: Text(Utils.creditFormatting(item.price)),
+    );
   }
-
-  @override
-  List<UserCampModel> get items => state.userCamps;
-
-  @override
-  BaseListState get listStatus => state.listState;
 }

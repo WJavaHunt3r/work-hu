@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/camps/data/api/camps_api.dart';
 import 'package:work_hu/features/camps/data/model/camp_filter.dart';
@@ -10,9 +10,9 @@ class CampRepository {
 
   CampRepository(this._campApi);
 
-  Future<PaginatedResponse<CampModel>> getCamps({required CampFilter filter, required PageStru pageStru}) async {
+  Future<PaginatedResponse<CampModel>> getCamps(ListQuery<CampFilter> query, {int page = 0}) async {
     try {
-      final res = await _campApi.getCamps(filter: filter, pageStru: pageStru);
+      final res = await _campApi.getCamps(query, page);
       final paginatedData = PaginatedResponse<CampModel>.fromJson(
         res,
         (json) => CampModel.fromJson(json as Map<String, dynamic>),

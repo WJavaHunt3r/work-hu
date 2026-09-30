@@ -1,17 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_notifier.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_state.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
-import 'package:work_hu/app/framework/base_components/sort_builder.dart';
-import 'package:work_hu/app/locator.dart';
-import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/data/api/activity_api.dart';
 import 'package:work_hu/features/activities/data/model/activity_filter.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
-import 'package:work_hu/features/activities/data/state/activity_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 
 import '../data/repository/activity_repository.dart';
@@ -20,75 +16,51 @@ final activityApiProvider = Provider<ActivityApi>((ref) => ActivityApi());
 
 final activityRepoProvider = Provider<ActivityRepository>((ref) => ActivityRepository(ref.read(activityApiProvider)));
 
-final activityDataProvider = StateNotifierProvider.autoDispose<ActivityDataNotifier, ActivityState>(
-  (ref) => ActivityDataNotifier(ref.read(activityRepoProvider)),
-);
+final activityDataProvider =
+    StateNotifierProvider.autoDispose<ActivityDataNotifier, PagedState<ActivityModel, ActivityFilter>>(
+      (ref) => ActivityDataNotifier(ref.read(activityRepoProvider), ref.read(userDataProvider).user),
+    );
 
-class ActivityDataNotifier extends BaseDataNotifier<ActivityState> implements ListApiProvider<ActivityFilter> {
-  ActivityDataNotifier(this.activityRepository)
+class ActivityDataNotifier extends PagedListNotifier<ActivityModel, ActivityFilter> {
+  ActivityDataNotifier(this.activityRepository, this.user)
     : super(
-        ActivityState(filter: ActivityFilter(referenceDate: DateTime(DateTime.now().year, DateTime.now().month, 1))),
-      ) {
-    list();
-  }
+        ListQuery(
+          filter: ActivityFilter(referenceDate: DateTime(DateTime.now().year, DateTime.now().month, 1)),
+          sort: const [SortOrder("activityDateTime", SortDir.desc)],
+        ),
+      );
 
   final ActivityRepository activityRepository;
-  final UserModel? user = locator<UserProvider>().user;
+  final UserModel? user;
 
+  /// Non-admins only see activities they created, are responsible for or are employed in.
+  /// Applied per request, so the filter in the state stays what the user picked.
   @override
-  Future<void> list({ActivityFilter? filter, int? page, int? size, List<String>? sort}) async {
-    var sort = SortBuilder()..add("activityDateTime", descending: true);
-    state = state.copyWith(filter: filter ?? state.filter);
-
-    await executeApiCall<PaginatedResponse<ActivityModel>>(
-      () => activityRepository.getActivities(
-        registeredInMyShare: state.filter.registeredInMyShare,
-        responsibleId: user!.isAdmin() ? state.filter.responsible?.id : user!.id,
-        createUserId: user!.isAdmin() ? state.filter.createUser?.id : user!.id,
-        referenceDate: state.filter.referenceDate,
-        searchText: state.filter.description,
-        employerId: user!.isAdmin() ? state.filter.employer?.id : user!.id,
-        page: page ?? state.status.number,
-        size: size ?? state.status.size,
-        sort: sort.build(),
-      ),
-      background: true,
-      onSuccess: (data) async {
-        state = state.copyWith(
-          activities: data.page.number == 0 ? data.content : [...state.activities, ...data.content],
-          status: state.status.copyWith(
-            totalElements: data.page.totalElements,
-            totalPages: data.page.totalPages,
-            number: data.page.number,
-          ),
-        );
-      },
-    );
+  Future<PaginatedResponse<ActivityModel>> fetch(ListQuery<ActivityFilter> query, int page) {
+    final scoped = user!.isAdmin()
+        ? query
+        : query.copyWith(
+            filter: query.filter.copyWith(responsible: user, createUser: user, employer: user),
+          );
+    return activityRepository.getActivities(scoped, page: page);
   }
 
   Future<void> deleteActivity(num id) async {
-    executeApiCall(() => activityRepository.deleteActivity(id, user!.id), onSuccess: (data) => list());
-  }
-
-  Future<void> registerActivity(num id) async {
-    executeApiCall(() => activityRepository.registerActivity(id, user!.id), onSuccess: (data) => list());
-  }
-
-  Future<void> putActivity(ActivityModel activity) async {
-    executeApiCall(
-      () => activityRepository.putActivity(activity, activity.id!),
-      onSuccess: (data) async {
-        list();
-      },
+    await executeApiCall(
+      () => activityRepository.deleteActivity(id, user!.id),
+      onSuccess: (_) async => removeItems((activity) => activity.id == id),
     );
   }
 
-  Future<void> registerActivityInTeams(num id) async {
-    executeApiCall(() => activityRepository.registerActivityInTeams(id, user!.id), onSuccess: (data) => list());
+  Future<void> registerActivity(num id) async {
+    await executeApiCall(() => activityRepository.registerActivity(id, user!.id), onSuccess: (_) => reload());
   }
 
-  @override
-  ActivityState copyWithState(BaseState status) {
-    return state.copyWith(status: state.status.copyWith(baseStatus: status));
+  Future<void> putActivity(ActivityModel activity) async {
+    await executeApiCall(() => activityRepository.putActivity(activity, activity.id!), onSuccess: (_) => reload());
+  }
+
+  Future<void> registerActivityInTeams(num id) async {
+    await executeApiCall(() => activityRepository.registerActivityInTeams(id, user!.id), onSuccess: (_) => reload());
   }
 }

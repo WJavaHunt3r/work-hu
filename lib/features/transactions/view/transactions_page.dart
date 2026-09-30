@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
 import 'package:work_hu/app/providers/localeProvider.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
-import 'package:work_hu/features/transactions/data/state/transactions_state.dart';
+import 'package:work_hu/features/transactions/data/models/transactions_filter.dart';
 import 'package:work_hu/features/transactions/providers/transactions_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
@@ -23,16 +21,15 @@ class TransactionsPage extends BaseListPage {
   }
 }
 
-class TransactionPageState extends BaseListPageState<TransactionsPage, TransactionsState, TransactionsDataNotifier> {
+class TransactionPageState
+    extends PagedListPageState<TransactionsPage, TransactionModel, TransactionsFilter, TransactionsDataNotifier> {
   @override
-  Widget buildListTile(item) {
-    item as TransactionModel;
-    var index = items.indexOf(item);
+  Widget buildListTile(TransactionModel item, int index) {
     return BaseListTile(
       isLast: items.length - 1 == index,
       index: index,
       onTap: () {
-        context.push("/admin/transactions/${item.id}").then((value) => list());
+        context.push("/admin/transactions/${item.id}").then((value) => notifier.reload());
       },
       leading: Image.asset(setLeadingIcon(item), fit: BoxFit.fitWidth, width: 15.sp),
       title: Text(item.name),
@@ -42,15 +39,10 @@ class TransactionPageState extends BaseListPageState<TransactionsPage, Transacti
   }
 
   @override
-  canDelete(item) {
-    return true;
-  }
+  bool canDelete(TransactionModel item) => true;
 
   @override
-  onDelete(e) {
-    e as TransactionModel;
-    ref.read(provider.notifier).deleteTransaction(e.id!, items.indexOf(e));
-  }
+  void onDelete(TransactionModel item) => notifier.deleteTransaction(item.id!);
 
   String setLeadingIcon(TransactionModel current) {
     if (current.account == Account.MYSHARE) {
@@ -63,18 +55,7 @@ class TransactionPageState extends BaseListPageState<TransactionsPage, Transacti
   }
 
   @override
-  List<dynamic> getFilters() {
-    return [];
-  }
-
-  @override
-  List<TransactionModel> get items => state.transactions;
-
-  @override
-  BaseListState get listStatus => state.listState;
-
-  @override
-  StateNotifierProvider<TransactionsDataNotifier, TransactionsState> get provider => transactionsDataProvider;
+  get provider => transactionsDataProvider;
 
   // @override
   // List<BaseFilterChip> buildFilterLayout(BuildContext context, WidgetRef ref) {

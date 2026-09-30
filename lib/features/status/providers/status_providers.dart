@@ -11,6 +11,7 @@ import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/status/data/state/status_state.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_items_filter.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/features/transaction_items/data/repository/transaction_items_repository.dart';
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
 import 'package:work_hu/features/user_rounds/data/model/user_round_head_model.dart';
@@ -62,10 +63,11 @@ class StatusDataNotifier extends BaseDataNotifier<StatusState> {
         if (userRounds.userId == userModel.id) {
           executeApiCall<PaginatedResponse<TransactionItemModel>>(
             () => _transactionItemsRepository.getTransactionItems(
-              filter: TransactionItemsFilter(userId: userModel.id, seasonYear: DateTime.now().year),
-              page: 0,
-              size: 10,
-              sort: ["transactionDate,desc"],
+              ListQuery(
+                filter: TransactionItemsFilter(userId: userModel.id, seasonYear: DateTime.now().year),
+                size: 10,
+                sort: const [SortOrder("transactionDate", SortDir.desc)],
+              ),
             ),
             onSuccess: (data) async {
               state = state.copyWith(transactions: data.content);

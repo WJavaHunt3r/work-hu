@@ -15,13 +15,16 @@ class CreateMentorMenteeDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () {
-            ref.read(mentorMenteeDataProvider.notifier).clearCreation();
+            ref.read(mentorMenteeCreateProvider.notifier).clearCreation();
             context.pop();
           },
           child: const Text("cancel"),
         ),
         TextButton(
-          onPressed: () => ref.watch(mentorMenteeDataProvider.notifier).postMentee().then((value) => context.pop()),
+          onPressed: () async {
+            final saved = await ref.read(mentorMenteeCreateProvider.notifier).postMentee();
+            if (context.mounted) context.pop(saved);
+          },
           child: const Text("Create"),
         ),
       ],
@@ -29,20 +32,20 @@ class CreateMentorMenteeDialog extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           UserComboWidget(
-            controller: ref.read(mentorMenteeDataProvider.notifier).mentorController,
+            controller: ref.read(mentorMenteeCreateProvider.notifier).mentorController,
             onSuggestionSelected: (UserComboModel suggestion) => null,
-            // ref.read(mentorMenteeDataProvider.notifier).updateSelection(mentor: suggestion),
+            // ref.read(mentorMenteeCreateProvider.notifier).updateSelection(mentor: suggestion),
             // itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
-            // suggestionsCallback: (String pattern) => ref.read(mentorMenteeDataProvider.notifier).filterUsers(pattern),
+            // suggestionsCallback: (String pattern) => ref.read(mentorMenteeCreateProvider.notifier).filterUsers(pattern),
             labelText: 'mentor_mentee_mentor'.i18n(),
           ),
           UserComboWidget(
             labelText: "mentor_mentee_mentor".i18n(),
-            controller: ref.read(mentorMenteeDataProvider.notifier).menteeController,
+            controller: ref.read(mentorMenteeCreateProvider.notifier).menteeController,
             onSuggestionSelected: (UserComboModel suggestion) => null,
-            // ref.read(mentorMenteeDataProvider.notifier).updateSelection(mentee: suggestion),
+            // ref.read(mentorMenteeCreateProvider.notifier).updateSelection(mentee: suggestion),
             // itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
-            // suggestionsCallback: (String pattern) => ref.read(mentorMenteeDataProvider.notifier).filterUsers(pattern),
+            // suggestionsCallback: (String pattern) => ref.read(mentorMenteeCreateProvider.notifier).filterUsers(pattern),
           ),
         ],
       ),

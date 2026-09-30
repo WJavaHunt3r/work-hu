@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/user_status/data/model/user_status_filter.dart';
 
@@ -11,12 +11,9 @@ class UserStatusRepository {
 
   UserStatusRepository(this._userStatusApi);
 
-  Future<PaginatedResponse<UserStatusModel>> getUserStatuses({
-    required UserStatusFilter filter,
-    required PageStru pageStru,
-  }) async {
+  Future<PaginatedResponse<UserStatusModel>> getUserStatuses(ListQuery<UserStatusFilter> query, {int page = 0}) async {
     try {
-      final res = await _userStatusApi.getUserStatuses(filter: filter, pageStru: pageStru);
+      final res = await _userStatusApi.getUserStatuses(query, page);
       final paginatedData = PaginatedResponse<UserStatusModel>.fromJson(
         res,
         (json) => UserStatusModel.fromJson(json as Map<String, dynamic>),

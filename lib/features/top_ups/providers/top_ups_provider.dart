@@ -1,52 +1,26 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
-import 'package:work_hu/app/locator.dart';
-import 'package:work_hu/app/providers/base_provider.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_notifier.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_state.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/bufe/data/model/sumup_transactions.dart';
 import 'package:work_hu/features/bufe/data/repository/bufe_repository.dart';
 import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
-import 'package:work_hu/features/login/data/model/user_model.dart';
-import 'package:work_hu/features/top_ups/data/state/top_ups_state.dart';
 
-final topUpsDataProvider = StateNotifierProvider.autoDispose<TopUpsDataNotifier, TopUpsState>(
-  (ref) => TopUpsDataNotifier(ref.watch(bufeRepoProvider)),
+/// Filtered by user id.
+final topUpsDataProvider = StateNotifierProvider.autoDispose<TopUpsDataNotifier, PagedState<TopUpEntry, num>>(
+  (ref) => TopUpsDataNotifier(ref.watch(bufeRepoProvider), ref.read(userDataProvider).user?.id ?? 0),
 );
 
-class TopUpsDataNotifier extends BaseDataNotifier<TopUpsState> implements ListApiProvider<num> {
-  TopUpsDataNotifier(this._bufeRepository) : super(const TopUpsState()) {
-    if (currentUser != null) {
-      list(filter: currentUser!.id);
-    }
-  }
+class TopUpsDataNotifier extends PagedListNotifier<TopUpEntry, num> {
+  TopUpsDataNotifier(this._bufeRepository, num userId) : super(ListQuery(filter: userId, size: 50));
 
   final BufeRepository _bufeRepository;
-  final UserModel? currentUser = locator<UserProvider>().user;
 
   @override
-  Future<void> list({num? filter, int? page, int? size, List<String>? sort}) async {
-    await executeApiCall<TopUpResponse?>(
-      () => _bufeRepository.getPayments(userId: filter ?? 0),
-      background: true,
-      onSuccess: (data) async {
-        state = state.copyWith(
-          topUps: data?.items ?? [],
-          listStatus: state.listStatus.copyWith(
-            totalElements: data?.total ?? 0,
-            size: data?.limit ?? 0,
-            number: data?.offset ?? 0,
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  TopUpsState copyWithState(BaseState status) {
-    return state.copyWith(listStatus: state.listStatus.copyWith(baseStatus: status));
+  Future<PaginatedResponse<TopUpEntry>> fetch(ListQuery<num> query, int page) async {
+    final data = await _bufeRepository.getPayments(userId: query.filter, limit: query.size, offset: page * query.size);
+    return PaginatedResponse.fromOffset(content: data.items, offset: data.offset, limit: data.limit, total: data.total);
   }
 }

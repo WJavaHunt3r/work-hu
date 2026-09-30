@@ -7,7 +7,7 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/style/app_colors.dart';
-import 'package:work_hu/features/mentees/data/state/mentees_state.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_state.dart';
 import 'package:work_hu/features/mentees/data/state/user_goal_user_round_model.dart';
 import 'package:work_hu/features/mentees/provider/mentees_provider.dart';
 import 'package:work_hu/features/utils.dart';
@@ -29,7 +29,8 @@ class MyShareStatusPage extends BasePage {
   }
 }
 
-class MyShareStatusPageState extends BasePageState<MyShareStatusPage, MenteesState, MenteesDataNotifier> {
+class MyShareStatusPageState
+    extends BasePageState<MyShareStatusPage, PagedState<UserGoalUserRoundModel, num>, MenteesDataNotifier> {
   @override
   Widget buildLayout() {
     var userStatusModel = widget.userGoalRound.userStatus;
@@ -114,8 +115,9 @@ class MyShareStatusPageState extends BasePageState<MyShareStatusPage, MenteesSta
   }
 
   @override
-  StateNotifierProvider<MenteesDataNotifier, MenteesState> get provider => menteesDataProvider;
+  StateNotifierProvider<MenteesDataNotifier, PagedState<UserGoalUserRoundModel, num>> get provider =>
+      menteesDataProvider;
 
   @override
-  BaseState get status => state.listState.baseStatus;
+  BaseState get status => state.baseStatus;
 }

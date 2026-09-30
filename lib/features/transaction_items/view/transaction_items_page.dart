@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:localization/localization.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
+import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_header_chip.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
-import 'package:work_hu/features/transaction_items/data/state/transaction_items_state.dart';
+import 'package:work_hu/features/transaction_items/data/models/transaction_items_filter.dart';
 import 'package:work_hu/features/transaction_items/providers/transaction_items_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
@@ -25,19 +27,32 @@ class TransactionItemsPage extends BaseListPage {
 }
 
 class TransactionItemsPageState
-    extends BaseListPageState<TransactionItemsPage, TransactionItemsState, TransactionItemsDataNotifier> {
+    extends
+        PagedListPageState<
+          TransactionItemsPage,
+          TransactionItemModel,
+          TransactionItemsFilter,
+          TransactionItemsDataNotifier
+        > {
   @override
-  void postInit(WidgetRef ref) {
-    ref.read(provider.notifier).getTransaction(widget.transactionId);
+  get provider => transactionItemsDataProvider(widget.transactionId);
+
+  @override
+  Widget build(BuildContext context) {
+    // The base page only reports errors of the list provider.
+    ref.listen(transactionDetailProvider(widget.transactionId), (previous, next) {
+      if (next.status.modelState.isError && !(previous?.status.modelState.isError ?? false)) {
+        Utils.showErrorDialog(context, content: next.status.message.i18n());
+      }
+    });
+    return super.build(context);
   }
 
   @override
-  Widget buildListTile(item) {
-    item as TransactionItemModel;
-    bool isLast = items.indexOf(item) == items.length - 1;
+  Widget buildListTile(TransactionItemModel item, int index) {
     return BaseListTile(
-      isLast: isLast,
-      index: items.indexOf(item),
+      isLast: index == items.length - 1,
+      index: index,
       title: Text(item.userName),
       trailing: Text(
         createTrailingText(item),
@@ -57,32 +72,14 @@ class TransactionItemsPageState
   }
 
   @override
-  onDelete(e) {
-    ref.read(provider.notifier).deleteTransactionItem(e.id!, items.indexOf(e));
-  }
+  void onDelete(TransactionItemModel item) => notifier.deleteTransactionItem(item.id!);
 
   @override
-  bool canDelete(item) {
-    return true;
-  }
-
-  @override
-  List<dynamic> getFilters() {
-    return [];
-  }
-
-  @override
-  List<dynamic> get items => state.transactionItems;
-
-  @override
-  BaseListState get listStatus => state.listState;
-
-  @override
-  get provider => transactionItemsDataProvider;
+  bool canDelete(TransactionItemModel item) => true;
 
   @override
   List<Widget> buildHeaderLayout(BuildContext context, WidgetRef ref) {
-    var transaction = state.transaction;
+    var transaction = ref.watch(transactionDetailProvider(widget.transactionId)).transaction;
     return [
       BaseHeaderChip(
         label: "transaction_items_date",
@@ -104,7 +101,7 @@ class TransactionItemsPageState
   @override
   Widget? buildFloatingActionButton(BuildContext context, WidgetRef ref) {
     return FloatingActionButton(
-      onPressed: () => ref.read(provider.notifier).createCreditsCsv(),
+      onPressed: () => ref.read(transactionDetailProvider(widget.transactionId).notifier).createCreditsCsv(items),
       child: const Icon(Icons.download),
     );
   }

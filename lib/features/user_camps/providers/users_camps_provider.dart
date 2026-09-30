@@ -1,44 +1,32 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/providers/user_provider.dart';
-import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_notifier.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_state.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/user_camps/data/api/user_camp_api.dart';
+import 'package:work_hu/features/user_camps/data/model/user_camp_model.dart';
 import 'package:work_hu/features/user_camps/data/repository/user_camp_repository.dart';
-import 'package:work_hu/features/user_camps/data/state/user_camp_state.dart';
 
 final userCampApiProvider = Provider<UserCampApi>((ref) => UserCampApi());
 
 final userCampRepoProvider = Provider<UserCampRepository>((ref) => UserCampRepository(ref.read(userCampApiProvider)));
 
-final userCampDataProvider = StateNotifierProvider.autoDispose<UserCampDataNotifier, UserCampState>(
-  (ref) => UserCampDataNotifier(ref.read(userCampRepoProvider), ref.read(userDataProvider).user),
+/// Filtered by season year.
+final userCampDataProvider = StateNotifierProvider.autoDispose<UserCampDataNotifier, PagedState<UserCampModel, int>>(
+  (ref) => UserCampDataNotifier(ref.read(userCampRepoProvider)),
 );
 
-class UserCampDataNotifier extends StateNotifier<UserCampState> {
-  UserCampDataNotifier(this.userCampRepository, this.currentUser) : super(const UserCampState()) {
-    getUserCamps();
-  }
+class UserCampDataNotifier extends PagedListNotifier<UserCampModel, int> {
+  UserCampDataNotifier(this.userCampRepository) : super(ListQuery(filter: DateTime.now().year));
 
   final UserCampRepository userCampRepository;
-  final UserModel? currentUser;
 
-  Future<void> getUserCamps() async {
-    state = state.copyWith(modelState: ModelState.loading);
-    try {
-      await userCampRepository.getUserCamps(seasonYear: DateTime.now().year).then((value) {
-        // value.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
-        // state = state.copyWith(userCamp: value, filtered: value, modelState: ModelState.success);
-      });
-    } on DioException catch (e) {
-      state = state.copyWith(modelState: ModelState.error, message: e.toString());
-    }
+  /// Not paged by the server: returns the whole season at once, sorted by name.
+  @override
+  Future<PaginatedResponse<UserCampModel>> fetch(ListQuery<int> query, int page) async {
+    final userCamps = await userCampRepository.getUserCamps(seasonYear: query.filter);
+    userCamps.sort((a, b) => a.userModel.getFullName().compareTo(b.userModel.getFullName()));
+    return PaginatedResponse.all(userCamps);
   }
-
-  void updateCurrentUser(UserModel user) {
-    // state = state.copyWith(selectedUser: user);
-  }
-
-  Future<void> downloadUserInfo() async {}
 }

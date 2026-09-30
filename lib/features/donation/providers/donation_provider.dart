@@ -1,83 +1,71 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_notifier.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_state.dart';
+import 'package:work_hu/app/framework/base_components/paginated_response.dart';
+import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/donation/data/api/donation_api.dart';
 import 'package:work_hu/features/donation/data/model/donation_model.dart';
 import 'package:work_hu/features/donation/data/repository/donation_repository.dart';
+import 'package:work_hu/features/donation/data/state/donation_maintenance_state.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
-
-import '../data/state/donation_state.dart';
 
 final donationApiProvider = Provider<DonationsApi>((ref) => DonationsApi());
 
 final donationRepoProvider = Provider<DonationRepository>((ref) => DonationRepository(ref.read(donationApiProvider)));
 
-final donationDataProvider = StateNotifierProvider.autoDispose<DonationDataNotifier, DonationState>(
-  (ref) => DonationDataNotifier(ref.read(donationRepoProvider), ref.read(userDataProvider).user),
+final donationDataProvider = StateNotifierProvider.autoDispose<DonationDataNotifier, PagedState<DonationModel, void>>(
+  (ref) => DonationDataNotifier(ref.read(donationRepoProvider)),
 );
 
-class DonationDataNotifier extends BaseDataNotifier<DonationState> implements ListApiProvider {
-  DonationDataNotifier(this.donationRepository, this.currentUser) : super(const DonationState()) {
-    startDateTimeController = TextEditingController(text: DateTime.now().toString());
-    endDateTimeController = TextEditingController();
-    descriptionController = TextEditingController();
-    descriptionNoController = TextEditingController();
+final donationMaintenanceProvider =
+    StateNotifierProvider.autoDispose<DonationMaintenanceNotifier, DonationMaintenanceState>(
+      (ref) => DonationMaintenanceNotifier(ref.read(donationRepoProvider), ref.read(userDataProvider).user),
+    );
 
+class DonationDataNotifier extends PagedListNotifier<DonationModel, void> {
+  DonationDataNotifier(this.donationRepository) : super(const ListQuery(filter: null));
+
+  final DonationRepository donationRepository;
+
+  /// Not paged by the server: returns every donation at once, latest ending first.
+  @override
+  Future<PaginatedResponse<DonationModel>> fetch(ListQuery<void> query, int page) async {
+    final donations = await donationRepository.getDonations(null);
+    donations.sort((a, b) => b.endDateTime!.compareTo(a.endDateTime!));
+    return PaginatedResponse.all(donations);
+  }
+
+  Future<void> deleteDonation(num donationId) async {
+    await executeApiCall<String>(
+      () => donationRepository.deleteDonation(donationId),
+      onSuccess: (_) async => removeItems((d) => d.id == donationId),
+    );
+  }
+}
+
+/// The donation being created or edited in the maintenance dialog.
+class DonationMaintenanceNotifier extends BaseDataNotifier<DonationMaintenanceState> {
+  DonationMaintenanceNotifier(this.donationRepository, this.currentUser) : super(const DonationMaintenanceState()) {
     startDateTimeController.addListener(_updateStartDate);
     endDateTimeController.addListener(_updateEndDate);
     descriptionController.addListener(_updateDescription);
     descriptionNoController.addListener(_updateNoDescription);
-
-    list();
   }
 
-  late final TextEditingController startDateTimeController;
-  late final TextEditingController endDateTimeController;
-  late final TextEditingController descriptionController;
-  late final TextEditingController descriptionNoController;
+  final TextEditingController startDateTimeController = TextEditingController(text: DateTime.now().toString());
+  final TextEditingController endDateTimeController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController descriptionNoController = TextEditingController();
   final DonationRepository donationRepository;
   final UserModel? currentUser;
 
-  @override
-  Future<void> list({filter, int? page, int? size, List<String>? sort}) async {
-    await executeApiCall<List<DonationModel>>(
-      () => donationRepository.getDonations(null),
-      background: true,
-      onSuccess: (donations) async {
-        donations.sort((a, b) => b.endDateTime!.compareTo(a.endDateTime!));
-        state = state.copyWith(
-          donations: donations,
-          listState: state.listState.copyWith(number: 0, totalPages: 1, totalElements: donations.length),
-        );
-      },
-    );
-  }
-
-  Future<void> deleteDonation(num donationId) async {
-    var origItems = state.donations;
-    var origListState = state.listState;
-    state = state.copyWith(
-      donations: origItems.where((d) => d.id != donationId).toList(),
-      listState: origListState.copyWith(totalElements: origListState.totalElements - 1),
-    );
-    await executeApiCall<String>(
-      () => donationRepository.deleteDonation(donationId),
-      onError: (error) async {
-        state = state.copyWith(
-          donations: origItems,
-          listState: state.listState.copyWith(totalElements: origListState.totalElements),
-        );
-      },
-    );
-  }
-
   Future<void> updateDonation(DonationModel donation) async {
-    // userController.text = "${donation.user?.getFullName()} (${donation.user?.getAge()}) ";
     state = state.copyWith(selectedDonation: donation);
   }
 
@@ -132,7 +120,14 @@ class DonationDataNotifier extends BaseDataNotifier<DonationState> implements Li
   }
 
   @override
-  DonationState copyWithState(BaseState status) {
-    return state.copyWith(listState: state.listState.copyWith(baseStatus: status));
+  DonationMaintenanceState copyWithState(BaseState status) => state.copyWith(status: status);
+
+  @override
+  void dispose() {
+    startDateTimeController.dispose();
+    endDateTimeController.dispose();
+    descriptionController.dispose();
+    descriptionNoController.dispose();
+    super.dispose();
   }
 }

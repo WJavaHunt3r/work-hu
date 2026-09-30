@@ -1,5 +1,8 @@
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/features/activities/data/model/activity_filter.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
+import 'package:work_hu/features/utils.dart';
 
 import '../../../../api/dio_client.dart';
 
@@ -8,32 +11,19 @@ class ActivityApi {
 
   ActivityApi();
 
-  Future<dynamic> getActivities({
-    num? responsibleId,
-    num? employerId,
-    num? createUserId,
-    bool? registeredInApp,
-    bool? registeredInMyShare,
-    String? searchText,
-    String? referenceDate,
-    required int page,
-    required int size,
-    required List<String> sort,
-  }) async {
+  Future<dynamic> getActivities(ListQuery<ActivityFilter> query, int page) async {
+    final filter = query.filter;
     try {
       final res = await _dioClient.dio.get(
         "/activity",
         queryParameters: {
-          "responsibleId": responsibleId,
-          "employerId": employerId,
-          "createUserId": createUserId,
-          "registeredInApp": registeredInApp,
-          "registeredInMyShare": registeredInMyShare,
-          "referenceDate": referenceDate,
-          "searchText": searchText,
-          "page": page,
-          "size": size,
-          "sort": sort,
+          "responsibleId": filter.responsible?.id,
+          "employerId": filter.employer?.id,
+          "createUserId": filter.createUser?.id,
+          "registeredInMyShare": filter.registeredInMyShare,
+          "referenceDate": filter.referenceDate == null ? "" : Utils.dateToString(filter.referenceDate!),
+          "searchText": filter.description,
+          ...query.pageParams(page),
         },
       );
       return res.data;

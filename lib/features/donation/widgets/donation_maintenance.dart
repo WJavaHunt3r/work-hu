@@ -28,13 +28,13 @@ class DonationMaintenanceState extends ConsumerState<DonationMaintenance> {
     super.initState();
     // Use a post-frame callback to ensure the widget is fully mounted.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(donationDataProvider.notifier).preset(widget.donation, widget.mode);
+      ref.read(donationMaintenanceProvider.notifier).preset(widget.donation, widget.mode);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final mode = ref.watch(donationDataProvider).mode;
+    final mode = ref.watch(donationMaintenanceProvider).mode;
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
@@ -43,7 +43,7 @@ class DonationMaintenanceState extends ConsumerState<DonationMaintenance> {
           actions: [
             MaterialButton(
               onPressed: () => _formKey.currentState != null && _formKey.currentState!.validate()
-                  ? ref.read(donationDataProvider.notifier).saveDonation().then((value) => context.pop())
+                  ? ref.read(donationMaintenanceProvider.notifier).saveDonation().then((value) => context.pop())
                   : null,
               child: const Text("Save"),
             ),
@@ -60,7 +60,7 @@ class DonationMaintenanceState extends ConsumerState<DonationMaintenance> {
                     Expanded(
                       child: BaseTextFormField(
                         labelText: "donation_description".i18n(),
-                        controller: ref.watch(donationDataProvider.notifier).descriptionController,
+                        controller: ref.watch(donationMaintenanceProvider.notifier).descriptionController,
                         validator: (text) {
                           if (text == null || text.isEmpty) {
                             return 'cannot_be_empty'.i18n();
@@ -77,7 +77,7 @@ class DonationMaintenanceState extends ConsumerState<DonationMaintenance> {
                     Expanded(
                       child: BaseTextFormField(
                         labelText: "donation_description_no".i18n(),
-                        controller: ref.watch(donationDataProvider.notifier).descriptionNoController,
+                        controller: ref.watch(donationMaintenanceProvider.notifier).descriptionNoController,
                         validator: (text) {
                           if (text == null || text.isEmpty) {
                             return 'cannot_be_empty'.i18n();
@@ -93,12 +93,14 @@ class DonationMaintenanceState extends ConsumerState<DonationMaintenance> {
                   children: [
                     Expanded(
                       child: BaseTextFormField(
-                        controller: ref.watch(donationDataProvider.notifier).startDateTimeController,
+                        controller: ref.watch(donationMaintenanceProvider.notifier).startDateTimeController,
                         textInputAction: TextInputAction.next,
                         labelText: "donation_start_date".i18n(),
                         suffix: IconButton(
-                          onPressed: () =>
-                              _selectDate(context, ref.watch(donationDataProvider.notifier).startDateTimeController),
+                          onPressed: () => _selectDate(
+                            context,
+                            ref.watch(donationMaintenanceProvider.notifier).startDateTimeController,
+                          ),
                           icon: const Icon(Icons.calendar_month),
                         ),
                         validator: (text) {
@@ -115,12 +117,14 @@ class DonationMaintenanceState extends ConsumerState<DonationMaintenance> {
                   children: [
                     Expanded(
                       child: BaseTextFormField(
-                        controller: ref.watch(donationDataProvider.notifier).endDateTimeController,
+                        controller: ref.watch(donationMaintenanceProvider.notifier).endDateTimeController,
                         textInputAction: TextInputAction.send,
                         labelText: "donation_end_date".i18n(),
                         suffix: IconButton(
-                          onPressed: () =>
-                              _selectDate(context, ref.watch(donationDataProvider.notifier).endDateTimeController),
+                          onPressed: () => _selectDate(
+                            context,
+                            ref.watch(donationMaintenanceProvider.notifier).endDateTimeController,
+                          ),
                           icon: const Icon(Icons.calendar_month),
                         ),
                         validator: (text) {
@@ -128,7 +132,7 @@ class DonationMaintenanceState extends ConsumerState<DonationMaintenance> {
                             return 'cannot_be_empty'.i18n();
                           }
                           if ((DateTime.tryParse(
-                                        ref.watch(donationDataProvider.notifier).startDateTimeController.text,
+                                        ref.watch(donationMaintenanceProvider.notifier).startDateTimeController.text,
                                       ) ??
                                       DateTime.now())
                                   .compareTo(DateTime.tryParse(text) ?? DateTime.now()) >=

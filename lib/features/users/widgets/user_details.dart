@@ -19,7 +19,7 @@ class UserDetails extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var user = ref.watch(usersDataProvider).selectedUser;
+    var user = ref.watch(userDetailProvider).selectedUser;
     return Dialog.fullscreen(
       child: user == null
           ? Scaffold(
@@ -34,7 +34,7 @@ class UserDetails extends ConsumerWidget {
                 title: Text(user.getFullName(), style: const TextStyle(fontWeight: FontWeight.w800)),
                 actions: [
                   MaterialButton(
-                    onPressed: () => ref.read(usersDataProvider.notifier).saveUser().then((value) => context.pop(true)),
+                    onPressed: () => ref.read(userDetailProvider.notifier).saveUser().then((value) => context.pop(true)),
                     child: Text("user_details_save".i18n()),
                   ),
                 ],
@@ -76,7 +76,7 @@ class UserDetails extends ConsumerWidget {
                           labelText: "user_details_email".i18n(),
                           initialValue: user.email ?? "",
                           onChanged: (String text) => text.isNotEmpty
-                              ? ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(email: text))
+                              ? ref.watch(userDetailProvider.notifier).updateCurrentUser(user.copyWith(email: text))
                               : null,
                         ),
                         BaseTextFormField(
@@ -85,7 +85,7 @@ class UserDetails extends ConsumerWidget {
                           keyBoardType: TextInputType.number,
                           onChanged: (String text) => text.isNotEmpty
                               ? ref
-                                    .watch(usersDataProvider.notifier)
+                                    .watch(userDetailProvider.notifier)
                                     .updateCurrentUser(user.copyWith(phoneNumber: num.tryParse(text) ?? 0))
                               : null,
                         ),
@@ -108,7 +108,7 @@ class UserDetails extends ConsumerWidget {
                                 keyBoardType: TextInputType.number,
                                 onChanged: (String text) => text.isNotEmpty
                                     ? ref
-                                          .watch(usersDataProvider.notifier)
+                                          .watch(userDetailProvider.notifier)
                                           .updateCurrentUser(user.copyWith(baseMyShareCredit: num.tryParse(text) ?? 0))
                                     : null,
                               ),
@@ -119,7 +119,7 @@ class UserDetails extends ConsumerWidget {
                         //     ? WorkDropDownSearchFormField<TeamModel>(
                         //         controller: TextEditingController(),
                         //         onSuggestionSelected: (value) =>
-                        //             ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(paceTeam: value)),
+                        //             ref.watch(userDetailProvider.notifier).updateCurrentUser(user.copyWith(paceTeam: value)),
                         //         itemBuilder: (context, e) => Text(e.teamName.toString()),
                         //         suggestionsCallback: (value) => ref.watch(teamsDataProvider).teams,
                         //         labelText: '',
@@ -141,7 +141,7 @@ class UserDetails extends ConsumerWidget {
                                 .map((e) => DropdownMenuItem<Role>(value: e, child: Text(e.toString())))
                                 .toList(),
                             onChanged: (value) => value != null
-                                ? ref.watch(usersDataProvider.notifier).updateCurrentUser(user.copyWith(role: value))
+                                ? ref.watch(userDetailProvider.notifier).updateCurrentUser(user.copyWith(role: value))
                                 : null,
                           ),
                         ),
@@ -150,7 +150,7 @@ class UserDetails extends ConsumerWidget {
                             // backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
                             foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
                           ),
-                          onPressed: () => ref.watch(usersDataProvider.notifier).resetUserPassword(user.id),
+                          onPressed: () => ref.watch(userDetailProvider.notifier).resetUserPassword(user.id),
                           child: Text(
                             "user_details_reset_password".i18n(),
                             style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),

@@ -1,4 +1,4 @@
-import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/goal/data/model/goal_filter.dart';
 import 'package:work_hu/features/goal/data/model/goal_model.dart';
@@ -10,9 +10,12 @@ class GoalApi {
 
   GoalApi();
 
-  Future<dynamic> getGoals({required GoalFilter filter, required PageStru pageStru}) async {
+  Future<dynamic> getGoals(ListQuery<GoalFilter> query, int page) async {
     try {
-      final res = await _dioClient.dio.get("/goal", queryParameters: {...filter.toJson(), ...pageStru.toJson()});
+      final res = await _dioClient.dio.get(
+        "/goal",
+        queryParameters: {...query.filter.toJson(), ...query.pageParams(page)},
+      );
       return res.data;
     } catch (e) {
       rethrow;

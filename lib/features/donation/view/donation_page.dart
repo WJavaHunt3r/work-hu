@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:localization/localization.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
 import 'package:work_hu/app/models/maintenance_mode.dart';
+import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/donation/data/model/donation_model.dart';
-import 'package:work_hu/features/donation/data/state/donation_state.dart';
 import 'package:work_hu/features/donation/providers/donation_provider.dart';
 import 'package:work_hu/features/donation/widgets/donation_maintenance.dart';
 import 'package:work_hu/features/utils.dart';
@@ -20,11 +20,23 @@ class DonationsPage extends BaseListPage {
   }
 }
 
-class DonationsPageState extends BaseListPageState<DonationsPage, DonationState, DonationDataNotifier> {
+class DonationsPageState extends PagedListPageState<DonationsPage, DonationModel, void, DonationDataNotifier> {
   @override
-  Widget buildListTile(item) {
-    item as DonationModel;
-    var index = items.indexOf(item);
+  get provider => donationDataProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    // The base page only reports errors of the list provider.
+    ref.listen(donationMaintenanceProvider, (previous, next) {
+      if (next.status.modelState.isError && !(previous?.status.modelState.isError ?? false)) {
+        Utils.showErrorDialog(context, content: next.status.message.i18n());
+      }
+    });
+    return super.build(context);
+  }
+
+  @override
+  Widget buildListTile(DonationModel item, int index) {
     var isOpen = _isDonationOpen(item.startDateTime!, item.endDateTime!);
     return BaseListTile(
       isLast: items.length - 1 == index,
@@ -44,7 +56,7 @@ class DonationsPageState extends BaseListPageState<DonationsPage, DonationState,
       barrierDismissible: false,
       context: context,
       builder: (context) => DonationMaintenance(mode: MaintenanceMode.create, donation: donation),
-    ).then((value) => list(pageFrom: 0));
+    ).then((value) => notifier.reload());
   }
 
   bool _isDonationOpen(DateTime startDateTime, DateTime endDateTime) {
@@ -52,12 +64,10 @@ class DonationsPageState extends BaseListPageState<DonationsPage, DonationState,
   }
 
   @override
-  bool canDelete(item) => true;
+  bool canDelete(DonationModel item) => true;
 
   @override
-  onDelete(e) {
-    ref.read(donationDataProvider.notifier).deleteDonation(e.id!);
-  }
+  void onDelete(DonationModel item) => notifier.deleteDonation(item.id!);
 
   @override
   Widget? buildFloatingActionButton(BuildContext context, WidgetRef ref) {
@@ -66,18 +76,4 @@ class DonationsPageState extends BaseListPageState<DonationsPage, DonationState,
       child: const Icon(Icons.add),
     );
   }
-
-  @override
-  List<dynamic> getFilters() {
-    return [];
-  }
-
-  @override
-  List<dynamic> get items => state.donations;
-
-  @override
-  BaseListState get listStatus => state.listState;
-
-  @override
-  StateNotifierProvider<DonationDataNotifier, DonationState> get provider => donationDataProvider;
 }

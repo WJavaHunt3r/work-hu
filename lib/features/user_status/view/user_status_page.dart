@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_header_chip.dart';
+import 'package:work_hu/features/user_status/data/model/user_status_filter.dart';
 import 'package:work_hu/features/user_status/data/model/user_status_model.dart';
-import 'package:work_hu/features/user_status/data/state/user_status_state.dart';
 import 'package:work_hu/features/user_status/providers/user_status_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
@@ -25,18 +23,25 @@ class UserStatusPage extends BaseListPage {
   }
 }
 
-class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusState, UserStatusDataNotifier> {
+class UserStatusPageState
+    extends PagedListPageState<UserStatusPage, UserStatusModel, UserStatusFilter, UserStatusDataNotifier> {
   @override
-  Widget buildListTile(item) {
-    item as UserStatusModel;
-    var index = items.indexOf(item);
+  Widget build(BuildContext context) {
+    // The base page only reports errors of the list provider.
+    ref.listen(userStatusHeadProvider, (previous, next) {
+      if (next.status.modelState.isError && !(previous?.status.modelState.isError ?? false)) {
+        Utils.showErrorDialog(context, content: next.status.message.i18n());
+      }
+    });
+    return super.build(context);
+  }
+
+  @override
+  Widget buildListTile(UserStatusModel item, int index) {
     var userStatus = item.status * 100;
 
-    var toOnTrack = item.toOnTrack;
-
-    var isLast = index == items.length - 1;
     return BaseListTile(
-      isLast: isLast,
+      isLast: index == items.length - 1,
       index: index,
       minVerticalPadding: 0,
       title: Text(item.name),
@@ -67,12 +72,13 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
 
   @override
   List<Widget> buildHeaderLayout(BuildContext context, WidgetRef ref) {
+    final headData = ref.watch(userStatusHeadProvider).headData;
     return [
       BaseHeaderChip(
         label: "user_status_head_on_track",
-        labelValue: () async => "${state.headData.onTrackCount} / ${state.headData.goalCount}",
+        labelValue: () async => "${headData.onTrackCount} / ${headData.goalCount}",
       ),
-      BaseHeaderChip(label: "user_status_head_goal", labelValue: () async => "${state.headData.localMyShareGoal}%"),
+      BaseHeaderChip(label: "user_status_head_goal", labelValue: () async => "${headData.localMyShareGoal}%"),
     ];
   }
 
@@ -81,24 +87,17 @@ class UserStatusPageState extends BaseListPageState<UserStatusPage, UserStatusSt
     return ref.watch(userDataProvider).user!.isAdmin()
         ? [
             MaterialButton(
-              onPressed: !status.modelState.isLoading ? () => ref.watch(provider.notifier).recalculate() : null,
+              onPressed: !ref.watch(userStatusHeadProvider).status.modelState.isLoading ? _recalculate : null,
               child: const Icon(Icons.refresh_outlined),
             ),
           ]
         : [];
   }
 
-  @override
-  List<dynamic> getFilters() {
-    return [];
+  Future<void> _recalculate() async {
+    if (await ref.read(userStatusHeadProvider.notifier).recalculate()) notifier.reload();
   }
 
   @override
-  List<dynamic> get items => state.userStatuses;
-
-  @override
-  BaseListState get listStatus => state.status;
-
-  @override
-  StateNotifierProvider<UserStatusDataNotifier, UserStatusState> get provider => userStatusDataProvider;
+  get provider => userStatusDataProvider;
 }
