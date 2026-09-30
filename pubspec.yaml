@@ -2,7 +2,7 @@ name: work_hu
 description: See the status of the competition. Follow your MyShare status and much more.
 publish_to: 'none'
 
-version: 2.0.17+19
+version: 2.0.19+21
 
 environment:
   sdk: '>=3.8.0<4.0.0'

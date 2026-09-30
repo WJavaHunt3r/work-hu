@@ -191,9 +191,12 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'home_recent_transactions'.i18n(),
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        // Takes the space the button leaves and wraps, so longer translations don't overflow.
+        Expanded(
+          child: Text(
+            'home_recent_transactions'.i18n(),
+            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
         ),
         TextButton(
           onPressed: () {
@@ -294,7 +297,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
 
   Widget _buildWelcomeTitle(ThemeData theme) {
     return Padding(
-      padding: EdgeInsets.only(top: 12.sp, bottom: 20.sp),
+      padding: EdgeInsets.only(top: 24.sp, bottom: 20.sp),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
