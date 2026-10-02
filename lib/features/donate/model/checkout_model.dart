@@ -4,23 +4,27 @@ import 'package:work_hu/app/models/payment_status.dart';
 part 'checkout_model.freezed.dart';
 part 'checkout_model.g.dart';
 
+/// A SumUp checkout as returned by the GM gateway.
+///
+/// Only what identifies the checkout and its outcome is required: SumUp leaves out some of the other fields
+/// depending on the checkout's state (e.g. after a failed payment), and a missing one must not hide the result.
 @freezed
 abstract class CheckoutModel with _$CheckoutModel {
   const factory CheckoutModel({
     required num amount,
     required String checkout_reference,
-    required String checkout_type,
     required String id,
-    required String date,
     required String description,
-    required String merchant_code,
-    required String merchant_name,
-    required String merchant_country,
-    required String pay_to_email,
     required PaymentStatus status,
-    required String purpose,
-    required String hosted_checkout_url,
-    required List<dynamic> transactions,
+    String? checkout_type,
+    String? date,
+    String? merchant_code,
+    String? merchant_name,
+    String? merchant_country,
+    String? pay_to_email,
+    String? purpose,
+    String? hosted_checkout_url,
+    @Default([]) List<dynamic> transactions,
   }) = _CheckoutModel;
 
   factory CheckoutModel.fromJson(Map<String, dynamic> json) => _$CheckoutModelFromJson(json);

@@ -10,6 +10,7 @@ import 'package:work_hu/features/bufe/data/repository/bufe_repository.dart';
 import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/top_up/data/state/top_up_state.dart';
+import 'package:work_hu/features/utils.dart';
 
 final topUpDataProvider = StateNotifierProvider.autoDispose<TopUpDataNotifier, TopUpState>(
   (ref) => TopUpDataNotifier(ref.watch(bufeRepoProvider)),
@@ -26,7 +27,7 @@ class TopUpDataNotifier extends BaseDataNotifier<TopUpState> {
       () => _bufeRepository.createSumupCheckout(
         dukappId: currentUser!.id,
         description: "top_up_customer_id:${currentUser!.id}",
-        redirectUrl: "https://dukapp.bcc-ktk.org/balance/topUp/success/{checkout_reference}",
+        redirectUrl: Utils.appUrl("/balance/topUp/success/{checkout_reference}"),
         returnUrl: "https://fngkzlmhfegroyulcgfc.supabase.co/functions/v1/sumup-webhook",
         amount: amount,
       ),

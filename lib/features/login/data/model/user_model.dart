@@ -35,6 +35,9 @@ abstract class UserModel with _$UserModel {
     num? bufeId,
     num? points,
     String? email,
+
+    /// True while the first or last name is the backend's placeholder (e.g. Google sent no last name).
+    @Default(false) bool profileIncomplete,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
@@ -79,6 +82,7 @@ abstract class UserModel with _$UserModel {
         Permission.DONATION_MANAGE,
         Permission.PAYMENT_MANAGE,
         Permission.SEASON_MANAGE,
+        Permission.AUDIT_LOG_VIEW,
       ]);
 
   /// A parent is an adult with a family; their children are the family members aged 18 or younger.

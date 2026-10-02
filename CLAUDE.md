@@ -52,6 +52,10 @@ Folder names are not fully consistent (`provider` vs `providers`, `widget` vs `w
 
 **Jobs (pre-registration):** `lib/features/jobs/`. A job exists before it happens; people register (with a comment), there is a registration and cancellation deadline, an optional participant limit with waitlist, age limits and a gender restriction. Parents (adult, same `familyId`) register their children, `JOB_MANAGE_ALL` registers anyone. The responsible user (or `JOB_MANAGE_ALL`) completes the job with hours per registered user, which creates a normal activity that then follows the existing activity flow. Creating jobs needs `JOB_CREATE`. Routes are under `/profile/jobs` (list, `create`, `:id`, `:id/edit`). The repository wraps calls in `guardApi` (`lib/app/framework/api_exception.dart`) so the backend's plain-text reason (409 full, 422 deadline passed or not eligible) reaches the user: notifiers pass `onError: (m) => showApiError(m)` to `executeApiCall`.
 
+**Audit log:** `lib/features/audit_log/`, admin → Audit log (needs `AUDIT_LOG_VIEW`, backend `GET /api/auditLog`). Newest first, filters for action, entity type, user, dates and free text; tapping an entry shows its details JSON. Action names are kept as strings and translated with `audit_action_<NAME>` (unknown ones show their raw name).
+
+**Incomplete names:** when Google sends no last name the backend stores `-` and sets `UserModel.profileIncomplete`. `CompleteNameGate` (wrapped around the shell in `router_provider.dart`) then shows a small non-dismissible dialog asking for last and first name and saves it with `PUT /user/{id}`; it also appears for a restored session. The only way out besides saving is logging out.
+
 **i18n:** the `localization` package loads JSON from `lib/I18n/` (`en_US.json`, `hu_HU.json`). Use `"key".i18n()`. Add every new key to both files.
 
 **Sizing:** `flutter_screenutil` uses a 360×640 design size, so use `.w`, `.h`, `.sp`.

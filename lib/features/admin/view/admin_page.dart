@@ -62,6 +62,7 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
       if (can(Permission.CAMP_MANAGE))
         (label: "admin_camp_registrations", icon: Icons.app_registration, route: "/admin/campRegistrations"),
       if (can(Permission.SEASON_MANAGE)) (label: "admin_rounds", icon: Icons.timelapse, route: "/admin/rounds"),
+      if (can(Permission.AUDIT_LOG_VIEW)) (label: "admin_audit_log", icon: Icons.history, route: "/admin/auditLog"),
     ];
 
     return [

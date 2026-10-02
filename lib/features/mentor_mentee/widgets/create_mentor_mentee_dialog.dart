@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/features/mentor_mentee/provider/mentor_mentee_provider.dart';
 import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
@@ -11,43 +10,47 @@ class CreateMentorMenteeDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(mentorMenteeCreateProvider);
+    final notifier = ref.read(mentorMenteeCreateProvider.notifier);
     return AlertDialog(
       actions: [
         TextButton(
           onPressed: () {
-            ref.read(mentorMenteeCreateProvider.notifier).clearCreation();
-            context.pop();
+            notifier.clearCreation();
+            Navigator.of(context).pop();
           },
-          child: const Text("cancel"),
+          child: Text("base_cancel".i18n()),
         ),
-        TextButton(
-          onPressed: () async {
-            final saved = await ref.read(mentorMenteeCreateProvider.notifier).postMentee();
-            if (context.mounted) context.pop(saved);
-          },
-          child: const Text("Create"),
+        FilledButton(
+          // postMentee needs both users.
+          onPressed: state.mentor == null || state.mentee == null
+              ? null
+              : () async {
+                  final saved = await notifier.postMentee();
+                  if (context.mounted) Navigator.of(context).pop(saved);
+                },
+          child: Text("base_save".i18n()),
         ),
       ],
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          UserComboWidget(
-            controller: ref.read(mentorMenteeCreateProvider.notifier).mentorController,
-            onSuggestionSelected: (UserComboModel suggestion) => null,
-            // ref.read(mentorMenteeCreateProvider.notifier).updateSelection(mentor: suggestion),
-            // itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
-            // suggestionsCallback: (String pattern) => ref.read(mentorMenteeCreateProvider.notifier).filterUsers(pattern),
-            labelText: 'mentor_mentee_mentor'.i18n(),
-          ),
-          UserComboWidget(
-            labelText: "mentor_mentee_mentor".i18n(),
-            controller: ref.read(mentorMenteeCreateProvider.notifier).menteeController,
-            onSuggestionSelected: (UserComboModel suggestion) => null,
-            // ref.read(mentorMenteeCreateProvider.notifier).updateSelection(mentee: suggestion),
-            // itemBuilder: (context, data) => Text("${data.getFullName()} (${data.getAge()})"),
-            // suggestionsCallback: (String pattern) => ref.read(mentorMenteeCreateProvider.notifier).filterUsers(pattern),
-          ),
-        ],
+      // AlertDialog sizes its content with IntrinsicWidth, which the user picker's LayoutBuilder can't answer;
+      // a fixed width means the content is never asked.
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            UserComboWidget(
+              controller: notifier.mentorController,
+              labelText: "mentor_mentee_mentor".i18n(),
+              onSuggestionSelected: (UserComboModel user) => notifier.selectMentor(user.id),
+            ),
+            UserComboWidget(
+              controller: notifier.menteeController,
+              labelText: "mentor_mentee_mentee".i18n(),
+              onSuggestionSelected: (UserComboModel user) => notifier.selectMentee(user.id),
+            ),
+          ],
+        ),
       ),
     );
   }

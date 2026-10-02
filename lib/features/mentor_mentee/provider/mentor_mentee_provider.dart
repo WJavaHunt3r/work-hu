@@ -15,7 +15,6 @@ import 'package:work_hu/features/mentor_mentee/data/repository/mentor_mentee_rep
 import 'package:work_hu/features/mentor_mentee/data/state/mentor_mentee_create_state.dart';
 import 'package:work_hu/features/users/data/repository/users_repository.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
-import 'package:work_hu/features/utils.dart';
 
 final mentorMenteeApiProvider = Provider<MentorMenteeApi>((ref) => MentorMenteeApi());
 
@@ -91,29 +90,12 @@ class MentorMenteeCreateNotifier extends BaseDataNotifier<MentorMenteeCreateStat
     );
   }
 
-  Future<List<UserModel>> filterUsers(String filter) async {
-    var filtered = state.users
-        .where(
-          (u) =>
-              Utils.changeSpecChars(
-                u.firstname.toLowerCase(),
-              ).startsWith(Utils.changeSpecChars(filter.toLowerCase())) ||
-              Utils.changeSpecChars(u.lastname.toLowerCase()).startsWith(Utils.changeSpecChars(filter.toLowerCase())),
-        )
-        .toList();
-    filtered.sort((a, b) => (a.getFullName()).compareTo(b.getFullName()));
-    return filtered;
-  }
+  // The user picker only knows the id; the pair needs the full user, which getUsers has loaded.
+  void selectMentor(num userId) => state = state.copyWith(mentor: _userById(userId));
 
-  void updateSelection({UserModel? mentor, UserModel? mentee}) {
-    if (mentor != null) {
-      mentorController.text = "${mentor.getFullName()} ( ${mentor.getAge()}) ";
-    }
-    if (mentee != null) {
-      menteeController.text = "${mentee.getFullName()} ( ${mentee.getAge()}) ";
-    }
-    state = state.copyWith(mentor: mentor ?? state.mentor, mentee: mentee ?? state.mentee);
-  }
+  void selectMentee(num userId) => state = state.copyWith(mentee: _userById(userId));
+
+  UserModel? _userById(num id) => state.users.where((u) => u.id == id).firstOrNull;
 
   void clearCreation() {
     menteeController.text = "";

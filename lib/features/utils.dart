@@ -17,6 +17,13 @@ import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 
 class Utils {
+  /// Where the web app is published; used for links back into the app from native builds.
+  static const String webAppUrl = "https://dukapp.bcc-ktk.org";
+
+  /// Absolute URL of an app [path] (starting with "/"). On web it uses the current origin, so local and
+  /// staging builds link back to themselves.
+  static String appUrl(String path) => "${kIsWeb ? Uri.base.origin : webAppUrl}$path";
+
   static const FlutterSecureStorage _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(enforceBiometrics: true),
     iOptions: IOSOptions(),

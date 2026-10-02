@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:injectable/injectable.dart';
 import 'package:work_hu/api/dio_client.dart';
 import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/session/tab_session.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/utils.dart';
 
@@ -24,6 +25,7 @@ class UserProvider extends ChangeNotifier {
       await Utils.saveData('password', '');
       await Utils.saveData('jwt_token', '');
       _token = null;
+      clearTabSession();
     }
     _user = user;
     notifyListeners();
@@ -31,6 +33,8 @@ class UserProvider extends ChangeNotifier {
 
   Future<void> setToken(String? token) async {
     _token = token;
+    // Lets a reload of this tab (e.g. coming back from the SumUp checkout) keep the session.
+    if (token != null) markTabSessionActive();
   }
 
   UserModel? get user => _user;
@@ -42,7 +46,8 @@ class UserProvider extends ChangeNotifier {
 
     final String token = await Utils.getData('jwt_token');
 
-    if (!keepLoggedIn) {
+    // Without "keep me logged in" the session ends with the browser tab, not with a reload of it.
+    if (!keepLoggedIn && !isTabSessionActive()) {
       if (token.isNotEmpty) await logout();
       return;
     }

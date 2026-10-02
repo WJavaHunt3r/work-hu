@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/widgets/base_form_field.dart';
 
 class BaseTextFormField extends StatefulWidget {
   const BaseTextFormField({
@@ -118,18 +119,9 @@ class _BaseTextFormFieldState extends State<BaseTextFormField> {
               textInputAction: widget.textInputAction,
               obscureText: _isObscured,
               inputFormatters: widget.inputFormatter == null ? null : [widget.inputFormatter!],
-              decoration: InputDecoration(
+              decoration: baseInputDecoration(
+                theme,
                 hintText: widget.hintText?.i18n(),
-                filled: true,
-                fillColor: theme.colorScheme.surface,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.sp),
-                  borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.sp),
-                  borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.sp),
-                ),
                 prefixIcon: widget.prefix,
                 suffixIcon: widget.isPasswordField
                     ? IconButton(

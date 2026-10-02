@@ -38,8 +38,10 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
   Widget buildLayout() {
     final theme = Theme.of(context);
     return state.donation == null
-        ? Column(
-            children: [Expanded(child: Center(child: CircularProgressIndicator()))],
+        // BasePage scrolls the layout, so the height is unbounded here: no Expanded.
+        ? Padding(
+            padding: EdgeInsets.symmetric(vertical: 32.sp),
+            child: const Center(child: CircularProgressIndicator()),
           )
         : Column(
             children: [

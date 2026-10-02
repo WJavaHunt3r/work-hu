@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/view/activities_page.dart';
+import 'package:work_hu/features/audit_log/view/audit_log_page.dart';
 import 'package:work_hu/features/jobs/view/job_detail_page.dart';
+import 'package:work_hu/features/login/widgets/complete_name_dialog.dart';
 import 'package:work_hu/features/jobs/view/job_form_page.dart';
 import 'package:work_hu/features/jobs/view/jobs_page.dart';
 import 'package:work_hu/features/roles/data/model/app_role_model.dart';
@@ -230,7 +232,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: "success/:checkout_reference",
             builder: (BuildContext context, GoRouterState state) {
-              return DonatePaymentSuccessPage(checkoutReference: state.pathParameters["checkout_reference"]);
+              return DonatePaymentSuccessPage(
+                donationId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+                checkoutReference: state.pathParameters["checkout_reference"],
+              );
             },
           ),
         ],
@@ -271,6 +276,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: "/admin/users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
       GoRoute(path: "/admin/roles", builder: (BuildContext context, GoRouterState state) => const RolesPage()),
+      GoRoute(path: "/admin/auditLog", builder: (BuildContext context, GoRouterState state) => const AuditLogPage()),
       GoRoute(
         path: "/admin/roles/edit",
         builder: (BuildContext context, GoRouterState state) => RoleEditPage(role: state.extra as AppRoleModel?),
@@ -369,7 +375,8 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userDataProvider).user;
     return Scaffold(
-      body: navigationShell, // The navigation shell contains the page for the current branch
+      // The navigation shell contains the page for the current branch; the gate asks for a missing name first
+      body: CompleteNameGate(child: navigationShell),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
