@@ -12,7 +12,7 @@ abstract class BaseDataNotifier<S> extends StateNotifier<S> {
 
   S copyWithState(BaseState status);
 
-  copyWithModelState(ModelState modelState) {
+  S copyWithModelState(ModelState modelState) {
     return copyWithState(BaseState(modelState: modelState));
   }
 
@@ -60,7 +60,7 @@ abstract class BaseDataNotifier<S> extends StateNotifier<S> {
         // Deferred so it never runs during a build; skipped if the call already finished.
         Future.microtask(() {
           final context = navigatorKey.currentContext;
-          if (finished || context == null) return;
+          if (finished || context == null || !context.mounted) return;
           overlayShown = true;
           LoadingScreen.instance().show(context: context);
         });

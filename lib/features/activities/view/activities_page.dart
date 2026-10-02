@@ -6,6 +6,7 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
+import 'package:work_hu/app/models/permission.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_confirm_dialog.dart';
 import 'package:work_hu/app/widgets/base_filter_chip.dart';
@@ -109,7 +110,10 @@ class ActivitiesPageState
 
   @override
   bool canDelete(ActivityModel item) =>
-      !item.registeredInMyShare && !item.registeredInApp && ref.read(userDataProvider).user!.isAdmin();
+      !item.registeredInMyShare &&
+      !item.registeredInApp &&
+      (ref.read(userDataProvider).user!.isAdmin() ||
+          ref.read(userDataProvider).user!.hasPermission(Permission.ACTIVITY_MANAGE_ALL));
 
   Widget _buildNotRegistered(ThemeData theme, List<Widget> notRegistered) {
     return Column(

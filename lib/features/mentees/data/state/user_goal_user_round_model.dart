@@ -10,7 +10,7 @@ class UserGoalUserRoundModel {
 
   @override
   String toString() {
-    return "${userStatus.name} ${Utils.percentFormat.format(userStatus.transactions)} ${userStatus.goal * (round.localMyShareGoal ?? round.myShareGoal) / 100}";
+    return "${userStatus.name} ${Utils.percentFormat.format(userStatus.transactions)} ${userStatus.goal * round.localMyShareGoal / 100}";
   }
 
   bool isOnTrack() => userStatus.onTrack;
@@ -20,5 +20,5 @@ class UserGoalUserRoundModel {
   String getStatusString() => "${Utils.percentFormat.format(userStatus.status * 100)}%";
 
   String getRemainingAmount() =>
-      "${Utils.creditFormatting(userStatus.goal * (round.localMyShareGoal ?? round.myShareGoal) / 100 - userStatus.transactions)}Ft to be On Track";
+      "${Utils.creditFormatting(userStatus.goal * round.localMyShareGoal / 100 - userStatus.transactions)}Ft to be On Track";
 }

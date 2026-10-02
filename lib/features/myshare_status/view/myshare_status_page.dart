@@ -38,9 +38,9 @@ class MyShareStatusPageState
 
     var currentRound = widget.userGoalRound.round;
     var userStatus = userStatusModel.status * 100;
-    var isOnTrack = userStatus > currentRound.localMyShareGoal!;
+    var isOnTrack = userStatus > currentRound.localMyShareGoal;
     var toOnTrack = Utils.creditFormatting(
-      (userStatusModel.goal) * (currentRound.localMyShareGoal!) / 100 - userStatusModel.transactions,
+      (userStatusModel.goal) * (currentRound.localMyShareGoal) / 100 - userStatusModel.transactions,
     );
     return Column(
       children: [
@@ -68,7 +68,7 @@ class MyShareStatusPageState
                 ),
                 MarkerPointer(
                   color: AppColors.teamOrange,
-                  value: (currentRound.localMyShareGoal ?? currentRound.myShareGoal) / 100 * (userStatusModel.goal),
+                  value: currentRound.localMyShareGoal / 100 * (userStatusModel.goal),
                 ),
               ],
               annotations: [

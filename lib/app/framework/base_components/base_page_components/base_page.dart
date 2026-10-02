@@ -161,18 +161,15 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
   }
 
   void confirmExit() {
+    // The dialog pops itself with true on confirm; leave the page only after that.
     showDialog<bool>(
       context: context,
       builder: (dialogContext) {
-        return BaseConfirmDialog(
-          title: "base_exit",
-          content: "base_exit_question",
-          onConfirm: () {
-            dialogContext.pop();
-          },
-        );
+        return BaseConfirmDialog(title: "base_exit", content: "base_exit_question", onConfirm: () {});
       },
-    );
+    ).then((leave) {
+      if (leave == true && mounted) context.pop();
+    });
   }
 
   Widget buildLayout();

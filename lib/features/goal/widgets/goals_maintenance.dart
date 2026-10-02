@@ -21,7 +21,6 @@ class GoalsMaintenance extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final mode = ref.watch(goalMaintenanceProvider).mode;
     final GoalModel goal = ref.watch(goalMaintenanceProvider).selectedGoal;
-    var year = goal.seasonYear;
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
@@ -29,7 +28,9 @@ class GoalsMaintenance extends ConsumerWidget {
           title: Text("${mode}_goal".i18n(), style: const TextStyle(fontWeight: FontWeight.w800)),
           actions: [
             MaterialButton(
-              onPressed: () => ref.read(goalMaintenanceProvider.notifier).saveGoal().then((value) => context.pop(true)),
+              onPressed: () => ref.read(goalMaintenanceProvider.notifier).saveGoal().then((_) {
+                if (context.mounted) context.pop(true);
+              }),
               child: const Text("Save"),
             ),
           ],
@@ -38,8 +39,9 @@ class GoalsMaintenance extends ConsumerWidget {
             ? const SizedBox()
             : Form(
                 key: _formKey,
-                onPopInvoked: (pop) =>
-                    ref.read(goalMaintenanceProvider.notifier).presetGoal(const GoalModel(goal: 0), MaintenanceMode.create),
+                onPopInvokedWithResult: (didPop, result) => ref
+                    .read(goalMaintenanceProvider.notifier)
+                    .presetGoal(const GoalModel(goal: 0), MaintenanceMode.create),
                 child: Padding(
                   padding: EdgeInsets.all(8.sp),
                   child: Column(

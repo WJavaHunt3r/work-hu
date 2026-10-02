@@ -13,6 +13,10 @@ import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/app/framework/api_exception.dart';
+import 'package:work_hu/app/models/permission.dart';
+import 'package:work_hu/features/roles/data/repository/roles_repository.dart';
+import 'package:work_hu/features/roles/providers/roles_provider.dart';
 import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
 import 'package:work_hu/features/user_combo/data/model/user_filter.dart';
 import 'package:work_hu/features/users/data/api/users_api.dart';
@@ -28,7 +32,8 @@ final usersDataProvider = StateNotifierProvider.autoDispose<UsersDataNotifier, P
 );
 
 final userDetailProvider = StateNotifierProvider.autoDispose<UserDetailNotifier, UserDetailState>(
-  (ref) => UserDetailNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider).user),
+  (ref) =>
+      UserDetailNotifier(ref.read(usersRepoProvider), ref.read(rolesRepoProvider), ref.read(userDataProvider).user),
 );
 
 const usersByName = [SortOrder("lastname"), SortOrder("firstname")];
@@ -81,16 +86,24 @@ class UsersDataNotifier extends PagedListNotifier<UserComboModel, UserFilter> {
 
 /// The user shown and edited in the user details dialog.
 class UserDetailNotifier extends BaseDataNotifier<UserDetailState> {
-  UserDetailNotifier(this.usersRepository, this.currentUser) : super(const UserDetailState());
+  UserDetailNotifier(this.usersRepository, this.rolesRepository, this.currentUser) : super(const UserDetailState());
 
   final UsersRepository usersRepository;
+  final RolesRepository rolesRepository;
   final UserModel? currentUser;
+
+  /// Roles the user had when loaded, to tell whether the roles need saving.
+  List<String> _loadedRoleNames = const [];
+
+  /// Roles are assigned separately from the profile, and only by users who may manage roles.
+  bool get canManageRoles => currentUser?.hasPermission(Permission.ROLE_MANAGE) ?? false;
 
   Future<void> getUser(num id) async {
     state = state.copyWith(selectedUser: null);
     await executeApiCall<UserModel>(
       () => usersRepository.getUserById(id),
       onSuccess: (user) async {
+        _loadedRoleNames = user.roleNames;
         state = state.copyWith(selectedUser: user);
       },
     );
@@ -100,13 +113,38 @@ class UserDetailNotifier extends BaseDataNotifier<UserDetailState> {
     state = state.copyWith(selectedUser: user);
   }
 
-  Future<void> saveUser() async {
-    await executeApiCall<UserModel>(
-      () => usersRepository.updateUser(currentUser!.id, state.selectedUser!),
+  /// Adds or removes one role of the edited user (saved with [saveUser]).
+  void toggleRole(String roleName, bool assigned) {
+    final user = state.selectedUser;
+    if (user == null) return;
+    final names = {...user.roleNames};
+    assigned ? names.add(roleName) : names.remove(roleName);
+    state = state.copyWith(selectedUser: user.copyWith(roleNames: names.toList()));
+  }
+
+  /// Saves the profile and, if they changed, the roles. Returns whether everything was saved.
+  Future<bool> saveUser() async {
+    final edited = state.selectedUser!;
+    final saved = await executeApiCall<UserModel>(
+      () => guardApi(() async {
+        var user = await usersRepository.updateUser(currentUser!.id, edited);
+        final rolesChanged =
+            !(Set.of(edited.roleNames).difference(Set.of(_loadedRoleNames)).isEmpty &&
+                Set.of(_loadedRoleNames).difference(Set.of(edited.roleNames)).isEmpty);
+        if (canManageRoles && rolesChanged) {
+          final roles = (await rolesRepository.getRoles()).content;
+          final ids = roles.where((r) => edited.roleNames.contains(r.name)).map((r) => r.id!);
+          user = await rolesRepository.setUserRoles(edited.id, ids);
+        }
+        return user;
+      }),
       onSuccess: (user) async {
+        _loadedRoleNames = user.roleNames;
         state = state.copyWith(selectedUser: user);
       },
+      onError: (message) async => showApiError(message),
     );
+    return saved != null;
   }
 
   Future<void> resetUserPassword(num userId) async {

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
-import 'package:work_hu/app/providers/localeProvider.dart';
+import 'package:work_hu/app/providers/locale_provider.dart';
 import 'package:work_hu/app/widgets/icon_box.dart';
 import 'package:work_hu/features/bufe/data/model/sumup_transactions.dart';
 import 'package:work_hu/features/top_ups/providers/top_ups_provider.dart';

@@ -14,8 +14,8 @@ import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/style/app_style.dart';
 import 'package:work_hu/app/update/web_update_checker.dart';
 
-import 'app/providers/authInitProvider.dart';
-import 'app/providers/localeProvider.dart';
+import 'app/providers/auth_init_provider.dart';
+import 'app/providers/locale_provider.dart';
 import 'features/login/view/login_page.dart';
 
 class DukApp extends ConsumerWidget {
@@ -57,7 +57,7 @@ class DukApp extends ConsumerWidget {
     );
   }
 
-  buildMaterial(WidgetRef ref) {
+  Widget buildMaterial(WidgetRef ref) {
     final authInit = ref.watch(authInitProvider);
     return authInit.when(
       loading: () => const Center(child: CircularProgressIndicator()),

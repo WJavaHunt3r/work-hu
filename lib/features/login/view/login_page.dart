@@ -6,11 +6,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/providers/localeProvider.dart';
+import 'package:work_hu/app/providers/locale_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
@@ -69,7 +68,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
     }
   }
 
-  _buildDonations(ThemeData theme) {
+  Widget _buildDonations(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -176,7 +175,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController passwordAgainController = TextEditingController();
 
-  _buildLoginForms() {
+  Widget _buildLoginForms() {
     return AutofillGroup(
       key: const ValueKey('login_autofill_group'),
       child: Column(
@@ -230,7 +229,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
     }
   }
 
-  _buildRegisterForms() {
+  Widget _buildRegisterForms() {
     return AutofillGroup(
       key: const ValueKey('login_register_group'),
       child: Column(
@@ -363,10 +362,10 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => ConfirmAlertDialog(
-                    onConfirm: () => ref
-                        .read(loginDataProvider.notifier)
-                        .sendNewPassword(emailController.text)
-                        .then((r) => context.pop()),
+                    onConfirm: () =>
+                        ref.read(loginDataProvider.notifier).sendNewPassword(emailController.text).then((r) {
+                          if (context.mounted) context.pop();
+                        }),
                     title: 'login_reset_password_confirm_title'.i18n(),
                     content: Text("login_reset_password_question".i18n()),
                   ),

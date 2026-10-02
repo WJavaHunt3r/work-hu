@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
-import 'package:work_hu/app/providers/localeProvider.dart';
+import 'package:work_hu/app/providers/locale_provider.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
 import 'package:work_hu/features/transactions/data/models/transactions_filter.dart';

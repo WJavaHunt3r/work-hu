@@ -27,7 +27,7 @@ class LocaleNotifier extends AsyncNotifier<Locale> {
     }
 
     // If no saved locale, try the system locale
-    final systemLocale = WidgetsBinding.instance.window.locale;
+    final systemLocale = WidgetsBinding.instance.platformDispatcher.locale;
     final systemLanguageCode = systemLocale.languageCode;
 
     // Find the first supported locale that matches the system language

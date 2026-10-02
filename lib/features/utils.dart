@@ -245,7 +245,7 @@ class Utils {
     return formatted[0].toUpperCase() + formatted.substring(1);
   }
 
-  static showErrorDialog(BuildContext context, {String? title, required String content}) {
+  static void showErrorDialog(BuildContext context, {String? title, required String content}) {
     showDialog(
       context: context,
       barrierDismissible: false,

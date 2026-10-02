@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/locator.dart';

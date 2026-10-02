@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:work_hu/app/models/role.dart';
+import 'package:work_hu/app/models/gender.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/widgets/base_form_field.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
-import 'package:work_hu/features/teams/data/model/team_model.dart';
-import 'package:work_hu/features/teams/provider/teams_provider.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
+import 'package:work_hu/features/roles/providers/roles_provider.dart';
+import 'package:work_hu/features/roles/view/role_edit_page.dart' show permissionLabel;
 import 'package:work_hu/features/users/providers/users_providers.dart';
 import 'package:work_hu/features/utils.dart';
 
@@ -34,7 +36,10 @@ class UserDetails extends ConsumerWidget {
                 title: Text(user.getFullName(), style: const TextStyle(fontWeight: FontWeight.w800)),
                 actions: [
                   MaterialButton(
-                    onPressed: () => ref.read(userDetailProvider.notifier).saveUser().then((value) => context.pop(true)),
+                    onPressed: () async {
+                      final saved = await ref.read(userDetailProvider.notifier).saveUser();
+                      if (saved && context.mounted) context.pop(true);
+                    },
                     child: Text("user_details_save".i18n()),
                   ),
                 ],
@@ -131,20 +136,19 @@ class UserDetails extends ConsumerWidget {
                         //         enabled: false,
                         //         onChanged: (String text) => null,
                         //       ),
-                        Padding(
-                          padding: EdgeInsets.all(8.sp),
-                          child: DropdownButtonFormField(
-                            dropdownColor: Theme.of(context).colorScheme.secondary,
-                            decoration: InputDecoration(labelText: "user_details_role".i18n(), isDense: true),
-                            value: user.role,
-                            items: Role.values
-                                .map((e) => DropdownMenuItem<Role>(value: e, child: Text(e.toString())))
-                                .toList(),
-                            onChanged: (value) => value != null
-                                ? ref.watch(userDetailProvider.notifier).updateCurrentUser(user.copyWith(role: value))
-                                : null,
-                          ),
+                        BaseDropdownFormField<Gender?>(
+                          labelText: "user_details_gender",
+                          initialValue: user.gender,
+                          items: [
+                            const DropdownMenuItem<Gender?>(value: null, child: Text("")),
+                            ...Gender.values.map(
+                              (e) => DropdownMenuItem<Gender?>(value: e, child: Text(e.label.i18n())),
+                            ),
+                          ],
+                          onChanged: (value) =>
+                              ref.read(userDetailProvider.notifier).updateCurrentUser(user.copyWith(gender: value)),
                         ),
+                        _RolesSection(user: user),
                         TextButton(
                           style: ButtonStyle(
                             // backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
@@ -164,14 +168,58 @@ class UserDetails extends ConsumerWidget {
             ),
     );
   }
+}
 
-  createTeamsDropDownList(WidgetRef ref) {
-    var list = ref
-        .watch(teamsDataProvider)
-        .teams
-        .map((e) => DropdownMenuItem<TeamModel>(value: e, child: Text(e.teamName.toString())))
-        .toList();
-    list.add(const DropdownMenuItem(value: null, child: Text("")));
-    return list;
+/// The roles of the user as one checkbox per role; changing them needs the ROLE_MANAGE permission.
+/// The user's effective permissions are the union of the permissions of all checked roles.
+class _RolesSection extends ConsumerWidget {
+  const _RolesSection({required this.user});
+
+  final UserModel user;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(userDetailProvider.notifier);
+    final roles = ref.watch(allRolesProvider);
+    return Padding(
+      padding: EdgeInsets.all(8.sp),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("user_details_roles".i18n(), style: Theme.of(context).textTheme.titleMedium),
+          roles.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, _) => Text(user.roleNames.join(", ")),
+            data: (all) => Column(
+              children: [
+                for (final role in all)
+                  CheckboxListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    value: user.roleNames.contains(role.name),
+                    title: Text(role.name),
+                    subtitle: role.description == null ? null : Text(role.description!),
+                    onChanged: notifier.canManageRoles
+                        ? (checked) => notifier.toggleRole(role.name, checked == true)
+                        : null,
+                  ),
+              ],
+            ),
+          ),
+          if (user.permissions.isNotEmpty) ...[
+            SizedBox(height: 8.sp),
+            Text("user_details_permissions".i18n(), style: Theme.of(context).textTheme.titleSmall),
+            Wrap(
+              spacing: 4.sp,
+              children: [
+                for (final p in user.permissions)
+                  Chip(label: Text(permissionLabel(p)), visualDensity: VisualDensity.compact),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
   }
 }

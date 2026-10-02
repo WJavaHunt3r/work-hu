@@ -12,6 +12,7 @@ class SettingsTile extends StatelessWidget {
   final int index;
 
   const SettingsTile({
+    super.key,
     required this.label,
     required this.icon,
     this.trailingText,

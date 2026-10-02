@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
@@ -17,7 +16,7 @@ final topUpDataProvider = StateNotifierProvider.autoDispose<TopUpDataNotifier, T
 );
 
 class TopUpDataNotifier extends BaseDataNotifier<TopUpState> {
-  TopUpDataNotifier(this._bufeRepository) : super(const TopUpState()) {}
+  TopUpDataNotifier(this._bufeRepository) : super(const TopUpState());
 
   final BufeRepository _bufeRepository;
   final UserModel? currentUser = locator<UserProvider>().user;

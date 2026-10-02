@@ -1,8 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/models/payment_status.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/features/bufe/data/model/sumup_checkout_model.dart';
 import 'package:work_hu/features/bufe/data/repository/bufe_repository.dart';
@@ -16,7 +13,7 @@ final paymentSuccessDataProvider = StateNotifierProvider.autoDispose<PaymentSucc
 );
 
 class PaymentSuccessDataNotifier extends BaseDataNotifier<PaymentSuccessState> {
-  PaymentSuccessDataNotifier(this.paymentRepository, this.bufeRepository) : super(const PaymentSuccessState()) {}
+  PaymentSuccessDataNotifier(this.paymentRepository, this.bufeRepository) : super(const PaymentSuccessState());
 
   final PaymentRepository paymentRepository;
   final BufeRepository bufeRepository;
@@ -26,15 +23,12 @@ class PaymentSuccessDataNotifier extends BaseDataNotifier<PaymentSuccessState> {
       () => bufeRepository.getSumupCheckout(checkoutId: checkoutReference),
       onSuccess: (data) async {
         state = state.copyWith(payment: data);
-        if (data.status != PaymentStatus.PAID) {
-          copyWithModelState(ModelState.error);
-        }
       },
     );
   }
 
   @override
   PaymentSuccessState copyWithState(BaseState status) {
-    return PaymentSuccessState(status: status);
+    return state.copyWith(status: status);
   }
 }

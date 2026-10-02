@@ -43,7 +43,9 @@ class DonationMaintenanceState extends ConsumerState<DonationMaintenance> {
           actions: [
             MaterialButton(
               onPressed: () => _formKey.currentState != null && _formKey.currentState!.validate()
-                  ? ref.read(donationMaintenanceProvider.notifier).saveDonation().then((value) => context.pop())
+                  ? ref.read(donationMaintenanceProvider.notifier).saveDonation().then((_) {
+                      if (context.mounted) context.pop();
+                    })
                   : null,
               child: const Text("Save"),
             ),

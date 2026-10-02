@@ -6,7 +6,8 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
-import 'package:work_hu/app/models/role.dart';
+import 'package:work_hu/app/models/permission.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/settings_tile.dart';
@@ -31,83 +32,49 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
     return BaseListView(
       hasBottomPadding: false,
       physics: const NeverScrollableScrollPhysics(),
-      children: user == null
-          ? []
-          : user.role == Role.TEAM_LEADER
-          ? teamLeaderScreens(context)
-          : user.role == Role.ADMIN
-          ? [...teamLeaderScreens(context), ...adminLeaderScreens(context)]
-          : [],
+      children: user == null ? [] : _tiles(context, user),
     );
   }
 
-  List<Widget> teamLeaderScreens(BuildContext context) => [
-    SettingsTile(
-      label: "admin_myshare_status".i18n(),
-      icon: Icons.bar_chart_outlined,
-      onTap: () => context.push("/admin/userStatus"),
-      index: 0,
-    ),
-    // createListTile(context: context, title: "admin_myshare_status", route: "userStatus"),
-    // createListTile(context: context, title: "admin_fra_kare_weeks", route: "fraKareWeeks"),
-    // createListTile(context: context, title: "admin_statistics", route: "statistics", enabled: false, isLast: true),
-  ];
+  /// Every entry is shown to admins (as before) and to anyone holding the permission it needs.
+  List<Widget> _tiles(BuildContext context, UserModel user) {
+    bool can(Permission permission) => user.isAdmin() || user.hasPermission(permission);
 
-  List<Widget> adminLeaderScreens(BuildContext context) => [
-    // createListTile(context: context, title: "admin_activities", route: "activities"),
-    SettingsTile(
-      label: "admin_myshare_credits".i18n(),
-      icon: Icons.account_balance_outlined,
-      onTap: () => context.push("/admin/createTransaction"),
-      index: 0,
-    ),
-    // createListTile(context: context, title: "admin_myshare_credits", route: "createTransaction"),
-    // createListTile(context: context, title: "admin_samvirk_credit", route: "createSamvirkTransaction"),
-    // createListTile(context: context, title: "admin_points", route: "createPointsTransaction"),
-    SettingsTile(label: "admin_users".i18n(), icon: Icons.group_outlined, onTap: () => context.push("/admin/users")),
-    // createListTile(context: context, title: "admin_users", route: "users"),
-    SettingsTile(label: "admin_goals".i18n(), icon: Icons.gps_fixed, onTap: () => context.push("/admin/goals")),
-    // createListTile(context: context, title: "admin_goals", route: "goals"),
-    SettingsTile(
-      label: "admin_mentor_mentees".i18n(),
-      icon: Icons.group_add_outlined,
-      onTap: () => context.push("/admin/mentorMentees"),
-    ),
-    // createListTile(context: context, title: "admin_mentor_mentees", route: "mentorMentees"),
-    SettingsTile(
-      label: "admin_transactions".i18n(),
-      icon: Icons.list_alt,
-      onTap: () => context.push("/admin/transactions"),
-    ),
-    // createListTile(context: context, title: "admin_transactions", route: "transactions"),
-    SettingsTile(
-      label: "admin_donations".i18n(),
-      icon: Icons.add_circle_outline,
-      onTap: () => context.push("/admin/donations"),
-    ),
-    // createListTile(context: context, title: "admin_donations", route: "donations"),
-    SettingsTile(
-      label: "admin_payments".i18n(),
-      icon: Icons.payments_outlined,
-      onTap: () => context.push("/admin/payments"),
-    ),
-    // createListTile(context: context, title: "admin_payments", route: "payments"),
-    SettingsTile(label: "admin_camps".i18n(), icon: Icons.map_outlined, onTap: () => context.push("/admin/camps")),
-    // createListTile(context: context, title: "admin_camps", route: "camps"),
-    SettingsTile(
-      label: "admin_camp_registrations".i18n(),
-      icon: Icons.app_registration,
-      onTap: () => context.push("/admin/campRegistrations"),
-    ),
-    // createListTile(context: context, title: "admin_camp_registrations", route: "campRegistrations"),
-    SettingsTile(
-      label: "admin_rounds".i18n(),
-      icon: Icons.timelapse,
-      isLast: true,
-      onTap: () => context.push("/admin/rounds"),
-    ),
-    // createListTile(context: context, title: "admin_rounds", route: "rounds", isLast: true),
-  ];
+    final entries = <({String label, IconData icon, String route})>[
+      if (user.isAdmin() || user.isTeamLeader())
+        (label: "admin_myshare_status", icon: Icons.bar_chart_outlined, route: "/admin/userStatus"),
+      if (can(Permission.TRANSACTION_MANAGE))
+        (label: "admin_myshare_credits", icon: Icons.account_balance_outlined, route: "/admin/createTransaction"),
+      if (can(Permission.USER_MANAGE) || can(Permission.ROLE_MANAGE))
+        (label: "admin_users", icon: Icons.group_outlined, route: "/admin/users"),
+      if (can(Permission.ROLE_MANAGE))
+        (label: "admin_roles", icon: Icons.admin_panel_settings_outlined, route: "/admin/roles"),
+      if (can(Permission.GOAL_MANAGE)) (label: "admin_goals", icon: Icons.gps_fixed, route: "/admin/goals"),
+      if (can(Permission.MENTOR_MANAGE))
+        (label: "admin_mentor_mentees", icon: Icons.group_add_outlined, route: "/admin/mentorMentees"),
+      if (can(Permission.TRANSACTION_MANAGE))
+        (label: "admin_transactions", icon: Icons.list_alt, route: "/admin/transactions"),
+      if (can(Permission.DONATION_MANAGE))
+        (label: "admin_donations", icon: Icons.add_circle_outline, route: "/admin/donations"),
+      if (can(Permission.PAYMENT_MANAGE))
+        (label: "admin_payments", icon: Icons.payments_outlined, route: "/admin/payments"),
+      if (can(Permission.CAMP_MANAGE)) (label: "admin_camps", icon: Icons.map_outlined, route: "/admin/camps"),
+      if (can(Permission.CAMP_MANAGE))
+        (label: "admin_camp_registrations", icon: Icons.app_registration, route: "/admin/campRegistrations"),
+      if (can(Permission.SEASON_MANAGE)) (label: "admin_rounds", icon: Icons.timelapse, route: "/admin/rounds"),
+    ];
+
+    return [
+      for (var i = 0; i < entries.length; i++)
+        SettingsTile(
+          label: entries[i].label.i18n(),
+          icon: entries[i].icon,
+          onTap: () => context.push(entries[i].route),
+          index: i,
+          isLast: i == entries.length - 1,
+        ),
+    ];
+  }
 
   Widget createListTile({
     required BuildContext context,

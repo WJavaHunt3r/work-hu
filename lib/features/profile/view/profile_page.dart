@@ -6,13 +6,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/app_theme_mode.dart';
-import 'package:work_hu/app/providers/localeProvider.dart';
+import 'package:work_hu/app/providers/locale_provider.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
@@ -87,6 +86,12 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
               icon: Icons.list_alt,
               onTap: () => context.push('/profile/activities'),
               index: 0,
+            ),
+            Divider(height: 1.sp),
+            SettingsTile(
+              label: 'profile_my_jobs'.i18n(),
+              icon: Icons.work_outline,
+              onTap: () => context.push('/profile/jobs'),
             ),
             Divider(height: 1.sp),
             SettingsTile(
@@ -206,7 +211,7 @@ class _InfoTile extends StatelessWidget {
               Text(value, style: Theme.of(context).textTheme.bodyLarge),
             ],
           ),
-          Icon(Icons.edit_outlined, size: 20.sp, color: Theme.of(context).hintColor.withOpacity(0.3)),
+          Icon(Icons.edit_outlined, size: 20.sp, color: Theme.of(context).hintColor.withValues(alpha: 0.3)),
         ],
       ),
     );

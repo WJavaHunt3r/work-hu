@@ -5,6 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/view/activities_page.dart';
+import 'package:work_hu/features/jobs/view/job_detail_page.dart';
+import 'package:work_hu/features/jobs/view/job_form_page.dart';
+import 'package:work_hu/features/jobs/view/jobs_page.dart';
+import 'package:work_hu/features/roles/data/model/app_role_model.dart';
+import 'package:work_hu/features/roles/view/role_edit_page.dart';
+import 'package:work_hu/features/roles/view/roles_page.dart';
 import 'package:work_hu/features/activity_items/view/activity_items_page.dart';
 import 'package:work_hu/features/admin/view/admin_page.dart';
 import 'package:work_hu/features/bufe_transactions/view/bufe_transactions_page.dart';
@@ -132,6 +138,29 @@ final routerProvider = Provider<GoRouter>((ref) {
                     ],
                   ),
                   GoRoute(
+                    path: "jobs",
+                    builder: (BuildContext context, GoRouterState state) => const JobsPage(),
+                    routes: [
+                      // "create" must stay before ":id", or it would be read as a job id.
+                      GoRoute(
+                        path: 'create',
+                        builder: (BuildContext context, GoRouterState state) => const JobFormPage(),
+                      ),
+                      GoRoute(
+                        path: ':id',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            JobDetailPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+                        routes: [
+                          GoRoute(
+                            path: 'edit',
+                            builder: (BuildContext context, GoRouterState state) =>
+                                JobFormPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  GoRoute(
                     path: 'theme',
                     pageBuilder: (context, state) {
                       return CustomTransitionPage(
@@ -241,6 +270,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (BuildContext context, GoRouterState state) => const UserStatusPage(),
       ),
       GoRoute(path: "/admin/users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
+      GoRoute(path: "/admin/roles", builder: (BuildContext context, GoRouterState state) => const RolesPage()),
+      GoRoute(
+        path: "/admin/roles/edit",
+        builder: (BuildContext context, GoRouterState state) => RoleEditPage(role: state.extra as AppRoleModel?),
+      ),
       GoRoute(path: "/admin/goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
       GoRoute(path: "/admin/rounds", builder: (BuildContext context, GoRouterState state) => const RoundsPage()),
       GoRoute(
@@ -354,7 +388,7 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
           backgroundColor: Colors.transparent,
           elevation: 0,
           currentIndex: navigationShell.currentIndex,
-          items: user!.isUser() ? userScreens() : adminScreens(),
+          items: user!.hasAdminAccess() ? adminScreens() : userScreens(),
           onTap: _goBranch,
         ),
       ),

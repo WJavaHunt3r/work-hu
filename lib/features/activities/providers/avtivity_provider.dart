@@ -4,6 +4,7 @@ import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart
 import 'package:work_hu/app/framework/base_components/paged_list/paged_list_notifier.dart';
 import 'package:work_hu/app/framework/base_components/paged_list/paged_state.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
+import 'package:work_hu/app/models/permission.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/data/api/activity_api.dart';
 import 'package:work_hu/features/activities/data/model/activity_filter.dart';
@@ -33,11 +34,15 @@ class ActivityDataNotifier extends PagedListNotifier<ActivityModel, ActivityFilt
   final ActivityRepository activityRepository;
   final UserModel? user;
 
-  /// Non-admins only see activities they created, are responsible for or are employed in.
+  /// Users without the activity permissions only see activities they created, are responsible for or are employed in.
   /// Applied per request, so the filter in the state stays what the user picked.
   @override
   Future<PaginatedResponse<ActivityModel>> fetch(ListQuery<ActivityFilter> query, int page) {
-    final scoped = user!.isAdmin()
+    final seesAll =
+        user!.isAdmin() ||
+        user!.hasPermission(Permission.ACTIVITY_MANAGE_ALL) ||
+        user!.hasPermission(Permission.ACTIVITY_REGISTER);
+    final scoped = seesAll
         ? query
         : query.copyWith(
             filter: query.filter.copyWith(responsible: user, createUser: user, employer: user),

@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
@@ -183,7 +182,7 @@ class PaymentSuccessStatePage
   @override
   BaseState get status => state.status;
 
-  buildErrorPage(ThemeData theme, ColorScheme colorScheme, SumupCheckoutModel payment) {
+  Widget buildErrorPage(ThemeData theme, ColorScheme colorScheme, SumupCheckoutModel payment) {
     var errorColor = colorScheme.error;
     return Column(
       children: [

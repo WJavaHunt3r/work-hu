@@ -19,19 +19,11 @@ class UserComboDataNotifier extends BaseDataNotifier<UserComboState> {
   UserComboDataNotifier(this.usersRepository) : super(const UserComboState());
 
   final UsersRepository usersRepository;
-  final Map<String, List<UserComboModel>> _cache = {};
 
   Future<List<UserComboModel>> list({UserFilter? filter, int? page, int? size, List<String>? sort}) async {
-    // var cacheKey = filter.toString();
-    // if (_cache.containsKey(cacheKey)) {
-    //   var list = _cache[cacheKey]!;
-    //   return list;
-    // }
     state = state.copyWith(filter: filter ?? state.filter);
     try {
       var result = await usersRepository.fetchByQuery(ListQuery(filter: state.filter, sort: usersByName));
-      // _cache[cacheKey] = result.content;
-
       return result.content;
     } catch (e) {
       return [];

@@ -86,7 +86,9 @@ class GoalDataNotifier extends PagedListNotifier<GoalModel, GoalFilter> {
                 goals.add(goalModel);
               }
             }
-          } catch (e) {}
+          } catch (_) {
+            // Skip rows that can't be parsed.
+          }
         }
         rowNb++;
       }

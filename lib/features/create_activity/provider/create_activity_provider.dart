@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
@@ -101,15 +100,15 @@ class CreateActivityDataNotifier extends BaseDataNotifier<CreateActivityState> {
     return state.activityItems.indexWhere((e) => e.hours != 0) < 0;
   }
 
-  _clearAddFields() {
+  void _clearAddFields() {
     state = state.copyWith(selectedUser: null, hours: 0);
   }
 
-  updateSelectedUser(UserComboModel? u) {
+  void updateSelectedUser(UserComboModel? u) {
     state = state.copyWith(selectedUser: u);
   }
 
-  updateAccount(TransactionType transactionTye) {
+  void updateAccount(TransactionType transactionTye) {
     var account = transactionTye == TransactionType.POINT ? Account.OTHER : Account.MYSHARE;
     state = state.copyWith(
       activity: state.activity!.copyWith(account: account, transactionType: transactionTye),
@@ -117,7 +116,7 @@ class CreateActivityDataNotifier extends BaseDataNotifier<CreateActivityState> {
     _updateItems();
   }
 
-  _updateItems() {
+  void _updateItems() {
     List<ActivityItemsModel> items = [];
     items.addAll(state.activityItems);
     List<ActivityItemsModel> newItems = [];

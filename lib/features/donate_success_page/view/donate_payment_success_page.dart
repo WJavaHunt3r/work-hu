@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
@@ -179,7 +178,7 @@ class DonatePaymentSuccessStatePage
   @override
   BaseState get status => state.status;
 
-  buildErrorPage(ThemeData theme, ColorScheme colorScheme, CheckoutModel payment) {
+  Widget buildErrorPage(ThemeData theme, ColorScheme colorScheme, CheckoutModel payment) {
     var errorColor = colorScheme.error;
     return Column(
       children: [
@@ -275,7 +274,7 @@ class _DetailRow extends StatelessWidget {
   final String value;
   final IconData? icon;
 
-  const _DetailRow({required this.label, required this.value, this.icon});
+  const _DetailRow({required this.label, required this.value}) : icon = null;
 
   @override
   Widget build(BuildContext context) {

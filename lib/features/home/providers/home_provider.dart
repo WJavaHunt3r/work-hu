@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
@@ -48,9 +47,9 @@ class HomeDataNotifier extends BaseDataNotifier<HomeState> {
         if (data.contains("404")) {
           executeApiCall<SumupUserModel>(
             () => _bufeRepository.createCustomer(
-              fullname: _currentUser!.getFullName(),
-              dukappId: _currentUser!.id,
-              email: _currentUser!.email ?? "",
+              fullname: _currentUser.getFullName(),
+              dukappId: _currentUser.id,
+              email: _currentUser.email ?? "",
             ),
             onSuccess: (data) async {
               state = state.copyWith(account: data);
@@ -111,6 +110,8 @@ class HomeDataNotifier extends BaseDataNotifier<HomeState> {
       await _donationRepository.getDonations(DateTime.now()).then((data) {
         state = state.copyWith(donations: data);
       });
-    } catch (e) {}
+    } catch (_) {
+      // Donations are optional on this page; keep the current list.
+    }
   }
 }
