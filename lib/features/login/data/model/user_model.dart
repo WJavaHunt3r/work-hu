@@ -36,6 +36,9 @@ abstract class UserModel with _$UserModel {
     num? points,
     String? email,
 
+    /// Null for users who don't belong to a church: they only get the balance and the profile.
+    num? churchId,
+
     /// True while the first or last name is the backend's placeholder (e.g. Google sent no last name).
     @Default(false) bool profileIncomplete,
   }) = _UserModel;
@@ -68,6 +71,9 @@ abstract class UserModel with _$UserModel {
     return role == Role.ADMIN;
   }
 
+  /// Users outside a church only see the balance and the profile (no status, jobs or admin).
+  bool hasChurch() => churchId != null;
+
   /// Whether the admin tab has anything to show: team leaders, admins and anyone holding a management permission.
   bool hasAdminAccess() =>
       isAdmin() ||
@@ -83,6 +89,8 @@ abstract class UserModel with _$UserModel {
         Permission.PAYMENT_MANAGE,
         Permission.SEASON_MANAGE,
         Permission.AUDIT_LOG_VIEW,
+        Permission.JOB_CREATE,
+        Permission.JOB_MANAGE_ALL,
       ]);
 
   /// A parent is an adult with a family; their children are the family members aged 18 or younger.

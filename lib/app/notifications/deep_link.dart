@@ -22,7 +22,7 @@ class DeepLink {
   /// Maps the data of a push message to an in-app location.
   ///
   /// The backend's payload carries `type` plus ids (`jobId`), which are mapped to a screen here. An explicit `route`
-  /// (an in-app path such as `/profile/jobs/12`) wins if a message ever includes one.
+  /// (an in-app path such as `/jobs/12`) wins if a message ever includes one.
   static String? fromPushData(Map<String, dynamic> data) {
     final route = data['route'] ?? data['deepLink'] ?? data['link'];
     if (route is String && route.trim().isNotEmpty) return _normalize(route.trim());
@@ -32,10 +32,10 @@ class DeepLink {
     switch (type) {
       case 'JOB_NEW':
       case 'JOB_REGISTERED_BY_OTHER':
-        return jobId == null ? '/profile/jobs' : '/profile/jobs/$jobId';
+        return jobId == null ? '/jobs' : '/jobs/$jobId';
       // The job still exists (cancelled); its page shows that.
       case 'JOB_CANCELLED':
-        return jobId == null ? '/profile/jobs' : '/profile/jobs/$jobId';
+        return jobId == null ? '/jobs' : '/jobs/$jobId';
       case 'TRANSACTION_CREATED':
         return '/status';
       // WEEKLY / GENERAL carry no target: tapping just opens the app.
@@ -43,7 +43,7 @@ class DeepLink {
     return null;
   }
 
-  /// Accepts an absolute app URL (`https://dukapp.bcc-ktk.org/profile/jobs/12`, `dukapp://profile/jobs/12`) or a path.
+  /// Accepts an absolute app URL (`https://dukapp.bcc-ktk.org/jobs/12`, `dukapp://jobs/12`) or a path.
   static String? _normalize(String route) {
     final uri = Uri.tryParse(route);
     if (uri == null) return null;

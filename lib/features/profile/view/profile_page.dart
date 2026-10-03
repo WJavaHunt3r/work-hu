@@ -89,12 +89,6 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
             ),
             Divider(height: 1.sp),
             SettingsTile(
-              label: 'profile_my_jobs'.i18n(),
-              icon: Icons.work_outline,
-              onTap: () => context.push('/profile/jobs'),
-            ),
-            Divider(height: 1.sp),
-            SettingsTile(
               label: 'profile_booking'.i18n(),
               icon: Icons.book_outlined,
               onTap: () {

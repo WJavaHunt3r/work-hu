@@ -16,6 +16,7 @@ import 'package:work_hu/features/jobs/data/model/job_model.dart';
 import 'package:work_hu/features/jobs/data/model/job_registration_model.dart';
 import 'package:work_hu/features/jobs/data/state/job_detail_state.dart';
 import 'package:work_hu/features/jobs/providers/jobs_provider.dart';
+import 'package:work_hu/features/jobs/view/jobs_page.dart';
 import 'package:work_hu/features/jobs/widgets/job_dialogs.dart';
 import 'package:work_hu/features/jobs/widgets/job_marker.dart';
 import 'package:work_hu/features/jobs/widgets/job_status_chip.dart';
@@ -23,12 +24,16 @@ import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
 import 'package:work_hu/features/utils.dart';
 
-/// One job: its details, the registration of the current user and their children, everyone who registered, and the
-/// actions for the people running it (edit, cancel, complete with hours).
+/// One job: its details and everyone who registered.
+///
+/// From the Jobs tab ([manage] false) it is for registering the current user and their children (plus "complete" for
+/// the job's responsible person). From the admin list ([manage] true) it has the actions for the people running the
+/// job instead: edit, cancel, complete with hours and register anyone.
 class JobDetailPage extends BasePage {
-  const JobDetailPage({super.key, required this.jobId, super.title = "jobs_detail_title"});
+  const JobDetailPage({super.key, required this.jobId, this.manage = false, super.title = "jobs_detail_title"});
 
   final num jobId;
+  final bool manage;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => JobDetailPageState();
@@ -45,6 +50,9 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
 
   UserModel get me => ref.read(userDataProvider).user!;
 
+  /// JOB_MANAGE_ALL's extras (acting for anyone, cancelling after the deadline) belong to the admin view.
+  bool get _manageAll => widget.manage && notifier.canManageAll;
+
   @override
   void onRefresh() => notifier.load();
 
@@ -53,19 +61,25 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
   @override
   List<Widget>? buildActions(BuildContext context, WidgetRef ref) {
     final job = state.job;
-    if (job == null || !job.isOpen) return [];
+    if (!widget.manage || job == null || !job.isOpen) return [];
     return [
       if (notifier.canEdit)
         IconButton(
           icon: const Icon(Icons.edit_outlined),
           tooltip: "jobs_edit".i18n(),
-          onPressed: () => context.push("/profile/jobs/${job.id}/edit").then((_) => notifier.load()),
+          onPressed: () => context.push("${JobsPage.basePath(true)}/${job.id}/edit").then((_) => notifier.load()),
         ),
       if (notifier.canEdit)
         IconButton(
           icon: const Icon(Icons.cancel_outlined),
           tooltip: "jobs_cancel_job".i18n(),
           onPressed: _confirmCancelJob,
+        ),
+      if (notifier.canEdit && job.isRepeating)
+        IconButton(
+          icon: const Icon(Icons.event_busy_outlined),
+          tooltip: "jobs_cancel_series".i18n(),
+          onPressed: () => _confirmCancelSeries(job.seriesId!),
         ),
     ];
   }
@@ -76,6 +90,14 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
       builder: (_) =>
           BaseConfirmDialog(title: "jobs_cancel_job", content: "jobs_cancel_job_question", onConfirm: () {}),
     ).then((confirmed) => confirmed == true ? notifier.cancelJob() : null);
+  }
+
+  void _confirmCancelSeries(String seriesId) {
+    showDialog<bool>(
+      context: context,
+      builder: (_) =>
+          BaseConfirmDialog(title: "jobs_cancel_series", content: "jobs_cancel_series_question", onConfirm: () {}),
+    ).then((confirmed) => confirmed == true ? notifier.cancelSeries(seriesId) : null);
   }
 
   Future<void> _register(JobModel job, {required num userId}) async {
@@ -150,8 +172,7 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
         _buildOrganizerActions(job),
         _buildDetails(job),
         SizedBox(height: 12.sp),
-        _buildMyRegistrations(job),
-        SizedBox(height: 12.sp),
+        if (!widget.manage) ...[_buildMyRegistrations(job), SizedBox(height: 12.sp)],
         _buildRegistrations(job),
         SizedBox(height: 32.sp),
       ],
@@ -214,13 +235,29 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
       header: null,
       children: [
         _InfoRow("jobs_responsible", job.responsibleName ?? ""),
-        _InfoRow("jobs_registration_deadline", Utils.dateToStringWithTime(job.registrationDeadline)),
-        _InfoRow("jobs_cancellation_deadline", Utils.dateToStringWithTime(job.cancellationDeadline)),
+        if (job.registrationOpensAt != null)
+          _InfoRow("jobs_registration_opens", Utils.dateToStringWithTime(job.registrationOpensAt!)),
+        if (job.registrationClosed) _InfoRow("jobs_registration_start", "jobs_reg_start_closed".i18n()),
+        _InfoRow(
+          "jobs_registration_deadline",
+          job.registrationDeadline == null
+              ? "jobs_no_deadline".i18n()
+              : Utils.dateToStringWithTime(job.registrationDeadline!),
+        ),
+        _InfoRow(
+          "jobs_cancellation_deadline",
+          !job.cancellationAllowed
+              ? "jobs_cancel_not_allowed".i18n()
+              : job.cancellationDeadline == null
+              ? "jobs_no_deadline".i18n()
+              : Utils.dateToStringWithTime(job.cancellationDeadline!),
+        ),
         _InfoRow("jobs_places", places),
         if (job.waitlistEnabled) _InfoRow("jobs_waitlist", "${job.waitlistCount}"),
         if (job.hasAgeLimit) _InfoRow("jobs_age", "${job.minAge ?? "-"} - ${job.maxAge ?? "-"}"),
         if (job.genderRestriction != null) _InfoRow("jobs_gender", job.genderRestriction!.label.i18n()),
         if (job.createUserName != null) _InfoRow("jobs_created_by", job.createUserName!),
+        if (job.isRepeating) _InfoRow("jobs_repeating", "jobs_repeating_value".i18n()),
         if (job.status == JobStatus.COMPLETED && job.activityId != null) ...[
           SizedBox(height: 8.sp),
           OutlinedButton.icon(
@@ -233,10 +270,12 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
     );
   }
 
+  /// In the admin view: complete and register anyone. In the tab only the responsible person gets "complete", since
+  /// they may not have access to the admin.
   Widget _buildOrganizerActions(JobModel job) {
     if (!job.isOpen) return const SizedBox();
-    final canComplete = notifier.canComplete;
-    if (!canComplete && !notifier.canManageAll) return const SizedBox();
+    final canComplete = widget.manage ? notifier.canComplete : job.responsibleId == me.id;
+    if (!canComplete && !_manageAll) return const SizedBox();
     return Padding(
       padding: EdgeInsets.only(bottom: 12.sp),
       child: Wrap(
@@ -249,7 +288,7 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
               icon: const Icon(Icons.task_alt),
               label: Text(job.hasStarted ? "jobs_complete".i18n() : "jobs_complete_after_start".i18n()),
             ),
-          if (notifier.canManageAll)
+          if (_manageAll)
             OutlinedButton.icon(
               onPressed: () => _registerSomeone(job),
               icon: const Icon(Icons.person_add_alt),
@@ -296,7 +335,7 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
             label: Text("jobs_edit_comment".i18n()),
           ),
         );
-        if (job.cancellationOpen || notifier.canManageAll) {
+        if (job.cancellationOpen || _manageAll) {
           actions.add(
             TextButton.icon(
               style: TextButton.styleFrom(foregroundColor: registered ? foreground : scheme.error),
@@ -326,11 +365,12 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
         child: Text((job.canJoinWaitlist ? "jobs_join_waitlist" : "jobs_register").i18n()),
       );
     } else {
-      hint =
-          (job.isOpen
-                  ? (job.full && !job.waitlistEnabled ? "jobs_full" : "jobs_registration_closed")
-                  : "jobs_not_registered")
-              .i18n();
+      hint = job.isOpen && job.registrationNotOpenYet
+          ? "jobs_registration_opens_on".i18n([Utils.dateToStringWithTime(job.registrationOpensAt!)])
+          : (job.isOpen
+                    ? (job.full && !job.waitlistEnabled ? "jobs_full" : "jobs_registration_closed")
+                    : "jobs_not_registered")
+                .i18n();
     }
 
     return Padding(
@@ -392,7 +432,10 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
 
   Widget _buildRegistrationTile(JobModel job, JobRegistrationModel r) {
     final theme = Theme.of(context);
-    final canCancel = job.isOpen && notifier.canActFor(r.userId) && (job.cancellationOpen || notifier.canManageAll);
+    final mayAct = widget.manage
+        ? notifier.canActFor(r.userId)
+        : r.userId == me.id || state.children.any((c) => c.id == r.userId);
+    final canCancel = job.isOpen && mayAct && (job.cancellationOpen || _manageAll);
     return ListTile(
       contentPadding: EdgeInsets.zero,
       dense: true,

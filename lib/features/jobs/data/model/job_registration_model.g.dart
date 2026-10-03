@@ -6,9 +6,7 @@ part of 'job_registration_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_JobRegistrationModel _$JobRegistrationModelFromJson(
-  Map<String, dynamic> json,
-) => _JobRegistrationModel(
+_JobRegistrationModel _$JobRegistrationModelFromJson(Map<String, dynamic> json) => _JobRegistrationModel(
   id: json['id'] as num?,
   jobId: json['jobId'] as num,
   userId: json['userId'] as num,
@@ -18,18 +16,12 @@ _JobRegistrationModel _$JobRegistrationModelFromJson(
   comment: json['comment'] as String?,
   status: $enumDecode(_$JobRegistrationStatusEnumMap, json['status']),
   waitlistPosition: (json['waitlistPosition'] as num?)?.toInt(),
-  registeredDateTime: json['registeredDateTime'] == null
-      ? null
-      : DateTime.parse(json['registeredDateTime'] as String),
-  cancelledDateTime: json['cancelledDateTime'] == null
-      ? null
-      : DateTime.parse(json['cancelledDateTime'] as String),
+  registeredDateTime: json['registeredDateTime'] == null ? null : DateTime.parse(json['registeredDateTime'] as String),
+  cancelledDateTime: json['cancelledDateTime'] == null ? null : DateTime.parse(json['cancelledDateTime'] as String),
   hours: (json['hours'] as num?)?.toDouble() ?? 0,
 );
 
-Map<String, dynamic> _$JobRegistrationModelToJson(
-  _JobRegistrationModel instance,
-) => <String, dynamic>{
+Map<String, dynamic> _$JobRegistrationModelToJson(_JobRegistrationModel instance) => <String, dynamic>{
   'id': instance.id,
   'jobId': instance.jobId,
   'userId': instance.userId,

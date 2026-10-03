@@ -1,1 +1,1 @@
-void reloadPage() {}
+Future<void> reloadPage() async {}

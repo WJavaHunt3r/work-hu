@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
+import 'package:work_hu/app/models/gender.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/locale_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
@@ -174,6 +175,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController passwordAgainController = TextEditingController();
+  Gender? _gender;
 
   Widget _buildLoginForms() {
     return AutofillGroup(
@@ -225,6 +227,7 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
                   firstName: firstNameController.text,
                   pswd: passwordController.text,
                   pswdAgain: passwordAgainController.text,
+                  gender: _gender,
                 );
     }
   }
@@ -256,6 +259,39 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
                 ),
               ),
             ],
+          ),
+          SizedBox(height: 16.sp),
+          FormField<Gender>(
+            initialValue: _gender,
+            validator: (value) => value == null ? "base_is_required".i18n() : null,
+            builder: (field) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: SegmentedButton<Gender>(
+                    emptySelectionAllowed: true,
+                    showSelectedIcon: false,
+                    segments: [for (final g in Gender.values) ButtonSegment(value: g, label: Text(g.label.i18n()))],
+                    selected: {if (field.value != null) field.value!},
+                    onSelectionChanged: (selection) {
+                      _gender = selection.isEmpty ? null : selection.first;
+                      field.didChange(_gender);
+                    },
+                  ),
+                ),
+                if (field.hasError)
+                  Padding(
+                    padding: EdgeInsets.only(top: 6.sp, left: 12.sp),
+                    child: Text(
+                      field.errorText!,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.error),
+                    ),
+                  ),
+              ],
+            ),
           ),
           SizedBox(height: 16.sp),
           BaseTextFormField(

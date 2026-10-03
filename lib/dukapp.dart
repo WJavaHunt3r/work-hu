@@ -18,6 +18,9 @@ import 'app/providers/auth_init_provider.dart';
 import 'app/providers/locale_provider.dart';
 import 'features/login/view/login_page.dart';
 
+/// One key for the app's lifetime: a new key on every rebuild remounts everything under the MaterialApp.
+final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 class DukApp extends ConsumerWidget {
   const DukApp({super.key});
 
@@ -82,7 +85,7 @@ class DukApp extends ConsumerWidget {
           scrollBehavior: const MaterialScrollBehavior().copyWith(
             dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.trackpad},
           ),
-          scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
+          scaffoldMessengerKey: _scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
           theme: theme.globalTheme,
           darkTheme: theme.globalDarkTheme,

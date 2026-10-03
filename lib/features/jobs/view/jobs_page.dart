@@ -17,8 +17,15 @@ import 'package:work_hu/features/jobs/providers/jobs_provider.dart';
 import 'package:work_hu/features/jobs/widgets/job_list_item.dart';
 import 'package:work_hu/features/jobs/widgets/job_marker.dart';
 
+/// The job list. The Jobs tab ([manage] false) is for registering; the admin list ([manage] true) adds creating jobs
+/// and every status, and opens the jobs with their management actions.
 class JobsPage extends BaseListPage {
-  const JobsPage({super.key, super.title = "jobs_title"});
+  const JobsPage({super.key, this.manage = false, super.title = "jobs_title"});
+
+  final bool manage;
+
+  /// Where the jobs of this list live: `/jobs/...` or `/admin/jobs/...`.
+  static String basePath(bool manage) => manage ? "/admin/jobs" : "/jobs";
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => JobsPageState();
@@ -26,7 +33,9 @@ class JobsPage extends BaseListPage {
 
 class JobsPageState extends PagedListPageState<JobsPage, JobModel, JobFilter, JobsDataNotifier> {
   @override
-  get provider => jobsDataProvider;
+  get provider => jobsDataProvider(widget.manage);
+
+  String get _basePath => JobsPage.basePath(widget.manage);
 
   @override
   Widget buildListTile(JobModel item, int index) {
@@ -90,7 +99,7 @@ class JobsPageState extends PagedListPageState<JobsPage, JobModel, JobFilter, Jo
   }
 
   /// Registrations change the counts shown in the list, so it reloads whenever the detail page closes.
-  void _open(JobModel job) => context.push("/profile/jobs/${job.id}").then((_) => notifier.reload());
+  void _open(JobModel job) => context.push("$_basePath/${job.id}").then((_) => notifier.reload());
 
   @override
   List<Widget> buildHeaderLayout(BuildContext context, WidgetRef ref) {
@@ -109,8 +118,10 @@ class JobsPageState extends PagedListPageState<JobsPage, JobModel, JobFilter, Jo
     ];
   }
 
+  /// The tab lists open jobs only (the notifier's default filter); finished and cancelled ones are for the admin list.
   @override
   List<BaseFilterChip> buildFilterLayout(BuildContext context, WidgetRef ref) {
+    if (!widget.manage) return [];
     final filter = state.query.filter;
     return [
       DialogFilterChip<JobStatus>(
@@ -125,14 +136,14 @@ class JobsPageState extends PagedListPageState<JobsPage, JobModel, JobFilter, Jo
     ];
   }
 
-  /// Only users who may create jobs get the add button.
+  /// Jobs are created in the admin list, by users who may create them.
   @override
   Widget? buildFloatingActionButton(BuildContext context, WidgetRef ref) {
     final user = ref.read(userDataProvider).user;
-    if (user == null || !user.hasPermission(Permission.JOB_CREATE)) return null;
+    if (!widget.manage || user == null || !user.hasPermission(Permission.JOB_CREATE)) return null;
     return FloatingActionButton(
       child: const Icon(Icons.add),
-      onPressed: () => context.push("/profile/jobs/create").then((value) => value == true ? notifier.reload() : null),
+      onPressed: () => context.push("$_basePath/create").then((value) => value == true ? notifier.reload() : null),
     );
   }
 }

@@ -54,6 +54,8 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
         (label: "admin_mentor_mentees", icon: Icons.group_add_outlined, route: "/admin/mentorMentees"),
       if (can(Permission.TRANSACTION_MANAGE))
         (label: "admin_transactions", icon: Icons.list_alt, route: "/admin/transactions"),
+      if (can(Permission.JOB_CREATE) || can(Permission.JOB_MANAGE_ALL))
+        (label: "admin_jobs", icon: Icons.work_outline, route: "/admin/jobs"),
       if (can(Permission.DONATION_MANAGE))
         (label: "admin_donations", icon: Icons.add_circle_outline, route: "/admin/donations"),
       if (can(Permission.PAYMENT_MANAGE))

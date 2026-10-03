@@ -6,7 +6,9 @@ part of 'notification_schedule_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_NotificationScheduleModel _$NotificationScheduleModelFromJson(Map<String, dynamic> json) => _NotificationScheduleModel(
+_NotificationScheduleModel _$NotificationScheduleModelFromJson(
+  Map<String, dynamic> json,
+) => _NotificationScheduleModel(
   id: json['id'] as num?,
   type: json['type'] as String? ?? 'WEEKLY',
   title: json['title'] as String?,
@@ -14,11 +16,17 @@ _NotificationScheduleModel _$NotificationScheduleModelFromJson(Map<String, dynam
   dayOfWeek: json['dayOfWeek'] as String? ?? 'MONDAY',
   time: json['time'] as String? ?? '17:00',
   active: json['active'] as bool? ?? true,
-  roleIds: (json['roleIds'] as List<dynamic>?)?.map((e) => e as num).toList() ?? const [],
-  lastSentDateTime: json['lastSentDateTime'] == null ? null : DateTime.parse(json['lastSentDateTime'] as String),
+  roleIds:
+      (json['roleIds'] as List<dynamic>?)?.map((e) => e as num).toList() ??
+      const [],
+  lastSentDateTime: json['lastSentDateTime'] == null
+      ? null
+      : DateTime.parse(json['lastSentDateTime'] as String),
 );
 
-Map<String, dynamic> _$NotificationScheduleModelToJson(_NotificationScheduleModel instance) => <String, dynamic>{
+Map<String, dynamic> _$NotificationScheduleModelToJson(
+  _NotificationScheduleModel instance,
+) => <String, dynamic>{
   'id': instance.id,
   'type': instance.type,
   'title': instance.title,

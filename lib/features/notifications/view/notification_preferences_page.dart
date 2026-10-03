@@ -49,63 +49,106 @@ class NotificationPreferencesPageState
     final theme = Theme.of(context);
     final notifier = ref.read(provider.notifier);
 
+    // BasePage already pads the layout (16 around), so no outer spacing here. Text outside the boxes is inset like
+    // the rows inside them (18), as on the profile page.
+    final inset = EdgeInsets.symmetric(horizontal: 18.sp);
+    final loading = state.preferences.isEmpty && status.modelState.isAnyLoading;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 16.sp),
         if (state.pushAvailable && !state.pushAllowed) ...[
           BaseContainer(
             color: theme.colorScheme.primaryContainer,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('notification_push_off_title'.i18n(), style: theme.textTheme.titleMedium),
+                Row(
+                  children: [
+                    Icon(Icons.notifications_off_outlined, color: theme.colorScheme.onPrimaryContainer),
+                    SizedBox(width: 12.sp),
+                    Expanded(
+                      child: Text(
+                        'notification_push_off_title'.i18n(),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 SizedBox(height: 8.sp),
-                Text('notification_push_off_hint'.i18n(), style: theme.textTheme.bodyMedium),
+                Text(
+                  'notification_push_off_hint'.i18n(),
+                  style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onPrimaryContainer),
+                ),
                 SizedBox(height: 16.sp),
-                FilledButton.icon(
-                  onPressed: notifier.enablePush,
-                  icon: const Icon(Icons.notifications_active_outlined),
-                  label: Text('notification_push_enable'.i18n()),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: notifier.enablePush,
+                    icon: const Icon(Icons.notifications_active_outlined),
+                    label: Text('notification_push_enable'.i18n()),
+                  ),
                 ),
               ],
             ),
           ),
           SizedBox(height: 24.sp),
         ],
-        Text('notification_preferences_hint'.i18n(), style: theme.textTheme.bodySmall),
-        SizedBox(height: 12.sp),
-        if (state.preferences.isEmpty && !status.modelState.isLoading)
+        Padding(
+          padding: inset,
+          child: Text(
+            'notification_preferences_hint'.i18n(),
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor),
+          ),
+        ),
+        if (loading)
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 32.sp),
+            child: const Center(child: CircularProgressIndicator()),
+          )
+        else if (state.preferences.isEmpty)
           Padding(
             padding: EdgeInsets.all(24.sp),
-            child: Center(child: Text('notification_preferences_empty'.i18n())),
+            child: Center(child: Text('notification_preferences_empty'.i18n(), textAlign: TextAlign.center)),
           )
         else
           for (final channel in _channels()) ...[
             Padding(
-              padding: EdgeInsets.only(left: 8.sp, bottom: 8.sp, top: 8.sp),
-              child: Text('notification_channel_$channel'.i18n(), style: theme.textTheme.titleSmall),
+              padding: inset.copyWith(top: 24.sp, bottom: 8.sp),
+              child: Text(
+                'notification_channel_$channel'.i18n(),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             ),
             BaseContainer(
               padding: EdgeInsets.zero,
-              child: Column(
-                children: [
-                  for (final (i, preference)
-                      in state.preferences.where((p) => (p.channel ?? 'PUSH') == channel).indexed) ...[
-                    if (i > 0) const Divider(height: 1),
-                    SwitchListTile(
-                      title: Text(_label(preference.type)),
-                      subtitle: _description(preference.type),
-                      value: preference.enabled,
-                      onChanged: (value) => notifier.setEnabled(preference.type, value),
-                    ),
+              // Clips the rows' tap highlight to the rounded corners.
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24.sp),
+                child: Column(
+                  children: [
+                    for (final (i, preference)
+                        in state.preferences.where((p) => (p.channel ?? 'PUSH') == channel).indexed) ...[
+                      if (i > 0) const Divider(height: 1),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 18.sp, vertical: 6.sp),
+                        title: Text(_label(preference.type), style: const TextStyle(fontWeight: FontWeight.w500)),
+                        subtitle: _description(preference.type, theme),
+                        value: preference.enabled,
+                        onChanged: (value) => notifier.setEnabled(preference.type, value),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
-            SizedBox(height: 16.sp),
           ],
-        SizedBox(height: 32.sp),
       ],
     );
   }
@@ -119,10 +162,15 @@ class NotificationPreferencesPageState
     return label == key ? type : label;
   }
 
-  Widget? _description(String type) {
+  Widget? _description(String type, ThemeData theme) {
     final key = 'notification_type_${type}_hint';
     final text = key.i18n();
-    return text == key ? null : Text(text);
+    return text == key
+        ? null
+        : Padding(
+            padding: EdgeInsets.only(top: 2.sp),
+            child: Text(text, style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor)),
+          );
   }
 
   @override

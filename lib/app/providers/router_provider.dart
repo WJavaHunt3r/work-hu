@@ -29,6 +29,7 @@ import 'package:work_hu/features/donation/view/donation_page.dart';
 import 'package:work_hu/features/fra_kare_week/view/fra_kare_week_page.dart';
 import 'package:work_hu/features/goal/view/goal_page.dart';
 import 'package:work_hu/features/home/view/home_page.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/login/view/login_page.dart';
 import 'package:work_hu/features/mentees/view/mentees_page.dart';
 import 'package:work_hu/features/mentor_mentee/view/mentor_mentees_page.dart';
@@ -64,6 +65,11 @@ final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellPr
 final _shellNavigatorAdminKey = GlobalKey<NavigatorState>(debugLabel: 'shellAdmin');
 final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellHome');
 final _shellNavigatorStatusKey = GlobalKey<NavigatorState>(debugLabel: 'shellStatus');
+final _shellNavigatorJobsKey = GlobalKey<NavigatorState>(debugLabel: 'shellJobs');
+
+/// Jobs used to live under /profile; links in notifications that were already sent still point there.
+String _oldJobsLocation(BuildContext context, GoRouterState state) =>
+    state.uri.toString().replaceFirst('/profile/jobs', '/jobs');
 final routerProvider = Provider<GoRouter>((ref) {
   final userNotifier = ref.watch(userDataProvider);
   return GoRouter(
@@ -117,6 +123,23 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
+          // Jobs: registering for jobs. Creating and running them is in the admin (/admin/jobs).
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorJobsKey,
+            routes: [
+              GoRoute(
+                path: '/jobs',
+                builder: (context, state) => const JobsPage(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        JobDetailPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+                  ),
+                ],
+              ),
+            ],
+          ),
           // Branch 2: Profile
           StatefulShellBranch(
             navigatorKey: _shellNavigatorProfileKey,
@@ -148,26 +171,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: "jobs",
-                    builder: (BuildContext context, GoRouterState state) => const JobsPage(),
-                    routes: [
-                      // "create" must stay before ":id", or it would be read as a job id.
-                      GoRoute(
-                        path: 'create',
-                        builder: (BuildContext context, GoRouterState state) => const JobFormPage(),
-                      ),
-                      GoRoute(
-                        path: ':id',
-                        builder: (BuildContext context, GoRouterState state) =>
-                            JobDetailPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
-                        routes: [
-                          GoRoute(
-                            path: 'edit',
-                            builder: (BuildContext context, GoRouterState state) =>
-                                JobFormPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
-                          ),
-                        ],
-                      ),
-                    ],
+                    redirect: _oldJobsLocation,
+                    routes: [GoRoute(path: ':id', redirect: _oldJobsLocation)],
                   ),
                   GoRoute(
                     path: 'notifications',
@@ -288,6 +293,22 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: "/admin/users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
       GoRoute(path: "/admin/roles", builder: (BuildContext context, GoRouterState state) => const RolesPage()),
       GoRoute(path: "/admin/auditLog", builder: (BuildContext context, GoRouterState state) => const AuditLogPage()),
+      // Single page level each, like the roles routes. "create" must stay before ":id", or it is read as a job id.
+      GoRoute(
+        path: "/admin/jobs",
+        builder: (BuildContext context, GoRouterState state) => const JobsPage(manage: true, title: "admin_jobs"),
+      ),
+      GoRoute(path: "/admin/jobs/create", builder: (BuildContext context, GoRouterState state) => const JobFormPage()),
+      GoRoute(
+        path: "/admin/jobs/:id",
+        builder: (BuildContext context, GoRouterState state) =>
+            JobDetailPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0, manage: true),
+      ),
+      GoRoute(
+        path: "/admin/jobs/:id/edit",
+        builder: (BuildContext context, GoRouterState state) =>
+            JobFormPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+      ),
       GoRoute(
         path: "/admin/roles/edit",
         builder: (BuildContext context, GoRouterState state) => RoleEditPage(role: state.extra as AppRoleModel?),
@@ -381,6 +402,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         return DeepLink.consume();
       }
 
+      // Users outside a church only have the balance and the profile (also covers the initial "/status").
+      if (loggedIn && !user.hasChurch()) {
+        final location = state.matchedLocation;
+        if (location == '/' || ['/status', '/jobs', '/admin'].any(location.startsWith)) return '/balance';
+      }
+
       if (loggedIn && state.matchedLocation == '/') {
         return '/status';
       }
@@ -406,9 +433,62 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
     );
   }
 
+  /// The tabs this user sees, each with the index of its branch in the shell route. Hidden tabs leave gaps, so an
+  /// item's position in the bar is not its branch index.
+  List<({int branch, BottomNavigationBarItem item})> _tabs(UserModel user) {
+    final church = user.hasChurch();
+    return [
+      (
+        branch: 0,
+        item: BottomNavigationBarItem(
+          activeIcon: const Icon(Icons.account_balance_wallet),
+          icon: const Icon(Icons.account_balance_wallet_outlined),
+          label: 'nav_bar_home'.i18n(),
+        ),
+      ),
+      if (church)
+        (
+          branch: 1,
+          item: BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.bar_chart_outlined),
+            icon: const Icon(Icons.bar_chart_outlined),
+            label: 'nav_bar_status'.i18n(),
+          ),
+        ),
+      if (church)
+        (
+          branch: 2,
+          item: BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.work),
+            icon: const Icon(Icons.work_outline),
+            label: 'nav_bar_jobs'.i18n(),
+          ),
+        ),
+      (
+        branch: 3,
+        item: BottomNavigationBarItem(
+          activeIcon: const Icon(Icons.person_2_rounded),
+          icon: const Icon(Icons.person_2_outlined),
+          label: 'nav_bar_profile'.i18n(),
+        ),
+      ),
+      if (church && user.hasAdminAccess())
+        (
+          branch: 4,
+          item: BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.admin_panel_settings),
+            icon: const Icon(Icons.admin_panel_settings_outlined),
+            label: 'nav_bar_admin'.i18n(),
+          ),
+        ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userDataProvider).user;
+    final tabs = _tabs(user!);
+    final selected = tabs.indexWhere((t) => t.branch == navigationShell.currentIndex);
     return Scaffold(
       // The navigation shell contains the page for the current branch; the gate asks for a missing name first
       body: CompleteNameGate(child: navigationShell),
@@ -429,52 +509,12 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
           enableFeedback: false,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          currentIndex: navigationShell.currentIndex,
-          items: user!.hasAdminAccess() ? adminScreens() : userScreens(),
-          onTap: _goBranch,
+          // The router keeps users off hidden tabs; the fallback only covers the frame before it redirects.
+          currentIndex: selected < 0 ? 0 : selected,
+          items: [for (final t in tabs) t.item],
+          onTap: (i) => _goBranch(tabs[i].branch),
         ),
       ),
     );
   }
-
-  List<BottomNavigationBarItem> userScreens() => <BottomNavigationBarItem>[
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.account_balance_wallet),
-      icon: const Icon(Icons.account_balance_wallet_outlined),
-      label: 'nav_bar_home'.i18n(),
-    ),
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.bar_chart_outlined),
-      icon: const Icon(Icons.bar_chart_outlined),
-      label: 'nav_bar_status'.i18n(),
-    ),
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.person_2_rounded),
-      icon: const Icon(Icons.person_2_outlined),
-      label: 'nav_bar_profile'.i18n(),
-    ),
-  ];
-
-  List<BottomNavigationBarItem> adminScreens() => <BottomNavigationBarItem>[
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.account_balance_wallet),
-      icon: const Icon(Icons.account_balance_wallet_outlined),
-      label: 'nav_bar_home'.i18n(),
-    ),
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.bar_chart_outlined),
-      icon: const Icon(Icons.bar_chart_outlined),
-      label: 'nav_bar_status'.i18n(),
-    ),
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.person_2_rounded),
-      icon: const Icon(Icons.person_2_outlined),
-      label: 'nav_bar_profile'.i18n(),
-    ),
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.admin_panel_settings),
-      icon: const Icon(Icons.admin_panel_settings_outlined),
-      label: 'nav_bar_admin'.i18n(),
-    ),
-  ];
 }

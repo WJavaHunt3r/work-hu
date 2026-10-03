@@ -36,6 +36,10 @@ class JobApi {
 
   Future<dynamic> cancelJob(num jobId) async => (await _dioClient.dio.post("/job/$jobId/cancel")).data;
 
+  /// Cancels all open, not yet started occurrences of a repeating job; returns how many.
+  Future<dynamic> cancelSeries(String seriesId) async =>
+      (await _dioClient.dio.post("/job/series/$seriesId/cancel")).data;
+
   Future<List<dynamic>> getRegistrations(num jobId) async =>
       (await _dioClient.dio.get("/job/$jobId/registrations")).data;
 

@@ -9,19 +9,24 @@ part of 'job_model.dart';
 _JobModel _$JobModelFromJson(Map<String, dynamic> json) => _JobModel(
   id: json['id'] as num?,
   jobDateTime: DateTime.parse(json['jobDateTime'] as String),
-  jobEndDateTime: json['jobEndDateTime'] == null
-      ? null
-      : DateTime.parse(json['jobEndDateTime'] as String),
+  jobEndDateTime: json['jobEndDateTime'] == null ? null : DateTime.parse(json['jobEndDateTime'] as String),
   description: json['description'] as String,
   employerId: json['employerId'] as num,
   responsibleId: json['responsibleId'] as num,
   account: $enumDecode(_$AccountEnumMap, json['account']),
-  transactionType: $enumDecode(
-    _$TransactionTypeEnumMap,
-    json['transactionType'],
-  ),
-  registrationDeadline: DateTime.parse(json['registrationDeadline'] as String),
-  cancellationDeadline: DateTime.parse(json['cancellationDeadline'] as String),
+  transactionType: $enumDecode(_$TransactionTypeEnumMap, json['transactionType']),
+  registrationOpensAt: json['registrationOpensAt'] == null
+      ? null
+      : DateTime.parse(json['registrationOpensAt'] as String),
+  sendNotification: json['sendNotification'] as bool? ?? true,
+  registrationDeadline: json['registrationDeadline'] == null
+      ? null
+      : DateTime.parse(json['registrationDeadline'] as String),
+  cancellationDeadline: json['cancellationDeadline'] == null
+      ? null
+      : DateTime.parse(json['cancellationDeadline'] as String),
+  cancellationAllowed: json['cancellationAllowed'] as bool? ?? true,
+  registrationClosed: json['registrationClosed'] as bool? ?? false,
   maxParticipants: (json['maxParticipants'] as num?)?.toInt(),
   waitlistEnabled: json['waitlistEnabled'] as bool? ?? false,
   minAge: (json['minAge'] as num?)?.toInt(),
@@ -31,28 +36,24 @@ _JobModel _$JobModelFromJson(Map<String, dynamic> json) => _JobModel(
     json['genderRestriction'],
     unknownValue: JsonKey.nullForUndefinedEnumValue,
   ),
-  createDateTime: json['createDateTime'] == null
+  recurrence: json['recurrence'] == null
       ? null
-      : DateTime.parse(json['createDateTime'] as String),
+      : JobRecurrenceModel.fromJson(json['recurrence'] as Map<String, dynamic>),
+  seriesId: json['seriesId'] as String?,
+  createDateTime: json['createDateTime'] == null ? null : DateTime.parse(json['createDateTime'] as String),
   createUserId: json['createUserId'] as num?,
   createUserName: json['createUserName'] as String?,
   employerName: json['employerName'] as String?,
   responsibleName: json['responsibleName'] as String?,
-  status:
-      $enumDecodeNullable(_$JobStatusEnumMap, json['status']) ?? JobStatus.OPEN,
+  status: $enumDecodeNullable(_$JobStatusEnumMap, json['status']) ?? JobStatus.OPEN,
   activityId: json['activityId'] as num?,
-  completedDateTime: json['completedDateTime'] == null
-      ? null
-      : DateTime.parse(json['completedDateTime'] as String),
+  completedDateTime: json['completedDateTime'] == null ? null : DateTime.parse(json['completedDateTime'] as String),
   registeredCount: json['registeredCount'] as num? ?? 0,
   waitlistCount: json['waitlistCount'] as num? ?? 0,
   full: json['full'] as bool? ?? false,
   registrationOpen: json['registrationOpen'] as bool? ?? false,
   cancellationOpen: json['cancellationOpen'] as bool? ?? false,
-  myRegistrationStatus: $enumDecodeNullable(
-    _$JobRegistrationStatusEnumMap,
-    json['myRegistrationStatus'],
-  ),
+  myRegistrationStatus: $enumDecodeNullable(_$JobRegistrationStatusEnumMap, json['myRegistrationStatus']),
 );
 
 Map<String, dynamic> _$JobModelToJson(_JobModel instance) => <String, dynamic>{
@@ -64,13 +65,19 @@ Map<String, dynamic> _$JobModelToJson(_JobModel instance) => <String, dynamic>{
   'responsibleId': instance.responsibleId,
   'account': _$AccountEnumMap[instance.account]!,
   'transactionType': _$TransactionTypeEnumMap[instance.transactionType]!,
-  'registrationDeadline': instance.registrationDeadline.toIso8601String(),
-  'cancellationDeadline': instance.cancellationDeadline.toIso8601String(),
+  'registrationOpensAt': instance.registrationOpensAt?.toIso8601String(),
+  'sendNotification': instance.sendNotification,
+  'registrationDeadline': instance.registrationDeadline?.toIso8601String(),
+  'cancellationDeadline': instance.cancellationDeadline?.toIso8601String(),
+  'cancellationAllowed': instance.cancellationAllowed,
+  'registrationClosed': instance.registrationClosed,
   'maxParticipants': instance.maxParticipants,
   'waitlistEnabled': instance.waitlistEnabled,
   'minAge': instance.minAge,
   'maxAge': instance.maxAge,
   'genderRestriction': _$GenderEnumMap[instance.genderRestriction],
+  'recurrence': ?instance.recurrence,
+  'seriesId': instance.seriesId,
   'createDateTime': instance.createDateTime?.toIso8601String(),
   'createUserId': instance.createUserId,
   'createUserName': instance.createUserName,
@@ -84,15 +91,10 @@ Map<String, dynamic> _$JobModelToJson(_JobModel instance) => <String, dynamic>{
   'full': instance.full,
   'registrationOpen': instance.registrationOpen,
   'cancellationOpen': instance.cancellationOpen,
-  'myRegistrationStatus':
-      _$JobRegistrationStatusEnumMap[instance.myRegistrationStatus],
+  'myRegistrationStatus': _$JobRegistrationStatusEnumMap[instance.myRegistrationStatus],
 };
 
-const _$AccountEnumMap = {
-  Account.SAMVIRK: 'SAMVIRK',
-  Account.MYSHARE: 'MYSHARE',
-  Account.OTHER: 'OTHER',
-};
+const _$AccountEnumMap = {Account.SAMVIRK: 'SAMVIRK', Account.MYSHARE: 'MYSHARE', Account.OTHER: 'OTHER'};
 
 const _$TransactionTypeEnumMap = {
   TransactionType.HOURS: 'HOURS',
@@ -106,11 +108,7 @@ const _$TransactionTypeEnumMap = {
 
 const _$GenderEnumMap = {Gender.MALE: 'MALE', Gender.FEMALE: 'FEMALE'};
 
-const _$JobStatusEnumMap = {
-  JobStatus.OPEN: 'OPEN',
-  JobStatus.COMPLETED: 'COMPLETED',
-  JobStatus.CANCELLED: 'CANCELLED',
-};
+const _$JobStatusEnumMap = {JobStatus.OPEN: 'OPEN', JobStatus.COMPLETED: 'COMPLETED', JobStatus.CANCELLED: 'CANCELLED'};
 
 const _$JobRegistrationStatusEnumMap = {
   JobRegistrationStatus.REGISTERED: 'REGISTERED',

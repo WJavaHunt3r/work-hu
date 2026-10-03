@@ -7,6 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/models/gender.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
@@ -69,6 +70,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
     required String email,
     required String pswd,
     required String pswdAgain,
+    required Gender? gender,
     required bool keepLogedIn,
   }) async {
     if (pswd != pswdAgain) {
@@ -82,6 +84,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
           email: email.trim(),
           password: pswd.trim(),
           lastname: lastName.trim(),
+          gender: gender,
         ),
       ),
       onSuccess: (data) async {

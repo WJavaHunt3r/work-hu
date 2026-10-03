@@ -26,9 +26,12 @@ final jobApiProvider = Provider<JobApi>((ref) => JobApi());
 
 final jobRepoProvider = Provider<JobRepository>((ref) => JobRepository(ref.read(jobApiProvider)));
 
-final jobsDataProvider = StateNotifierProvider.autoDispose<JobsDataNotifier, PagedState<JobModel, JobFilter>>(
-  (ref) => JobsDataNotifier(ref.read(jobRepoProvider), ref.read(userDataProvider).user),
-);
+/// The job list, by mode: `false` is the registration list of the Jobs tab, `true` the admin list. Separate instances,
+/// because the tab stays alive while the admin list is open and the two must not share their filters.
+final jobsDataProvider = StateNotifierProvider.autoDispose
+    .family<JobsDataNotifier, PagedState<JobModel, JobFilter>, bool>(
+      (ref, manage) => JobsDataNotifier(ref.read(jobRepoProvider), ref.read(userDataProvider).user),
+    );
 
 /// One job with its registrations, by job id.
 final jobDetailProvider = StateNotifierProvider.autoDispose.family<JobDetailNotifier, JobDetailState, num>(
@@ -125,6 +128,9 @@ class JobDetailNotifier extends BaseDataNotifier<JobDetailState> {
       _action(() => jobRepository.cancelRegistration(jobId, userId: userId));
 
   Future<void> cancelJob() => _action(() => jobRepository.cancelJob(jobId));
+
+  /// Cancels this and every later open occurrence of a repeating job.
+  Future<void> cancelSeries(String seriesId) => _action(() => jobRepository.cancelSeries(seriesId));
 
   /// Submits the hours and closes the job. Returns the activity that was created, or null if it failed.
   Future<ActivityModel?> complete(List<JobHoursEntry> entries) async {

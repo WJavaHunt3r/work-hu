@@ -28,6 +28,9 @@ class JobRepository {
 
   Future<JobModel> cancelJob(num jobId) => guardApi(() async => JobModel.fromJson(await _api.cancelJob(jobId)));
 
+  /// Returns how many jobs were cancelled.
+  Future<num> cancelSeries(String seriesId) => guardApi(() async => (await _api.cancelSeries(seriesId)) as num);
+
   Future<List<JobRegistrationModel>> getRegistrations(num jobId) => guardApi(() async {
     final res = await _api.getRegistrations(jobId);
     return res.map((e) => JobRegistrationModel.fromJson(e as Map<String, dynamic>)).toList();
