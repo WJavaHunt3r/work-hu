@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/notifications/deep_link.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/view/activities_page.dart';
 import 'package:work_hu/features/audit_log/view/audit_log_page.dart';
@@ -33,6 +34,12 @@ import 'package:work_hu/features/mentees/view/mentees_page.dart';
 import 'package:work_hu/features/mentor_mentee/view/mentor_mentees_page.dart';
 import 'package:work_hu/features/payment_success/view/payment_success_page.dart';
 import 'package:work_hu/features/payments/view/payments_page.dart';
+import 'package:work_hu/features/notification_admin/data/model/notification_schedule_model.dart';
+import 'package:work_hu/features/notification_admin/view/general_notifications_page.dart';
+import 'package:work_hu/features/notification_admin/view/notification_schedules_page.dart';
+import 'package:work_hu/features/notification_admin/view/schedule_edit_page.dart';
+import 'package:work_hu/features/notification_admin/view/send_notification_page.dart';
+import 'package:work_hu/features/notifications/view/notification_preferences_page.dart';
 import 'package:work_hu/features/profile/view/language_picker_page.dart';
 import 'package:work_hu/features/profile/view/profile_page.dart';
 import 'package:work_hu/features/rounds/view/rounds_maintenance_page.dart';
@@ -163,6 +170,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                     ],
                   ),
                   GoRoute(
+                    path: 'notifications',
+                    builder: (BuildContext context, GoRouterState state) => const NotificationPreferencesPage(),
+                  ),
+                  GoRoute(
                     path: 'theme',
                     pageBuilder: (context, state) {
                       return CustomTransitionPage(
@@ -281,6 +292,24 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: "/admin/roles/edit",
         builder: (BuildContext context, GoRouterState state) => RoleEditPage(role: state.extra as AppRoleModel?),
       ),
+      // "send" and "schedules" are siblings, not children: a single page level each, like the roles routes
+      GoRoute(
+        path: "/admin/notifications",
+        builder: (BuildContext context, GoRouterState state) => const GeneralNotificationsPage(),
+      ),
+      GoRoute(
+        path: "/admin/notifications/send",
+        builder: (BuildContext context, GoRouterState state) => const SendNotificationPage(),
+      ),
+      GoRoute(
+        path: "/admin/notifications/schedules",
+        builder: (BuildContext context, GoRouterState state) => const NotificationSchedulesPage(),
+      ),
+      GoRoute(
+        path: "/admin/notifications/schedules/edit",
+        builder: (BuildContext context, GoRouterState state) =>
+            ScheduleEditPage(schedule: state.extra as NotificationScheduleModel?),
+      ),
       GoRoute(path: "/admin/goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
       GoRoute(path: "/admin/rounds", builder: (BuildContext context, GoRouterState state) => const RoundsPage()),
       GoRoute(
@@ -343,7 +372,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // If the user isn't logged in AND it's not a public route, kick to login
       if (!loggedIn && !isPublicRoute) {
+        // Remember where they were heading (deep link / notification) so login can continue there.
+        DeepLink.remember(state.uri.toString());
         return '/login';
+      }
+
+      if (loggedIn && user.changedPassword && DeepLink.hasPending) {
+        return DeepLink.consume();
       }
 
       if (loggedIn && state.matchedLocation == '/') {

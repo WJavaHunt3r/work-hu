@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:injectable/injectable.dart';
 import 'package:work_hu/api/dio_client.dart';
 import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/notifications/push_service.dart';
 import 'package:work_hu/app/session/tab_session.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/utils.dart';
@@ -27,8 +28,10 @@ class UserProvider extends ChangeNotifier {
       _token = null;
       clearTabSession();
     }
+    final signedIn = _user == null && user != null;
     _user = user;
     notifyListeners();
+    if (signedIn) PushService.instance.onSignedIn();
   }
 
   Future<void> setToken(String? token) async {
@@ -57,6 +60,7 @@ class UserProvider extends ChangeNotifier {
         final res = await _dio.dio.get("/user/me");
 
         _user = UserModel.fromJson(res.data);
+        PushService.instance.onSignedIn();
       } on DioException catch (e) {
         // Expired or revoked sessions are cleared by DioClient's refresh handling.
         // Keep the tokens on network errors or timeouts so the next start can restore the session.
@@ -80,6 +84,9 @@ class UserProvider extends ChangeNotifier {
   Future<void> logout() async {
     final token = _token ?? await Utils.getData('jwt_token');
     final refreshToken = await Utils.getData('refresh_token');
+
+    // Before the token is deleted: the backend needs it to know whose device to remove.
+    await PushService.instance.onSigningOut(bearer: token.isEmpty ? null : token);
 
     await Utils.deleteData('jwt_token');
     await Utils.deleteData('refresh_token');

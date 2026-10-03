@@ -114,7 +114,11 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
           children: [
             SettingsTile(label: 'profile_password_security'.i18n(), icon: Icons.shield_outlined, index: 0),
             const Divider(height: 1),
-            SettingsTile(label: 'profile_notifications'.i18n(), icon: Icons.notifications_none),
+            SettingsTile(
+              label: 'profile_notifications'.i18n(),
+              icon: Icons.notifications_none,
+              onTap: () => context.push('/profile/notifications'),
+            ),
             const Divider(height: 1),
             SettingsTile(
               label: 'profile_language'.i18n(),

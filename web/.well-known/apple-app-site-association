@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["2CU9YRNUJU.com.ktk.dukapp"],
+        "components": [
+          { "/": "/profile/*" },
+          { "/": "/status*" },
+          { "/": "/balance*" },
+          { "/": "/mentees*" }
+        ]
+      }
+    ]
+  }
+}
