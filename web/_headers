@@ -10,3 +10,9 @@
   Cache-Control: no-cache
 /flutter_service_worker.js
   Cache-Control: no-cache
+/firebase-messaging-sw.js
+  Cache-Control: no-cache
+/.well-known/apple-app-site-association
+  Content-Type: application/json
+/.well-known/assetlinks.json
+  Content-Type: application/json

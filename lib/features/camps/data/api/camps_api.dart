@@ -1,4 +1,4 @@
-import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/camps/data/model/camp_filter.dart';
 import 'package:work_hu/features/camps/data/model/camp_model.dart';
@@ -10,9 +10,12 @@ class CampApi {
 
   CampApi();
 
-  Future<dynamic> getCamps({required CampFilter filter, required PageStru pageStru}) async {
+  Future<dynamic> getCamps(ListQuery<CampFilter> query, int page) async {
     try {
-      final res = await _dioClient.dio.get("/camp", queryParameters: filter.toJson());
+      final res = await _dioClient.dio.get(
+        "/camp",
+        queryParameters: {...query.filter.toJson(), ...query.pageParams(page)},
+      );
       return res.data;
     } catch (e) {
       rethrow;

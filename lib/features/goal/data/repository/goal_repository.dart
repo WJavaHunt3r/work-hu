@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/goal/data/api/goal_api.dart';
 import 'package:work_hu/features/goal/data/model/goal_filter.dart';
@@ -10,9 +10,9 @@ class GoalRepository {
 
   GoalRepository(this._goalApi);
 
-  Future<PaginatedResponse<GoalModel>> getGoals({required GoalFilter filter, required PageStru pageStru}) async {
+  Future<PaginatedResponse<GoalModel>> getGoals(ListQuery<GoalFilter> query, {int page = 0}) async {
     try {
-      final res = await _goalApi.getGoals(filter: filter, pageStru: pageStru);
+      final res = await _goalApi.getGoals(query, page);
       final paginatedData = PaginatedResponse<GoalModel>.fromJson(
         res,
         (json) => GoalModel.fromJson(json as Map<String, dynamic>),

@@ -1,67 +1,59 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
-import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_notifier.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_state.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
-import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/features/rounds/data/api/round_api.dart';
 import 'package:work_hu/features/rounds/data/model/round_filter.dart';
 import 'package:work_hu/features/rounds/data/model/round_model.dart';
 import 'package:work_hu/features/rounds/data/repository/round_repository.dart';
-import 'package:work_hu/features/rounds/data/state/rounds_state.dart';
+import 'package:work_hu/features/rounds/data/state/round_detail_state.dart';
 
 final roundApiProvider = Provider<RoundApi>((ref) => RoundApi());
 
 final roundRepoProvider = Provider<RoundRepository>((ref) => RoundRepository(ref.read(roundApiProvider)));
 
-final roundDataProvider = StateNotifierProvider.autoDispose<RoundsDataNotifier, RoundsState>(
+final roundDataProvider = StateNotifierProvider.autoDispose<RoundsDataNotifier, PagedState<RoundModel, RoundFilter>>(
   (ref) => RoundsDataNotifier(ref.read(roundRepoProvider)),
 );
 
-class RoundsDataNotifier extends BaseDataNotifier<RoundsState> implements ListApiProvider<RoundFilter> {
+final roundDetailProvider = StateNotifierProvider.autoDispose<RoundDetailNotifier, RoundDetailState>(
+  (ref) => RoundDetailNotifier(ref.read(roundRepoProvider)),
+);
+
+class RoundsDataNotifier extends PagedListNotifier<RoundModel, RoundFilter> {
   RoundsDataNotifier(this.roundRepository)
-    : super(RoundsState(filter: RoundFilter(activeRound: true, seasonYear: DateTime.now().year))) {
-    list();
-  }
+    : super(
+        ListQuery(
+          filter: RoundFilter(activeRound: true, seasonYear: DateTime.now().year),
+          sort: const [SortOrder("startDateTime", SortDir.desc)],
+        ),
+      );
 
   final RoundRepository roundRepository;
 
   @override
-  Future<void> list({RoundFilter? filter, int? page, int? size, List<String>? sort}) async {
-    var sort = SortBuilder()..add("startDateTime", descending: true);
-    await executeApiCall<PaginatedResponse<RoundModel>>(
-      (() => roundRepository.getRounds(
-        filter: filter ?? state.filter,
-        pageStru: PageStru(page: page ?? state.status.number, size: size ?? state.status.size, sort: sort.build()),
-      )),
-      background: true,
+  Future<PaginatedResponse<RoundModel>> fetch(ListQuery<RoundFilter> query, int page) =>
+      roundRepository.getRounds(query, page: page);
+}
+
+class RoundDetailNotifier extends BaseDataNotifier<RoundDetailState> {
+  RoundDetailNotifier(this.roundRepository) : super(const RoundDetailState());
+
+  final RoundRepository roundRepository;
+
+  Future<void> getRound(num id) async {
+    executeApiCall<RoundModel>(
+      () => roundRepository.getRound(id),
       onSuccess: (data) async {
-        state = state.copyWith(
-          rounds: page == 0 ? data.content : [...state.rounds, ...data.content],
-          status: state.status.copyWith(
-            totalElements: data.page.totalElements,
-            totalPages: data.page.totalPages,
-            number: data.page.number,
-          ),
-        );
+        state = state.copyWith(round: data);
       },
     );
   }
 
   @override
-  RoundsState copyWithState(BaseState status) {
-    return state.copyWith(status: state.status.copyWith(baseStatus: status));
-  }
-
-  Future<void> getRound(id) async {
-    executeApiCall<RoundModel>(
-      () => roundRepository.getRound(id),
-      onSuccess: (data) async {
-        state = state.copyWith(selectedRound: data);
-      },
-    );
-  }
+  RoundDetailState copyWithState(BaseState status) => state.copyWith(status: status);
 }

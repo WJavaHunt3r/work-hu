@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:localization/localization.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/models/gender.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
@@ -70,6 +70,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
     required String email,
     required String pswd,
     required String pswdAgain,
+    required Gender? gender,
     required bool keepLogedIn,
   }) async {
     if (pswd != pswdAgain) {
@@ -83,6 +84,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
           email: email.trim(),
           password: pswd.trim(),
           lastname: lastName.trim(),
+          gender: gender,
         ),
       ),
       onSuccess: (data) async {
@@ -117,7 +119,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
         },
       );
     } catch (error) {
-      print("Google Sign-In Error: $error");
+      debugPrint("Google Sign-In Error: $error");
     }
   }
 
@@ -144,7 +146,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
           await signInWithGoogle(idToken);
         }
       }
-    }, onError: (Object e) => print("Google Sign-In Error: $e"));
+    }, onError: (Object e) => debugPrint("Google Sign-In Error: $e"));
   }
 
   /// Android / iOS: opens the native account picker. The result is delivered
@@ -156,7 +158,7 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
       await GoogleSignIn.instance.authenticate();
     } on GoogleSignInException catch (e) {
       if (e.code != GoogleSignInExceptionCode.canceled) {
-        print("Google Sign-In Error: $e");
+        debugPrint("Google Sign-In Error: $e");
       }
     }
   }
@@ -176,7 +178,9 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
       await _donationRepository.getDonations(DateTime.now()).then((data) {
         state = state.copyWith(donations: data);
       });
-    } catch (e) {}
+    } catch (_) {
+      // Donations are optional on this page; keep the current list.
+    }
   }
 
   Future<void> isAlive() async {

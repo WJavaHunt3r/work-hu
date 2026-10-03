@@ -1,4 +1,5 @@
 import 'package:work_hu/api/dio_client.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_items_filter.dart';
 
@@ -7,26 +8,20 @@ class TransactionItemsApi {
 
   TransactionItemsApi();
 
-  Future<dynamic> getTransactionItems({
-    TransactionItemsFilter? filter,
-    required int page,
-    required int size,
-    required List<String> sort,
-  }) async {
+  Future<dynamic> getTransactionItems(ListQuery<TransactionItemsFilter> query, int page) async {
+    final filter = query.filter;
     try {
       final res = await _dioClient.dio.get(
         "/transactionItem",
         queryParameters: {
-          "transactionId": filter?.transactionId,
-          "userId": filter?.userId,
-          "roundId": filter?.roundId,
-          "seasonYear": filter?.seasonYear,
-          "startDate": filter?.startDate,
-          "endDate": filter?.endDate,
-          "transactionType": filter?.transactionType,
-          "page": page,
-          "size": size,
-          "sort": sort,
+          "transactionId": filter.transactionId,
+          "userId": filter.userId,
+          "roundId": filter.roundId,
+          "seasonYear": filter.seasonYear,
+          "startDate": filter.startDate,
+          "endDate": filter.endDate,
+          "transactionType": filter.transactionType,
+          ...query.pageParams(page),
         },
       );
       return res.data;

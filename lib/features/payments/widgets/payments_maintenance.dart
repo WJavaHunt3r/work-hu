@@ -27,20 +27,20 @@ class PaymentMaintenanceState extends ConsumerState<PaymentMaintenance> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(paymentDataProvider.notifier).getPayment(widget.paymentId);
+      ref.read(paymentDetailProvider.notifier).getPayment(widget.paymentId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    var payment = ref.watch(paymentDataProvider).selectedPayment;
+    var payment = ref.watch(paymentDetailProvider).selectedPayment;
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
-              ref.read(paymentDataProvider.notifier).getPayment(null);
+              ref.read(paymentDetailProvider.notifier).getPayment(null);
               context.pop();
             },
           ),
@@ -109,7 +109,7 @@ class PaymentMaintenanceState extends ConsumerState<PaymentMaintenance> {
                               ),
                               if (payment.status == PaymentStatus.PENDING)
                                 IconButton(
-                                  onPressed: () => ref.watch(paymentDataProvider.notifier).refreshPayment(payment),
+                                  onPressed: () => ref.watch(paymentDetailProvider.notifier).refreshPayment(payment),
                                   icon: const Icon(Icons.refresh),
                                 ),
                             ],

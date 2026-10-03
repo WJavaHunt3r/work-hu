@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
+import 'package:work_hu/features/rounds/data/model/round_filter.dart';
 import 'package:work_hu/features/rounds/data/model/round_model.dart';
-import 'package:work_hu/features/rounds/data/state/rounds_state.dart';
 import 'package:work_hu/features/rounds/provider/round_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
@@ -18,13 +18,11 @@ class RoundsPage extends BaseListPage {
   }
 }
 
-class RoundsPageState extends BaseListPageState<RoundsPage, RoundsState, RoundsDataNotifier> {
+class RoundsPageState extends PagedListPageState<RoundsPage, RoundModel, RoundFilter, RoundsDataNotifier> {
   @override
-  Widget buildListTile(item) {
-    item as RoundModel;
-    var index = items.indexOf(item);
+  Widget buildListTile(RoundModel item, int index) {
     return BaseListTile(
-      isLast: item == items.last,
+      isLast: index == items.length - 1,
       index: index,
       onTap: () => context.push("/rounds/maintenance", extra: item.id),
       title: Row(
@@ -42,17 +40,6 @@ class RoundsPageState extends BaseListPageState<RoundsPage, RoundsState, RoundsD
       ),
     );
   }
-
-  @override
-  List<dynamic> getFilters() {
-    return [];
-  }
-
-  @override
-  List<dynamic> get items => state.rounds;
-
-  @override
-  BaseListState get listStatus => state.status;
 
   @override
   get provider => roundDataProvider;

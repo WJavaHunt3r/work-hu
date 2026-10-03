@@ -7,6 +7,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/notifications/push_service.dart';
 import 'package:work_hu/dukapp.dart';
 
 void main() async {
@@ -14,6 +15,7 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
 
   await setupLocator();
+  await PushService.instance.init();
   usePathUrlStrategy();
   GoRouter.optionURLReflectsImperativeAPIs = true;
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);

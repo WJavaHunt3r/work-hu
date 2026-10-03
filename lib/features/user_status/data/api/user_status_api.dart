@@ -1,4 +1,4 @@
-import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/user_status/data/model/user_status_filter.dart';
 
@@ -9,9 +9,12 @@ class UserStatusApi {
 
   UserStatusApi();
 
-  Future<dynamic> getUserStatuses({required UserStatusFilter filter, required PageStru pageStru}) async {
+  Future<dynamic> getUserStatuses(ListQuery<UserStatusFilter> query, int page) async {
     try {
-      final res = await _dioClient.dio.get("/userStatus", queryParameters: {...filter.toJson(), ...pageStru.toJson()});
+      final res = await _dioClient.dio.get(
+        "/userStatus",
+        queryParameters: {...query.filter.toJson(), ...query.pageParams(page)},
+      );
       return res.data;
     } catch (e) {
       rethrow;

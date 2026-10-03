@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
@@ -13,7 +12,7 @@ import 'package:work_hu/features/top_up/data/state/top_up_state.dart';
 import 'package:work_hu/features/top_up/providers/top_up_provider.dart';
 
 class TopUpPage extends BasePage {
-  TopUpPage({super.key}) : super(title: 'top_up_title');
+  const TopUpPage({super.key}) : super(title: 'top_up_title');
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -131,7 +130,7 @@ class _AmountPresetButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 24.sp, vertical: 12.sp),
         decoration: BoxDecoration(
-          color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant,
+          color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(8.sp),
         ),
         child: Text(
@@ -141,85 +140,6 @@ class _AmountPresetButton extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _PaymentTile extends StatelessWidget {
-  final String title, subtitle;
-  final IconData icon;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _PaymentTile({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(16.sp),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(12.sp),
-          border: Border.all(color: isSelected ? theme.colorScheme.primary : Colors.transparent, width: 2),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(8.sp),
-              decoration: BoxDecoration(color: theme.colorScheme.onSurface, borderRadius: BorderRadius.circular(8.sp)),
-              child: Icon(icon, color: theme.colorScheme.surface),
-            ),
-            SizedBox(width: 16.sp),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                Text(subtitle, style: theme.textTheme.bodySmall),
-              ],
-            ),
-            const Spacer(),
-            Icon(
-              isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-              color: isSelected ? theme.colorScheme.primary : theme.hintColor,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DashedAddButton extends StatelessWidget {
-  final String label;
-
-  const _DashedAddButton({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(16.sp),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.sp),
-        border: Border.all(color: theme.dividerColor, style: BorderStyle.solid),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.add, color: theme.hintColor),
-          SizedBox(width: 16),
-          Text(label, style: theme.textTheme.labelLarge?.copyWith(color: theme.hintColor)),
-        ],
       ),
     );
   }

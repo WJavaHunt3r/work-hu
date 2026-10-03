@@ -12,7 +12,7 @@ abstract class BaseDataNotifier<S> extends StateNotifier<S> {
 
   S copyWithState(BaseState status);
 
-  copyWithModelState(ModelState modelState) {
+  S copyWithModelState(ModelState modelState) {
     return copyWithState(BaseState(modelState: modelState));
   }
 
@@ -39,6 +39,11 @@ abstract class BaseDataNotifier<S> extends StateNotifier<S> {
     }
 
     Future<dynamic> fail(String message) async {
+      // The page (and with it an autoDispose notifier) may be gone by the time a slow request fails.
+      if (!mounted) {
+        if (onError != null) await onError.call(message);
+        return null;
+      }
       if (onError != null) {
         state = copyWithModelState(ModelState.empty);
         await onError.call(message);
@@ -60,7 +65,7 @@ abstract class BaseDataNotifier<S> extends StateNotifier<S> {
         // Deferred so it never runs during a build; skipped if the call already finished.
         Future.microtask(() {
           final context = navigatorKey.currentContext;
-          if (finished || context == null) return;
+          if (finished || context == null || !context.mounted) return;
           overlayShown = true;
           LoadingScreen.instance().show(context: context);
         });
@@ -70,7 +75,7 @@ abstract class BaseDataNotifier<S> extends StateNotifier<S> {
       hideOverlay();
 
       if (response != null) {
-        state = copyWithModelState(ModelState.success);
+        if (mounted) state = copyWithModelState(ModelState.success);
         await onSuccess?.call(response as T);
         return response;
       }

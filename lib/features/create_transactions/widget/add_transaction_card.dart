@@ -26,8 +26,8 @@ class AddTransactionCard extends ConsumerWidget {
             child: UserComboWidget(
               controller: ref.read(createTransactionsDataProvider.notifier).userController,
               focusNode: ref.read(createTransactionsDataProvider.notifier).usersFocusNode,
-              onSuggestionSelected: (UserComboModel suggestion) async {
-                await ref.read(createTransactionsDataProvider.notifier).updateSelectedUser(suggestion);
+              onSuggestionSelected: (UserComboModel suggestion) {
+                ref.read(createTransactionsDataProvider.notifier).updateSelectedUser(suggestion);
                 ref.read(createTransactionsDataProvider.notifier).valueFocusNode.requestFocus();
               },
               labelText: "create_activity_user".i18n(),

@@ -17,9 +17,8 @@ class CampsMaintenance extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(campsDataProvider).mode.name;
-    final CampModel camp = ref.watch(campsDataProvider).selectedCamp;
-    var year = camp.season!.seasonYear;
+    final mode = ref.watch(campMaintenanceProvider).mode.name;
+    final CampModel camp = ref.watch(campMaintenanceProvider).selectedCamp;
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
@@ -27,7 +26,9 @@ class CampsMaintenance extends ConsumerWidget {
           title: Text("maintenance_mode_$mode".i18n(), style: const TextStyle(fontWeight: FontWeight.w800)),
           actions: [
             MaterialButton(
-              onPressed: () => ref.read(campsDataProvider.notifier).saveCamp().then((value) => context.pop(true)),
+              onPressed: () => ref.read(campMaintenanceProvider.notifier).saveCamp().then((_) {
+                if (context.mounted) context.pop(true);
+              }),
               child: const Text("camp_maintenance_save"),
             ),
           ],
@@ -36,8 +37,8 @@ class CampsMaintenance extends ConsumerWidget {
             ? const SizedBox()
             : Form(
                 key: _formKey,
-                onPopInvoked: (pop) =>
-                    ref.read(campsDataProvider.notifier).presetCamp(const CampModel(), MaintenanceMode.create),
+                onPopInvokedWithResult: (didPop, result) =>
+                    ref.read(campMaintenanceProvider.notifier).presetCamp(const CampModel(), MaintenanceMode.create),
                 child: Padding(
                   padding: EdgeInsets.all(8.sp),
                   child: Column(
@@ -59,7 +60,7 @@ class CampsMaintenance extends ConsumerWidget {
                               labelText: "camp_maintenance_campName".i18n(),
                               initialValue: camp.campName,
                               onChanged: (String text) => text.isNotEmpty
-                                  ? ref.read(campsDataProvider.notifier).updateCamp(camp.copyWith(campName: text))
+                                  ? ref.read(campMaintenanceProvider.notifier).updateCamp(camp.copyWith(campName: text))
                                   : null,
                             ),
                           ),
@@ -74,7 +75,7 @@ class CampsMaintenance extends ConsumerWidget {
                               keyBoardType: TextInputType.number,
                               onChanged: (String text) => text.isNotEmpty
                                   ? ref
-                                        .read(campsDataProvider.notifier)
+                                        .read(campMaintenanceProvider.notifier)
                                         .updateCamp(camp.copyWith(u18BrunstadFee: num.tryParse(text) ?? 0))
                                   : null,
                             ),
@@ -86,7 +87,7 @@ class CampsMaintenance extends ConsumerWidget {
                               keyBoardType: TextInputType.number,
                               onChanged: (String text) => text.isNotEmpty
                                   ? ref
-                                        .read(campsDataProvider.notifier)
+                                        .read(campMaintenanceProvider.notifier)
                                         .updateCamp(camp.copyWith(o18BrunstadFee: num.tryParse(text) ?? 0))
                                   : null,
                             ),
@@ -102,7 +103,7 @@ class CampsMaintenance extends ConsumerWidget {
                               keyBoardType: TextInputType.number,
                               onChanged: (String text) => text.isNotEmpty
                                   ? ref
-                                        .read(campsDataProvider.notifier)
+                                        .read(campMaintenanceProvider.notifier)
                                         .updateCamp(camp.copyWith(u18LocalFee: num.tryParse(text) ?? 0))
                                   : null,
                             ),
@@ -114,7 +115,7 @@ class CampsMaintenance extends ConsumerWidget {
                               keyBoardType: TextInputType.number,
                               onChanged: (String text) => text.isNotEmpty
                                   ? ref
-                                        .read(campsDataProvider.notifier)
+                                        .read(campMaintenanceProvider.notifier)
                                         .updateCamp(camp.copyWith(o18LocalFee: num.tryParse(text) ?? 0))
                                   : null,
                             ),

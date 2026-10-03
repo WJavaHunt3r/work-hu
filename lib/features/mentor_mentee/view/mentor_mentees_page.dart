@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:localization/localization.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
+import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/mentor_mentee/data/model/mentor_mentee_model.dart';
-import 'package:work_hu/features/mentor_mentee/data/state/mentor_mentee_state.dart';
 import 'package:work_hu/features/mentor_mentee/provider/mentor_mentee_provider.dart';
 import 'package:work_hu/features/mentor_mentee/widgets/create_mentor_mentee_dialog.dart';
+import 'package:work_hu/features/utils.dart';
 
 class MentorMenteesPage extends BaseListPage {
   const MentorMenteesPage({super.key, super.title = "admin_mentor_mentees"});
@@ -18,11 +19,24 @@ class MentorMenteesPage extends BaseListPage {
   }
 }
 
-class MentorMenteesPageState extends BaseListPageState<MentorMenteesPage, MentorMenteeState, MentorMenteeDataNotifier> {
+class MentorMenteesPageState
+    extends PagedListPageState<MentorMenteesPage, MentorMenteeModel, void, MentorMenteeDataNotifier> {
   @override
-  Widget buildListTile(item) {
-    item as MentorMenteeModel;
-    var index = items.indexOf(item);
+  get provider => mentorMenteeDataProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    // Keeps the create dialog's state alive, and reports its errors, which the base page doesn't.
+    ref.listen(mentorMenteeCreateProvider, (previous, next) {
+      if (next.status.modelState.isError && !(previous?.status.modelState.isError ?? false)) {
+        Utils.showErrorDialog(context, content: next.status.message.i18n());
+      }
+    });
+    return super.build(context);
+  }
+
+  @override
+  Widget buildListTile(MentorMenteeModel item, int index) {
     return BaseListTile(
       isLast: items.length - 1 == index,
       index: index,
@@ -34,36 +48,20 @@ class MentorMenteesPageState extends BaseListPageState<MentorMenteesPage, Mentor
   }
 
   @override
-  bool canDelete(item) => true;
+  bool canDelete(MentorMenteeModel item) => true;
 
   @override
-  onDelete(e) {
-    ref.read(mentorMenteeDataProvider.notifier).deleteMentee(e.id!);
-  }
+  void onDelete(MentorMenteeModel item) => notifier.deleteMentee(item.id!);
 
   @override
   Widget? buildFloatingActionButton(BuildContext context, WidgetRef ref) {
     return FloatingActionButton(
       child: const Icon(Icons.add),
-      onPressed: () => showDialog(
+      onPressed: () => showDialog<bool>(
         barrierDismissible: false,
         context: context,
         builder: (context) => const CreateMentorMenteeDialog(),
-      ),
+      ).then((saved) => saved == true ? notifier.reload() : null),
     );
   }
-
-  @override
-  List<dynamic> getFilters() {
-    return [];
-  }
-
-  @override
-  List<dynamic> get items => state.mentees;
-
-  @override
-  BaseListState get listStatus => state.listState;
-
-  @override
-  StateNotifierProvider<MentorMenteeDataNotifier, MentorMenteeState> get provider => mentorMenteeDataProvider;
 }

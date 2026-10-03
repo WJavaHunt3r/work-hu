@@ -8,7 +8,7 @@ class FreeScrollList extends StatefulWidget {
   const FreeScrollList({super.key, required this.elements});
 
   @override
-  _FreeScrollListState createState() => _FreeScrollListState();
+  State<FreeScrollList> createState() => _FreeScrollListState();
 }
 
 class _FreeScrollListState extends State<FreeScrollList> {

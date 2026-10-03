@@ -2,9 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/list_api_provider.dart';
-import 'package:work_hu/app/framework/base_components/page_stru.dart';
-import 'package:work_hu/app/framework/base_components/sort_builder.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/features/round_filter_chip/data/state/round_filter_chip_state.dart';
 import 'package:work_hu/features/rounds/data/model/round_filter.dart';
@@ -16,8 +14,7 @@ final roundFilterChipDataProvider = StateNotifierProvider<RoundFilterChipDataNot
   (ref) => RoundFilterChipDataNotifier(ref.read(roundRepoProvider)),
 );
 
-class RoundFilterChipDataNotifier extends BaseDataNotifier<RoundFilterChipState>
-    implements ListApiProvider<RoundFilter> {
+class RoundFilterChipDataNotifier extends BaseDataNotifier<RoundFilterChipState> {
   RoundFilterChipDataNotifier(this.roundsRepository) : super(const RoundFilterChipState()) {
     getCurrentRound();
   }
@@ -25,19 +22,16 @@ class RoundFilterChipDataNotifier extends BaseDataNotifier<RoundFilterChipState>
   final RoundRepository roundsRepository;
   final Map<String, List<RoundModel>> _cache = {};
 
-  @override
   Future<List<RoundModel>> list({RoundFilter? filter, int? page, int? size, List<String>? sort}) async {
     var cacheKey = filter.toString();
     if (_cache.containsKey(cacheKey)) {
       var list = _cache[cacheKey]!;
       return list;
     }
-    var sort = SortBuilder()..add("createDateTime", descending: false);
     state = state.copyWith(filter: filter ?? state.filter);
     try {
       var result = await roundsRepository.getRounds(
-        filter: filter ?? state.filter,
-        pageStru: PageStru(sort: sort.build()),
+        ListQuery(filter: state.filter, sort: const [SortOrder("createDateTime")]),
       );
       _cache[cacheKey] = result.content;
 
@@ -59,6 +53,6 @@ class RoundFilterChipDataNotifier extends BaseDataNotifier<RoundFilterChipState>
 
   @override
   RoundFilterChipState copyWithState(BaseState status) {
-    return state.copyWith(status: state.status.copyWith(baseStatus: status));
+    return state.copyWith(status: status);
   }
 }

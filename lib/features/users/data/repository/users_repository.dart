@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
-import 'package:work_hu/app/framework/base_components/sort_builder.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
@@ -22,14 +22,9 @@ class UsersRepository {
     }
   }
 
-  Future<PaginatedResponse<UserComboModel>> fetchByQuery({
-    required UserFilter filter,
-    int? size,
-    int? page,
-    SortBuilder? sort,
-  }) async {
+  Future<PaginatedResponse<UserComboModel>> fetchByQuery(ListQuery<UserFilter> query, {int page = 0}) async {
     try {
-      final res = await _userApi.fetchByQuery(filter, size, page, sort);
+      final res = await _userApi.fetchByQuery(query, page);
 
       final paginatedData = PaginatedResponse<UserComboModel>.fromJson(
         res,

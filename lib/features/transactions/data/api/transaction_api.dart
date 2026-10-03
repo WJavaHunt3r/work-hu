@@ -1,5 +1,5 @@
 import 'package:work_hu/api/dio_client.dart';
-import 'package:work_hu/app/framework/base_components/page_stru.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/transactions/data/models/transaction_model.dart';
 import 'package:work_hu/features/transactions/data/models/transactions_filter.dart';
@@ -31,9 +31,12 @@ class TransactionApi {
     }
   }
 
-  Future<dynamic> getTransactions({required TransactionsFilter filter, required PageStru pageStru}) async {
+  Future<dynamic> getTransactions(ListQuery<TransactionsFilter> query, int page) async {
     try {
-      final res = await _dioClient.dio.get("/transaction", queryParameters: {...filter.toJson(), ...pageStru.toJson()});
+      final res = await _dioClient.dio.get(
+        "/transaction",
+        queryParameters: {...query.filter.toJson(), ...query.pageParams(page)},
+      );
       return res.data;
     } catch (e) {
       rethrow;

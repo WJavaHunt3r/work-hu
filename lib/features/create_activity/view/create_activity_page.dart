@@ -3,13 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
+import 'package:work_hu/app/widgets/base_form_field.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
 import 'package:work_hu/app/widgets/error_alert_dialog.dart';
@@ -117,7 +117,7 @@ class CreateActivityPageState
           );
   }
 
-  _buildDetails(ThemeData theme) {
+  Widget _buildDetails(ThemeData theme) {
     return BaseContainer(
       padding: EdgeInsets.all(8.sp),
       child: Form(
@@ -163,39 +163,14 @@ class CreateActivityPageState
             ),
             SizedBox(height: 5.sp),
             state.activity!.employerId == 281
-                ? Padding(
-                    padding: EdgeInsets.all(8.sp),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Container(
-                          constraints: constraints,
-                          child: DropdownButtonFormField(
-                            alignment: AlignmentDirectional.topStart,
-                            borderRadius: BorderRadius.all(Radius.circular(8.sp)),
-                            decoration: InputDecoration(
-                              labelText: "create_activity_transaction_type".i18n(),
-                              filled: true,
-                              fillColor: theme.colorScheme.surface,
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.sp),
-                                borderSide: BorderSide(color: theme.colorScheme.outlineVariant),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.sp),
-                                borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.sp),
-                              ),
-                            ),
-                            initialValue: state.activity!.transactionType,
-                            items: [
-                              TransactionType.DUKA_MUNKA_2000,
-                              TransactionType.DUKA_MUNKA,
-                            ].map((e) => DropdownMenuItem<TransactionType>(value: e, child: Text(e.name))).toList(),
-                            onChanged: (value) =>
-                                value != null ? ref.watch(provider.notifier).updateAccount(value) : null,
-                          ),
-                        );
-                      },
-                    ),
+                ? BaseDropdownFormField<TransactionType>(
+                    labelText: "create_activity_transaction_type",
+                    initialValue: state.activity!.transactionType,
+                    items: [
+                      TransactionType.DUKA_MUNKA_2000,
+                      TransactionType.DUKA_MUNKA,
+                    ].map((e) => DropdownMenuItem<TransactionType>(value: e, child: Text(e.name))).toList(),
+                    onChanged: (value) => value != null ? ref.read(provider.notifier).updateAccount(value) : null,
                   )
                 : const SizedBox(),
             SizedBox(
@@ -264,7 +239,7 @@ class CreateActivityPageState
     });
   }
 
-  _buildRegistrationCard(ThemeData theme) {
+  Widget _buildRegistrationCard(ThemeData theme) {
     return BaseContainer(
       padding: EdgeInsets.all(8.sp),
       child: Row(
@@ -311,13 +286,13 @@ class CreateActivityPageState
     );
   }
 
-  addRegistration() {
+  void addRegistration() {
     ref.read(provider.notifier).addRegistration(hours: double.tryParse(hoursController.text.replaceAll(",", ".")) ?? 0);
     _clearControllers();
     usersFocusNode.requestFocus();
   }
 
-  _buildSummaryCard(ThemeData theme) {
+  Widget _buildSummaryCard(ThemeData theme) {
     var sum = state.sum;
     return BaseContainer(
       padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 8.sp),
@@ -375,7 +350,11 @@ class CreateActivityPageState
                         ? ref
                               .read(provider.notifier)
                               .sendActivity()
-                              .then((r) => state.status.modelState.isSuccess ? Navigator.of(context).pop() : null)
+                              .then(
+                                (r) => mounted && state.status.modelState.isSuccess
+                                    ? Navigator.of(context).pop(true)
+                                    : null,
+                              )
                         : null,
                   ),
             child: Text("create_activity_send".i18n()),
@@ -411,7 +390,7 @@ class CreateActivityPageState
     );
   }
 
-  _clearControllers() {
+  void _clearControllers() {
     hoursController.text = defaultHourController.text;
     userController.clear();
   }

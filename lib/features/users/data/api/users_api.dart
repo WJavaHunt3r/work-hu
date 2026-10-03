@@ -1,5 +1,5 @@
 import 'package:work_hu/api/dio_client.dart';
-import 'package:work_hu/app/framework/base_components/sort_builder.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
@@ -21,10 +21,12 @@ class UsersApi {
     }
   }
 
-  Future<dynamic> fetchByQuery(UserFilter filter, int? size, int? page, SortBuilder? sort) async {
+  Future<dynamic> fetchByQuery(ListQuery<UserFilter> query, int page) async {
     try {
-      Map<String, dynamic> map = {...filter.toJson(), "size": size, "page": page, "sort": sort?.build()};
-      final res = await _dioClient.dio.get("/userCombo", queryParameters: map);
+      final res = await _dioClient.dio.get(
+        "/userCombo",
+        queryParameters: {...query.filter.toJson(), ...query.pageParams(page)},
+      );
       return res.data;
     } catch (e) {
       rethrow;

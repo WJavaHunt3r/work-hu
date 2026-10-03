@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
-import 'package:work_hu/app/framework/base_components/sort_builder.dart';
 import 'package:work_hu/features/activity_items/data/api/activity_items_api.dart';
+import 'package:work_hu/features/activity_items/data/model/activity_items_filter.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 
 class ActivityItemsRepository {
@@ -9,27 +10,12 @@ class ActivityItemsRepository {
 
   ActivityItemsRepository(this._activityItemsApi);
 
-  Future<PaginatedResponse<ActivityItemsModel>> getActivityItems({
-    num? activityId,
-    num? userId,
-    num? roundId,
-    bool? registeredInApp,
-    String? searchText,
-    int? size,
-    int? page,
-    SortBuilder? sort,
+  Future<PaginatedResponse<ActivityItemsModel>> getActivityItems(
+    ListQuery<ActivityItemsFilter> query, {
+    int page = 0,
   }) async {
     try {
-      final res = await _activityItemsApi.getActivityItems(
-        activityId: activityId,
-        userId: userId,
-        registeredInApp: registeredInApp,
-        roundId: roundId,
-        searchText: searchText,
-        size: size,
-        page: page,
-        sort: sort,
-      );
+      final res = await _activityItemsApi.getActivityItems(query, page);
       final paginatedData = PaginatedResponse<ActivityItemsModel>.fromJson(
         res,
         (json) => ActivityItemsModel.fromJson(json as Map<String, dynamic>),

@@ -25,17 +25,20 @@ class WebUpdateChecker extends StatefulWidget {
 class _WebUpdateCheckerState extends State<WebUpdateChecker> with WidgetsBindingObserver {
   static const _checkInterval = Duration(minutes: 5);
 
+  // Static on purpose: if this widget is rebuilt from scratch (the app above it remounts), what was learned about
+  // the running build and a found update must survive, otherwise the banner vanishes and never comes back.
+  static String? _loadedBuild;
+  static bool _updateAvailable = false;
+
   final Dio _dio = Dio();
   Timer? _timer;
-  String? _loadedBuild;
-  bool _updateAvailable = false;
 
   @override
   void initState() {
     super.initState();
     if (!kIsWeb) return;
     WidgetsBinding.instance.addObserver(this);
-    _fetchBuildId().then((id) => _loadedBuild = id);
+    if (_loadedBuild == null) _fetchBuildId().then((id) => _loadedBuild ??= id);
     _timer = Timer.periodic(_checkInterval, (_) => _check());
   }
 
@@ -65,15 +68,19 @@ class _WebUpdateCheckerState extends State<WebUpdateChecker> with WidgetsBinding
   }
 
   Future<void> _check() async {
-    if (_updateAvailable) return;
+    if (_updateAvailable) {
+      if (mounted) setState(() {});
+      return;
+    }
     final current = await _fetchBuildId();
     if (current == null) return;
     if (_loadedBuild == null) {
       _loadedBuild = current;
       return;
     }
-    if (current != _loadedBuild && mounted) {
-      setState(() => _updateAvailable = true);
+    if (current != _loadedBuild) {
+      _updateAvailable = true;
+      if (mounted) setState(() {});
     }
   }
 
@@ -102,7 +109,7 @@ class _WebUpdateCheckerState extends State<WebUpdateChecker> with WidgetsBinding
                         child: Text('update_available'.i18n(), style: TextStyle(color: colorScheme.onInverseSurface)),
                       ),
                       TextButton(
-                        onPressed: reloadPage,
+                        onPressed: () => reloadPage(),
                         child: Text('update_reload'.i18n(), style: TextStyle(color: colorScheme.inversePrimary)),
                       ),
                     ],

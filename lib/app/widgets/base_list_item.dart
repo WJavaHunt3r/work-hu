@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BaseListTile extends StatelessWidget {
-  BaseListTile({
+  const BaseListTile({
     super.key,
     required this.isLast,
     this.enabled = true,

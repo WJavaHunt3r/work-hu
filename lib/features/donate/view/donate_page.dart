@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
-import 'package:work_hu/app/providers/localeProvider.dart';
+import 'package:work_hu/app/providers/locale_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/features/donate/data/state/donate_state.dart';
 import 'package:work_hu/features/donate/providers/donate_provider.dart';
@@ -38,8 +38,10 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
   Widget buildLayout() {
     final theme = Theme.of(context);
     return state.donation == null
-        ? Column(
-            children: [Expanded(child: Center(child: CircularProgressIndicator()))],
+        // BasePage scrolls the layout, so the height is unbounded here: no Expanded.
+        ? Padding(
+            padding: EdgeInsets.symmetric(vertical: 32.sp),
+            child: const Center(child: CircularProgressIndicator()),
           )
         : Column(
             children: [
@@ -86,7 +88,7 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
     );
   }
 
-  _buildDonateCard(ThemeData theme) {
+  Widget _buildDonateCard(ThemeData theme) {
     return BaseContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

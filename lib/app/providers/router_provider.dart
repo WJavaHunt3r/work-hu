@@ -3,8 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/notifications/deep_link.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/view/activities_page.dart';
+import 'package:work_hu/features/audit_log/view/audit_log_page.dart';
+import 'package:work_hu/features/jobs/view/job_detail_page.dart';
+import 'package:work_hu/features/login/widgets/complete_name_dialog.dart';
+import 'package:work_hu/features/jobs/view/job_form_page.dart';
+import 'package:work_hu/features/jobs/view/jobs_page.dart';
+import 'package:work_hu/features/roles/data/model/app_role_model.dart';
+import 'package:work_hu/features/roles/view/role_edit_page.dart';
+import 'package:work_hu/features/roles/view/roles_page.dart';
 import 'package:work_hu/features/activity_items/view/activity_items_page.dart';
 import 'package:work_hu/features/admin/view/admin_page.dart';
 import 'package:work_hu/features/bufe_transactions/view/bufe_transactions_page.dart';
@@ -20,11 +29,18 @@ import 'package:work_hu/features/donation/view/donation_page.dart';
 import 'package:work_hu/features/fra_kare_week/view/fra_kare_week_page.dart';
 import 'package:work_hu/features/goal/view/goal_page.dart';
 import 'package:work_hu/features/home/view/home_page.dart';
+import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/login/view/login_page.dart';
 import 'package:work_hu/features/mentees/view/mentees_page.dart';
 import 'package:work_hu/features/mentor_mentee/view/mentor_mentees_page.dart';
 import 'package:work_hu/features/payment_success/view/payment_success_page.dart';
 import 'package:work_hu/features/payments/view/payments_page.dart';
+import 'package:work_hu/features/notification_admin/data/model/notification_schedule_model.dart';
+import 'package:work_hu/features/notification_admin/view/general_notifications_page.dart';
+import 'package:work_hu/features/notification_admin/view/notification_schedules_page.dart';
+import 'package:work_hu/features/notification_admin/view/schedule_edit_page.dart';
+import 'package:work_hu/features/notification_admin/view/send_notification_page.dart';
+import 'package:work_hu/features/notifications/view/notification_preferences_page.dart';
 import 'package:work_hu/features/profile/view/language_picker_page.dart';
 import 'package:work_hu/features/profile/view/profile_page.dart';
 import 'package:work_hu/features/rounds/view/rounds_maintenance_page.dart';
@@ -49,6 +65,11 @@ final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellPr
 final _shellNavigatorAdminKey = GlobalKey<NavigatorState>(debugLabel: 'shellAdmin');
 final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellHome');
 final _shellNavigatorStatusKey = GlobalKey<NavigatorState>(debugLabel: 'shellStatus');
+final _shellNavigatorJobsKey = GlobalKey<NavigatorState>(debugLabel: 'shellJobs');
+
+/// Jobs used to live under /profile; links in notifications that were already sent still point there.
+String _oldJobsLocation(BuildContext context, GoRouterState state) =>
+    state.uri.toString().replaceFirst('/profile/jobs', '/jobs');
 final routerProvider = Provider<GoRouter>((ref) {
   final userNotifier = ref.watch(userDataProvider);
   return GoRouter(
@@ -102,6 +123,23 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
+          // Jobs: registering for jobs. Creating and running them is in the admin (/admin/jobs).
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorJobsKey,
+            routes: [
+              GoRoute(
+                path: '/jobs',
+                builder: (context, state) => const JobsPage(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        JobDetailPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+                  ),
+                ],
+              ),
+            ],
+          ),
           // Branch 2: Profile
           StatefulShellBranch(
             navigatorKey: _shellNavigatorProfileKey,
@@ -130,6 +168,15 @@ final routerProvider = Provider<GoRouter>((ref) {
                             CreateActivityPage(id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: "jobs",
+                    redirect: _oldJobsLocation,
+                    routes: [GoRoute(path: ':id', redirect: _oldJobsLocation)],
+                  ),
+                  GoRoute(
+                    path: 'notifications',
+                    builder: (BuildContext context, GoRouterState state) => const NotificationPreferencesPage(),
                   ),
                   GoRoute(
                     path: 'theme',
@@ -201,7 +248,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: "success/:checkout_reference",
             builder: (BuildContext context, GoRouterState state) {
-              return DonatePaymentSuccessPage(checkoutReference: state.pathParameters["checkout_reference"]);
+              return DonatePaymentSuccessPage(
+                donationId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0,
+                checkoutReference: state.pathParameters["checkout_reference"],
+              );
             },
           ),
         ],
@@ -241,6 +291,46 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (BuildContext context, GoRouterState state) => const UserStatusPage(),
       ),
       GoRoute(path: "/admin/users", builder: (BuildContext context, GoRouterState state) => const UsersPage()),
+      GoRoute(path: "/admin/roles", builder: (BuildContext context, GoRouterState state) => const RolesPage()),
+      GoRoute(path: "/admin/auditLog", builder: (BuildContext context, GoRouterState state) => const AuditLogPage()),
+      // Single page level each, like the roles routes. "create" must stay before ":id", or it is read as a job id.
+      GoRoute(
+        path: "/admin/jobs",
+        builder: (BuildContext context, GoRouterState state) => const JobsPage(manage: true, title: "admin_jobs"),
+      ),
+      GoRoute(path: "/admin/jobs/create", builder: (BuildContext context, GoRouterState state) => const JobFormPage()),
+      GoRoute(
+        path: "/admin/jobs/:id",
+        builder: (BuildContext context, GoRouterState state) =>
+            JobDetailPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0, manage: true),
+      ),
+      GoRoute(
+        path: "/admin/jobs/:id/edit",
+        builder: (BuildContext context, GoRouterState state) =>
+            JobFormPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+      ),
+      GoRoute(
+        path: "/admin/roles/edit",
+        builder: (BuildContext context, GoRouterState state) => RoleEditPage(role: state.extra as AppRoleModel?),
+      ),
+      // "send" and "schedules" are siblings, not children: a single page level each, like the roles routes
+      GoRoute(
+        path: "/admin/notifications",
+        builder: (BuildContext context, GoRouterState state) => const GeneralNotificationsPage(),
+      ),
+      GoRoute(
+        path: "/admin/notifications/send",
+        builder: (BuildContext context, GoRouterState state) => const SendNotificationPage(),
+      ),
+      GoRoute(
+        path: "/admin/notifications/schedules",
+        builder: (BuildContext context, GoRouterState state) => const NotificationSchedulesPage(),
+      ),
+      GoRoute(
+        path: "/admin/notifications/schedules/edit",
+        builder: (BuildContext context, GoRouterState state) =>
+            ScheduleEditPage(schedule: state.extra as NotificationScheduleModel?),
+      ),
       GoRoute(path: "/admin/goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
       GoRoute(path: "/admin/rounds", builder: (BuildContext context, GoRouterState state) => const RoundsPage()),
       GoRoute(
@@ -303,7 +393,19 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // If the user isn't logged in AND it's not a public route, kick to login
       if (!loggedIn && !isPublicRoute) {
+        // Remember where they were heading (deep link / notification) so login can continue there.
+        DeepLink.remember(state.uri.toString());
         return '/login';
+      }
+
+      if (loggedIn && user.changedPassword && DeepLink.hasPending) {
+        return DeepLink.consume();
+      }
+
+      // Users outside a church only have the balance and the profile (also covers the initial "/status").
+      if (loggedIn && !user.hasChurch()) {
+        final location = state.matchedLocation;
+        if (location == '/' || ['/status', '/jobs', '/admin'].any(location.startsWith)) return '/balance';
       }
 
       if (loggedIn && state.matchedLocation == '/') {
@@ -331,11 +433,65 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
     );
   }
 
+  /// The tabs this user sees, each with the index of its branch in the shell route. Hidden tabs leave gaps, so an
+  /// item's position in the bar is not its branch index.
+  List<({int branch, BottomNavigationBarItem item})> _tabs(UserModel user) {
+    final church = user.hasChurch();
+    return [
+      (
+        branch: 0,
+        item: BottomNavigationBarItem(
+          activeIcon: const Icon(Icons.account_balance_wallet),
+          icon: const Icon(Icons.account_balance_wallet_outlined),
+          label: 'nav_bar_home'.i18n(),
+        ),
+      ),
+      if (church)
+        (
+          branch: 1,
+          item: BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.bar_chart_outlined),
+            icon: const Icon(Icons.bar_chart_outlined),
+            label: 'nav_bar_status'.i18n(),
+          ),
+        ),
+      if (church)
+        (
+          branch: 2,
+          item: BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.work),
+            icon: const Icon(Icons.work_outline),
+            label: 'nav_bar_jobs'.i18n(),
+          ),
+        ),
+      (
+        branch: 3,
+        item: BottomNavigationBarItem(
+          activeIcon: const Icon(Icons.person_2_rounded),
+          icon: const Icon(Icons.person_2_outlined),
+          label: 'nav_bar_profile'.i18n(),
+        ),
+      ),
+      if (church && user.hasAdminAccess())
+        (
+          branch: 4,
+          item: BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.admin_panel_settings),
+            icon: const Icon(Icons.admin_panel_settings_outlined),
+            label: 'nav_bar_admin'.i18n(),
+          ),
+        ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userDataProvider).user;
+    final tabs = _tabs(user!);
+    final selected = tabs.indexWhere((t) => t.branch == navigationShell.currentIndex);
     return Scaffold(
-      body: navigationShell, // The navigation shell contains the page for the current branch
+      // The navigation shell contains the page for the current branch; the gate asks for a missing name first
+      body: CompleteNameGate(child: navigationShell),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -353,52 +509,12 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
           enableFeedback: false,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          currentIndex: navigationShell.currentIndex,
-          items: user!.isUser() ? userScreens() : adminScreens(),
-          onTap: _goBranch,
+          // The router keeps users off hidden tabs; the fallback only covers the frame before it redirects.
+          currentIndex: selected < 0 ? 0 : selected,
+          items: [for (final t in tabs) t.item],
+          onTap: (i) => _goBranch(tabs[i].branch),
         ),
       ),
     );
   }
-
-  List<BottomNavigationBarItem> userScreens() => <BottomNavigationBarItem>[
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.account_balance_wallet),
-      icon: const Icon(Icons.account_balance_wallet_outlined),
-      label: 'nav_bar_home'.i18n(),
-    ),
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.bar_chart_outlined),
-      icon: const Icon(Icons.bar_chart_outlined),
-      label: 'nav_bar_status'.i18n(),
-    ),
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.person_2_rounded),
-      icon: const Icon(Icons.person_2_outlined),
-      label: 'nav_bar_profile'.i18n(),
-    ),
-  ];
-
-  List<BottomNavigationBarItem> adminScreens() => <BottomNavigationBarItem>[
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.account_balance_wallet),
-      icon: const Icon(Icons.account_balance_wallet_outlined),
-      label: 'nav_bar_home'.i18n(),
-    ),
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.bar_chart_outlined),
-      icon: const Icon(Icons.bar_chart_outlined),
-      label: 'nav_bar_status'.i18n(),
-    ),
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.person_2_rounded),
-      icon: const Icon(Icons.person_2_outlined),
-      label: 'nav_bar_profile'.i18n(),
-    ),
-    BottomNavigationBarItem(
-      activeIcon: const Icon(Icons.admin_panel_settings),
-      icon: const Icon(Icons.admin_panel_settings_outlined),
-      label: 'nav_bar_admin'.i18n(),
-    ),
-  ];
 }

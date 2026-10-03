@@ -1,5 +1,6 @@
-import 'package:work_hu/app/framework/base_components/sort_builder.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/features/activity_items/data/model/activity_items_filter.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
 
 import '../../../../api/dio_client.dart';
@@ -9,29 +10,11 @@ class ActivityItemsApi {
 
   ActivityItemsApi();
 
-  Future<dynamic> getActivityItems({
-    num? activityId,
-    num? userId,
-    num? roundId,
-    bool? registeredInApp,
-    String? searchText,
-    int? size,
-    int? page,
-    SortBuilder? sort,
-  }) async {
+  Future<dynamic> getActivityItems(ListQuery<ActivityItemsFilter> query, int page) async {
     try {
       final res = await _dioClient.dio.get(
         "/activityItem",
-        queryParameters: {
-          "activityId": activityId,
-          "userId": userId,
-          "roundId": roundId,
-          "registeredInApp": registeredInApp,
-          "searchText": searchText,
-          "size": size,
-          "page": page,
-          "sort": sort?.build(),
-        },
+        queryParameters: {...query.filter.toJson(), ...query.pageParams(page)},
       );
       return res.data;
     } catch (e) {

@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
@@ -20,7 +19,7 @@ import 'package:work_hu/features/user_transactions/widgets/points_list_item.dart
 import 'package:work_hu/features/utils.dart';
 
 class StatusPage extends BasePage {
-  StatusPage({super.key, super.title = "status_title"});
+  const StatusPage({super.key, super.title = "status_title"});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -278,7 +277,7 @@ class _OnTrackStatus extends StatelessWidget {
   final String subData;
   final IconData icon;
 
-  const _OnTrackStatus({super.key, required this.title, required this.data, required this.subData, required this.icon});
+  const _OnTrackStatus({required this.title, required this.data, required this.subData, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -325,7 +324,7 @@ class _GoalProgressBar extends StatelessWidget {
             value: value,
             minHeight: 10.sp,
             borderRadius: BorderRadius.circular(10.sp),
-            backgroundColor: colorScheme.primary.withOpacity(0.1),
+            backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
             color: colorScheme.primary,
           ),
           if (goal > 0 && goal < 1)
@@ -340,44 +339,6 @@ class _GoalProgressBar extends StatelessWidget {
             ),
         ],
       ),
-    );
-  }
-}
-
-class _MonthStatus extends StatelessWidget {
-  final String month;
-  final bool? status; // true: check, false: more, null: minus
-  final bool isCurrent;
-
-  const _MonthStatus({required this.month, this.status, this.isCurrent = false});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isCurrent ? Theme.of(context).colorScheme.primary : Colors.grey;
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.all(8.sp),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: color.withOpacity(0.3)),
-            color: isCurrent ? Colors.transparent : Colors.grey.withOpacity(0.1),
-          ),
-          child: Icon(
-            status == true ? Icons.check : (status == false ? Icons.more_horiz : Icons.remove),
-            color: isCurrent ? color : Colors.grey,
-            size: 20.sp,
-          ),
-        ),
-        SizedBox(height: 8.sp),
-        Text(
-          month,
-          style: TextStyle(
-            color: isCurrent ? color : Colors.grey,
-            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-      ],
     );
   }
 }

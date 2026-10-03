@@ -110,11 +110,11 @@ class CreateTransactionsDataNotifier extends BaseDataNotifier<CreateTransactions
     );
   }
 
-  setTransactionTypeAndAccount(TransactionType transactionType, Account account) {
+  void setTransactionTypeAndAccount(TransactionType transactionType, Account account) {
     state = state.copyWith(transactionType: transactionType, account: account);
   }
 
-  update({required num userId, double? hours, double? points, num? credits}) {
+  void update({required num userId, double? hours, double? points, num? credits}) {
     TransactionItemModel? transactionItem = state.transactionItems.firstWhere((t) => t.userId == userId);
     var newItem = transactionItem.copyWith(
       hours: hours ?? transactionItem.hours,
@@ -126,13 +126,6 @@ class CreateTransactionsDataNotifier extends BaseDataNotifier<CreateTransactions
       transactionItems: state.transactionItems.map((e) => e.userId == userId ? newItem : e).toList(),
       creationState: ModelState.empty,
     );
-  }
-
-  void _createTransactionItems(List<UserComboModel> users) {
-    for (UserComboModel u in users) {
-      state = state.copyWith(selectedUser: u);
-      addTransaction(description: "${currentUser!.paceTeam!.teamName} csapat tökéletes BMM hét");
-    }
   }
 
   Future<void> addTransaction({String? description}) async {
@@ -168,7 +161,7 @@ class CreateTransactionsDataNotifier extends BaseDataNotifier<CreateTransactions
     }
   }
 
-  deleteTransaction(int index) {
+  void deleteTransaction(int index) {
     List<TransactionItemModel> items = [];
     var item = state.transactionItems[index];
     var value = item.credit + item.hours + item.points;
@@ -188,21 +181,21 @@ class CreateTransactionsDataNotifier extends BaseDataNotifier<CreateTransactions
         0;
   }
 
-  _clearAddFields() {
+  void _clearAddFields() {
     valueController.clear();
     userController.clear();
     state = state.copyWith(selectedUser: null, creationState: ModelState.empty);
   }
 
-  _clearTransactions() {
+  void _clearTransactions() {
     state = state.copyWith(transactionItems: [], sum: 0, creationState: ModelState.empty);
   }
 
-  _updateState() {
+  void _updateState() {
     state = state.copyWith();
   }
 
-  updateSelectedUser(UserComboModel? u) {
+  void updateSelectedUser(UserComboModel? u) {
     valueFocusNode.requestFocus();
     state = state.copyWith(selectedUser: u);
   }

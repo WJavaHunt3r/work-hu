@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
-import 'package:work_hu/app/locator.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
+import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_header_chip.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
+import 'package:work_hu/features/activities/data/model/activity_model.dart';
+import 'package:work_hu/features/activity_items/data/model/activity_items_filter.dart';
 import 'package:work_hu/features/activity_items/data/model/activity_items_model.dart';
-import 'package:work_hu/features/activity_items/data/state/activity_items_state.dart';
 import 'package:work_hu/features/activity_items/provider/activity_items_provider.dart';
 import 'package:work_hu/features/utils.dart';
 
@@ -26,16 +28,27 @@ class ActivityItemsPage extends BaseListPage {
 }
 
 class ActivityItemsPageState
-    extends BaseListPageState<ActivityItemsPage, ActivityItemsState, ActivityItemsDataNotifier> {
+    extends PagedListPageState<ActivityItemsPage, ActivityItemsModel, ActivityItemsFilter, ActivityItemsDataNotifier> {
   @override
-  void postInit(WidgetRef ref) {
-    ref.read(provider.notifier).getActivity(widget.activityId);
+  get provider => activityItemsDataProvider(widget.activityId);
+
+  /// Loads in parallel with the items, so it can still be null while they show.
+  ActivityModel? get activity => ref.watch(activityDetailProvider(widget.activityId)).activity;
+
+  @override
+  Widget build(BuildContext context) {
+    // The base page only reports errors of the list provider.
+    ref.listen(activityDetailProvider(widget.activityId), (previous, next) {
+      if (next.status.modelState.isError && !(previous?.status.modelState.isError ?? false)) {
+        Utils.showErrorDialog(context, content: next.status.message.i18n());
+      }
+    });
+    return super.build(context);
   }
 
   @override
-  Widget buildListTile(item) {
-    var date = state.activity!.activityDateTime;
-    var dateString = Utils.dateToString(date);
+  Widget buildListTile(ActivityItemsModel item, int index) {
+    final date = activity?.activityDateTime;
     return BaseListTile(
       onTap: () {},
       trailing: Text(
@@ -45,31 +58,30 @@ class ActivityItemsPageState
       title: Row(
         children: [Text(item.userName, style: const TextStyle(fontWeight: FontWeight.bold))],
       ),
-      subtitle: Text(dateString),
-      isLast: items.indexOf(item) == items.length - 1,
-      index: items.indexOf(item),
+      subtitle: Text(date == null ? "" : Utils.dateToString(date)),
+      isLast: index == items.length - 1,
+      index: index,
     );
   }
 
   @override
-  onDelete(e) {
-    e as ActivityItemsModel;
-    ref.watch(provider.notifier).deleteActivityItem(e.id!);
-  }
+  void onDelete(ActivityItemsModel item) => notifier.deleteActivityItem(item.id!);
 
   @override
-  bool canDelete(item) {
-    var activity = state.activity;
-    return !activity!.registeredInApp && !activity.registeredInMyShare;
+  bool canDelete(ActivityItemsModel item) {
+    final activity = this.activity;
+    return activity != null && !activity.registeredInApp && !activity.registeredInMyShare;
   }
 
   @override
   List<Widget>? buildActions(BuildContext context, WidgetRef ref) {
-    return state.activity != null && !state.activity!.registeredInApp
+    return activity != null && !activity!.registeredInApp
         ? [
             IconButton(
-              onPressed: () =>
-                  ref.read(provider.notifier).registerActivity().then((r) => Navigator.of(context).pop(true)),
+              onPressed: () async {
+                await ref.read(activityDetailProvider(widget.activityId).notifier).registerActivity(items);
+                if (mounted) Navigator.of(this.context).pop(true);
+              },
               icon: const Icon(Icons.send_outlined),
             ),
           ]
@@ -78,7 +90,7 @@ class ActivityItemsPageState
 
   @override
   List<Widget> buildHeaderLayout(BuildContext context, WidgetRef ref) {
-    var activity = state.activity;
+    var activity = this.activity;
     return [
       BaseHeaderChip(
         label: "activity_items_date",
@@ -91,7 +103,7 @@ class ActivityItemsPageState
         label: "activity_items_transactionType",
         labelValue: () async => activity?.transactionType.name ?? "",
       ),
-      if (locator<UserProvider>().user!.isAdmin())
+      if (ref.read(userDataProvider).user!.isAdmin())
         BaseHeaderChip(label: "activity_items_created_by", labelValue: () async => activity?.createUserName ?? ""),
     ];
   }
@@ -99,22 +111,10 @@ class ActivityItemsPageState
   @override
   Widget? buildFloatingActionButton(BuildContext context, WidgetRef ref) {
     return FloatingActionButton(
-      onPressed: () => ref.watch(provider.notifier).createCreditCsv(),
+      onPressed: activity == null
+          ? null
+          : () => ref.read(activityDetailProvider(widget.activityId).notifier).createCreditCsv(items),
       child: const Image(image: AssetImage("assets/img/myshare-logo.png"), fit: BoxFit.fitWidth),
     );
   }
-
-  @override
-  List<dynamic> getFilters() {
-    return [];
-  }
-
-  @override
-  List<ActivityItemsModel> get items => state.activityItems;
-
-  @override
-  BaseListState get listStatus => state.status;
-
-  @override
-  get provider => activityItemsDataProvider;
 }

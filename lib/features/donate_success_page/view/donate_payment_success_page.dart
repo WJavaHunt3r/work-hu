@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
-import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
@@ -19,11 +17,13 @@ import 'package:work_hu/features/utils.dart';
 class DonatePaymentSuccessPage extends BasePage {
   const DonatePaymentSuccessPage({
     super.key,
+    required this.donationId,
     this.checkoutReference,
     super.hasAppBar = false,
     super.title = "payment_success",
   });
 
+  final num donationId;
   final String? checkoutReference;
 
   @override
@@ -43,20 +43,19 @@ class DonatePaymentSuccessStatePage
   Widget buildLayout() {
     var theme = Theme.of(context);
     var colorScheme = theme.colorScheme;
-    return state.payment == null
-        ? const Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16.sp.sp),
-              child: state.status.modelState.isSuccess
-                  ? state.payment!.status == PaymentStatus.PAID
-                        ? buildSuccessPage(theme, colorScheme, state.payment!)
-                        : buildErrorPage(theme, colorScheme, state.payment!)
-                  : state.status.modelState.isError
-                  ? Center(child: Text("payment_success_error".i18n()))
-                  : const Center(child: CircularProgressIndicator()),
-            ),
-          );
+    // Same order as the top-up's PaymentSuccessPage: an error must win over "still loading", or a failed lookup
+    // leaves the page spinning. The payment is null between the payment lookup and the checkout fetch.
+    final payment = state.payment;
+    return Padding(
+      padding: EdgeInsets.all(16.sp),
+      child: state.status.modelState.isError
+          ? Center(child: Text("payment_success_error".i18n()))
+          : state.status.modelState.isSuccess && payment != null
+          ? payment.status == PaymentStatus.PAID
+                ? buildSuccessPage(theme, colorScheme, payment)
+                : buildErrorPage(theme, colorScheme, payment)
+          : const Center(child: CircularProgressIndicator()),
+    );
   }
 
   Widget buildSuccessPage(ThemeData theme, ColorScheme colorScheme, CheckoutModel payment) {
@@ -139,7 +138,7 @@ class DonatePaymentSuccessStatePage
             children: [
               _DetailRow(label: 'payment_success_transaction_id'.i18n(), value: payment.description),
               Divider(height: 24.sp),
-              _DetailRow(label: 'payment_success_date_time'.i18n(), value: payment.date),
+              _DetailRow(label: 'payment_success_date_time'.i18n(), value: payment.date ?? ''),
               //  Divider(height: 24.sp),
               // _DetailRow(
               //   label: 'payment_success_payment_method'.i18n(),
@@ -179,7 +178,7 @@ class DonatePaymentSuccessStatePage
   @override
   BaseState get status => state.status;
 
-  buildErrorPage(ThemeData theme, ColorScheme colorScheme, CheckoutModel payment) {
+  Widget buildErrorPage(ThemeData theme, ColorScheme colorScheme, CheckoutModel payment) {
     var errorColor = colorScheme.error;
     return Column(
       children: [
@@ -239,12 +238,8 @@ class DonatePaymentSuccessStatePage
           width: double.infinity,
           height: 56.sp,
           child: FilledButton(
-            onPressed: () async {
-              Uri uri = Uri.parse(state.payment!.hosted_checkout_url.toString());
-              if (!await launchUrl(uri, mode: LaunchMode.inAppWebView, webOnlyWindowName: "_self")) {
-                throw Exception('top_up_failed_to_launch'.i18n([uri.toString()]));
-              }
-            },
+            // The old checkout may already be deleted (see the notifier), so start a new donation instead.
+            onPressed: () => context.go("/donate/${widget.donationId}"),
             child: Text(
               'payment_success_try_again'.i18n(),
               style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
@@ -275,7 +270,7 @@ class _DetailRow extends StatelessWidget {
   final String value;
   final IconData? icon;
 
-  const _DetailRow({required this.label, required this.value, this.icon});
+  const _DetailRow({required this.label, required this.value}) : icon = null;
 
   @override
   Widget build(BuildContext context) {

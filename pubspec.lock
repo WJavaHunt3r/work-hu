@@ -218,7 +218,7 @@ packages:
     source: hosted
     version: "1.19.1"
   convert:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: convert
       sha256: b30acd5944035672bc15c6b7a8b47d773e41e2f17de064350988c5d02adb1c68
@@ -718,7 +718,7 @@ packages:
     source: hosted
     version: "3.1.0"
   google_sign_in_web:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: google_sign_in_web
       sha256: d473003eeca892f96a01a64fc803378be765071cb0c265ee872c7f8683245d14

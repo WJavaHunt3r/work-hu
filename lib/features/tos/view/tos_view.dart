@@ -48,7 +48,7 @@ class ToSPage extends StatelessWidget {
             Text(
               'tos_last_updated'.i18n(),
               textAlign: TextAlign.center,
-              style: TextStyle(color: colorScheme.onBackground.withAlpha(125), fontSize: 13.sp),
+              style: TextStyle(color: colorScheme.onSurface.withAlpha(125), fontSize: 13.sp),
             ),
             SizedBox(height: 30.sp),
 
@@ -150,26 +150,24 @@ class ToSPage extends StatelessWidget {
             ],
           ),
           SizedBox(height: 15.sp),
-          ...items
-              .map(
-                (item) => Padding(
-                  padding: EdgeInsets.only(bottom: 12.sp),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item['title']!.i18n(),
-                        style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 14),
-                      ),
-                      Text(
-                        item['body']!.i18n(),
-                        style: TextStyle(color: theme.colorScheme.onSurface.withAlpha(140), fontSize: 12),
-                      ),
-                    ],
+          ...items.map(
+            (item) => Padding(
+              padding: EdgeInsets.only(bottom: 12.sp),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item['title']!.i18n(),
+                    style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 14),
                   ),
-                ),
-              )
-              .toList(),
+                  Text(
+                    item['body']!.i18n(),
+                    style: TextStyle(color: theme.colorScheme.onSurface.withAlpha(140), fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -227,7 +225,7 @@ class ToSPage extends StatelessWidget {
               style: TextStyle(color: Colors.white70, fontSize: 13.sp),
             ),
           ],
-          if (child != null) child,
+          ?child,
         ],
       ),
     );

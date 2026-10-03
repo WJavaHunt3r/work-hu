@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
+import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/app/models/payment_goal.dart';
 import 'package:work_hu/app/models/payment_status.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/app/widgets/confirm_alert_dialog.dart';
-import 'package:work_hu/features/payments/data/state/payments_state.dart';
+import 'package:work_hu/features/payments/data/model/payments_filter.dart';
+import 'package:work_hu/features/payments/data/model/payments_model.dart';
 import 'package:work_hu/features/payments/providers/payments_provider.dart';
 import 'package:work_hu/features/payments/widgets/payments_maintenance.dart';
 import 'package:work_hu/features/utils.dart';
@@ -28,33 +28,40 @@ class PaymentsPage extends BaseListPage {
   }
 }
 
-class PaymentsPageState extends BaseListPageState<PaymentsPage, PaymentsState, PaymentDataNotifier> {
+class PaymentsPageState extends PagedListPageState<PaymentsPage, PaymentsModel, PaymentsFilter, PaymentDataNotifier> {
   @override
-  Widget buildListTile(item) {
-    var payments = state.payments;
-    var index = payments.indexOf(item);
+  get provider => paymentDataProvider(PaymentsFilter(donationId: widget.donationId, userId: widget.userId));
+
+  @override
+  Widget build(BuildContext context) {
+    // The base page only reports errors of the list provider.
+    ref.listen(paymentDetailProvider, (previous, next) {
+      if (next.status.modelState.isError && !(previous?.status.modelState.isError ?? false)) {
+        Utils.showErrorDialog(context, content: next.status.message.i18n());
+      }
+    });
+    return super.build(context);
+  }
+
+  @override
+  Widget buildListTile(PaymentsModel item, int index) {
     var date = item.dateTime;
     var dateString = Utils.dateToString(date);
     return Dismissible(
       key: UniqueKey(),
-      onDismissed: (direction) =>
-          showDialog(
-            context: context,
-            builder: (buildContext) {
-              return ConfirmAlertDialog(
-                onConfirm: () => buildContext.pop(true),
-                title: "base_delete".i18n(),
-                content: Text("payment_delete_warning".i18n(), textAlign: TextAlign.center),
-              );
-            },
-          ).then(
-            (confirmed) => confirmed != null && confirmed
-                ? ref.read(paymentDataProvider.notifier).deletePayments(item.id!, index, item.checkoutId)
-                : null,
-          ),
+      onDismissed: (direction) => showDialog(
+        context: context,
+        builder: (buildContext) {
+          return ConfirmAlertDialog(
+            onConfirm: () => buildContext.pop(true),
+            title: "base_delete".i18n(),
+            content: Text("payment_delete_warning".i18n(), textAlign: TextAlign.center),
+          );
+        },
+      ).then((confirmed) => confirmed == true ? notifier.deletePayment(item) : null),
       dismissThresholds: const <DismissDirection, double>{DismissDirection.endToStart: 0.4},
       child: BaseListTile(
-        isLast: payments.length - 1 == index,
+        isLast: items.length - 1 == index,
         index: index,
         onTap: () {
           showDialog(
@@ -119,26 +126,7 @@ class PaymentsPageState extends BaseListPageState<PaymentsPage, PaymentsState, P
   }
 
   @override
-  StateNotifierProvider<PaymentDataNotifier, PaymentsState> get provider => paymentDataProvider;
-
-  @override
   List<Widget> buildActions(BuildContext context, WidgetRef ref) {
-    return [
-      IconButton(
-        onPressed: () => ref.watch(paymentDataProvider.notifier).refreshPayments(),
-        icon: const Icon(Icons.refresh),
-      ),
-    ];
+    return [IconButton(onPressed: () => notifier.refreshPayments(), icon: const Icon(Icons.refresh))];
   }
-
-  @override
-  List<dynamic> getFilters() {
-    return [];
-  }
-
-  @override
-  List<dynamic> get items => state.payments;
-
-  @override
-  BaseListState get listStatus => state.status;
 }

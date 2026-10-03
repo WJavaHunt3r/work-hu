@@ -5,7 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
-import 'package:work_hu/app/providers/localeProvider.dart';
+import 'package:work_hu/app/models/permission.dart';
+import 'package:work_hu/app/providers/locale_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
@@ -30,6 +31,8 @@ class ActivityListItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var user = ref.watch(userDataProvider).user!;
     var theme = Theme.of(context);
+    final canRegister = user.isAdmin() || user.hasPermission(Permission.ACTIVITY_REGISTER);
+    final canManage = user.isAdmin() || user.hasPermission(Permission.ACTIVITY_MANAGE_ALL);
     return Padding(
       padding: EdgeInsets.only(bottom: 12.sp),
       child: BaseContainer(
@@ -37,7 +40,7 @@ class ActivityListItem extends ConsumerWidget {
         onTap: () {
           context
               .push("/profile/activities/${current.id}/items")
-              .then((r) => r != null && r == true ? ref.read(activityDataProvider.notifier).list(page: 0) : null);
+              .then((r) => r == true ? ref.read(activityDataProvider.notifier).reload() : null);
         },
         child: ListTile(
           contentPadding: EdgeInsets.zero,
@@ -54,22 +57,21 @@ class ActivityListItem extends ConsumerWidget {
               !current.registeredInApp &&
                   !current.registeredInMyShare &&
                   !current.registeredInTeams &&
-                  ([current.createUserId, current.responsibleId, current.employerId].contains(user.id) ||
-                      user.isAdmin())
+                  ([current.createUserId, current.responsibleId, current.employerId].contains(user.id) || canManage)
               ? IconButton(
                   onPressed: () => context
                       .push("/profile/activities/${current.id}/edit")
-                      .then((value) => ref.read(activityDataProvider.notifier).list(page: 0)),
+                      .then((value) => ref.read(activityDataProvider.notifier).reload()),
                   icon: const Icon(Icons.edit_outlined),
                 )
-              : user.isAdmin() && !current.registeredInApp
+              : canRegister && !current.registeredInApp
               ? IconButton(icon: const Icon(Icons.send_outlined), onPressed: () => onIconPressed())
-              : user.isAdmin() && !current.registeredInMyShare && current.transactionType != TransactionType.POINT
+              : canRegister && !current.registeredInMyShare && current.transactionType != TransactionType.POINT
               ? MaterialButton(
                   child: const Image(image: AssetImage("assets/img/myshare-logo.png"), fit: BoxFit.fitWidth),
                   onPressed: () => onIconPressed(),
                 )
-              : user.isAdmin() && current.registeredInMyShare && current.registeredInApp && !current.registeredInTeams
+              : canRegister && current.registeredInMyShare && current.registeredInApp && !current.registeredInTeams
               ? IconButton(
                   icon: Icon(Icons.group, size: 25.sp, color: Colors.deepPurple),
                   onPressed: () => onIconPressed(),

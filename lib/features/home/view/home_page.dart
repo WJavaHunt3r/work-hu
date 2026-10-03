@@ -6,11 +6,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
-import 'package:work_hu/app/providers/localeProvider.dart';
+import 'package:work_hu/app/providers/locale_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_alert_dialog.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
@@ -191,9 +190,12 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'home_recent_transactions'.i18n(),
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        // Takes the space the button leaves and wraps, so longer translations don't overflow.
+        Expanded(
+          child: Text(
+            'home_recent_transactions'.i18n(),
+            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
         ),
         TextButton(
           onPressed: () {
@@ -267,7 +269,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
   @override
   BaseState get status => state.status;
 
-  _showQrCode(BuildContext context) {
+  void _showQrCode(BuildContext context) {
     showDialog(
       context: context,
       barrierColor: Theme.of(context).colorScheme.surfaceContainer.withAlpha(200),
@@ -294,7 +296,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
 
   Widget _buildWelcomeTitle(ThemeData theme) {
     return Padding(
-      padding: EdgeInsets.only(top: 12.sp, bottom: 20.sp),
+      padding: EdgeInsets.only(top: 24.sp, bottom: 20.sp),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,7 +312,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
     );
   }
 
-  _buildDonations(ThemeData theme) {
+  Widget _buildDonations(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -345,7 +347,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
     );
   }
 
-  _buildFamilyAccounts(ThemeData theme) {
+  Widget _buildFamilyAccounts(ThemeData theme) {
     var items = state.familiyAccounts;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

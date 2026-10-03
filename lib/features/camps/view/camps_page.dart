@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:localization/localization.dart';
-import 'package:riverpod/src/providers/legacy/state_notifier_provider.dart' show StateNotifierProvider;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
-import 'package:work_hu/app/framework/base_components/base_page_components/base_list_state.dart';
+import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
 import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
+import 'package:work_hu/features/camps/data/model/camp_filter.dart';
 import 'package:work_hu/features/camps/data/model/camp_model.dart';
-import 'package:work_hu/features/camps/data/state/camp_state.dart';
 import 'package:work_hu/features/camps/provider/camps_provider.dart';
 import 'package:work_hu/features/camps/widgets/camps_maintenance.dart';
 import 'package:work_hu/features/utils.dart';
@@ -22,22 +20,20 @@ class CampPage extends BaseListPage {
   }
 }
 
-class CampPageState extends BaseListPageState<CampPage, CampState, CampDataNotifier> {
+class CampPageState extends PagedListPageState<CampPage, CampModel, CampFilter, CampDataNotifier> {
   @override
-  Widget buildListTile(item) {
-    item as CampModel;
-    var index = items.indexOf(item);
+  Widget build(BuildContext context) {
+    // Keeps the maintenance state alive between presetting a camp and the dialog watching it.
+    ref.listen(campMaintenanceProvider, (previous, next) {});
+    return super.build(context);
+  }
+
+  @override
+  Widget buildListTile(CampModel item, int index) {
     return BaseListTile(
-      isLast: items.length - 1 == index,
+      isLast: index == items.length - 1,
       index: index,
-      onTap: () async {
-        await ref.read(campsDataProvider.notifier).presetCamp(item, MaintenanceMode.edit);
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) => CampsMaintenance(),
-        ).then((value) => value != null && value == true ? ref.read(campsDataProvider.notifier).list(page: 0) : null);
-      },
+      onTap: () => _openMaintenance(item, MaintenanceMode.edit),
       title: Text(item.campName!),
       subtitle: Column(
         children: [
@@ -49,42 +45,30 @@ class CampPageState extends BaseListPageState<CampPage, CampState, CampDataNotif
   }
 
   @override
-  bool canDelete(item) {
-    item as CampModel;
-    return item.season!.seasonYear == DateTime.now().year;
-  }
+  bool canDelete(CampModel item) => item.season!.seasonYear == DateTime.now().year;
 
   @override
-  onDelete(e) {
-    ref.read(campsDataProvider.notifier).deleteCamp(e.id!);
-  }
+  void onDelete(CampModel item) => notifier.deleteCamp(item.id!);
 
   @override
-  List<dynamic> getFilters() {
-    return [];
-  }
-
-  @override
-  List<dynamic> get items => state.camps;
-
-  @override
-  BaseListState get listStatus => state.listState;
-
-  @override
-  StateNotifierProvider<CampDataNotifier, CampState> get provider => campsDataProvider;
+  get provider => campsDataProvider;
 
   @override
   buildFloatingActionButton(BuildContext context, WidgetRef ref) {
     return FloatingActionButton(
-      onPressed: () async {
-        await ref.read(campsDataProvider.notifier).presetCamp(const CampModel(), MaintenanceMode.create);
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) => CampsMaintenance(),
-        ).then((value) => value != null && value == true ? ref.read(campsDataProvider.notifier).list(page: 0) : null);
-      },
+      onPressed: () => _openMaintenance(const CampModel(), MaintenanceMode.create),
       child: const Icon(Icons.add),
     );
+  }
+
+  Future<void> _openMaintenance(CampModel camp, MaintenanceMode mode) async {
+    await ref.read(campMaintenanceProvider.notifier).presetCamp(camp, mode);
+    if (!mounted) return;
+    final saved = await showDialog<bool>(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => CampsMaintenance(),
+    );
+    if (saved == true) notifier.reload();
   }
 }
