@@ -3,6 +3,47 @@
 importScripts('https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging-compat.js');
 
+// Where a tap on a notification leads. Mirrors DeepLink.fromPushData (lib/app/notifications/deep_link.dart): the backend
+// sends `type` and ids (`jobId`), and an explicit `route` wins if a message ever has one.
+function routeFor(data) {
+  const route = data.route || data.deepLink || data.link;
+  if (route) return route;
+  switch ((data.type || '').toUpperCase()) {
+    case 'JOB_NEW':
+    case 'JOB_REGISTERED_BY_OTHER':
+    case 'JOB_CANCELLED':
+      return data.jobId ? '/profile/jobs/' + data.jobId : '/profile/jobs';
+    case 'TRANSACTION_CREATED':
+      return '/status';
+    default:
+      return '/';
+  }
+}
+
+// Registered BEFORE firebase.messaging() on purpose: the Firebase SDK adds its own click handler when it starts, which
+// closes the notification and only opens a window for messages with a link (fcmOptions.link). Ours carries none, so
+// with the SDK's handler first a tap just dismissed the notification. Stopping propagation here keeps the SDK's from
+// also running.
+self.addEventListener('notificationclick', (event) => {
+  event.stopImmediatePropagation();
+  event.notification.close();
+  const raw = event.notification.data || {};
+  const data = (raw.FCM_MSG && raw.FCM_MSG.data) || raw;
+  const target = new URL(routeFor(data), self.location.origin).href;
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+      for (const w of windows) {
+        if (w.url.startsWith(self.location.origin) && 'focus' in w) {
+          // An open app: focus it and send it there. navigate() can fail for pages the worker doesn't control.
+          return w.focus().then(() => w.navigate(target)).catch(() => clients.openWindow(target));
+        }
+      }
+      return clients.openWindow(target);
+    }),
+  );
+});
+
 firebase.initializeApp({
   apiKey: 'AIzaSyBrqSUmLzHJARi9PX-hisBq0NGmqintxYM',
   authDomain: 'dukapp-494509.firebaseapp.com',
@@ -24,23 +65,4 @@ messaging.onBackgroundMessage((payload) => {
     icon: '/icons/Icon-192.png',
     data,
   });
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  const data = (event.notification.data && (event.notification.data.FCM_MSG ? event.notification.data.FCM_MSG.data : event.notification.data)) || {};
-  const route = data.route || data.deepLink || data.link || '/';
-  const target = new URL(route, self.location.origin).href;
-
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
-      for (const w of windows) {
-        if ('focus' in w && w.url.startsWith(self.location.origin)) {
-          w.navigate(target);
-          return w.focus();
-        }
-      }
-      return clients.openWindow(target);
-    }),
-  );
 });
