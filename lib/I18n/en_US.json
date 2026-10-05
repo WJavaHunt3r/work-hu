@@ -686,5 +686,11 @@
   "jobs_cancel_not_allowed": "Not allowed",
   "jobs_cancel_registration_deadline": "Registration deadline",
   "jobs_cancel_end_date": "End date",
-  "jobs_no_deadline": "No deadline"
+  "jobs_no_deadline": "No deadline",
+  "jobs_complete_add_user": "Add someone who wasn't registered",
+  "jobs_complete_add_user_hint": "For people who took part without registering. They get hours like everyone else.",
+  "jobs_comment_field": "Details",
+  "jobs_comment_field_hint": "What is the job about, what should people bring ...",
+  "jobs_share": "Share",
+  "jobs_share_copied": "Link copied. Paste it into a message to invite people."
 }

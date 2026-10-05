@@ -4,6 +4,7 @@ import 'package:work_hu/app/data/models/account.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
 import 'package:work_hu/app/models/gender.dart';
 import 'package:work_hu/features/jobs/data/model/job_enums.dart';
+import 'package:work_hu/features/utils.dart';
 
 import 'package:work_hu/features/jobs/data/model/job_recurrence_model.dart';
 
@@ -24,6 +25,9 @@ abstract class JobModel with _$JobModel {
     /// When the job ends; null for jobs created without an end time.
     DateTime? jobEndDateTime,
     required String description,
+
+    /// Longer free text from the creator (details, what to bring, ...).
+    String? comment,
     required num employerId,
     required num responsibleId,
     required Account account,
@@ -94,6 +98,9 @@ abstract class JobModel with _$JobModel {
   /// Registration is scheduled for later.
   bool get registrationNotOpenYet => registrationOpensAt != null && registrationOpensAt!.isAfter(DateTime.now());
 
+  /// Opens this job in the app (after sign-in), also for people who tap it outside the app.
+  String get shareUrl => Utils.appUrl("/profile/jobs/$id");
+
   bool get isOpen => status == JobStatus.OPEN;
 
   /// "17:00 → 21:00", or just the start time when there is no end time.
@@ -101,6 +108,14 @@ abstract class JobModel with _$JobModel {
     final format = DateFormat("HH:mm");
     final start = format.format(jobDateTime);
     return jobEndDateTime == null ? start : "$start → ${format.format(jobEndDateTime!)}";
+  }
+
+  /// Hours to suggest when completing: as long as the job was planned, at least 1 and at most 8.
+  /// Jobs without an end time suggest the minimum.
+  double get defaultHours {
+    if (jobEndDateTime == null) return 1;
+    final hours = jobEndDateTime!.difference(jobDateTime).inMinutes / 60;
+    return (hours.clamp(1, 8) * 100).round() / 100;
   }
 
   bool get hasStarted => !jobDateTime.isAfter(DateTime.now());

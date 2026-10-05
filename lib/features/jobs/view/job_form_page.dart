@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -41,6 +42,7 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
 
   final _formKey = GlobalKey<FormState>();
   final _description = TextEditingController();
+  final _comment = TextEditingController();
   final _employer = TextEditingController();
   final _responsible = TextEditingController();
   final _maxParticipants = TextEditingController();
@@ -86,6 +88,9 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
     _cancellationDeadline = _jobDateTime.subtract(const Duration(days: 1));
     _registrationOpensAt = _jobDateTime.subtract(const Duration(days: 7));
     if (widget.jobId == null) {
+      // Defaults for a new job; editing keeps what the job has (including no limit).
+      _minAge.text = "12";
+      _maxAge.text = "36";
       _responsibleId = ref.read(userDataProvider).user?.id;
       _loaded = true;
     } else {
@@ -95,7 +100,7 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
 
   @override
   void dispose() {
-    for (final c in [_description, _employer, _responsible, _maxParticipants, _minAge, _maxAge]) {
+    for (final c in [_description, _comment, _employer, _responsible, _maxParticipants, _minAge, _maxAge]) {
       c.dispose();
     }
     super.dispose();
@@ -108,6 +113,7 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
       setState(() {
         _existing = job;
         _description.text = job.description;
+        _comment.text = job.comment ?? "";
         _jobDateTime = job.jobDateTime;
         _jobEndDateTime = job.jobEndDateTime ?? job.jobDateTime.add(_defaultDuration);
         _loadWindow(job);
@@ -282,6 +288,7 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
         jobDateTime: _jobDateTime,
         jobEndDateTime: _jobEndDateTime,
         description: _description.text.trim(),
+        comment: _comment.text.trim().isEmpty ? null : _comment.text.trim(),
         employerId: _employerId!,
         responsibleId: _responsibleId!,
         account: _account,
@@ -357,6 +364,15 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
             labelText: "jobs_description".i18n(),
             textInputAction: TextInputAction.next,
             validator: (text) => text == null || text.trim().isEmpty ? "jobs_form_description_missing".i18n() : null,
+          ),
+          BaseTextFormField(
+            controller: _comment,
+            labelText: "jobs_comment_field".i18n(),
+            hintText: "jobs_comment_field_hint",
+            maxLines: 6,
+            keyBoardType: TextInputType.multiline,
+            textInputAction: TextInputAction.newline,
+            inputFormatter: LengthLimitingTextInputFormatter(4000),
           ),
           _DateTimeField(
             label: "jobs_date",

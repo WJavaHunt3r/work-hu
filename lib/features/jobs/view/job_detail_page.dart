@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -61,27 +62,35 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
   @override
   List<Widget>? buildActions(BuildContext context, WidgetRef ref) {
     final job = state.job;
-    if (!widget.manage || job == null || !job.isOpen) return [];
+    if (job == null) return [];
     return [
-      if (notifier.canEdit)
+      IconButton(icon: const Icon(Icons.share_outlined), tooltip: "jobs_share".i18n(), onPressed: () => _share(job)),
+      if (widget.manage && job.isOpen && notifier.canEdit)
         IconButton(
           icon: const Icon(Icons.edit_outlined),
           tooltip: "jobs_edit".i18n(),
           onPressed: () => context.push("${JobsPage.basePath(true)}/${job.id}/edit").then((_) => notifier.load()),
         ),
-      if (notifier.canEdit)
+      if (widget.manage && job.isOpen && notifier.canEdit)
         IconButton(
           icon: const Icon(Icons.cancel_outlined),
           tooltip: "jobs_cancel_job".i18n(),
           onPressed: _confirmCancelJob,
         ),
-      if (notifier.canEdit && job.isRepeating)
+      if (widget.manage && job.isOpen && notifier.canEdit && job.isRepeating)
         IconButton(
           icon: const Icon(Icons.event_busy_outlined),
           tooltip: "jobs_cancel_series".i18n(),
           onPressed: () => _confirmCancelSeries(job.seriesId!),
         ),
     ];
+  }
+
+  /// Copies the link that opens this job (after signing in) so it can be pasted into a chat or message.
+  Future<void> _share(JobModel job) async {
+    await Clipboard.setData(ClipboardData(text: "${job.description}\n${job.shareUrl}"));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("jobs_share_copied".i18n())));
   }
 
   void _confirmCancelJob() {
@@ -142,7 +151,10 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
   Future<void> _complete(JobModel job) async {
     final entries = await showDialog<List<JobHoursEntry>>(
       context: context,
-      builder: (_) => JobCompleteDialog(registrations: state.registrations.where((r) => r.isRegistered).toList()),
+      builder: (_) => JobCompleteDialog(
+        registrations: state.registrations.where((r) => r.isRegistered).toList(),
+        defaultHours: job.defaultHours,
+      ),
     );
     if (entries == null) return;
     final activity = await notifier.complete(entries);
@@ -193,6 +205,10 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
               SpacedHeader(DateFormat("EEEE · dd. MMMM", locale).format(job.jobDateTime)),
               SizedBox(height: 8.sp),
               Text(job.description, style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
+              if (job.comment != null && job.comment!.trim().isNotEmpty) ...[
+                SizedBox(height: 8.sp),
+                SelectableText(job.comment!, style: theme.textTheme.bodyMedium),
+              ],
               SizedBox(height: 4.sp),
               Text(
                 [job.timeRange, if (job.employerName != null) job.employerName!].join("  ·  "),

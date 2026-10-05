@@ -683,5 +683,11 @@
   "jobs_cancel_not_allowed": "Nem engedélyezett",
   "jobs_cancel_registration_deadline": "Jelentkezési határidő",
   "jobs_cancel_end_date": "Befejező dátum",
-  "jobs_no_deadline": "Nincs határidő"
+  "jobs_no_deadline": "Nincs határidő",
+  "jobs_complete_add_user": "Nem jelentkezett személy hozzáadása",
+  "jobs_complete_add_user_hint": "Azoknak, akik jelentkezés nélkül részt vettek. Ők is megkapják az órákat.",
+  "jobs_comment_field": "Részletek",
+  "jobs_comment_field_hint": "Miről szól a munka, mit érdemes hozni ...",
+  "jobs_share": "Megosztás",
+  "jobs_share_copied": "A link a vágólapra másolva. Illeszd be egy üzenetbe, hogy meghívj másokat."
 }
