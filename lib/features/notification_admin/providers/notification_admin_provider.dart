@@ -8,11 +8,17 @@ import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/notification_admin/data/api/notification_admin_api.dart';
 import 'package:work_hu/features/notification_admin/data/model/general_notification_model.dart';
 import 'package:work_hu/features/notification_admin/data/model/notification_schedule_model.dart';
+import 'package:work_hu/features/notification_admin/data/model/overdue_jobs_model.dart';
 import 'package:work_hu/features/notification_admin/data/repository/notification_admin_repository.dart';
 import 'package:work_hu/features/roles/providers/roles_provider.dart' show NoFilter;
 
 final notificationAdminRepoProvider = Provider<NotificationAdminRepository>(
   (ref) => NotificationAdminRepository(NotificationAdminApi()),
+);
+
+/// Users with jobs that are over but not closed.
+final overdueJobsProvider = FutureProvider.autoDispose<List<OverdueJobsModel>>(
+  (ref) => ref.read(notificationAdminRepoProvider).getOverdueJobs(),
 );
 
 final generalNotificationsProvider =

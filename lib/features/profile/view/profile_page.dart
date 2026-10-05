@@ -18,6 +18,7 @@ import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/settings_tile.dart';
 import 'package:work_hu/features/profile/data/state/profile_state.dart';
+import 'package:work_hu/features/profile/view/account_deletion.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
 
 class ProfilePage extends BasePage {
@@ -76,30 +77,32 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
 
         SizedBox(height: 32.sp),
 
-        // Account Settings Section
-        BaseListView(
-          hasBottomPadding: false,
-          physics: const NeverScrollableScrollPhysics(),
-          children: [
-            SettingsTile(
-              label: 'profile_my_activities'.i18n(),
-              icon: Icons.list_alt,
-              onTap: () => context.push('/profile/activities'),
-              index: 0,
-            ),
-            Divider(height: 1.sp),
-            SettingsTile(
-              label: 'profile_booking'.i18n(),
-              icon: Icons.book_outlined,
-              onTap: () {
-                openLink();
-              },
-              isLast: true,
-            ),
-          ],
-        ),
+        // Account Settings Section: activities and room booking are for users who belong to a church
+        if (user.hasChurch()) ...[
+          BaseListView(
+            hasBottomPadding: false,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              SettingsTile(
+                label: 'profile_my_activities'.i18n(),
+                icon: Icons.list_alt,
+                onTap: () => context.push('/profile/activities'),
+                index: 0,
+              ),
+              Divider(height: 1.sp),
+              SettingsTile(
+                label: 'profile_booking'.i18n(),
+                icon: Icons.book_outlined,
+                onTap: () {
+                  openLink();
+                },
+                isLast: true,
+              ),
+            ],
+          ),
 
-        SizedBox(height: 32.sp),
+          SizedBox(height: 32.sp),
+        ],
 
         // App Settings Section
         BaseListView(
@@ -132,7 +135,14 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
               },
             ),
             const Divider(height: 1),
-            SettingsTile(label: 'profile_help_support'.i18n(), icon: Icons.help_outline, isLast: true),
+            SettingsTile(label: 'profile_help_support'.i18n(), icon: Icons.help_outline),
+            const Divider(height: 1),
+            SettingsTile(
+              label: 'profile_delete_account'.i18n(),
+              icon: Icons.delete_forever_outlined,
+              onTap: () => requestAccountDeletion(context),
+              isLast: true,
+            ),
           ],
         ),
 

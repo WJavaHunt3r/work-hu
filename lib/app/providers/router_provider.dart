@@ -7,6 +7,7 @@ import 'package:work_hu/app/notifications/deep_link.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/activities/view/activities_page.dart';
 import 'package:work_hu/features/audit_log/view/audit_log_page.dart';
+import 'package:work_hu/features/job_chat/view/job_chat_page.dart';
 import 'package:work_hu/features/jobs/view/job_detail_page.dart';
 import 'package:work_hu/features/login/widgets/complete_name_dialog.dart';
 import 'package:work_hu/features/jobs/view/job_form_page.dart';
@@ -37,6 +38,7 @@ import 'package:work_hu/features/payment_success/view/payment_success_page.dart'
 import 'package:work_hu/features/payments/view/payments_page.dart';
 import 'package:work_hu/features/notification_admin/data/model/notification_schedule_model.dart';
 import 'package:work_hu/features/notification_admin/view/general_notifications_page.dart';
+import 'package:work_hu/features/notification_admin/view/overdue_jobs_page.dart';
 import 'package:work_hu/features/notification_admin/view/notification_schedules_page.dart';
 import 'package:work_hu/features/notification_admin/view/schedule_edit_page.dart';
 import 'package:work_hu/features/notification_admin/view/send_notification_page.dart';
@@ -135,6 +137,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: ':id',
                     builder: (BuildContext context, GoRouterState state) =>
                         JobDetailPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+                    routes: [
+                      GoRoute(
+                        path: 'chat',
+                        builder: (BuildContext context, GoRouterState state) =>
+                            JobChatPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -172,7 +181,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: "jobs",
                     redirect: _oldJobsLocation,
-                    routes: [GoRoute(path: ':id', redirect: _oldJobsLocation)],
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        redirect: _oldJobsLocation,
+                        routes: [GoRoute(path: 'chat', redirect: _oldJobsLocation)],
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: 'notifications',
@@ -305,6 +320,15 @@ final routerProvider = Provider<GoRouter>((ref) {
             JobDetailPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0, manage: true),
       ),
       GoRoute(
+        path: "/admin/jobs/:id/chat",
+        builder: (BuildContext context, GoRouterState state) =>
+            JobChatPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+      ),
+      GoRoute(
+        path: "/admin/notifications/overdueJobs",
+        builder: (BuildContext context, GoRouterState state) => const OverdueJobsPage(),
+      ),
+      GoRoute(
         path: "/admin/jobs/:id/edit",
         builder: (BuildContext context, GoRouterState state) =>
             JobFormPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
@@ -406,6 +430,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (loggedIn && !user.hasChurch()) {
         final location = state.matchedLocation;
         if (location == '/' || ['/status', '/jobs', '/admin'].any(location.startsWith)) return '/balance';
+        if (location.startsWith('/profile/activities')) return '/profile';
       }
 
       if (loggedIn && state.matchedLocation == '/') {

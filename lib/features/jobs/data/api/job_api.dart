@@ -18,6 +18,8 @@ class JobApi {
       queryParameters: {
         "status": filter.status?.name,
         "openOnly": filter.openOnly,
+        "responsibleId": filter.responsibleId,
+        "employerId": filter.employerId,
         "registeredUserId": registeredUserId,
         "dateFrom": filter.dateFrom == null ? null : Utils.dateToString(filter.dateFrom!),
         "dateTo": filter.dateTo == null ? null : Utils.dateToString(filter.dateTo!),

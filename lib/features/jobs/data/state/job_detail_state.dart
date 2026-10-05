@@ -14,7 +14,7 @@ abstract class JobDetailState with _$JobDetailState {
     /// Active registrations (registered and waitlisted) in registration order.
     @Default([]) List<JobRegistrationModel> registrations,
 
-    /// The current user's children, who they may register and cancel.
+    /// The people the current user may register and cancel besides themselves: their spouse and their children.
     @Default([]) List<UserModel> children,
     @Default(BaseState()) BaseState status,
   }) = _JobDetailState;

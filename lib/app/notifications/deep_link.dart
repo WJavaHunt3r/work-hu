@@ -32,10 +32,11 @@ class DeepLink {
     switch (type) {
       case 'JOB_NEW':
       case 'JOB_REGISTERED_BY_OTHER':
-        return jobId == null ? '/jobs' : '/jobs/$jobId';
-      // The job still exists (cancelled); its page shows that.
       case 'JOB_CANCELLED':
+      case 'JOB_NOT_CLOSED':
         return jobId == null ? '/jobs' : '/jobs/$jobId';
+      case 'JOB_CHAT_MESSAGE':
+        return jobId == null ? '/jobs' : '/jobs/$jobId/chat';
       case 'TRANSACTION_CREATED':
         return '/status';
       // WEEKLY / GENERAL carry no target: tapping just opens the app.

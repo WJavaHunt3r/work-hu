@@ -105,16 +105,25 @@ class JobDetailNotifier extends BaseDataNotifier<JobDetailState> {
     );
   }
 
-  /// Parents act for their children: the other, under-18 members of their family.
+  /// The people the current user may register besides themselves: their spouse, and as a parent their children (the
+  /// other, under-18 members of their family).
   Future<List<UserModel>> _loadChildren() async {
     final me = currentUser;
-    if (me == null || !me.isAdult() || me.familyId == null) return [];
-    try {
-      final family = await usersRepository.getChildren(me.id);
-      return family.where((u) => u.id != me.id && u.birthDate != null && !u.isAdult()).toList();
-    } catch (_) {
-      return [];
+    if (me == null) return [];
+    final people = <UserModel>[];
+    if (me.spouseId != null) {
+      try {
+        people.add(await usersRepository.getUserById(me.spouseId!));
+      } catch (_) {}
     }
+    if (me.isAdult() && me.familyId != null) {
+      try {
+        final family = await usersRepository.getChildren(me.id);
+        people.addAll(family.where((u) => u.id != me.id && u.birthDate != null && !u.isAdult()));
+      } catch (_) {}
+    }
+    final seen = <num>{};
+    return people.where((u) => seen.add(u.id)).toList();
   }
 
   /// Registers [userId] (null = the current user). Reloads on success; failures are shown as a dialog.

@@ -12,12 +12,16 @@ function routeFor(data) {
     case 'JOB_NEW':
     case 'JOB_REGISTERED_BY_OTHER':
     case 'JOB_CANCELLED':
-      return data.jobId ? '/profile/jobs/' + data.jobId : '/profile/jobs';
+    case 'JOB_NOT_CLOSED':
+      return data.jobId ? '/jobs/' + data.jobId : '/jobs';
+    case 'JOB_CHAT_MESSAGE':
+      return data.jobId ? '/jobs/' + data.jobId + '/chat' : '/jobs';
     case 'TRANSACTION_CREATED':
       return '/status';
     default:
       return '/';
   }
+}
 }
 
 // Registered BEFORE firebase.messaging() on purpose: the Firebase SDK adds its own click handler when it starts, which

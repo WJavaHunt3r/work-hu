@@ -18,7 +18,9 @@ mixin _$JobFilter {
 
  JobStatus? get status;/// Only jobs that accept registrations right now.
  bool get openOnly;/// Only jobs the current user is registered for.
- bool get onlyMine; DateTime? get dateFrom; DateTime? get dateTo; String? get searchText;
+ bool get onlyMine;/// Only jobs this user is responsible for / that this user is the employer of (admin list). The names are for the
+/// filter chips only.
+ num? get responsibleId; String? get responsibleName; num? get employerId; String? get employerName; DateTime? get dateFrom; DateTime? get dateTo; String? get searchText;
 /// Create a copy of JobFilter
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -32,20 +34,20 @@ $JobFilterCopyWith<JobFilter> get copyWith => _$JobFilterCopyWithImpl<JobFilter>
 @override
 bool operator ==(Object other) {
   final _this = this as JobFilter;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is JobFilter&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.openOnly, _this.openOnly) || other.openOnly == _this.openOnly)&&(identical(other.onlyMine, _this.onlyMine) || other.onlyMine == _this.onlyMine)&&(identical(other.dateFrom, _this.dateFrom) || other.dateFrom == _this.dateFrom)&&(identical(other.dateTo, _this.dateTo) || other.dateTo == _this.dateTo)&&(identical(other.searchText, _this.searchText) || other.searchText == _this.searchText));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is JobFilter&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.openOnly, _this.openOnly) || other.openOnly == _this.openOnly)&&(identical(other.onlyMine, _this.onlyMine) || other.onlyMine == _this.onlyMine)&&(identical(other.responsibleId, _this.responsibleId) || other.responsibleId == _this.responsibleId)&&(identical(other.responsibleName, _this.responsibleName) || other.responsibleName == _this.responsibleName)&&(identical(other.employerId, _this.employerId) || other.employerId == _this.employerId)&&(identical(other.employerName, _this.employerName) || other.employerName == _this.employerName)&&(identical(other.dateFrom, _this.dateFrom) || other.dateFrom == _this.dateFrom)&&(identical(other.dateTo, _this.dateTo) || other.dateTo == _this.dateTo)&&(identical(other.searchText, _this.searchText) || other.searchText == _this.searchText));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as JobFilter;
-  return Object.hash(runtimeType,_this.status,_this.openOnly,_this.onlyMine,_this.dateFrom,_this.dateTo,_this.searchText);
+  return Object.hash(runtimeType,_this.status,_this.openOnly,_this.onlyMine,_this.responsibleId,_this.responsibleName,_this.employerId,_this.employerName,_this.dateFrom,_this.dateTo,_this.searchText);
 }
 
 @override
 String toString() {
   final _this = this as JobFilter;
-  return 'JobFilter(status: ${_this.status}, openOnly: ${_this.openOnly}, onlyMine: ${_this.onlyMine}, dateFrom: ${_this.dateFrom}, dateTo: ${_this.dateTo}, searchText: ${_this.searchText})';
+  return 'JobFilter(status: ${_this.status}, openOnly: ${_this.openOnly}, onlyMine: ${_this.onlyMine}, responsibleId: ${_this.responsibleId}, responsibleName: ${_this.responsibleName}, employerId: ${_this.employerId}, employerName: ${_this.employerName}, dateFrom: ${_this.dateFrom}, dateTo: ${_this.dateTo}, searchText: ${_this.searchText})';
 }
 
 
@@ -56,7 +58,7 @@ abstract mixin class $JobFilterCopyWith<$Res>  {
   factory $JobFilterCopyWith(JobFilter value, $Res Function(JobFilter) _then) = _$JobFilterCopyWithImpl;
 @useResult
 $Res call({
- JobStatus? status, bool openOnly, bool onlyMine, DateTime? dateFrom, DateTime? dateTo, String? searchText
+ JobStatus? status, bool openOnly, bool onlyMine, num? responsibleId, String? responsibleName, num? employerId, String? employerName, DateTime? dateFrom, DateTime? dateTo, String? searchText
 });
 
 
@@ -73,12 +75,16 @@ class _$JobFilterCopyWithImpl<$Res>
 
 /// Create a copy of JobFilter
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = freezed,Object? openOnly = null,Object? onlyMine = null,Object? dateFrom = freezed,Object? dateTo = freezed,Object? searchText = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = freezed,Object? openOnly = null,Object? onlyMine = null,Object? responsibleId = freezed,Object? responsibleName = freezed,Object? employerId = freezed,Object? employerName = freezed,Object? dateFrom = freezed,Object? dateTo = freezed,Object? searchText = freezed,}) {
   return _then(JobFilter(
 status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as JobStatus?,openOnly: null == openOnly ? _self.openOnly : openOnly // ignore: cast_nullable_to_non_nullable
 as bool,onlyMine: null == onlyMine ? _self.onlyMine : onlyMine // ignore: cast_nullable_to_non_nullable
-as bool,dateFrom: freezed == dateFrom ? _self.dateFrom : dateFrom // ignore: cast_nullable_to_non_nullable
+as bool,responsibleId: freezed == responsibleId ? _self.responsibleId : responsibleId // ignore: cast_nullable_to_non_nullable
+as num?,responsibleName: freezed == responsibleName ? _self.responsibleName : responsibleName // ignore: cast_nullable_to_non_nullable
+as String?,employerId: freezed == employerId ? _self.employerId : employerId // ignore: cast_nullable_to_non_nullable
+as num?,employerName: freezed == employerName ? _self.employerName : employerName // ignore: cast_nullable_to_non_nullable
+as String?,dateFrom: freezed == dateFrom ? _self.dateFrom : dateFrom // ignore: cast_nullable_to_non_nullable
 as DateTime?,dateTo: freezed == dateTo ? _self.dateTo : dateTo // ignore: cast_nullable_to_non_nullable
 as DateTime?,searchText: freezed == searchText ? _self.searchText : searchText // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -166,10 +172,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( JobStatus? status,  bool openOnly,  bool onlyMine,  DateTime? dateFrom,  DateTime? dateTo,  String? searchText)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( JobStatus? status,  bool openOnly,  bool onlyMine,  num? responsibleId,  String? responsibleName,  num? employerId,  String? employerName,  DateTime? dateFrom,  DateTime? dateTo,  String? searchText)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _JobFilter() when $default != null:
-return $default(_that.status,_that.openOnly,_that.onlyMine,_that.dateFrom,_that.dateTo,_that.searchText);case _:
+return $default(_that.status,_that.openOnly,_that.onlyMine,_that.responsibleId,_that.responsibleName,_that.employerId,_that.employerName,_that.dateFrom,_that.dateTo,_that.searchText);case _:
   return orElse();
 
 }
@@ -187,10 +193,10 @@ return $default(_that.status,_that.openOnly,_that.onlyMine,_that.dateFrom,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( JobStatus? status,  bool openOnly,  bool onlyMine,  DateTime? dateFrom,  DateTime? dateTo,  String? searchText)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( JobStatus? status,  bool openOnly,  bool onlyMine,  num? responsibleId,  String? responsibleName,  num? employerId,  String? employerName,  DateTime? dateFrom,  DateTime? dateTo,  String? searchText)  $default,) {final _that = this;
 switch (_that) {
 case _JobFilter():
-return $default(_that.status,_that.openOnly,_that.onlyMine,_that.dateFrom,_that.dateTo,_that.searchText);case _:
+return $default(_that.status,_that.openOnly,_that.onlyMine,_that.responsibleId,_that.responsibleName,_that.employerId,_that.employerName,_that.dateFrom,_that.dateTo,_that.searchText);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -207,10 +213,10 @@ return $default(_that.status,_that.openOnly,_that.onlyMine,_that.dateFrom,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( JobStatus? status,  bool openOnly,  bool onlyMine,  DateTime? dateFrom,  DateTime? dateTo,  String? searchText)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( JobStatus? status,  bool openOnly,  bool onlyMine,  num? responsibleId,  String? responsibleName,  num? employerId,  String? employerName,  DateTime? dateFrom,  DateTime? dateTo,  String? searchText)?  $default,) {final _that = this;
 switch (_that) {
 case _JobFilter() when $default != null:
-return $default(_that.status,_that.openOnly,_that.onlyMine,_that.dateFrom,_that.dateTo,_that.searchText);case _:
+return $default(_that.status,_that.openOnly,_that.onlyMine,_that.responsibleId,_that.responsibleName,_that.employerId,_that.employerName,_that.dateFrom,_that.dateTo,_that.searchText);case _:
   return null;
 
 }
@@ -222,7 +228,7 @@ return $default(_that.status,_that.openOnly,_that.onlyMine,_that.dateFrom,_that.
 @JsonSerializable()
 
 class _JobFilter implements JobFilter {
-  const _JobFilter({this.status, this.openOnly = false, this.onlyMine = false, this.dateFrom, this.dateTo, this.searchText});
+  const _JobFilter({this.status, this.openOnly = false, this.onlyMine = false, this.responsibleId, this.responsibleName, this.employerId, this.employerName, this.dateFrom, this.dateTo, this.searchText});
   factory _JobFilter.fromJson(Map<String, dynamic> json) => _$JobFilterFromJson(json);
 
 @override final  JobStatus? status;
@@ -230,6 +236,12 @@ class _JobFilter implements JobFilter {
 @override@JsonKey() final  bool openOnly;
 /// Only jobs the current user is registered for.
 @override@JsonKey() final  bool onlyMine;
+/// Only jobs this user is responsible for / that this user is the employer of (admin list). The names are for the
+/// filter chips only.
+@override final  num? responsibleId;
+@override final  String? responsibleName;
+@override final  num? employerId;
+@override final  String? employerName;
 @override final  DateTime? dateFrom;
 @override final  DateTime? dateTo;
 @override final  String? searchText;
@@ -247,18 +259,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _JobFilter&&(identical(other.status, status) || other.status == status)&&(identical(other.openOnly, openOnly) || other.openOnly == openOnly)&&(identical(other.onlyMine, onlyMine) || other.onlyMine == onlyMine)&&(identical(other.dateFrom, dateFrom) || other.dateFrom == dateFrom)&&(identical(other.dateTo, dateTo) || other.dateTo == dateTo)&&(identical(other.searchText, searchText) || other.searchText == searchText));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _JobFilter&&(identical(other.status, status) || other.status == status)&&(identical(other.openOnly, openOnly) || other.openOnly == openOnly)&&(identical(other.onlyMine, onlyMine) || other.onlyMine == onlyMine)&&(identical(other.responsibleId, responsibleId) || other.responsibleId == responsibleId)&&(identical(other.responsibleName, responsibleName) || other.responsibleName == responsibleName)&&(identical(other.employerId, employerId) || other.employerId == employerId)&&(identical(other.employerName, employerName) || other.employerName == employerName)&&(identical(other.dateFrom, dateFrom) || other.dateFrom == dateFrom)&&(identical(other.dateTo, dateTo) || other.dateTo == dateTo)&&(identical(other.searchText, searchText) || other.searchText == searchText));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,status,openOnly,onlyMine,dateFrom,dateTo,searchText);
+    return Object.hash(runtimeType,status,openOnly,onlyMine,responsibleId,responsibleName,employerId,employerName,dateFrom,dateTo,searchText);
 }
 
 @override
 String toString() {
-    return 'JobFilter(status: $status, openOnly: $openOnly, onlyMine: $onlyMine, dateFrom: $dateFrom, dateTo: $dateTo, searchText: $searchText)';
+    return 'JobFilter(status: $status, openOnly: $openOnly, onlyMine: $onlyMine, responsibleId: $responsibleId, responsibleName: $responsibleName, employerId: $employerId, employerName: $employerName, dateFrom: $dateFrom, dateTo: $dateTo, searchText: $searchText)';
 }
 
 
@@ -269,7 +281,7 @@ abstract mixin class _$JobFilterCopyWith<$Res> implements $JobFilterCopyWith<$Re
   factory _$JobFilterCopyWith(_JobFilter value, $Res Function(_JobFilter) _then) = __$JobFilterCopyWithImpl;
 @override @useResult
 $Res call({
- JobStatus? status, bool openOnly, bool onlyMine, DateTime? dateFrom, DateTime? dateTo, String? searchText
+ JobStatus? status, bool openOnly, bool onlyMine, num? responsibleId, String? responsibleName, num? employerId, String? employerName, DateTime? dateFrom, DateTime? dateTo, String? searchText
 });
 
 
@@ -286,12 +298,16 @@ class __$JobFilterCopyWithImpl<$Res>
 
 /// Create a copy of JobFilter
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = freezed,Object? openOnly = null,Object? onlyMine = null,Object? dateFrom = freezed,Object? dateTo = freezed,Object? searchText = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = freezed,Object? openOnly = null,Object? onlyMine = null,Object? responsibleId = freezed,Object? responsibleName = freezed,Object? employerId = freezed,Object? employerName = freezed,Object? dateFrom = freezed,Object? dateTo = freezed,Object? searchText = freezed,}) {
   return _then(_JobFilter(
 status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as JobStatus?,openOnly: null == openOnly ? _self.openOnly : openOnly // ignore: cast_nullable_to_non_nullable
 as bool,onlyMine: null == onlyMine ? _self.onlyMine : onlyMine // ignore: cast_nullable_to_non_nullable
-as bool,dateFrom: freezed == dateFrom ? _self.dateFrom : dateFrom // ignore: cast_nullable_to_non_nullable
+as bool,responsibleId: freezed == responsibleId ? _self.responsibleId : responsibleId // ignore: cast_nullable_to_non_nullable
+as num?,responsibleName: freezed == responsibleName ? _self.responsibleName : responsibleName // ignore: cast_nullable_to_non_nullable
+as String?,employerId: freezed == employerId ? _self.employerId : employerId // ignore: cast_nullable_to_non_nullable
+as num?,employerName: freezed == employerName ? _self.employerName : employerName // ignore: cast_nullable_to_non_nullable
+as String?,dateFrom: freezed == dateFrom ? _self.dateFrom : dateFrom // ignore: cast_nullable_to_non_nullable
 as DateTime?,dateTo: freezed == dateTo ? _self.dateTo : dateTo // ignore: cast_nullable_to_non_nullable
 as DateTime?,searchText: freezed == searchText ? _self.searchText : searchText // ignore: cast_nullable_to_non_nullable
 as String?,

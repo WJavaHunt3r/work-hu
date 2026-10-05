@@ -5,6 +5,7 @@
         "appIDs": ["2CU9YRNUJU.com.ktk.dukapp"],
         "components": [
           { "/": "/profile/*" },
+          { "/": "/jobs*" },
           { "/": "/status*" },
           { "/": "/balance*" },
           { "/": "/mentees*" }

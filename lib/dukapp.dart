@@ -21,6 +21,12 @@ import 'features/login/view/login_page.dart';
 /// One key for the app's lifetime: a new key on every rebuild remounts everything under the MaterialApp.
 final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
+/// Every FilterChip looks like the ones in BaseFilterChip: the primary container when active, and no checkmark.
+/// Without this a selected chip got the pale secondary container, with unreadable text in dark mode.
+ThemeData _withChipStyle(ThemeData theme) => theme.copyWith(
+  chipTheme: theme.chipTheme.copyWith(selectedColor: theme.colorScheme.primaryContainer, showCheckmark: false),
+);
+
 class DukApp extends ConsumerWidget {
   const DukApp({super.key});
 
@@ -87,8 +93,8 @@ class DukApp extends ConsumerWidget {
           ),
           scaffoldMessengerKey: _scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
-          theme: theme.globalTheme,
-          darkTheme: theme.globalDarkTheme,
+          theme: _withChipStyle(theme.globalTheme),
+          darkTheme: _withChipStyle(theme.globalDarkTheme),
           themeMode: AppThemeMode.getThemeMode(appThemeMode),
           routerConfig: router,
           builder: (context, child) => WebUpdateChecker(child: child!),

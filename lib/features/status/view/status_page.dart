@@ -125,7 +125,7 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
                           Utils.creditFormatting(child.transactions),
                           style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                        child.onTrack
+                        child.localOnTrack
                             ? Row(
                                 children: [
                                   Icon(Icons.done_outline, size: 24.sp),

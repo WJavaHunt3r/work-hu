@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:work_hu/features/utils.dart';
 
 class PrivacyPolicy extends StatelessWidget {
   const PrivacyPolicy({super.key});
@@ -73,7 +75,10 @@ class PrivacyPolicy extends StatelessWidget {
                 children: [
                   Text('pp_contact_us'.i18n(), style: TextStyle(color: colorScheme.onSurfaceVariant)),
                   SizedBox(height: 20.sp),
-                  ElevatedButton(onPressed: () {}, child: Text('pp_delete_account_btn'.i18n())),
+                  ElevatedButton(
+                    onPressed: () => launchUrl(Uri.parse(Utils.appUrl('/delete-account')), webOnlyWindowName: '_self'),
+                    child: Text('pp_delete_account_btn'.i18n()),
+                  ),
                 ],
               ),
             ),

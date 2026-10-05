@@ -4,6 +4,7 @@ import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/features/notification_admin/data/api/notification_admin_api.dart';
 import 'package:work_hu/features/notification_admin/data/model/general_notification_model.dart';
 import 'package:work_hu/features/notification_admin/data/model/notification_schedule_model.dart';
+import 'package:work_hu/features/notification_admin/data/model/overdue_jobs_model.dart';
 
 class NotificationAdminRepository {
   NotificationAdminRepository(this._api);
@@ -21,6 +22,15 @@ class NotificationAdminRepository {
 
   Future<GeneralNotificationModel> sendGeneral(GeneralNotificationModel notification) =>
       guardApi(() async => GeneralNotificationModel.fromJson(await _api.sendGeneral(notification)));
+
+  Future<List<OverdueJobsModel>> getOverdueJobs() => guardApi(() async {
+    final res = await _api.getOverdueJobs();
+    return res.map((e) => OverdueJobsModel.fromJson(e as Map<String, dynamic>)).toList();
+  });
+
+  /// Returns how many users the reminder reached.
+  Future<num> remindOverdue(List<num> userIds) =>
+      guardApi(() async => ((await _api.remindOverdue(userIds)) as Map<String, dynamic>)['users'] as num);
 
   /// Not paged by the backend, so everything comes back as one page.
   Future<PaginatedResponse<NotificationScheduleModel>> getSchedules() => guardApi(() async {

@@ -86,6 +86,13 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
     ];
   }
 
+  /// The chat is for the people taking part (registered, responsible, creator) and for those who manage all jobs.
+  bool _canOpenChat(JobModel job) =>
+      job.myRegistrationStatus == JobRegistrationStatus.REGISTERED ||
+      job.responsibleId == me.id ||
+      job.createUserId == me.id ||
+      notifier.canManageAll;
+
   /// Copies the link that opens this job (after signing in) so it can be pasted into a chat or message.
   Future<void> _share(JobModel job) async {
     await Clipboard.setData(ClipboardData(text: "${job.description}\n${job.shareUrl}"));
@@ -273,6 +280,15 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
         if (job.hasAgeLimit) _InfoRow("jobs_age", "${job.minAge ?? "-"} - ${job.maxAge ?? "-"}"),
         if (job.genderRestriction != null) _InfoRow("jobs_gender", job.genderRestriction!.label.i18n()),
         if (job.createUserName != null) _InfoRow("jobs_created_by", job.createUserName!),
+        if (_canOpenChat(job))
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.forum_outlined),
+            title: Text("jobs_chat_title".i18n()),
+            subtitle: job.isOpen ? null : Text("jobs_chat_archived_short".i18n()),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push("${JobsPage.basePath(widget.manage)}/${job.id}/chat"),
+          ),
         if (job.isRepeating) _InfoRow("jobs_repeating", "jobs_repeating_value".i18n()),
         if (job.status == JobStatus.COMPLETED && job.activityId != null) ...[
           SizedBox(height: 8.sp),
@@ -291,7 +307,9 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
   Widget _buildOrganizerActions(JobModel job) {
     if (!job.isOpen) return const SizedBox();
     final canComplete = widget.manage ? notifier.canComplete : job.responsibleId == me.id;
-    if (!canComplete && !_manageAll) return const SizedBox();
+    // Registering anyone is for JOB_MANAGE_ALL, in the Jobs tab as well as in the admin list.
+    final canRegisterSomeone = notifier.canManageAll;
+    if (!canComplete && !canRegisterSomeone) return const SizedBox();
     return Padding(
       padding: EdgeInsets.only(bottom: 12.sp),
       child: Wrap(
@@ -304,7 +322,7 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
               icon: const Icon(Icons.task_alt),
               label: Text(job.hasStarted ? "jobs_complete".i18n() : "jobs_complete_after_start".i18n()),
             ),
-          if (_manageAll)
+          if (canRegisterSomeone)
             OutlinedButton.icon(
               onPressed: () => _registerSomeone(job),
               icon: const Icon(Icons.person_add_alt),
@@ -315,7 +333,7 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
     );
   }
 
-  /// The current user and their children, one card each, in the style of the list: filled when registered.
+  /// The current user, their spouse and children, one card each, in the style of the list: filled when registered.
   Widget _buildMyRegistrations(JobModel job) {
     final people = <({num id, String name})>[
       (id: me.id, name: me.getFullName()),

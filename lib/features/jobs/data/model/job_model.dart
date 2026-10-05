@@ -99,7 +99,7 @@ abstract class JobModel with _$JobModel {
   bool get registrationNotOpenYet => registrationOpensAt != null && registrationOpensAt!.isAfter(DateTime.now());
 
   /// Opens this job in the app (after sign-in), also for people who tap it outside the app.
-  String get shareUrl => Utils.appUrl("/profile/jobs/$id");
+  String get shareUrl => Utils.appUrl("/jobs/$id");
 
   bool get isOpen => status == JobStatus.OPEN;
 

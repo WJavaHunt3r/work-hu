@@ -14,6 +14,12 @@ class NotificationAdminApi {
   Future<dynamic> sendGeneral(GeneralNotificationModel notification) async =>
       (await _dioClient.dio.post("/notifications/general", data: notification.toJson())).data;
 
+  Future<List<dynamic>> getOverdueJobs() async => (await _dioClient.dio.get("/notifications/overdue-jobs")).data;
+
+  /// [userIds] empty = everyone who has unclosed jobs. Returns the delivery counts.
+  Future<dynamic> remindOverdue(List<num> userIds) async =>
+      (await _dioClient.dio.post("/notifications/overdue-jobs/remind", data: {"userIds": userIds})).data;
+
   Future<List<dynamic>> getSchedules() async => (await _dioClient.dio.get("/notifications/schedules")).data;
 
   Future<dynamic> postSchedule(NotificationScheduleModel schedule) async =>

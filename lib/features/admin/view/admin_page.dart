@@ -66,6 +66,8 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
       if (can(Permission.SEASON_MANAGE)) (label: "admin_rounds", icon: Icons.timelapse, route: "/admin/rounds"),
       if (can(Permission.NOTIFICATION_SEND))
         (label: "admin_send_notification", icon: Icons.campaign_outlined, route: "/admin/notifications"),
+      if (can(Permission.NOTIFICATION_SEND))
+        (label: "admin_overdue_jobs", icon: Icons.assignment_late_outlined, route: "/admin/notifications/overdueJobs"),
       if (can(Permission.NOTIFICATION_SCHEDULE_MANAGE))
         (
           label: "admin_notification_schedules",
