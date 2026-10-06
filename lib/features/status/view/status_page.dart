@@ -133,7 +133,7 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
                                 ],
                               )
                             : Text(
-                                'status_to_onTrack'.i18n([Utils.creditFormatting(child.toOnTrack).toString()]),
+                                'status_to_onTrack'.i18n([Utils.creditFormatting(child.toLocalOnTrack).toString()]),
                                 style: theme.textTheme.bodySmall,
                               ),
                       ],
