@@ -89,6 +89,9 @@ abstract class JobModel with _$JobModel {
 
     /// The requesting user's own registration; null if none.
     JobRegistrationStatus? myRegistrationStatus,
+
+    /// Whether the current user takes part in the job's chat (registered, organiser, or added to it); null in lists.
+    bool? chatAccess,
   }) = _JobModel;
 
   factory JobModel.fromJson(Map<String, dynamic> json) => _$JobModelFromJson(json);

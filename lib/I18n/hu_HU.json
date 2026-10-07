@@ -723,5 +723,12 @@
   "delete_account_sent_title": "Kérelem elküldve",
   "delete_account_sent": "Egy adminisztrátor megkapta a kérelmedet, és 30 napon belül törli a fiókodat. E-mailben visszaigazolást kapsz.",
   "delete_account_failed": "A kérelmet nem sikerült elküldeni. Kérjük, írj a support@bcc-ktk.org címre.",
-  "audit_action_ACCOUNT_DELETION_REQUEST": "Fióktörlési kérelem"
+  "audit_action_ACCOUNT_DELETION_REQUEST": "Fióktörlési kérelem",
+  "jobs_chat_people": "A chat résztvevői",
+  "jobs_chat_add_person": "Személy hozzáadása",
+  "jobs_chat_remove_person": "Eltávolítás a chatből",
+  "jobs_chat_role_REGISTERED": "Jelentkezett",
+  "jobs_chat_role_RESPONSIBLE": "Felelős",
+  "jobs_chat_role_CREATOR": "A munka létrehozója",
+  "jobs_chat_role_MEMBER": "Hozzáadva a chathez"
 }

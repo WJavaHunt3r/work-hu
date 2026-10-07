@@ -40,3 +40,35 @@ class JobChatModel {
     archived: json['archived'] as bool? ?? false,
   );
 }
+
+/// Someone in the chat. [role]: REGISTERED, RESPONSIBLE, CREATOR, or MEMBER (added to the chat only, [removable]).
+class JobChatPersonModel {
+  const JobChatPersonModel({required this.userId, required this.userName, required this.role, required this.removable});
+
+  final num userId;
+  final String userName;
+  final String role;
+  final bool removable;
+
+  factory JobChatPersonModel.fromJson(Map<String, dynamic> json) => JobChatPersonModel(
+    userId: json['userId'] as num,
+    userName: json['userName'] as String? ?? '',
+    role: json['role'] as String? ?? 'REGISTERED',
+    removable: json['removable'] as bool? ?? false,
+  );
+}
+
+/// Everyone in the chat, and whether the current user may add and remove chat-only members.
+class JobChatPeopleModel {
+  const JobChatPeopleModel({required this.participants, required this.canManage});
+
+  final List<JobChatPersonModel> participants;
+  final bool canManage;
+
+  factory JobChatPeopleModel.fromJson(Map<String, dynamic> json) => JobChatPeopleModel(
+    participants: (json['participants'] as List? ?? [])
+        .map((e) => JobChatPersonModel.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    canManage: json['canManage'] as bool? ?? false,
+  );
+}

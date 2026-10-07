@@ -88,6 +88,7 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
 
   /// The chat is for the people taking part (registered, responsible, creator) and for those who manage all jobs.
   bool _canOpenChat(JobModel job) =>
+      job.chatAccess == true ||
       job.myRegistrationStatus == JobRegistrationStatus.REGISTERED ||
       job.responsibleId == me.id ||
       job.createUserId == me.id ||

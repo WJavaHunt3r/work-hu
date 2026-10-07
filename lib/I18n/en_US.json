@@ -726,5 +726,12 @@
   "delete_account_sent_title": "Request sent",
   "delete_account_sent": "An administrator received your request and will delete your account within 30 days. You will get a confirmation by e-mail.",
   "delete_account_failed": "The request could not be sent. Please e-mail support@bcc-ktk.org instead.",
-  "audit_action_ACCOUNT_DELETION_REQUEST": "Account deletion request"
+  "audit_action_ACCOUNT_DELETION_REQUEST": "Account deletion request",
+  "jobs_chat_people": "People in the chat",
+  "jobs_chat_add_person": "Add person",
+  "jobs_chat_remove_person": "Remove from chat",
+  "jobs_chat_role_REGISTERED": "Registered",
+  "jobs_chat_role_RESPONSIBLE": "Responsible",
+  "jobs_chat_role_CREATOR": "Created the job",
+  "jobs_chat_role_MEMBER": "Added to the chat"
 }

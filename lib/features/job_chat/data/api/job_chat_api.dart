@@ -11,6 +11,14 @@ class JobChatApi {
   Future<dynamic> send(num jobId, String text) async =>
       (await _dioClient.dio.post("/job/$jobId/chat", data: {"text": text})).data;
 
+  Future<dynamic> getPeople(num jobId) async => (await _dioClient.dio.get("/job/$jobId/chat/members")).data;
+
+  Future<dynamic> addMember(num jobId, num userId) async =>
+      (await _dioClient.dio.post("/job/$jobId/chat/members", data: {"userId": userId})).data;
+
+  Future<dynamic> removeMember(num jobId, num userId) async =>
+      (await _dioClient.dio.delete("/job/$jobId/chat/members/$userId")).data;
+
   Future<dynamic> setMuted(num jobId, bool muted) async =>
       (await _dioClient.dio.put("/job/$jobId/chat/mute", data: {"muted": muted})).data;
 }

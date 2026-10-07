@@ -7,6 +7,7 @@ import 'package:work_hu/app/framework/api_exception.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/features/job_chat/data/model/job_chat_models.dart';
 import 'package:work_hu/features/job_chat/providers/job_chat_provider.dart';
+import 'package:work_hu/features/job_chat/view/job_chat_people_sheet.dart';
 
 /// The chat room of a job. Everyone taking part gets a push for new messages unless they mute the chat. Once the
 /// job is closed the chat is archived: it can be read but not written to.
@@ -50,6 +51,12 @@ class _JobChatPageState extends ConsumerState<JobChatPage> {
       appBar: AppBar(
         title: Text("jobs_chat_title".i18n(), style: const TextStyle(fontWeight: FontWeight.bold)),
         actions: [
+          if (state.error == null && !state.loading)
+            IconButton(
+              tooltip: "jobs_chat_people".i18n(),
+              icon: const Icon(Icons.group_outlined),
+              onPressed: () => showJobChatPeople(context, widget.jobId),
+            ),
           if (state.error == null && !state.loading)
             IconButton(
               tooltip: (state.muted ? "jobs_chat_unmute" : "jobs_chat_mute").i18n(),
