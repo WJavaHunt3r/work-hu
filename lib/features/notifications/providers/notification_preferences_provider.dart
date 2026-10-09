@@ -39,9 +39,26 @@ class NotificationPreferencesNotifier extends BaseDataNotifier<NotificationPrefe
   }
 
   Future<void> refreshPushStatus() async {
-    final allowed = await PushService.instance.isAuthorized;
+    final status = await PushService.instance.status();
     if (!mounted) return;
-    state = state.copyWith(pushAvailable: PushService.instance.available, pushAllowed: allowed);
+    state = state.copyWith(pushStatus: status, pushDetail: PushService.instance.lastError);
+  }
+
+  /// Registers this device again, for when permission is given but registration failed.
+  Future<void> retryRegistration() async {
+    await PushService.instance.registerCurrentDevice();
+    await refreshPushStatus();
+  }
+
+  /// Sends a test notification to all of the user's devices. Returns the backend's reason when it failed.
+  Future<({NotificationTestResult? result, String? error})> sendTest() async {
+    try {
+      return (result: await _repository.sendTest(), error: null);
+    } on ApiException catch (e) {
+      return (result: null, error: e.message);
+    } catch (_) {
+      return (result: null, error: 'api_unknown_error');
+    }
   }
 
   /// Asks for permission on this device and registers it for pushes.

@@ -18,6 +18,7 @@ import 'package:work_hu/features/jobs/data/model/job_registration_model.dart';
 import 'package:work_hu/features/jobs/data/state/job_detail_state.dart';
 import 'package:work_hu/features/jobs/providers/jobs_provider.dart';
 import 'package:work_hu/features/jobs/view/jobs_page.dart';
+import 'package:work_hu/features/jobs/widgets/calendar_actions.dart';
 import 'package:work_hu/features/jobs/widgets/job_dialogs.dart';
 import 'package:work_hu/features/jobs/widgets/job_marker.dart';
 import 'package:work_hu/features/jobs/widgets/job_status_chip.dart';
@@ -64,6 +65,17 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
     final job = state.job;
     if (job == null) return [];
     return [
+      PopupMenuButton<String>(
+        icon: const Icon(Icons.event_available_outlined),
+        tooltip: "jobs_add_to_calendar".i18n(),
+        onSelected: (choice) => choice == "google"
+            ? addJobToGoogleCalendar(job)
+            : saveJobToCalendarFile(context, ref.read(jobRepoProvider), job),
+        itemBuilder: (_) => [
+          PopupMenuItem(value: "google", child: Text("jobs_calendar_google_event".i18n())),
+          PopupMenuItem(value: "file", child: Text("jobs_calendar_file".i18n())),
+        ],
+      ),
       IconButton(icon: const Icon(Icons.share_outlined), tooltip: "jobs_share".i18n(), onPressed: () => _share(job)),
       if (widget.manage && job.isOpen && notifier.canEdit)
         IconButton(

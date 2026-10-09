@@ -27,7 +27,7 @@ class JobListItem extends StatelessWidget {
     ].join("  ·  ");
 
     return Padding(
-      padding: EdgeInsets.only(bottom: 12.sp),
+      padding: EdgeInsets.only(bottom: 8.sp),
       child: Opacity(
         opacity: inactive ? 0.6 : 1,
         child: Material(
@@ -40,7 +40,7 @@ class JobListItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.sp),
             onTap: onTap,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 14.sp),
+              padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 8.sp),
               child: Row(
                 children: [
                   Expanded(
@@ -49,15 +49,15 @@ class JobListItem extends StatelessWidget {
                       children: [
                         Text(
                           job.description,
-                          maxLines: 2,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700, color: foreground),
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, color: foreground),
                         ),
-                        SizedBox(height: 4.sp),
+                        SizedBox(height: 2.sp),
                         Text(
                           subtitle,
                           overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodyMedium?.copyWith(color: secondary),
+                          style: theme.textTheme.bodySmall?.copyWith(color: secondary),
                         ),
                         if (job.status != JobStatus.OPEN)
                           Padding(
@@ -79,7 +79,7 @@ class JobListItem extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 8.sp),
-                  JobMarker(job: job, onFilled: registered),
+                  JobMarker(job: job, onFilled: registered, size: 36.sp),
                 ],
               ),
             ),

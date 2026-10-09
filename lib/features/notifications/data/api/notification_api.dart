@@ -21,6 +21,9 @@ class NotificationApi {
     );
   }
 
+  /// Sends a test push to all of the user's devices; returns `{users, devices, delivered, failed}`.
+  Future<dynamic> sendTest() async => (await _dioClient.dio.post("/notifications/test")).data;
+
   Future<dynamic> getPreferences() async => (await _dioClient.dio.get("/notifications/preferences")).data;
 
   /// Body is `{TYPE: enabled}`; types left out keep their setting. Returns the full list.

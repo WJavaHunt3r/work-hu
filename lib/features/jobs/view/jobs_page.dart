@@ -189,6 +189,16 @@ class JobsPageState extends PagedListPageState<JobsPage, JobModel, JobFilter, Jo
     ];
   }
 
+  /// The week and month view, with the option to import the jobs into the user's own calendar.
+  @override
+  List<Widget>? buildActions(BuildContext context, WidgetRef ref) => [
+    IconButton(
+      icon: const Icon(Icons.calendar_month_outlined),
+      tooltip: "jobs_calendar_title".i18n(),
+      onPressed: () => context.push("$_basePath/calendar"),
+    ),
+  ];
+
   /// Jobs are created in the admin list, by users who may create them.
   @override
   Widget? buildFloatingActionButton(BuildContext context, WidgetRef ref) {

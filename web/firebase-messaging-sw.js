@@ -22,7 +22,6 @@ function routeFor(data) {
       return '/';
   }
 }
-}
 
 // Registered BEFORE firebase.messaging() on purpose: the Firebase SDK adds its own click handler when it starts, which
 // closes the notification and only opens a window for messages with a link (fcmOptions.link). Ours carries none, so
@@ -33,17 +32,24 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const raw = event.notification.data || {};
   const data = (raw.FCM_MSG && raw.FCM_MSG.data) || raw;
-  const target = new URL(routeFor(data), self.location.origin).href;
+  const route = routeFor(data);
 
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
-      for (const w of windows) {
-        if (w.url.startsWith(self.location.origin) && 'focus' in w) {
-          // An open app: focus it and send it there. navigate() can fail for pages the worker doesn't control.
-          return w.focus().then(() => w.navigate(target)).catch(() => clients.openWindow(target));
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async (windows) => {
+      const app = windows.find((w) => w.url.startsWith(self.location.origin));
+      if (app) {
+        // The app is open: tell it where to go (it navigates itself). WindowClient.navigate() only works for pages
+        // this worker controls, and the app's window is controlled by Flutter's own worker, so it was rejected.
+        app.postMessage({ type: 'dukapp-open', route });
+        try {
+          await app.focus();
+        } catch (e) {
+          // focus() isn't allowed everywhere; the message has been sent anyway
         }
+        return;
       }
-      return clients.openWindow(target);
+      // The app is closed: open it straight at the page
+      return clients.openWindow(new URL(route, self.location.origin).href);
     }),
   );
 });

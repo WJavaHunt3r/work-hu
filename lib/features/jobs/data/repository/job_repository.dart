@@ -21,6 +21,14 @@ class JobRepository {
         return PaginatedResponse<JobModel>.fromJson(res, (json) => JobModel.fromJson(json as Map<String, dynamic>));
       });
 
+  Future<List<int>> getIcs(num jobId) => guardApi(() => _api.getIcs(jobId));
+
+  Future<String> getCalendarToken() => guardApi(_api.getCalendarToken);
+
+  Future<String> resetCalendarToken() => guardApi(_api.resetCalendarToken);
+
+  String calendarFeedUrl(String token) => _api.calendarFeedUrl(token);
+
   Future<JobModel> getJob(num jobId) => guardApi(() async => JobModel.fromJson(await _api.getJob(jobId)));
 
   Future<JobModel> saveJob(JobModel job) =>

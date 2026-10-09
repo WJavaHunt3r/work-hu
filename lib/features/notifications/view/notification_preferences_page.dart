@@ -6,6 +6,7 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
+import 'package:work_hu/app/notifications/push_service.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/features/notifications/data/state/notification_preferences_state.dart';
 import 'package:work_hu/features/notifications/providers/notification_preferences_provider.dart';
@@ -57,46 +58,8 @@ class NotificationPreferencesPageState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (state.pushAvailable && !state.pushAllowed) ...[
-          BaseContainer(
-            color: theme.colorScheme.primaryContainer,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.notifications_off_outlined, color: theme.colorScheme.onPrimaryContainer),
-                    SizedBox(width: 12.sp),
-                    Expanded(
-                      child: Text(
-                        'notification_push_off_title'.i18n(),
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onPrimaryContainer,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.sp),
-                Text(
-                  'notification_push_off_hint'.i18n(),
-                  style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onPrimaryContainer),
-                ),
-                SizedBox(height: 16.sp),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: notifier.enablePush,
-                    icon: const Icon(Icons.notifications_active_outlined),
-                    label: Text('notification_push_enable'.i18n()),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 24.sp),
-        ],
+        _buildPushStatus(theme, notifier),
+        SizedBox(height: 24.sp),
         Padding(
           padding: inset,
           child: Text(
@@ -154,6 +117,93 @@ class NotificationPreferencesPageState
   }
 
   List<String> _channels() => {for (final p in state.preferences) p.channel ?? 'PUSH'}.toList();
+
+  Widget _buildPushStatus(ThemeData theme, NotificationPreferencesNotifier notifier) {
+    final status = state.pushStatus;
+    final detail = state.pushDetail;
+    final (IconData icon, String key) = switch (status) {
+      PushStatus.enabled => (Icons.notifications_active, 'push_status_enabled'),
+      PushStatus.notEnabled => (Icons.notifications_off_outlined, 'push_status_not_enabled'),
+      PushStatus.denied => (Icons.block, 'push_status_denied'),
+      PushStatus.installNeeded => (Icons.install_mobile, 'push_status_install'),
+      PushStatus.registrationFailed => (Icons.sync_problem, 'push_status_registration_failed'),
+      PushStatus.unsupported => (Icons.notifications_off_outlined, 'push_status_unsupported'),
+    };
+    final on = theme.colorScheme.onPrimaryContainer;
+    return BaseContainer(
+      color: theme.colorScheme.primaryContainer,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: on),
+              SizedBox(width: 12.sp),
+              Expanded(
+                child: Text(
+                  '${key}_title'.i18n(),
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: on),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8.sp),
+          Text('${key}_hint'.i18n(), style: theme.textTheme.bodyMedium?.copyWith(color: on)),
+          if (detail != null && status != PushStatus.enabled && status != PushStatus.notEnabled) ...[
+            SizedBox(height: 8.sp),
+            Text(detail, style: theme.textTheme.bodySmall?.copyWith(color: on.withValues(alpha: 0.7))),
+          ],
+          if (status == PushStatus.notEnabled ||
+              status == PushStatus.registrationFailed ||
+              status == PushStatus.enabled) ...[
+            SizedBox(height: 16.sp),
+            Wrap(
+              spacing: 8.sp,
+              runSpacing: 8.sp,
+              children: [
+                if (status == PushStatus.notEnabled)
+                  FilledButton.icon(
+                    onPressed: notifier.enablePush,
+                    icon: const Icon(Icons.notifications_active_outlined),
+                    label: Text('notification_push_enable'.i18n()),
+                  ),
+                if (status == PushStatus.registrationFailed)
+                  FilledButton.icon(
+                    onPressed: notifier.retryRegistration,
+                    icon: const Icon(Icons.refresh),
+                    label: Text('push_retry'.i18n()),
+                  ),
+                if (status == PushStatus.enabled || status == PushStatus.registrationFailed)
+                  OutlinedButton.icon(
+                    onPressed: () => _sendTest(notifier),
+                    icon: const Icon(Icons.send_outlined),
+                    label: Text('push_test_send'.i18n()),
+                  ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Future<void> _sendTest(NotificationPreferencesNotifier notifier) async {
+    final (:result, :error) = await notifier.sendTest();
+    if (!mounted) return;
+    final String message;
+    if (error != null) {
+      message = error == 'api_unknown_error' ? error.i18n() : error;
+    } else if (result!.devices == 0) {
+      message = 'push_test_no_devices'.i18n();
+    } else if (result.delivered == 0 && result.failed == 0) {
+      message = 'push_test_not_configured'.i18n();
+    } else if (result.failed > 0) {
+      message = 'push_test_failed'.i18n(['${result.delivered}', '${result.devices}']);
+    } else {
+      message = 'push_test_sent'.i18n(['${result.delivered}', '${result.devices}']);
+    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), duration: const Duration(seconds: 8)));
+  }
 
   /// Backend type names without a translation show as they are.
   String _label(String type) {

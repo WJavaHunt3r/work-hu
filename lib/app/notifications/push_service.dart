@@ -8,6 +8,10 @@ import 'package:go_router/go_router.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:work_hu/app/notifications/deep_link.dart';
 import 'package:work_hu/app/notifications/firebase_options.dart';
+import 'package:work_hu/app/notifications/sw_messages_stub.dart'
+    if (dart.library.js_interop) 'package:work_hu/app/notifications/sw_messages_web.dart';
+import 'package:work_hu/app/notifications/pwa_info_stub.dart'
+    if (dart.library.js_interop) 'package:work_hu/app/notifications/pwa_info_web.dart';
 import 'package:work_hu/app/providers/router_provider.dart';
 import 'package:work_hu/features/notifications/data/api/notification_api.dart';
 import 'package:work_hu/features/utils.dart';
@@ -17,6 +21,27 @@ import 'package:work_hu/features/utils.dart';
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (Firebase.apps.isEmpty) await Firebase.initializeApp();
+}
+
+/// Why push does or doesn't work on this device, for the notification settings.
+enum PushStatus {
+  /// Permission given and the device is registered with the backend.
+  enabled,
+
+  /// Never asked, or asked and left open: the user can turn it on.
+  notEnabled,
+
+  /// The user (or the system) blocked notifications for the app.
+  denied,
+
+  /// This browser or device can't do push (or it isn't set up).
+  unsupported,
+
+  /// iPhone/iPad browser tab: push only works in the app added to the home screen.
+  installNeeded,
+
+  /// Permission is given but the device could not be registered with the backend.
+  registrationFailed,
 }
 
 /// Firebase Cloud Messaging for web, Android and iOS: permission, device token registration with the backend and
@@ -34,6 +59,9 @@ class PushService {
   bool _available = false;
   String? _registeredToken;
 
+  /// What went wrong the last time starting push or registering the device failed; shown to help find the cause.
+  String? lastError;
+
   /// False when Firebase could not start (e.g. web without a configured Firebase app); everything then no-ops.
   bool get available => _available;
 
@@ -49,8 +77,15 @@ class PushService {
     try {
       if (kIsWeb) {
         // Without a web app registered in Firebase there is nothing to connect to; push stays off on web.
-        if (!DefaultFirebaseOptions.webConfigured) return;
+        if (!DefaultFirebaseOptions.webConfigured) {
+          lastError = 'Firebase web config missing in this build';
+          return;
+        }
         await Firebase.initializeApp(options: DefaultFirebaseOptions.web);
+        if (!await FirebaseMessaging.instance.isSupported()) {
+          lastError = 'This browser does not support web push';
+          return;
+        }
       } else {
         await Firebase.initializeApp();
         FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
@@ -61,6 +96,9 @@ class PushService {
       // iOS does not show notifications of a foreground app by itself; the in-app banner below does.
       await messaging.setForegroundNotificationPresentationOptions(alert: false, badge: true, sound: false);
 
+      // A tap on a notification while the web app is open arrives as a message from the push service worker
+      if (kIsWeb) listenForOpenRoute(openLocation);
+
       FirebaseMessaging.onMessage.listen(_showInAppBanner);
       FirebaseMessaging.onMessageOpenedApp.listen((m) => _open(m.data));
       messaging.onTokenRefresh.listen((token) => _register(token));
@@ -70,8 +108,21 @@ class PushService {
       if (initial != null) _open(initial.data);
     } catch (e) {
       _available = false;
+      lastError = e.toString();
       debugPrint('Push notifications unavailable: $e');
     }
+  }
+
+  /// Where push stands on this device, to explain it in the notification settings.
+  Future<PushStatus> status() async {
+    if (kIsWeb && isIosBrowserTab()) return PushStatus.installNeeded;
+    if (!_available) return PushStatus.unsupported;
+    final settings = await authorizationStatus;
+    if (settings == AuthorizationStatus.denied) return PushStatus.denied;
+    if (settings == AuthorizationStatus.authorized || settings == AuthorizationStatus.provisional) {
+      return _registeredToken != null ? PushStatus.enabled : PushStatus.registrationFailed;
+    }
+    return PushStatus.notEnabled;
   }
 
   Future<bool> get isAuthorized async {
@@ -97,7 +148,7 @@ class PushService {
     return granted;
   }
 
-  /// Called after sign-in. Registers silently when permission exists, and asks once when it was never asked.
+  /// Called after sign-in. Registers silently when permission exists, and (in the apps) asks once when it was never asked.
   Future<void> onSignedIn() async {
     if (!_available) return;
     try {
@@ -105,6 +156,9 @@ class PushService {
         await registerCurrentDevice();
         return;
       }
+      // Browsers (iOS Safari above all) ignore permission requests that don't come from a tap, so on the web the
+      // user turns notifications on with the button in the notification settings. The apps can ask right away.
+      if (kIsWeb) return;
       final status = await authorizationStatus;
       final prompted = await Utils.getData(_promptedKey) == 'true';
       if (status == AuthorizationStatus.notDetermined && !prompted) {
@@ -122,8 +176,13 @@ class PushService {
       final token = await FirebaseMessaging.instance.getToken(
         vapidKey: kIsWeb ? DefaultFirebaseOptions.vapidKey : null,
       );
-      if (token != null) await _register(token);
+      if (token != null) {
+        await _register(token);
+      } else {
+        lastError = 'Firebase gave no push token';
+      }
     } catch (e) {
+      lastError = e.toString();
       debugPrint('Could not get the push token: $e');
     }
   }
@@ -133,8 +192,10 @@ class PushService {
     try {
       await _api.registerDevice(token: token, platform: _platform);
       _registeredToken = token;
+      lastError = null;
       await Utils.saveData(_lastTokenKey, token);
     } catch (e) {
+      lastError = e.toString();
       // Not signed in yet or offline; onSignedIn registers again next time.
       debugPrint('Could not register the device token: $e');
     }

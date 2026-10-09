@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:work_hu/api/dio_client.dart';
 import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/locator.dart';
@@ -29,6 +30,25 @@ class JobApi {
     );
     return res.data;
   }
+
+  /// The job as an .ics file (bytes), to import into a calendar.
+  Future<List<int>> getIcs(num jobId) async =>
+      (await _dioClient.dio.get<List<int>>(
+        "/job/$jobId/ics",
+        options: Options(responseType: ResponseType.bytes),
+      )).data ??
+      [];
+
+  /// The secret in the user's calendar subscription link.
+  Future<String> getCalendarToken() async =>
+      ((await _dioClient.dio.get("/user/me/calendar-token")).data as Map)["token"] as String;
+
+  /// A new secret: the old link stops working.
+  Future<String> resetCalendarToken() async =>
+      ((await _dioClient.dio.post("/user/me/calendar-token/reset")).data as Map)["token"] as String;
+
+  /// The subscription link of [token] ("https://.../api/calendar/<token>.ics").
+  String calendarFeedUrl(String token) => "${_dioClient.dio.options.baseUrl}/calendar/$token.ics";
 
   Future<dynamic> getJob(num jobId) async => (await _dioClient.dio.get("/job/$jobId")).data;
 

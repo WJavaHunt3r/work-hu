@@ -9,6 +9,7 @@ import 'package:work_hu/features/activities/view/activities_page.dart';
 import 'package:work_hu/features/audit_log/view/audit_log_page.dart';
 import 'package:work_hu/features/job_chat/view/job_chat_page.dart';
 import 'package:work_hu/features/jobs/view/job_detail_page.dart';
+import 'package:work_hu/features/jobs/view/jobs_calendar_page.dart';
 import 'package:work_hu/features/login/widgets/complete_name_dialog.dart';
 import 'package:work_hu/features/jobs/view/job_form_page.dart';
 import 'package:work_hu/features/jobs/view/jobs_page.dart';
@@ -133,6 +134,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: '/jobs',
                 builder: (context, state) => const JobsPage(),
                 routes: [
+                  // "calendar" must stay before ":id", or it is read as a job id
+                  GoRoute(path: 'calendar', builder: (context, state) => const JobsCalendarPage()),
                   GoRoute(
                     path: ':id',
                     builder: (BuildContext context, GoRouterState state) =>
@@ -312,6 +315,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: "/admin/jobs",
         builder: (BuildContext context, GoRouterState state) => const JobsPage(manage: true, title: "admin_jobs"),
+      ),
+      GoRoute(
+        path: "/admin/jobs/calendar",
+        builder: (BuildContext context, GoRouterState state) => const JobsCalendarPage(manage: true),
       ),
       GoRoute(path: "/admin/jobs/create", builder: (BuildContext context, GoRouterState state) => const JobFormPage()),
       GoRoute(

@@ -21,11 +21,24 @@ import 'features/login/view/login_page.dart';
 /// One key for the app's lifetime: a new key on every rebuild remounts everything under the MaterialApp.
 final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-/// Every FilterChip looks like the ones in BaseFilterChip: the primary container when active, and no checkmark.
-/// Without this a selected chip got the pale secondary container, with unreadable text in dark mode.
-ThemeData _withChipStyle(ThemeData theme) => theme.copyWith(
-  chipTheme: theme.chipTheme.copyWith(selectedColor: theme.colorScheme.primaryContainer, showCheckmark: false),
-);
+/// Selected chips and segments use the primary container with its matching text color, in light and dark mode.
+/// Without this a selected FilterChip / SegmentedButton got a pale color with unreadable text in dark mode.
+ThemeData _withChipStyle(ThemeData theme) {
+  final scheme = theme.colorScheme;
+  return theme.copyWith(
+    chipTheme: theme.chipTheme.copyWith(selectedColor: scheme.primaryContainer, showCheckmark: false),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected) ? scheme.primaryContainer : null,
+        ),
+        foregroundColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected) ? scheme.onPrimaryContainer : scheme.onSurface,
+        ),
+      ),
+    ),
+  );
+}
 
 class DukApp extends ConsumerWidget {
   const DukApp({super.key});
