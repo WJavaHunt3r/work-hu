@@ -41,7 +41,7 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
         // BasePage scrolls the layout, so the height is unbounded here: no Expanded.
         ? Padding(
             padding: EdgeInsets.symmetric(vertical: 32.sp),
-            child: const Center(child: CircularProgressIndicator()),
+            child: const Center(child: CircularProgressIndicator.adaptive()),
           )
         : Column(
             children: [

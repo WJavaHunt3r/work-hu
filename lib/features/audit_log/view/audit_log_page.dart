@@ -12,6 +12,7 @@ import 'package:work_hu/features/audit_log/providers/audit_log_provider.dart';
 import 'package:work_hu/features/audit_log/widgets/audit_action_label.dart';
 import 'package:work_hu/features/audit_log/widgets/audit_log_detail_dialog.dart';
 import 'package:work_hu/features/utils.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 /// Admin view of the audit log (needs AUDIT_LOG_VIEW): newest first, filterable by action, entity type, user, dates
 /// and free text. Tap an entry to see its details.
@@ -29,11 +30,17 @@ class AuditLogPageState extends PagedListPageState<AuditLogPage, AuditLogModel, 
   @override
   Widget buildListTile(AuditLogModel item, int index) {
     final theme = Theme.of(context);
-    final target = [if (item.entityType != null) item.entityType!, if (item.entityId != null) "#${item.entityId}"].join(" ");
+    final target = [
+      if (item.entityType != null) item.entityType!,
+      if (item.entityId != null) "#${item.entityId}",
+    ].join(" ");
     return BaseListTile(
       index: index,
       isLast: index == items.length - 1,
-      onTap: () => showDialog(context: context, builder: (_) => AuditLogDetailDialog(entry: item)),
+      onTap: () => showDialog(
+        context: context,
+        builder: (_) => AuditLogDetailDialog(entry: item),
+      ),
       title: Row(
         children: [
           Expanded(
@@ -79,7 +86,9 @@ class AuditLogPageState extends PagedListPageState<AuditLogPage, AuditLogModel, 
         onClear: () => notifier.setFilter(filter.copyWith(dateFrom: null, dateTo: null)),
       ),
       _chip(
-        label: filter.username?.isNotEmpty == true ? "${"audit_filter_user".i18n()}: ${filter.username}" : "audit_filter_user".i18n(),
+        label: filter.username?.isNotEmpty == true
+            ? "${"audit_filter_user".i18n()}: ${filter.username}"
+            : "audit_filter_user".i18n(),
         active: filter.username?.isNotEmpty == true,
         onTap: () async {
           final text = await _askText("audit_filter_user", filter.username);
@@ -88,7 +97,9 @@ class AuditLogPageState extends PagedListPageState<AuditLogPage, AuditLogModel, 
         onClear: () => notifier.setFilter(filter.copyWith(username: null)),
       ),
       _chip(
-        label: filter.searchText?.isNotEmpty == true ? "${"audit_filter_search".i18n()}: ${filter.searchText}" : "audit_filter_search".i18n(),
+        label: filter.searchText?.isNotEmpty == true
+            ? "${"audit_filter_search".i18n()}: ${filter.searchText}"
+            : "audit_filter_search".i18n(),
         active: filter.searchText?.isNotEmpty == true,
         onTap: () async {
           final text = await _askText("audit_filter_search", filter.searchText);
@@ -124,7 +135,12 @@ class AuditLogPageState extends PagedListPageState<AuditLogPage, AuditLogModel, 
     ];
   }
 
-  Widget _chip({required String label, required bool active, required VoidCallback onTap, required VoidCallback onClear}) {
+  Widget _chip({
+    required String label,
+    required bool active,
+    required VoidCallback onTap,
+    required VoidCallback onClear,
+  }) {
     return InputChip(
       label: Text(label),
       selected: active,
@@ -152,7 +168,7 @@ class AuditLogPageState extends PagedListPageState<AuditLogPage, AuditLogModel, 
     final controller = TextEditingController(text: initial ?? "");
     return showDialog<String>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      builder: (dialogContext) => AdaptiveAlertDialog(
         title: Text(labelKey.i18n()),
         content: TextField(
           controller: controller,

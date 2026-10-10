@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 class ErrorDialog extends StatelessWidget {
   const ErrorDialog({super.key, this.title, required this.content});
@@ -9,7 +10,7 @@ class ErrorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return AdaptiveAlertDialog(
       title: Text(
         title ?? "base_error".i18n(),
         textAlign: TextAlign.center,

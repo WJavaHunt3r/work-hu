@@ -7,13 +7,14 @@ import 'package:work_hu/features/jobs/data/model/job_hours_entry.dart';
 import 'package:work_hu/features/jobs/data/model/job_registration_model.dart';
 import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
 import 'package:work_hu/features/user_combo/view/user_combo.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 /// Asks for the (optional) comment of a registration. Returns null when cancelled, otherwise the text (maybe empty).
 Future<String?> showCommentDialog(BuildContext context, {required String title, String? initial}) {
   final controller = TextEditingController(text: initial ?? "");
   return showDialog<String>(
     context: context,
-    builder: (dialogContext) => AlertDialog(
+    builder: (dialogContext) => AdaptiveAlertDialog(
       title: Text(title.i18n()),
       content: TextField(
         controller: controller,
@@ -58,7 +59,7 @@ class _JobRegisterSomeoneDialogState extends State<JobRegisterSomeoneDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return AdaptiveAlertDialog(
       title: Text("jobs_register_someone".i18n()),
       // AlertDialog sizes its content with IntrinsicWidth, which the user picker's LayoutBuilder can't answer;
       // a fixed width means the content is never asked.

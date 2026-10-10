@@ -12,7 +12,6 @@ import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
-import 'package:work_hu/app/widgets/icon_box.dart';
 import 'package:work_hu/features/status/data/state/status_state.dart';
 import 'package:work_hu/features/status/providers/status_providers.dart';
 import 'package:work_hu/features/user_transactions/widgets/points_list_item.dart';
@@ -68,26 +67,30 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
               ],
             ),
             SizedBox(height: 8.sp),
-            Row(
-              children: [
-                Expanded(
-                  child: _OnTrackStatus(
-                    title: "status_local_on_track_title".i18n(),
-                    data: "status_local_on_track_data".i18n([state.userRoundHead.onTrackCount.toString()]),
-                    subData: "status_local_on_track_subData".i18n([state.userRoundHead.goalCount.toString()]),
-                    icon: Icons.stacked_line_chart,
+            // Both cards as tall as the taller one, however the titles wrap
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _OnTrackStatus(
+                      title: "status_local_on_track_title".i18n(),
+                      data: "status_local_on_track_data".i18n([state.userRoundHead.onTrackCount.toString()]),
+                      subData: "status_local_on_track_subData".i18n([state.userRoundHead.goalCount.toString()]),
+                      icon: Icons.stacked_line_chart,
+                    ),
                   ),
-                ),
-                SizedBox(width: 16.sp),
-                Expanded(
-                  child: _OnTrackStatus(
-                    title: "status_local_required_title".i18n(),
-                    data: "status_local_required_data".i18n([state.userRoundHead.toOnTrackCount.toString()]),
-                    subData: "status_local_required_subData".i18n([state.userRoundHead.churchGoal.toString()]),
-                    icon: Icons.stars,
+                  SizedBox(width: 16.sp),
+                  Expanded(
+                    child: _OnTrackStatus(
+                      title: "status_local_required_title".i18n(),
+                      data: "status_local_required_data".i18n([state.userRoundHead.toOnTrackCount.toString()]),
+                      subData: "status_local_required_subData".i18n([state.userRoundHead.churchGoal.toString()]),
+                      icon: Icons.stars,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -281,26 +284,43 @@ class _OnTrackStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return BaseContainer(
+      // Less padding than the default, so the title has room and doesn't break inside a word
+      padding: EdgeInsets.all(14.sp),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // A small icon first, the title gets the rest of the width
+              Container(
+                padding: EdgeInsets.all(7.sp),
+                decoration: BoxDecoration(color: scheme.primary.withAlpha(25), shape: BoxShape.circle),
+                child: Icon(icon, size: 18.sp, color: scheme.primary),
+              ),
+              SizedBox(width: 8.sp),
               Expanded(
-                child: Text(
-                  title,
-                  maxLines: 3,
-                  overflow: TextOverflow.visible,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                child: Padding(
+                  padding: EdgeInsets.only(top: 2.sp),
+                  child: Text(
+                    title,
+                    maxLines: 3,
+                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
-              IconBox(icon: icon),
             ],
           ),
-          SizedBox(height: 8.sp),
-          Text(data, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-          Text(subData, style: Theme.of(context).textTheme.bodySmall),
+          SizedBox(height: 10.sp),
+          Column(
+            children: [
+              Text(data, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+              Text(subData, style: theme.textTheme.bodySmall),
+            ],
+          ),
         ],
       ),
     );

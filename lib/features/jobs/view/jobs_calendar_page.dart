@@ -14,6 +14,7 @@ import 'package:work_hu/features/jobs/providers/jobs_provider.dart';
 import 'package:work_hu/features/jobs/view/jobs_page.dart';
 import 'package:work_hu/features/jobs/widgets/calendar_actions.dart';
 import 'package:work_hu/features/jobs/widgets/job_list_item.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 enum _Mode { week, month }
 
@@ -135,15 +136,12 @@ class _JobsCalendarPageState extends ConsumerState<JobsCalendarPage> {
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(16.sp, 8.sp, 16.sp, 0),
-            child: SegmentedButton<_Mode>(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(value: _Mode.week, label: Text("jobs_calendar_week".i18n())),
-                ButtonSegment(value: _Mode.month, label: Text("jobs_calendar_month".i18n())),
-              ],
-              selected: {_mode},
-              onSelectionChanged: (selection) {
-                setState(() => _mode = selection.first);
+            child: AdaptiveSegmented<_Mode>(
+              options: {_Mode.week: "jobs_calendar_week".i18n(), _Mode.month: "jobs_calendar_month".i18n()},
+              selected: _mode,
+              onChanged: (mode) {
+                if (mode == null) return;
+                setState(() => _mode = mode);
                 _load();
               },
             ),

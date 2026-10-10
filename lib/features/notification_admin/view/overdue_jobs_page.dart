@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/api_exception.dart';
 import 'package:work_hu/features/notification_admin/providers/notification_admin_provider.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 /// Users who are responsible for jobs that are over but still have no hours, with a button to remind them. The
 /// automatic reminders (an hour after the end, and the next day) go out on their own; this is for the ones after that.
@@ -28,7 +29,7 @@ class OverdueJobsPage extends ConsumerWidget {
   Future<void> _remindAll(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      builder: (dialogContext) => AdaptiveAlertDialog(
         title: Text("overdue_jobs_remind_all".i18n()),
         content: Text("overdue_jobs_confirm_all".i18n()),
         actions: [
@@ -54,9 +55,9 @@ class OverdueJobsPage extends ConsumerWidget {
         ],
       ),
       body: overdue.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CircularProgressIndicator.adaptive()),
         error: (_, _) => Center(child: Text("api_unknown_error".i18n())),
-        data: (users) => RefreshIndicator(
+        data: (users) => RefreshIndicator.adaptive(
           onRefresh: () async => ref.refresh(overdueJobsProvider.future),
           child: ListView(
             padding: EdgeInsets.all(16.sp),

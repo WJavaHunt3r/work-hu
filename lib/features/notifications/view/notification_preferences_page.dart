@@ -70,7 +70,7 @@ class NotificationPreferencesPageState
         if (loading)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 32.sp),
-            child: const Center(child: CircularProgressIndicator()),
+            child: const Center(child: CircularProgressIndicator.adaptive()),
           )
         else if (state.preferences.isEmpty)
           Padding(
@@ -99,7 +99,7 @@ class NotificationPreferencesPageState
                     for (final (i, preference)
                         in state.preferences.where((p) => (p.channel ?? 'PUSH') == channel).indexed) ...[
                       if (i > 0) const Divider(height: 1),
-                      SwitchListTile(
+                      SwitchListTile.adaptive(
                         contentPadding: EdgeInsets.symmetric(horizontal: 18.sp, vertical: 6.sp),
                         title: Text(_label(preference.type), style: const TextStyle(fontWeight: FontWeight.w500)),
                         subtitle: _description(preference.type, theme),

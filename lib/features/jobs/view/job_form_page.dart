@@ -18,6 +18,7 @@ import 'package:work_hu/features/jobs/providers/jobs_provider.dart';
 import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
 import 'package:work_hu/features/user_combo/view/user_combo.dart';
 import 'package:work_hu/features/utils.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 /// Creates a job, or edits the one with [jobId].
 ///
@@ -206,14 +207,14 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
 
   Future<DateTime?> _pickDateTime(DateTime initial) async {
     final now = DateTime.now();
-    final date = await showDatePicker(
+    final date = await pickDate(
       context: context,
       initialDate: initial,
       firstDate: DateTime(now.year, now.month, now.day).subtract(const Duration(days: 30)),
       lastDate: DateTime(now.year + 2, 12, 31),
     );
     if (date == null || !mounted) return null;
-    final time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(initial));
+    final time = await pickTime(context: context, initialTime: TimeOfDay.fromDateTime(initial));
     if (time == null) return null;
     return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
@@ -334,7 +335,7 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
         actions: [TextButton(onPressed: _saving || !_loaded ? null : _save, child: Text("base_save".i18n()))],
       ),
       body: !_loaded
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator.adaptive())
           : SingleChildScrollView(
               padding: EdgeInsets.all(16.sp),
               child: Form(
@@ -433,7 +434,7 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
                 if (picked != null) setState(() => _registrationOpensAt = picked);
               },
             ),
-          SwitchListTile(
+          SwitchListTile.adaptive(
             contentPadding: EdgeInsets.symmetric(horizontal: 8.sp),
             title: Text("jobs_send_notification".i18n()),
             subtitle: Text(
@@ -512,7 +513,7 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
               value: _repeatUntil,
               dateOnly: true,
               onTap: () async {
-                final picked = await showDatePicker(
+                final picked = await pickDate(
                   context: context,
                   initialDate: _repeatUntil.isBefore(_jobDateTime) ? _jobDateTime : _repeatUntil,
                   firstDate: _jobDateTime,
@@ -566,7 +567,7 @@ class _JobFormPageState extends ConsumerState<JobFormPage> {
             keyBoardType: TextInputType.number,
             validator: positive,
           ),
-          SwitchListTile(
+          SwitchListTile.adaptive(
             contentPadding: EdgeInsets.symmetric(horizontal: 8.sp),
             title: Text("jobs_waitlist_enabled".i18n()),
             value: _waitlist,

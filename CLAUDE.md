@@ -56,6 +56,8 @@ Folder names are not fully consistent (`provider` vs `providers`, `widget` vs `w
 
 **Incomplete names:** when Google sends no last name the backend stores `-` and sets `UserModel.profileIncomplete`. `CompleteNameGate` (wrapped around the shell in `router_provider.dart`) then shows a small non-dismissible dialog asking for last and first name and saves it with `PUT /user/{id}`; it also appears for a restored session. The only way out besides saving is logging out.
 
+**Platform look:** the iOS app uses Cupertino widgets, Android and the web (also in an iPhone browser: `dukapp.dart` sets the theme platform to Android on the web) keep Material. `lib/app/platform/adaptive.dart` has the helpers: `useCupertino(context)`, `AdaptiveAlertDialog` (drop-in for `AlertDialog`, turns TextButton/FilledButton actions into Cupertino dialog actions), `pickDate` / `pickTime` (instead of `showDatePicker` / `showTimePicker`) and `AdaptiveSegmented` (instead of `SegmentedButton`). Switches, checkboxes, progress indicators and `RefreshIndicator` use their `.adaptive` constructors, and the bottom navigation is a `CupertinoTabBar` on iOS. New code should use these instead of the plain Material ones. Text fields, buttons and app bars stay Material on every platform.
+
 **i18n:** the `localization` package loads JSON from `lib/I18n/` (`en_US.json`, `hu_HU.json`). Use `"key".i18n()`. Add every new key to both files.
 
 **Sizing:** `flutter_screenutil` uses a 360×640 design size, so use `.w`, `.h`, `.sp`.

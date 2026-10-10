@@ -105,7 +105,7 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
               ),
             Expanded(
               child: widget.canRefresh
-                  ? RefreshIndicator(
+                  ? RefreshIndicator.adaptive(
                       onRefresh: () async {
                         onRefresh();
                       },

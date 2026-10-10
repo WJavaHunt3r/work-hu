@@ -78,7 +78,7 @@ class LoadingScreen {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(height: 10.sp),
-                    const CircularProgressIndicator(),
+                    const CircularProgressIndicator.adaptive(),
                     SizedBox(height: 10.sp),
                     StreamBuilder(
                       stream: textController.stream,

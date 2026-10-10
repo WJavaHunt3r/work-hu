@@ -9,6 +9,7 @@ import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/notification_admin/data/model/notification_schedule_model.dart';
 import 'package:work_hu/features/notification_admin/providers/notification_admin_provider.dart';
 import 'package:work_hu/features/notification_admin/widgets/role_target_picker.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 const _days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
@@ -42,7 +43,7 @@ class _ScheduleEditPageState extends ConsumerState<ScheduleEditPage> {
   }
 
   Future<void> _pickTime() async {
-    final picked = await showTimePicker(context: context, initialTime: _time);
+    final picked = await pickTime(context: context, initialTime: _time);
     if (picked == null) return;
     final text = "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}";
     setState(() => _schedule = _schedule.copyWith(time: text));
@@ -120,7 +121,7 @@ class _ScheduleEditPageState extends ConsumerState<ScheduleEditPage> {
                 trailing: Text(_schedule.shortTime, style: Theme.of(context).textTheme.titleMedium),
                 onTap: _pickTime,
               ),
-              SwitchListTile(
+              SwitchListTile.adaptive(
                 contentPadding: EdgeInsets.zero,
                 title: Text("notification_admin_active".i18n()),
                 value: _schedule.active,

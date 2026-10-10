@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
+import 'package:flutter/cupertino.dart' show CupertinoThemeData;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
@@ -26,6 +27,10 @@ final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 ThemeData _withChipStyle(ThemeData theme) {
   final scheme = theme.colorScheme;
   return theme.copyWith(
+    // The web keeps Material also in an iPhone browser; only the iOS app gets Cupertino widgets
+    platform: kIsWeb ? TargetPlatform.android : null,
+    // Cupertino switches, tab bar etc. in the iOS app take the app color instead of iOS blue/green
+    cupertinoOverrideTheme: CupertinoThemeData(primaryColor: scheme.primary, applyThemeToAll: true),
     chipTheme: theme.chipTheme.copyWith(selectedColor: scheme.primaryContainer, showCheckmark: false),
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: ButtonStyle(
@@ -82,7 +87,7 @@ class DukApp extends ConsumerWidget {
   Widget buildMaterial(WidgetRef ref) {
     final authInit = ref.watch(authInitProvider);
     return authInit.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(child: CircularProgressIndicator.adaptive()),
       error: (err, stack) => LoginPage(),
       data: (_) {
         final theme = GlobalTheme();

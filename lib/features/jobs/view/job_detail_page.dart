@@ -192,7 +192,7 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
       return status.modelState.isAnyLoading
           ? Padding(
               padding: EdgeInsets.symmetric(vertical: 32.sp),
-              child: const Center(child: CircularProgressIndicator()),
+              child: const Center(child: CircularProgressIndicator.adaptive()),
             )
           : const SizedBox();
     }

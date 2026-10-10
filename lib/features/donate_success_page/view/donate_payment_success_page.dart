@@ -54,7 +54,7 @@ class DonatePaymentSuccessStatePage
           ? payment.status == PaymentStatus.PAID
                 ? buildSuccessPage(theme, colorScheme, payment)
                 : buildErrorPage(theme, colorScheme, payment)
-          : const Center(child: CircularProgressIndicator()),
+          : const Center(child: CircularProgressIndicator.adaptive()),
     );
   }
 

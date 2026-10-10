@@ -4,6 +4,7 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/features/mentor_mentee/provider/mentor_mentee_provider.dart';
 import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
 import 'package:work_hu/features/user_combo/view/user_combo.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 class CreateMentorMenteeDialog extends ConsumerWidget {
   const CreateMentorMenteeDialog({super.key});
@@ -12,7 +13,7 @@ class CreateMentorMenteeDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(mentorMenteeCreateProvider);
     final notifier = ref.read(mentorMenteeCreateProvider.notifier);
-    return AlertDialog(
+    return AdaptiveAlertDialog(
       actions: [
         TextButton(
           onPressed: () {

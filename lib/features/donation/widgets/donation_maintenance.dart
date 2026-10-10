@@ -7,6 +7,7 @@ import 'package:work_hu/app/models/maintenance_mode.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/donation/data/model/donation_model.dart';
 import 'package:work_hu/features/donation/providers/donation_provider.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 class DonationMaintenance extends ConsumerStatefulWidget {
   const DonationMaintenance({super.key, required this.mode, required this.donation});
@@ -156,17 +157,14 @@ class DonationMaintenanceState extends ConsumerState<DonationMaintenance> {
   }
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
-    var date = await showDatePicker(
+    var date = await pickDate(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(DateTime.now().year + 1),
     );
     if (date != null && context.mounted) {
-      final TimeOfDay? time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(DateTime.now()),
-      );
+      final TimeOfDay? time = await pickTime(context: context, initialTime: TimeOfDay.fromDateTime(DateTime.now()));
       if (time != null) {
         var dateTime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
         controller.text = dateTime.toString();

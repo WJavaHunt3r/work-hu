@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 class BaseAlertDialog extends StatelessWidget {
   final String title;
@@ -23,7 +24,7 @@ class BaseAlertDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return AdaptiveAlertDialog(
       title: Text(title.i18n(), textAlign: TextAlign.center),
       content: content,
       constraints: BoxConstraints(minWidth: 600),

@@ -132,7 +132,7 @@ abstract class PagedListPageState<P extends BaseListPage, T, F, N extends PagedL
         if (items.isEmpty && modelState.isAnyLoading)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 32.sp),
-            child: const Center(child: CircularProgressIndicator()),
+            child: const Center(child: CircularProgressIndicator.adaptive()),
           )
         else if (items.isEmpty && modelState.isBackgroundError)
           _buildRetry()
@@ -158,7 +158,7 @@ abstract class PagedListPageState<P extends BaseListPage, T, F, N extends PagedL
                 child: SizedBox(
                   width: 24.sp,
                   height: 24.sp,
-                  child: CircularProgressIndicator(strokeWidth: 2.sp),
+                  child: CircularProgressIndicator.adaptive(strokeWidth: 2.sp),
                 ),
               ),
             ),

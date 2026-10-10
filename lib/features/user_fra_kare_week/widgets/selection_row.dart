@@ -24,7 +24,11 @@ class SelectionRow extends StatelessWidget {
         fraKareWeek.user.getFullName(),
         style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14.sp),
       ),
-      trailing: Checkbox(value: fraKareWeek.listened, onChanged: (changed) => onChanged(changed ?? false)),
+      trailing: Checkbox.adaptive(
+        activeColor: Theme.of(context).colorScheme.primary,
+        value: fraKareWeek.listened,
+        onChanged: (changed) => onChanged(changed ?? false),
+      ),
       isLast: isLast,
       index: index,
       title: SizedBox(),

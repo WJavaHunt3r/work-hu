@@ -19,6 +19,7 @@ import 'package:work_hu/features/create_activity/widgets/registration_row_widget
 import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
 import 'package:work_hu/features/user_combo/view/user_combo.dart';
 import 'package:work_hu/features/utils.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 class CreateActivityPage extends BasePage {
   const CreateActivityPage({
@@ -201,17 +202,14 @@ class CreateActivityPageState
   }
 
   Future<void> _selectDate(BuildContext context, WidgetRef ref) async {
-    var date = await showDatePicker(
+    var date = await pickDate(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(DateTime.now().year - 1),
       lastDate: DateTime(DateTime.now().year + 1),
     );
     if (date != null && context.mounted) {
-      final TimeOfDay? time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(DateTime.now()),
-      );
+      final TimeOfDay? time = await pickTime(context: context, initialTime: TimeOfDay.fromDateTime(DateTime.now()));
       if (time != null) {
         var dateTime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
         dateController.text = dateTime.toString();

@@ -93,12 +93,13 @@ class _RoleEditPageState extends ConsumerState<RoleEditPage> {
               Text("roles_permissions".i18n(), style: Theme.of(context).textTheme.titleMedium),
               if (_readOnly) Text("roles_admin_fixed".i18n(), style: Theme.of(context).textTheme.bodySmall),
               permissions.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(child: CircularProgressIndicator.adaptive()),
                 error: (_, _) => Text("api_unknown_error".i18n()),
                 data: (names) => Column(
                   children: [
                     for (final name in {...names, ..._selected})
-                      CheckboxListTile(
+                      CheckboxListTile.adaptive(
+                        activeColor: Theme.of(context).colorScheme.primary,
                         value: _readOnly || _selected.contains(name),
                         title: Text(permissionLabel(name)),
                         controlAffinity: ListTileControlAffinity.leading,

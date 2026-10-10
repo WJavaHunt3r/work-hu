@@ -7,6 +7,7 @@ import 'package:work_hu/app/models/gender.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 /// The backend stores this instead of a name it doesn't know (e.g. Google sent no last name).
 const _namePlaceholder = "-";
@@ -122,7 +123,7 @@ class _CompleteNameDialogState extends ConsumerState<CompleteNameDialog> {
     final theme = Theme.of(context);
     return PopScope(
       canPop: false,
-      child: AlertDialog(
+      child: AdaptiveAlertDialog(
         title: Text("complete_name_title".i18n()),
         content: SingleChildScrollView(
           child: Form(
@@ -206,7 +207,7 @@ class _CompleteGenderDialogState extends ConsumerState<CompleteGenderDialog> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      child: AlertDialog(
+      child: AdaptiveAlertDialog(
         title: Text("complete_gender_title".i18n()),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -216,12 +217,11 @@ class _CompleteGenderDialogState extends ConsumerState<CompleteGenderDialog> {
             SizedBox(height: 16.sp),
             SizedBox(
               width: double.infinity,
-              child: SegmentedButton<Gender>(
-                emptySelectionAllowed: true,
-                showSelectedIcon: false,
-                segments: [for (final g in Gender.values) ButtonSegment(value: g, label: Text(g.label.i18n()))],
-                selected: {if (_gender != null) _gender!},
-                onSelectionChanged: (selection) => setState(() => _gender = selection.isEmpty ? null : selection.first),
+              child: AdaptiveSegmented<Gender>(
+                allowEmpty: true,
+                options: {for (final g in Gender.values) g: g.label.i18n()},
+                selected: _gender,
+                onChanged: (gender) => setState(() => _gender = gender),
               ),
             ),
           ],

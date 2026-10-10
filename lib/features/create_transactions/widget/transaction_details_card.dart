@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 class TransactionDetailsCard extends ConsumerWidget {
   const TransactionDetailsCard({super.key});
@@ -30,7 +31,7 @@ class TransactionDetailsCard extends ConsumerWidget {
   }
 
   Future<void> _selectDate(BuildContext context, WidgetRef ref) async {
-    final DateTime? picked = await showDatePicker(
+    final DateTime? picked = await pickDate(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2015, 8),

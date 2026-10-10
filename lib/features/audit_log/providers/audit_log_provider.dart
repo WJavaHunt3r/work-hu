@@ -41,7 +41,9 @@ class AuditLogDataNotifier extends PagedListNotifier<AuditLogModel, AuditLogFilt
   final AuditLogRepository repository;
 
   @override
-  List<SortOption> get sortOptions => const [SortOption(label: "audit_sort_time", properties: ["timestamp"])];
+  List<SortOption> get sortOptions => const [
+    SortOption(label: "audit_sort_time", properties: ["timestamp"]),
+  ];
 
   @override
   Future<PaginatedResponse<AuditLogModel>> fetch(ListQuery<AuditLogFilter> query, int page) =>

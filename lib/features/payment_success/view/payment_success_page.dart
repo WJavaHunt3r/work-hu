@@ -55,7 +55,7 @@ class PaymentSuccessStatePage
                   : buildErrorPage(theme, colorScheme, state.payment!)
             : state.status.modelState.isError
             ? Center(child: Text("payment_success_error".i18n()))
-            : const Center(child: CircularProgressIndicator()),
+            : const Center(child: CircularProgressIndicator.adaptive()),
       ),
     );
   }

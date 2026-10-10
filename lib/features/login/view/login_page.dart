@@ -18,6 +18,7 @@ import 'package:work_hu/features/login/data/state/login_state.dart';
 import 'package:work_hu/features/login/providers/login_provider.dart';
 import 'package:work_hu/features/login/widgets/google_sign_in_button.dart';
 import 'package:work_hu/features/utils.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 class LoginPage extends BasePage {
   LoginPage({super.key})
@@ -269,13 +270,12 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
               children: [
                 SizedBox(
                   width: double.infinity,
-                  child: SegmentedButton<Gender>(
-                    emptySelectionAllowed: true,
-                    showSelectedIcon: false,
-                    segments: [for (final g in Gender.values) ButtonSegment(value: g, label: Text(g.label.i18n()))],
-                    selected: {if (field.value != null) field.value!},
-                    onSelectionChanged: (selection) {
-                      _gender = selection.isEmpty ? null : selection.first;
+                  child: AdaptiveSegmented<Gender>(
+                    allowEmpty: true,
+                    options: {for (final g in Gender.values) g: g.label.i18n()},
+                    selected: field.value,
+                    onChanged: (gender) {
+                      _gender = gender;
                       field.didChange(_gender);
                     },
                   ),
@@ -385,7 +385,11 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
       children: [
         Row(
           children: [
-            Checkbox(value: _rememberMe, onChanged: (v) => setState(() => _rememberMe = v!)),
+            Checkbox.adaptive(
+              activeColor: Theme.of(context).colorScheme.primary,
+              value: _rememberMe,
+              onChanged: (v) => setState(() => _rememberMe = v!),
+            ),
             Text('login_remember_me'.i18n(), style: theme.textTheme.bodyMedium),
           ],
         ),

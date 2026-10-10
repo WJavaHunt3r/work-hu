@@ -188,12 +188,13 @@ class _RolesSection extends ConsumerWidget {
         children: [
           Text("user_details_roles".i18n(), style: Theme.of(context).textTheme.titleMedium),
           roles.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: CircularProgressIndicator.adaptive()),
             error: (_, _) => Text(user.roleNames.join(", ")),
             data: (all) => Column(
               children: [
                 for (final role in all)
-                  CheckboxListTile(
+                  CheckboxListTile.adaptive(
+                    activeColor: Theme.of(context).colorScheme.primary,
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                     controlAffinity: ListTileControlAffinity.leading,

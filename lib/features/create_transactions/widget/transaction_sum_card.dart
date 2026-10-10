@@ -12,6 +12,7 @@ import 'package:work_hu/app/widgets/error_alert_dialog.dart';
 import 'package:work_hu/features/create_transactions/providers/create_transactions_provider.dart';
 import 'package:work_hu/features/transaction_items/data/models/transaction_item_model.dart';
 import 'package:work_hu/features/utils.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 class TransactionSumCard extends ConsumerWidget {
   const TransactionSumCard({super.key, required this.items});
@@ -93,7 +94,7 @@ class TransactionSumCard extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return AdaptiveAlertDialog(
           title: const Text("Set exhange rate!"),
           titleTextStyle: const TextStyle(fontWeight: FontWeight.w800),
           actions: [

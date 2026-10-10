@@ -44,9 +44,15 @@ class AuditLogDetailDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _Row("audit_time", Utils.dateToStringWithTime(entry.timestamp)),
-              _Row("audit_user", [entry.username ?? "audit_system".i18n(), if (entry.userId != null) "#${entry.userId}"].join("  ")),
+              _Row(
+                "audit_user",
+                [entry.username ?? "audit_system".i18n(), if (entry.userId != null) "#${entry.userId}"].join("  "),
+              ),
               _Row("audit_ip", entry.ipAddress ?? ""),
-              _Row("audit_entity", [entry.entityType ?? "", if (entry.entityId != null) "#${entry.entityId}"].join("  ")),
+              _Row(
+                "audit_entity",
+                [entry.entityType ?? "", if (entry.entityId != null) "#${entry.entityId}"].join("  "),
+              ),
               _Row("audit_request", entry.request ?? ""),
               SizedBox(height: 16.sp),
               Row(
@@ -95,7 +101,10 @@ class _Row extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 100.sp, child: Text(labelKey.i18n(), style: theme.textTheme.bodySmall)),
+          SizedBox(
+            width: 100.sp,
+            child: Text(labelKey.i18n(), style: theme.textTheme.bodySmall),
+          ),
           Expanded(child: SelectableText(value, style: theme.textTheme.bodyMedium)),
         ],
       ),

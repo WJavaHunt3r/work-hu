@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 class ConfirmAlertDialog extends StatelessWidget {
   const ConfirmAlertDialog({super.key, required this.onConfirm, required this.title, required this.content, this.icon});
@@ -11,7 +12,7 @@ class ConfirmAlertDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return AdaptiveAlertDialog(
       title: Text(title, textAlign: TextAlign.center),
       icon: icon,
       actionsAlignment: MainAxisAlignment.spaceEvenly,

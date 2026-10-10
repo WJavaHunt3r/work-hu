@@ -41,7 +41,7 @@ class NotificationSchedulesPageState
         "${"weekday_${item.dayOfWeek}".i18n()} ${item.shortTime}",
         style: Theme.of(context).textTheme.bodySmall,
       ),
-      trailing: Switch(value: item.active, onChanged: (on) => notifier.setActive(item, on)),
+      trailing: Switch.adaptive(value: item.active, onChanged: (on) => notifier.setActive(item, on)),
       onTap: () => _edit(item),
     );
   }

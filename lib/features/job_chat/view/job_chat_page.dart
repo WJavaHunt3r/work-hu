@@ -66,7 +66,7 @@ class _JobChatPageState extends ConsumerState<JobChatPage> {
         ],
       ),
       body: state.loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator.adaptive())
           : state.error != null
           ? Center(
               child: Padding(

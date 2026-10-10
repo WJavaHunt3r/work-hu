@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:work_hu/app/style/app_colors.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 class ErrorAlertDialog extends StatelessWidget {
   const ErrorAlertDialog({super.key, required this.title, this.content});
@@ -10,7 +11,7 @@ class ErrorAlertDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: AlertDialog(
+      child: AdaptiveAlertDialog(
         // backgroundColor: AppColors.white,
         title: Text(
           title,

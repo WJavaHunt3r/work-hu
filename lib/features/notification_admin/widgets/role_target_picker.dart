@@ -26,7 +26,7 @@ class RoleTargetPicker extends ConsumerWidget {
         ),
         SizedBox(height: 8.sp),
         roles.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(child: CircularProgressIndicator.adaptive()),
           error: (_, _) => Text("api_unknown_error".i18n()),
           data: (list) => Wrap(
             spacing: 8.sp,

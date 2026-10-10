@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoTabBar;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -62,6 +63,7 @@ import 'package:work_hu/features/user_transactions/view/user_transactions_page.d
 import 'package:work_hu/features/users/view/users_page.dart';
 
 import '../../features/profile/view/theme_picker_page.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
@@ -524,29 +526,39 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
     return Scaffold(
       // The navigation shell contains the page for the current branch; the gate asks for a missing name first
       body: CompleteNameGate(child: navigationShell),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(24.sp), topRight: Radius.circular(24.sp)),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 5.sp, // How soft the shadow is
-              spreadRadius: 0, // How far the shadow extends
-              color: Colors.black.withValues(alpha: 0.15), // Shadow color
+      // The iOS app gets the native tab bar, Android and the web keep the rounded Material one
+      bottomNavigationBar: useCupertino(context)
+          ? CupertinoTabBar(
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              activeColor: Theme.of(context).colorScheme.primary,
+              inactiveColor: Theme.of(context).hintColor,
+              currentIndex: selected < 0 ? 0 : selected,
+              items: [for (final t in tabs) t.item],
+              onTap: (i) => _goBranch(tabs[i].branch),
+            )
+          : Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(24.sp), topRight: Radius.circular(24.sp)),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 5.sp, // How soft the shadow is
+                    spreadRadius: 0, // How far the shadow extends
+                    color: Colors.black.withValues(alpha: 0.15), // Shadow color
+                  ),
+                ],
+              ),
+              child: BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                enableFeedback: false,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                // The router keeps users off hidden tabs; the fallback only covers the frame before it redirects.
+                currentIndex: selected < 0 ? 0 : selected,
+                items: [for (final t in tabs) t.item],
+                onTap: (i) => _goBranch(tabs[i].branch),
+              ),
             ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          enableFeedback: false,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          // The router keeps users off hidden tabs; the fallback only covers the frame before it redirects.
-          currentIndex: selected < 0 ? 0 : selected,
-          items: [for (final t in tabs) t.item],
-          onTap: (i) => _goBranch(tabs[i].branch),
-        ),
-      ),
     );
   }
 }

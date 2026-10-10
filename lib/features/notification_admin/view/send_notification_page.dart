@@ -9,6 +9,7 @@ import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/notification_admin/data/model/general_notification_model.dart';
 import 'package:work_hu/features/notification_admin/providers/notification_admin_provider.dart';
 import 'package:work_hu/features/notification_admin/widgets/role_target_picker.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 /// Composes and sends a one-off push to everyone or to the users of the chosen roles. Sending is immediate, so it
 /// asks for confirmation first.
@@ -37,7 +38,7 @@ class _SendNotificationPageState extends ConsumerState<SendNotificationPage> {
     if (!_formKey.currentState!.validate()) return;
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => AdaptiveAlertDialog(
         title: Text("notification_admin_confirm_title".i18n()),
         content: Text(
           _roles.isEmpty ? "notification_admin_confirm_all".i18n() : "notification_admin_confirm_roles".i18n(),

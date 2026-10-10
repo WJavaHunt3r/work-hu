@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/api_exception.dart';
 import 'package:work_hu/features/jobs/data/model/job_model.dart';
 import 'package:work_hu/features/jobs/data/repository/job_repository.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 
 /// Saves the job as an .ics file, which opens in (or imports into) the calendar of the user's choice.
 Future<void> saveJobToCalendarFile(BuildContext context, JobRepository repository, JobModel job) async {
@@ -89,7 +90,7 @@ class _SubscribeDialogState extends State<_SubscribeDialog> {
   Future<void> _reset() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      builder: (dialogContext) => AdaptiveAlertDialog(
         title: Text("jobs_calendar_reset".i18n()),
         content: Text("jobs_calendar_reset_question".i18n()),
         actions: [
@@ -111,14 +112,14 @@ class _SubscribeDialogState extends State<_SubscribeDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final url = _url;
-    return AlertDialog(
+    return AdaptiveAlertDialog(
       title: Text("jobs_calendar_subscribe".i18n()),
       content: SizedBox(
         width: double.maxFinite,
         child: _error != null
             ? Text(_error!)
             : url == null
-            ? const Center(heightFactor: 2, child: CircularProgressIndicator())
+            ? const Center(heightFactor: 2, child: CircularProgressIndicator.adaptive())
             : Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,

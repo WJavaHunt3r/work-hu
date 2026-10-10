@@ -82,7 +82,7 @@ class _JobChatPeopleSheetState extends ConsumerState<_JobChatPeopleSheet> {
               : people == null
               ? Padding(
                   padding: EdgeInsets.all(24.sp),
-                  child: const Center(child: CircularProgressIndicator()),
+                  child: const Center(child: CircularProgressIndicator.adaptive()),
                 )
               : Column(
                   mainAxisSize: MainAxisSize.min,
