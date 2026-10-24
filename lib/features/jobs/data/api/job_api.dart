@@ -19,6 +19,7 @@ class JobApi {
       queryParameters: {
         "status": filter.status?.name,
         "openOnly": filter.openOnly,
+        "eligibleOnly": filter.eligibleOnly,
         "responsibleId": filter.responsibleId,
         "employerId": filter.employerId,
         "registeredUserId": registeredUserId,

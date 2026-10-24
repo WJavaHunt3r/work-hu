@@ -8,8 +8,9 @@ abstract class SeasonModel with _$SeasonModel {
   const factory SeasonModel({
     required num id,
     required num seasonYear,
-    required DateTime startDate,
-    required DateTime endDate,
+    // Old seasons can have no dates
+    DateTime? startDate,
+    DateTime? endDate,
   }) = _SeasonModel;
 
   factory SeasonModel.fromJson(Map<String, dynamic> json) => _$SeasonModelFromJson(json);

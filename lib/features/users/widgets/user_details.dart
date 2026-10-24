@@ -4,9 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/gender.dart';
+import 'package:work_hu/app/models/permission.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
+import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/widgets/base_form_field.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
+import 'package:work_hu/features/churches/church_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/roles/providers/roles_provider.dart';
 import 'package:work_hu/features/roles/view/role_edit_page.dart' show permissionLabel;
@@ -18,6 +22,30 @@ class UserDetails extends ConsumerWidget {
 
   static final _formKey = GlobalKey<FormState>();
   final bool enabled;
+
+  /// Deleting needs USER_MANAGE, and you can't delete yourself.
+  bool _canDelete(WidgetRef ref, UserModel user) {
+    final me = ref.watch(userDataProvider).user;
+    return me != null && me.hasPermission(Permission.USER_MANAGE) && me.id != user.id;
+  }
+
+  /// Asks first; the backend refuses users with history (transactions, activities, ...) and says why.
+  Future<void> _delete(BuildContext context, WidgetRef ref, UserModel user) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AdaptiveAlertDialog(
+        title: Text("user_delete".i18n()),
+        content: Text("user_delete_question".i18n([user.getFullName()])),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(dialogContext).pop(false), child: Text("base_cancel".i18n())),
+          FilledButton(onPressed: () => Navigator.of(dialogContext).pop(true), child: Text("user_delete".i18n())),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final deleted = await ref.read(userDetailProvider.notifier).deleteUser();
+    if (deleted && context.mounted) context.pop(true);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,6 +63,12 @@ class UserDetails extends ConsumerWidget {
                 leading: IconButton(icon: const Icon(Icons.close), onPressed: () => context.pop()),
                 title: Text(user.getFullName(), style: const TextStyle(fontWeight: FontWeight.w800)),
                 actions: [
+                  if (_canDelete(ref, user))
+                    IconButton(
+                      tooltip: "user_delete".i18n(),
+                      icon: Icon(Icons.delete_outline, color: Theme.of(context).colorScheme.error),
+                      onPressed: () => _delete(context, ref, user),
+                    ),
                   MaterialButton(
                     onPressed: () async {
                       final saved = await ref.read(userDetailProvider.notifier).saveUser();
@@ -58,7 +92,11 @@ class UserDetails extends ConsumerWidget {
                                 labelText: "user_details_lastname".i18n(),
                                 textAlign: TextAlign.left,
                                 initialValue: user.lastname,
-                                onChanged: (String text) {},
+                                onChanged: (String text) => text.trim().isNotEmpty
+                                    ? ref
+                                          .read(userDetailProvider.notifier)
+                                          .updateCurrentUser(user.copyWith(lastname: text.trim()))
+                                    : null,
                               ),
                             ),
                             SizedBox(width: 5.sp),
@@ -67,15 +105,42 @@ class UserDetails extends ConsumerWidget {
                                 labelText: "user_details_firstname".i18n(),
                                 textAlign: TextAlign.left,
                                 initialValue: user.firstname,
-                                onChanged: (String text) {},
+                                onChanged: (String text) => text.trim().isNotEmpty
+                                    ? ref
+                                          .read(userDetailProvider.notifier)
+                                          .updateCurrentUser(user.copyWith(firstname: text.trim()))
+                                    : null,
                               ),
                             ),
                           ],
                         ),
-                        BaseTextFormField(
+                        BaseLabeledField(
                           labelText: "user_details_date_of_birth".i18n(),
-                          initialValue: Utils.dateTimeToDateOnlyString(user.birthDate),
-                          onChanged: (String text) {},
+                          child: InkWell(
+                            onTap: () async {
+                              final now = DateTime.now();
+                              final picked = await pickDate(
+                                context: context,
+                                initialDate: user.birthDate ?? DateTime(now.year - 20),
+                                firstDate: DateTime(1900),
+                                lastDate: now,
+                              );
+                              if (picked != null) {
+                                ref
+                                    .read(userDetailProvider.notifier)
+                                    .updateCurrentUser(user.copyWith(birthDate: picked));
+                              }
+                            },
+                            child: InputDecorator(
+                              decoration: baseInputDecoration(
+                                Theme.of(context),
+                                suffixIcon: const Icon(Icons.calendar_today_outlined),
+                              ),
+                              child: Text(
+                                user.birthDate == null ? " " : Utils.dateTimeToDateOnlyString(user.birthDate),
+                              ),
+                            ),
+                          ),
                         ),
                         BaseTextFormField(
                           labelText: "user_details_email".i18n(),
@@ -148,6 +213,15 @@ class UserDetails extends ConsumerWidget {
                           onChanged: (value) =>
                               ref.read(userDetailProvider.notifier).updateCurrentUser(user.copyWith(gender: value)),
                         ),
+                        _ChurchField(user: user),
+                        SwitchListTile.adaptive(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8.sp),
+                          title: Text("user_details_member".i18n()),
+                          subtitle: Text("user_details_member_hint".i18n()),
+                          value: user.member,
+                          onChanged: (value) =>
+                              ref.read(userDetailProvider.notifier).updateCurrentUser(user.copyWith(member: value)),
+                        ),
                         _RolesSection(user: user),
                         TextButton(
                           style: ButtonStyle(
@@ -166,6 +240,43 @@ class UserDetails extends ConsumerWidget {
                 ),
               ),
             ),
+    );
+  }
+}
+
+/// The user's church; only user managers can change it (it decides which screens the user gets).
+class _ChurchField extends ConsumerWidget {
+  const _ChurchField({required this.user});
+
+  final UserModel user;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(userDetailProvider.notifier);
+    final churches = ref.watch(churchesProvider).value ?? const <ChurchModel>[];
+    // A church that is not in the list (yet) must still be selectable, or the dropdown would fail
+    final selected = churches.any((c) => c.id == user.churchId) ? user.churchId : null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        BaseDropdownFormField<num?>(
+          // New key when the list arrives, so the dropdown shows the loaded value
+          key: ValueKey("church-${churches.length}-${user.id}"),
+          labelText: "user_details_church".i18n(),
+          initialValue: selected,
+          items: [
+            DropdownMenuItem<num?>(value: null, child: Text("user_details_church_none".i18n())),
+            for (final c in churches) DropdownMenuItem<num?>(value: c.id, child: Text(c.churchName)),
+          ],
+          onChanged: notifier.canManageUsers
+              ? (value) => notifier.updateCurrentUser(user.copyWith(churchId: value))
+              : null,
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.sp),
+          child: Text("user_details_church_hint".i18n(), style: Theme.of(context).textTheme.bodySmall),
+        ),
+      ],
     );
   }
 }

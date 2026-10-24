@@ -53,6 +53,24 @@ class LoginApi {
     }
   }
 
+  Future<dynamic> loginWithAppleRequest(
+    String identityToken,
+    String? authorizationCode,
+    String? givenName,
+    String? familyName,
+  ) async {
+    final res = await _dioClient.dio.post(
+      "/auth/apple",
+      data: {
+        'identityToken': identityToken,
+        'authorizationCode': authorizationCode,
+        'givenName': givenName,
+        'familyName': familyName,
+      },
+    );
+    return res.data;
+  }
+
   Future<dynamic> loginWithGoogleRequest(String idToken) async {
     try {
       final res = await _dioClient.dio.post("/auth/google", data: {'idToken': idToken});

@@ -12,6 +12,10 @@ abstract class JobFilter with _$JobFilter {
     /// Only jobs that accept registrations right now.
     @Default(false) bool openOnly,
 
+    /// Only jobs the user (or their spouse or children) may register for by age and gender, and those they are
+    /// already registered for. On in the Jobs tab, off in the admin list.
+    @Default(false) bool eligibleOnly,
+
     /// Only jobs the current user is registered for.
     @Default(false) bool onlyMine,
 

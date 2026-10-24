@@ -12,15 +12,21 @@ abstract class RoundModel with _$RoundModel {
     required DateTime startDateTime,
     required DateTime endDateTime,
     required num myShareGoal,
-    required num samvirkGoal,
-    required num samvirkChurchGoal,
+    // Old rounds can have empty columns here: they must not make the whole list unreadable
+    @Default(0) num samvirkGoal,
+    @Default(0) num samvirkChurchGoal,
     required num roundNumber,
     required SeasonModel season,
-    required DateTime freezeDateTime,
-    required bool activeRound,
+    DateTime? freezeDateTime,
+    @Default(true) bool activeRound,
     TeamModel? winnerTeam,
     required num localMyShareGoal,
+
+    /// The Samvirk church status (a percentage towards the common goal); empty on old rounds.
+    num? samvirkChurchStatus,
   }) = _RoundModel;
 
-  factory RoundModel.fromJson(Map<String, dynamic> json) => _$RoundModelFromJson(json);
+  /// Old rounds can have no local goal: it is then the same as the main goal.
+  factory RoundModel.fromJson(Map<String, dynamic> json) =>
+      _$RoundModelFromJson({...json, 'localMyShareGoal': json['localMyShareGoal'] ?? json['myShareGoal']});
 }

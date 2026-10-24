@@ -14,6 +14,8 @@ import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/status/data/state/status_state.dart';
 import 'package:work_hu/features/status/providers/status_providers.dart';
+import 'package:work_hu/features/reading_plan/view/reading_plan_card.dart';
+import 'package:work_hu/features/streams/view/live_page.dart';
 import 'package:work_hu/features/user_transactions/widgets/points_list_item.dart';
 import 'package:work_hu/features/utils.dart';
 
@@ -40,6 +42,8 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const LiveBanner(),
+        const ReadingPlanCard(),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

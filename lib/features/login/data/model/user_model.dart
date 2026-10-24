@@ -41,6 +41,9 @@ abstract class UserModel with _$UserModel {
 
     /// True while the first or last name is the backend's placeholder (e.g. Google sent no last name).
     @Default(false) bool profileIncomplete,
+
+    /// Member of the community: gets the mailings. Set by user managers in the user details.
+    @Default(false) bool member,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
@@ -74,7 +77,8 @@ abstract class UserModel with _$UserModel {
   /// Users outside a church only see the balance and the profile (no status, jobs or admin).
   bool hasChurch() => churchId != null;
 
-  /// Whether the admin tab has anything to show: team leaders, admins and anyone holding a management permission.
+  /// Whether the admin tab has anything to show: team leaders, admins and anyone holding a permission that has an entry
+  /// on the admin page (add a permission here when the admin page gets an entry for it).
   bool hasAdminAccess() =>
       isAdmin() ||
       isTeamLeader() ||
@@ -91,6 +95,11 @@ abstract class UserModel with _$UserModel {
         Permission.AUDIT_LOG_VIEW,
         Permission.JOB_CREATE,
         Permission.JOB_MANAGE_ALL,
+        Permission.MAILING_SEND,
+        Permission.STREAM_MANAGE,
+        Permission.NOTIFICATION_SEND,
+        Permission.NOTIFICATION_SCHEDULE_MANAGE,
+        Permission.READING_PLAN_MANAGE,
       ]);
 
   /// A parent is an adult with a family; their children are the family members aged 18 or younger.

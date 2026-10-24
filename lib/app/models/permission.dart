@@ -23,7 +23,11 @@ enum Permission {
   BOOKING_ADMIN,
   AUDIT_LOG_VIEW,
   NOTIFICATION_SEND,
-  NOTIFICATION_SCHEDULE_MANAGE;
+  NOTIFICATION_SCHEDULE_MANAGE,
+  STREAM_MANAGE,
+  MAILING_SEND,
+  READING_PLAN,
+  READING_PLAN_MANAGE;
 
   /// i18n key of the permission's name.
   String get label => "permission_$name";

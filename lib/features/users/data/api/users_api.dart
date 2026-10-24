@@ -82,6 +82,16 @@ class UsersApi {
     }
   }
 
+  Future<List<dynamic>> getChurches() async => (await _dioClient.dio.get("/church")).data as List<dynamic>;
+
+  /// Sets (or, with null, clears) the user's church; only user managers may.
+  Future<dynamic> setUserChurch(num userId, num? churchId) async =>
+      (await _dioClient.dio.put("/user/$userId/church", data: {"churchId": churchId})).data;
+
+  Future<dynamic> createUser(Map<String, dynamic> data) async => (await _dioClient.dio.post("/user", data: data)).data;
+
+  Future<void> deleteUser(num userId) async => _dioClient.dio.delete("/user/$userId");
+
   Future<dynamic> setPaceTeams() async {
     try {
       final res = await _dioClient.dio.get("/user/setPaceTeams");

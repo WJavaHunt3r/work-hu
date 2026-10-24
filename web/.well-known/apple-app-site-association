@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["2CU9YRNUJU.com.ktk.dukapp"],
+        "appIDs": ["PDF2843MSN.com.ktk.dukapp", "2CU9YRNUJU.com.ktk.dukapp"],
         "components": [
           { "/": "/profile/*" },
           { "/": "/jobs*" },

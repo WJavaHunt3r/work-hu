@@ -71,7 +71,12 @@ class _JobsCalendarPageState extends ConsumerState<JobsCalendarPage> {
           .read(jobRepoProvider)
           .getJobs(
             ListQuery<JobFilter>(
-              filter: JobFilter(dateFrom: from, dateTo: to, status: widget.manage ? null : JobStatus.OPEN),
+              filter: JobFilter(
+                dateFrom: from,
+                dateTo: to,
+                status: widget.manage ? null : JobStatus.OPEN,
+                eligibleOnly: !widget.manage,
+              ),
               size: _maxJobs,
             ),
           );

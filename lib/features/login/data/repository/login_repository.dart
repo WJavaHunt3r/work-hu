@@ -26,6 +26,16 @@ class LoginRepository {
     }
   }
 
+  Future<Map<String, dynamic>> loginWithApple(
+    String identityToken,
+    String? authorizationCode,
+    String? givenName,
+    String? familyName,
+  ) async {
+    final res = await _loginApi.loginWithAppleRequest(identityToken, authorizationCode, givenName, familyName);
+    return res;
+  }
+
   Future<Map<String, dynamic>> loginWithGoogle(String idToken) async {
     try {
       final res = await _loginApi.loginWithGoogleRequest(idToken);

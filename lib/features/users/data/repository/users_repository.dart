@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:work_hu/app/framework/api_exception.dart';
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
+import 'package:work_hu/features/churches/church_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/teams/data/model/team_model.dart';
 import 'package:work_hu/features/user_combo/data/model/user_combo_model.dart';
@@ -82,6 +84,14 @@ class UsersRepository {
     }
   }
 
+  Future<List<ChurchModel>> getChurches() => guardApi(() async {
+    final res = await _userApi.getChurches();
+    return [for (final e in res) ChurchModel.fromJson(e as Map<String, dynamic>)];
+  });
+
+  Future<UserModel> setUserChurch(num userId, num? churchId) =>
+      guardApi(() async => UserModel.fromJson(await _userApi.setUserChurch(userId, churchId)));
+
   Future<String> setPaceTeams() async {
     try {
       final res = await _userApi.setPaceTeams();
@@ -90,4 +100,16 @@ class UsersRepository {
       rethrow;
     }
   }
+
+  /// Creates a user; the backend e-mails them a temporary password. [emailSent] is false when that mail failed.
+  Future<({UserModel user, bool emailSent})> createUser(Map<String, dynamic> data) => guardApi(() async {
+    final res = await _userApi.createUser(data) as Map<String, dynamic>;
+    return (
+      user: UserModel.fromJson(res['user'] as Map<String, dynamic>),
+      emailSent: res['emailSent'] as bool? ?? false,
+    );
+  });
+
+  /// Only users without any history can be deleted; the backend says what stands in the way otherwise.
+  Future<void> deleteUser(num userId) => guardApi(() => _userApi.deleteUser(userId));
 }

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/locator.dart';
@@ -102,24 +103,53 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
     );
   }
 
+  /// Stores the tokens of a Google or Apple sign-in and loads the user, which signs them in.
+  Future<void> _finishSocialLogin(Map<String, dynamic> data) async {
+    await Utils.saveData("jwt_token", data['token']);
+    await Utils.saveData("refresh_token", data['refreshToken']);
+    await Utils.saveData("keep_logged_in", "true");
+    userProvider.setToken(data['token']);
+    executeApiCall(
+      () => _loginRepository.getUserByUsername(data['username']).then((userData) async {
+        userProvider.setUser(userData);
+      }),
+    );
+  }
+
   Future<void> signInWithGoogle(String idToken) async {
     try {
       executeApiCall<Map<String, dynamic>>(
         () => _loginRepository.loginWithGoogle(idToken),
-        onSuccess: (data) async {
-          await Utils.saveData("jwt_token", data['token']);
-          await Utils.saveData("refresh_token", data['refreshToken']);
-          await Utils.saveData("keep_logged_in", "true");
-          userProvider.setToken(data['token']);
-          executeApiCall(
-            () => _loginRepository.getUserByUsername(data['username']).then((userData) async {
-              userProvider.setUser(userData);
-            }),
-          );
-        },
+        onSuccess: _finishSocialLogin,
       );
     } catch (error) {
       debugPrint("Google Sign-In Error: $error");
+    }
+  }
+
+  /// iOS: the native "Sign in with Apple" sheet. Apple gives the name only the first time, so it is sent along.
+  Future<void> signInWithApple() async {
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName],
+      );
+      final token = credential.identityToken;
+      if (token == null) return;
+      executeApiCall<Map<String, dynamic>>(
+        () => _loginRepository.loginWithApple(
+          token,
+          // Single use, valid for minutes: the backend trades it for the token it revokes when the account is deleted
+          credential.authorizationCode,
+          credential.givenName,
+          credential.familyName,
+        ),
+        onSuccess: _finishSocialLogin,
+      );
+    } on SignInWithAppleAuthorizationException catch (e) {
+      // Closing the sheet is not an error
+      if (e.code != AuthorizationErrorCode.canceled) debugPrint("Apple Sign-In Error: $e");
+    } catch (error) {
+      debugPrint("Apple Sign-In Error: $error");
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_list_page.dart';
 import 'package:work_hu/app/framework/base_components/paged_list/paged_list_page.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
@@ -24,11 +25,20 @@ class RoundsPageState extends PagedListPageState<RoundsPage, RoundModel, RoundFi
     return BaseListTile(
       isLast: index == items.length - 1,
       index: index,
-      onTap: () => context.push("/rounds/maintenance", extra: item.id),
+      onTap: () async {
+        final changed = await context.push<bool>("/admin/rounds/${item.id}");
+        if (changed == true) notifier.reload();
+      },
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("${item.season.seasonYear} - ${Utils.getMonthFromDate(item.startDateTime, context)}"),
+          Flexible(
+            child: Text(
+              "${item.season.seasonYear} - ${Utils.getMonthFromDate(item.startDateTime, context)}"
+              "${item.activeRound ? "" : " (${"rounds_inactive".i18n()})"}",
+              style: item.activeRound ? null : TextStyle(color: Theme.of(context).hintColor),
+            ),
+          ),
           Row(
             children: [
               Text(Utils.percentFormatting(item.localMyShareGoal)),
@@ -40,6 +50,16 @@ class RoundsPageState extends PagedListPageState<RoundsPage, RoundModel, RoundFi
       ),
     );
   }
+
+  @override
+  Widget? buildFloatingActionButton(BuildContext context, WidgetRef ref) => FloatingActionButton(
+    tooltip: "rounds_new".i18n(),
+    onPressed: () async {
+      final created = await context.push<bool>("/admin/rounds/new");
+      if (created == true) notifier.reload();
+    },
+    child: const Icon(Icons.add),
+  );
 
   @override
   get provider => roundDataProvider;

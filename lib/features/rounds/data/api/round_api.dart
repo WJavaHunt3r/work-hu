@@ -2,7 +2,6 @@ import 'package:work_hu/api/dio_client.dart';
 import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/features/rounds/data/model/round_filter.dart';
-import 'package:work_hu/features/rounds/data/model/round_model.dart';
 
 class RoundApi {
   final DioClient _dioClient = locator<DioClient>();
@@ -39,21 +38,8 @@ class RoundApi {
     }
   }
 
-  Future<dynamic> postRound(RoundModel round) async {
-    try {
-      final res = await _dioClient.dio.get("/round");
-      return res.data;
-    } catch (e) {
-      rethrow;
-    }
-  }
+  Future<dynamic> postRound(Map<String, dynamic> data) async => (await _dioClient.dio.post("/round", data: data)).data;
 
-  Future<dynamic> putRound(RoundModel round, num roundId) async {
-    try {
-      final res = await _dioClient.dio.get("/round/$roundId", data: round.toJson());
-      return res.data;
-    } catch (e) {
-      rethrow;
-    }
-  }
+  Future<dynamic> putRound(num roundId, Map<String, dynamic> data) async =>
+      (await _dioClient.dio.put("/round/$roundId", data: data)).data;
 }

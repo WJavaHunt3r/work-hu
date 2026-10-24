@@ -64,6 +64,10 @@ class AdminPageState extends BasePageState<AdminPage, AdminState, AdminDataNotif
       if (can(Permission.CAMP_MANAGE))
         (label: "admin_camp_registrations", icon: Icons.app_registration, route: "/admin/campRegistrations"),
       if (can(Permission.SEASON_MANAGE)) (label: "admin_rounds", icon: Icons.timelapse, route: "/admin/rounds"),
+      if (can(Permission.MAILING_SEND)) (label: "admin_mailing", icon: Icons.mail_outline, route: "/admin/mailing"),
+      if (can(Permission.READING_PLAN_MANAGE))
+        (label: "admin_reading_plan", icon: Icons.menu_book_outlined, route: "/admin/readingPlan"),
+      if (can(Permission.STREAM_MANAGE)) (label: "admin_streams", icon: Icons.podcasts, route: "/admin/streams"),
       if (can(Permission.NOTIFICATION_SEND))
         (label: "admin_send_notification", icon: Icons.campaign_outlined, route: "/admin/notifications"),
       if (can(Permission.NOTIFICATION_SEND))

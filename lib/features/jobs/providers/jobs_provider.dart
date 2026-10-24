@@ -30,7 +30,7 @@ final jobRepoProvider = Provider<JobRepository>((ref) => JobRepository(ref.read(
 /// because the tab stays alive while the admin list is open and the two must not share their filters.
 final jobsDataProvider = StateNotifierProvider.autoDispose
     .family<JobsDataNotifier, PagedState<JobModel, JobFilter>, bool>(
-      (ref, manage) => JobsDataNotifier(ref.read(jobRepoProvider), ref.read(userDataProvider).user),
+      (ref, manage) => JobsDataNotifier(ref.read(jobRepoProvider), ref.read(userDataProvider).user, manage: manage),
     );
 
 /// One job with its registrations, by job id.
@@ -40,10 +40,11 @@ final jobDetailProvider = StateNotifierProvider.autoDispose.family<JobDetailNoti
 );
 
 class JobsDataNotifier extends PagedListNotifier<JobModel, JobFilter> {
-  JobsDataNotifier(this.jobRepository, this.user)
+  JobsDataNotifier(this.jobRepository, this.user, {required bool manage})
     : super(
         ListQuery(
-          filter: const JobFilter(status: JobStatus.OPEN),
+          // The Jobs tab only lists what the user may register for; the admin list lists everything
+          filter: JobFilter(status: JobStatus.OPEN, eligibleOnly: !manage),
           sort: const [SortOrder("jobDateTime")],
         ),
       );

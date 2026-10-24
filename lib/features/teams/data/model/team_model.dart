@@ -7,9 +7,10 @@ part 'team_model.g.dart';
 abstract class TeamModel with _$TeamModel {
   const factory TeamModel({
     required num id,
-    required num teamLeaderId,
+    // A team (e.g. an old round's winner) can have no leader or coins stored
+    @Default(0) num teamLeaderId,
     required String teamName,
-    required double coins,
+    @Default(0) double coins,
     String? color,
     String? startColor,
     String? endColor,

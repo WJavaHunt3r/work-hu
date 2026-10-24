@@ -12,6 +12,7 @@ import 'package:work_hu/app/framework/base_components/paged_list/paged_state.dar
 import 'package:work_hu/app/framework/base_components/paginated_response.dart';
 import 'package:work_hu/app/providers/base_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/features/churches/church_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/app/framework/api_exception.dart';
 import 'package:work_hu/app/models/permission.dart';
@@ -31,6 +32,11 @@ final usersDataProvider = StateNotifierProvider.autoDispose<UsersDataNotifier, P
   (ref) => UsersDataNotifier(ref.read(usersRepoProvider), ref.read(userDataProvider).user),
 );
 
+/// All churches, for the user list's filter and the church of a user.
+final churchesProvider = FutureProvider.autoDispose<List<ChurchModel>>(
+  (ref) => ref.read(usersRepoProvider).getChurches(),
+);
+
 final userDetailProvider = StateNotifierProvider.autoDispose<UserDetailNotifier, UserDetailState>(
   (ref) =>
       UserDetailNotifier(ref.read(usersRepoProvider), ref.read(rolesRepoProvider), ref.read(userDataProvider).user),
@@ -44,6 +50,14 @@ class UsersDataNotifier extends PagedListNotifier<UserComboModel, UserFilter> {
 
   final UsersRepository usersRepository;
   final UserModel? currentUser;
+
+  /// Search by name; the filter keeps the rest.
+  Future<void> setKeyword(String text) {
+    final keyword = text.trim();
+    final filter = state.query.filter;
+    if ((filter.keyword ?? "") == keyword) return Future.value();
+    return setFilter(filter.copyWith(keyword: keyword.isEmpty ? null : keyword));
+  }
 
   @override
   Future<PaginatedResponse<UserComboModel>> fetch(ListQuery<UserFilter> query, int page) =>
@@ -94,6 +108,9 @@ class UserDetailNotifier extends BaseDataNotifier<UserDetailState> {
 
   /// Roles the user had when loaded, to tell whether the roles need saving.
   List<String> _loadedRoleNames = const [];
+  num? _loadedChurchId;
+
+  bool get canManageUsers => currentUser?.hasPermission(Permission.USER_MANAGE) ?? false;
 
   /// Roles are assigned separately from the profile, and only by users who may manage roles.
   bool get canManageRoles => currentUser?.hasPermission(Permission.ROLE_MANAGE) ?? false;
@@ -104,6 +121,7 @@ class UserDetailNotifier extends BaseDataNotifier<UserDetailState> {
       () => usersRepository.getUserById(id),
       onSuccess: (user) async {
         _loadedRoleNames = user.roleNames;
+        _loadedChurchId = user.churchId;
         state = state.copyWith(selectedUser: user);
       },
     );
@@ -136,15 +154,41 @@ class UserDetailNotifier extends BaseDataNotifier<UserDetailState> {
           final ids = roles.where((r) => edited.roleNames.contains(r.name)).map((r) => r.id!);
           user = await rolesRepository.setUserRoles(edited.id, ids);
         }
+        if (canManageUsers && edited.churchId != _loadedChurchId) {
+          user = await usersRepository.setUserChurch(edited.id, edited.churchId);
+        }
         return user;
       }),
       onSuccess: (user) async {
         _loadedRoleNames = user.roleNames;
+        _loadedChurchId = user.churchId;
         state = state.copyWith(selectedUser: user);
       },
       onError: (message) async => showApiError(message),
     );
     return saved != null;
+  }
+
+  /// Creates a user from the "add user" form; returns the result, or null (after showing the reason) when refused.
+  Future<({UserModel user, bool emailSent})?> createUser(Map<String, dynamic> data) async {
+    final created = await executeApiCall<({UserModel user, bool emailSent})>(
+      () => usersRepository.createUser(data),
+      onError: (message) async => showApiError(message),
+    );
+    return created as ({UserModel user, bool emailSent})?;
+  }
+
+  /// Deletes the edited user. Returns whether it is gone; otherwise the reason (e.g. the user has history) was shown.
+  Future<bool> deleteUser() async {
+    final id = state.selectedUser!.id;
+    final deleted = await executeApiCall<bool>(
+      () => guardApi(() async {
+        await usersRepository.deleteUser(id);
+        return true;
+      }),
+      onError: (message) async => showApiError(message),
+    );
+    return deleted == true;
   }
 
   Future<void> resetUserPassword(num userId) async {

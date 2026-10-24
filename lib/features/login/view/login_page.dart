@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -164,6 +166,11 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
           _buildDivider(theme),
           SizedBox(height: 20.sp),
           _buildGoogleButton(theme),
+          // Apple requires it next to other social logins; only in the iOS app
+          if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) ...[
+            SizedBox(height: 12.sp),
+            _buildAppleButton(theme),
+          ],
           SizedBox(height: 24.sp),
           _isLogin ? _buildFooterText(theme) : const SizedBox(),
         ],
@@ -458,6 +465,21 @@ class LoginPageState extends BasePageState<LoginPage, LoginState, LoginDataNotif
         isLogin: _isLogin,
         languageCode: lngCode,
         onPressed: () => ref.read(loginDataProvider.notifier).signInWithGoogleNative(),
+      ),
+    );
+  }
+
+  Widget _buildAppleButton(ThemeData theme) {
+    return SizedBox(
+      height: 50.sp,
+      width: double.infinity,
+      child: SignInWithAppleButton(
+        text: (_isLogin ? 'login_apple_sign_in' : 'login_apple_sign_up').i18n(),
+        style: theme.brightness == Brightness.dark
+            ? SignInWithAppleButtonStyle.white
+            : SignInWithAppleButtonStyle.black,
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
+        onPressed: () => ref.read(loginDataProvider.notifier).signInWithApple(),
       ),
     );
   }

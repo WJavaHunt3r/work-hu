@@ -1,7 +1,9 @@
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/cupertino.dart' show CupertinoThemeData;
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart' show FlutterQuillLocalizations;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,12 +50,41 @@ ThemeData _withChipStyle(ThemeData theme) {
 class DukApp extends ConsumerWidget {
   const DukApp({super.key});
 
+  /// Screens whose shorter side is at least this many points (iPads) show the app in a column.
+  static const _tabletShortestSide = 600.0;
+  static const _columnWidth = 500.0;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var width = MediaQuery.sizeOf(context).width;
 
-    // Native apps use the full screen; the phone-sized frame is only for the web build.
+    // Phones use the full screen; the web build and tablets get the app in a phone-sized column (a stretched layout
+    // looks wrong on an iPad, and screenutil would scale everything up with the width).
     if (!kIsWeb) {
+      final media = MediaQuery.of(context);
+      if (media.size.shortestSide >= _tabletShortestSide) {
+        return ColoredBox(
+          color: AppColors.backgroundColor,
+          child: Center(
+            child: ClipRect(
+              child: SizedBox(
+                width: _columnWidth,
+                child: MediaQuery(
+                  data: media.copyWith(size: Size(_columnWidth, math.min(media.size.height, 1000))),
+                  child: ScreenUtilInit(
+                    designSize: const Size(360, 640),
+                    minTextAdapt: true,
+                    ensureScreenSize: true,
+                    enableScaleWH: () => false,
+                    splitScreenMode: false,
+                    builder: (context, child) => buildMaterial(ref),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
       return ScreenUtilInit(
         designSize: const Size(360, 640),
         minTextAdapt: true,
@@ -122,6 +153,7 @@ class DukApp extends ConsumerWidget {
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
+            FlutterQuillLocalizations.delegate,
             LocalJsonLocalization.delegate,
             const LocaleNamesLocalizationsDelegate(),
           ],

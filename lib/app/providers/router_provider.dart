@@ -10,6 +10,11 @@ import 'package:work_hu/features/activities/view/activities_page.dart';
 import 'package:work_hu/features/audit_log/view/audit_log_page.dart';
 import 'package:work_hu/features/job_chat/view/job_chat_page.dart';
 import 'package:work_hu/features/jobs/view/job_detail_page.dart';
+import 'package:work_hu/features/mailing/view/mailing_history_page.dart';
+import 'package:work_hu/features/mailing/view/mailing_page.dart';
+import 'package:work_hu/features/streams/providers/streams_provider.dart';
+import 'package:work_hu/features/streams/view/live_page.dart';
+import 'package:work_hu/features/streams/view/streams_page.dart';
 import 'package:work_hu/features/jobs/view/jobs_calendar_page.dart';
 import 'package:work_hu/features/login/widgets/complete_name_dialog.dart';
 import 'package:work_hu/features/jobs/view/job_form_page.dart';
@@ -47,7 +52,12 @@ import 'package:work_hu/features/notification_admin/view/send_notification_page.
 import 'package:work_hu/features/notifications/view/notification_preferences_page.dart';
 import 'package:work_hu/features/profile/view/language_picker_page.dart';
 import 'package:work_hu/features/profile/view/profile_page.dart';
-import 'package:work_hu/features/rounds/view/rounds_maintenance_page.dart';
+import 'package:work_hu/features/reading_plan/view/article_edit_page.dart';
+import 'package:work_hu/features/reading_plan/view/article_reader_page.dart';
+import 'package:work_hu/features/reading_plan/view/psalm_reader_page.dart';
+import 'package:work_hu/features/reading_plan/view/psalms_page.dart';
+import 'package:work_hu/features/reading_plan/view/reading_plan_articles_admin_page.dart';
+import 'package:work_hu/features/rounds/view/round_edit_page.dart';
 import 'package:work_hu/features/rounds/view/rounds_page.dart';
 import 'package:work_hu/features/status/view/status_page.dart';
 import 'package:work_hu/features/top_up/view/top_up_page.dart';
@@ -68,6 +78,7 @@ import 'package:work_hu/app/platform/adaptive.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
 final _shellNavigatorAdminKey = GlobalKey<NavigatorState>(debugLabel: 'shellAdmin');
+final _shellNavigatorLiveKey = GlobalKey<NavigatorState>(debugLabel: 'shellLive');
 final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellHome');
 final _shellNavigatorStatusKey = GlobalKey<NavigatorState>(debugLabel: 'shellStatus');
 final _shellNavigatorJobsKey = GlobalKey<NavigatorState>(debugLabel: 'shellJobs');
@@ -244,6 +255,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             navigatorKey: _shellNavigatorAdminKey,
             routes: [GoRoute(path: '/admin', builder: (context, state) => const AdminPage())],
           ),
+
+          // Branch 5: Live (only in the tab bar while a stream is on the air)
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorLiveKey,
+            routes: [GoRoute(path: '/live', builder: (context, state) => const LivePage())],
+          ),
         ],
       ),
       GoRoute(path: '/tos', builder: (context, state) => const ToSPage()),
@@ -333,6 +350,36 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (BuildContext context, GoRouterState state) =>
             JobChatPage(jobId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
       ),
+      GoRoute(path: "/admin/mailing", builder: (BuildContext context, GoRouterState state) => const MailingPage()),
+      GoRoute(
+        path: "/admin/mailing/history",
+        builder: (BuildContext context, GoRouterState state) => const MailingHistoryPage(),
+      ),
+      // The reading challenge: outside the tab shell, so users without a church (who have no Status page) can open it too
+      GoRoute(
+        path: '/psalms',
+        builder: (context, state) => const PsalmsPage(),
+        routes: [
+          // "article/:id" must stay before ":n"
+          GoRoute(
+            path: 'article/:id',
+            builder: (context, state) =>
+                ArticleReaderPage(articleId: num.tryParse(state.pathParameters['id'] ?? '') ?? 0),
+          ),
+          GoRoute(
+            path: ':n',
+            builder: (context, state) => PsalmReaderPage(number: int.tryParse(state.pathParameters['n'] ?? '') ?? 1),
+          ),
+        ],
+      ),
+      // The articles of the reading plan; "new" must stay before ":id"
+      GoRoute(path: "/admin/readingPlan", builder: (context, state) => const ReadingPlanArticlesAdminPage()),
+      GoRoute(path: "/admin/readingPlan/new", builder: (context, state) => const ArticleEditPage()),
+      GoRoute(
+        path: "/admin/readingPlan/:id",
+        builder: (context, state) => ArticleEditPage(id: num.tryParse(state.pathParameters["id"] ?? "")),
+      ),
+      GoRoute(path: "/admin/streams", builder: (BuildContext context, GoRouterState state) => const StreamsPage()),
       GoRoute(
         path: "/admin/notifications/overdueJobs",
         builder: (BuildContext context, GoRouterState state) => const OverdueJobsPage(),
@@ -366,12 +413,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: "/admin/goals", builder: (BuildContext context, GoRouterState state) => const GoalPage()),
       GoRoute(path: "/admin/rounds", builder: (BuildContext context, GoRouterState state) => const RoundsPage()),
+      // "new" must stay before ":id", or it is read as a round id
+      GoRoute(path: "/admin/rounds/new", builder: (BuildContext context, GoRouterState state) => const RoundEditPage()),
       GoRoute(
-        path: "/admin/rounds/maintenance",
-        builder: (BuildContext context, GoRouterState state) {
-          var map = state.extra == null ? null : state.extra as Map<String, dynamic>;
-          return RoundsMaintenancePage(id: map != null ? map["id"] : null);
-        },
+        path: "/admin/rounds/:id",
+        builder: (BuildContext context, GoRouterState state) =>
+            RoundEditPage(id: num.tryParse(state.pathParameters["id"] ?? "")),
       ),
       GoRoute(path: "/admin/donations", builder: (BuildContext context, GoRouterState state) => const DonationsPage()),
       GoRoute(path: "/admin/camps", builder: (BuildContext context, GoRouterState state) => const CampPage()),
@@ -438,7 +485,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Users outside a church only have the balance and the profile (also covers the initial "/status").
       if (loggedIn && !user.hasChurch()) {
         final location = state.matchedLocation;
-        if (location == '/' || ['/status', '/jobs', '/admin'].any(location.startsWith)) return '/balance';
+        if (location == '/' || ['/status', '/jobs', '/admin', '/live'].any(location.startsWith)) return '/balance';
         if (location.startsWith('/profile/activities')) return '/profile';
       }
 
@@ -469,7 +516,7 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
 
   /// The tabs this user sees, each with the index of its branch in the shell route. Hidden tabs leave gaps, so an
   /// item's position in the bar is not its branch index.
-  List<({int branch, BottomNavigationBarItem item})> _tabs(UserModel user) {
+  List<({int branch, BottomNavigationBarItem item})> _tabs(UserModel user, {required bool showLive}) {
     final church = user.hasChurch();
     return [
       (
@@ -498,6 +545,15 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
             label: 'nav_bar_jobs'.i18n(),
           ),
         ),
+      if (church && showLive)
+        (
+          branch: 5,
+          item: BottomNavigationBarItem(
+            activeIcon: const Icon(Icons.sensors),
+            icon: const Icon(Icons.sensors),
+            label: 'nav_bar_live'.i18n(),
+          ),
+        ),
       (
         branch: 3,
         item: BottomNavigationBarItem(
@@ -521,7 +577,9 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userDataProvider).user;
-    final tabs = _tabs(user!);
+    // The Live tab is there while something is on the air, and stays while it is open
+    final onAir = ref.watch(liveStreamsProvider).value?.isNotEmpty ?? false;
+    final tabs = _tabs(user!, showLive: onAir || navigationShell.currentIndex == 5);
     final selected = tabs.indexWhere((t) => t.branch == navigationShell.currentIndex);
     return Scaffold(
       // The navigation shell contains the page for the current branch; the gate asks for a missing name first
