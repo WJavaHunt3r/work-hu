@@ -8,6 +8,8 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>DukApp</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>A DukApp Face ID-val oldható fel, ha bekapcsolod a Jelszó és biztonság oldalon.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

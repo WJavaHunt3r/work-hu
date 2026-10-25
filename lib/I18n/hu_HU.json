@@ -1015,5 +1015,14 @@
   "user_details_reset_question": "Küldünk egy linket ide: %s, amellyel a felhasználó új jelszót állíthat be. A régi jelszava addig érvényes marad.",
   "user_details_reset_no_email": "A felhasználónak nincs e-mail címe, ezért nem küldhetünk neki linket. Előbb add meg az e-mail címét.",
   "user_details_reset_sent": "A link elküldve ide: %s",
-  "audit_action_PASSWORD_RESET_LINK": "Jelszó-visszaállító link elküldve"
+  "audit_action_PASSWORD_RESET_LINK": "Jelszó-visszaállító link elküldve",
+  "biometric_switch": "Feloldás Face ID-val / ujjlenyomattal",
+  "biometric_switch_hint": "Indításkor, és ha 5 percnél tovább volt a háttérben, a DukApp csak így nyílik meg. A telefon kódja is elfogadott.",
+  "biometric_enable_reason": "Erősítsd meg, hogy bekapcsolod a biometrikus feloldást",
+  "biometric_enabled": "Bekapcsolva: a DukApp ezentúl Face ID-val / ujjlenyomattal nyílik",
+  "biometric_unlock_reason": "A DukApp feloldása",
+  "biometric_locked_title": "A DukApp zárolva",
+  "biometric_locked_hint": "Oldd fel Face ID-val, ujjlenyomattal vagy a telefonod kódjával.",
+  "biometric_unlock": "Feloldás",
+  "biometric_use_password": "Belépés jelszóval"
 }

@@ -5,6 +5,7 @@ import 'package:injectable/injectable.dart';
 import 'package:work_hu/api/dio_client.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/notifications/push_service.dart';
+import 'package:work_hu/app/session/biometric_lock.dart';
 import 'package:work_hu/app/session/tab_session.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
 import 'package:work_hu/features/utils.dart';
@@ -90,6 +91,8 @@ class UserProvider extends ChangeNotifier {
 
     await Utils.deleteData('jwt_token');
     await Utils.deleteData('refresh_token');
+    // The biometric lock belongs to this session (BiometricLockNotifier.signedOut resets it in memory)
+    await Utils.deleteData(SecureBiometricSettingStore.key);
     // await GoogleSignIn.instance.signOut();
     await setUser(null);
 

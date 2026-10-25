@@ -1018,5 +1018,14 @@
   "user_details_reset_question": "We send a link to %s where the user can set a new password. Their old password keeps working until then.",
   "user_details_reset_no_email": "The user has no e-mail address, so no link can be sent. Add their e-mail address first.",
   "user_details_reset_sent": "The link was sent to %s",
-  "audit_action_PASSWORD_RESET_LINK": "Password reset link sent"
+  "audit_action_PASSWORD_RESET_LINK": "Password reset link sent",
+  "biometric_switch": "Unlock with Face ID / fingerprint",
+  "biometric_switch_hint": "At start, and after more than 5 minutes in the background, DukApp only opens this way. Your phone's passcode works too.",
+  "biometric_enable_reason": "Confirm to turn on biometric unlock",
+  "biometric_enabled": "Turned on: DukApp now opens with Face ID / fingerprint",
+  "biometric_unlock_reason": "Unlock DukApp",
+  "biometric_locked_title": "DukApp is locked",
+  "biometric_locked_hint": "Unlock it with Face ID, your fingerprint or your phone's passcode.",
+  "biometric_unlock": "Unlock",
+  "biometric_use_password": "Sign in with password"
 }

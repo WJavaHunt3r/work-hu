@@ -13,6 +13,7 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/app_theme_mode.dart';
 import 'package:work_hu/app/providers/router_provider.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
+import 'package:work_hu/app/session/biometric_gate.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/style/app_style.dart';
 import 'package:work_hu/app/update/web_update_checker.dart';
@@ -146,7 +147,7 @@ class DukApp extends ConsumerWidget {
           darkTheme: _withChipStyle(theme.globalDarkTheme),
           themeMode: AppThemeMode.getThemeMode(appThemeMode),
           routerConfig: router,
-          builder: (context, child) => WebUpdateChecker(child: child!),
+          builder: (context, child) => WebUpdateChecker(child: BiometricGate(child: child!)),
           locale: currentLocale,
           supportedLocales: supportedLocales,
           localizationsDelegates: [

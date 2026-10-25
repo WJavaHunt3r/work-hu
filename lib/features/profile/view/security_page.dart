@@ -9,6 +9,7 @@ import 'package:work_hu/app/framework/base_components/base_page_components/base_
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/platform/adaptive.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/app/session/biometric_lock.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
 import 'package:work_hu/features/change_password/provider/change_password_provider.dart';
@@ -102,10 +103,24 @@ class SecurityPageState extends BasePageState<SecurityPage, ProfileState, Profil
     }
   }
 
+  Future<void> _toggleBiometric(bool on) async {
+    final notifier = ref.read(biometricLockProvider.notifier);
+    if (!on) {
+      await notifier.disable();
+      return;
+    }
+    if (!await notifier.enable("biometric_enable_reason".i18n())) return;
+    // The lock only makes sense on a session that is kept between starts
+    await Utils.saveData("keep_logged_in", "true");
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("biometric_enabled".i18n())));
+  }
+
   @override
   Widget buildLayout() {
     final theme = Theme.of(context);
     final email = ref.watch(userDataProvider).user?.email;
+    final biometric = ref.watch(biometricLockProvider);
     final inset = EdgeInsets.symmetric(horizontal: 18.sp);
 
     return Form(
@@ -114,6 +129,21 @@ class SecurityPageState extends BasePageState<SecurityPage, ProfileState, Profil
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Only in the apps, on phones with Face ID / a fingerprint set up
+            if (biometric.available) ...[
+              BaseContainer(
+                padding: EdgeInsets.symmetric(vertical: 4.sp),
+                child: SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 18.sp),
+                  secondary: Icon(Icons.fingerprint, color: theme.colorScheme.primary),
+                  title: Text("biometric_switch".i18n(), style: const TextStyle(fontWeight: FontWeight.w500)),
+                  subtitle: Text("biometric_switch_hint".i18n()),
+                  value: biometric.enabled,
+                  onChanged: _toggleBiometric,
+                ),
+              ),
+              SizedBox(height: 24.sp),
+            ],
             Padding(
               padding: inset.copyWith(bottom: 8.sp),
               child: Text(
