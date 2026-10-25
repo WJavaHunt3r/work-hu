@@ -23,7 +23,11 @@ import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:work_hu/features/reading_plan/view/reading_plan_card.dart';
 
 class ProfilePage extends BasePage {
-  const ProfilePage({super.key, super.title = "profile_title", super.canRefresh = false});
+  const ProfilePage({super.key, super.title = "profile_title", super.canRefresh = false, this.inSheet = false})
+    : super(showBackButton: !inSheet);
+
+  /// Shown as the sheet the header's avatar opens: a close button instead of back.
+  final bool inSheet;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -32,6 +36,17 @@ class ProfilePage extends BasePage {
 }
 
 class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileDataNotifier> {
+  @override
+  List<Widget>? buildActions(BuildContext context, WidgetRef ref) => widget.inSheet
+      ? [
+          IconButton.outlined(
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            icon: const Icon(Icons.close),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ]
+      : null;
+
   @override
   Widget buildLayout() {
     var theme = Theme.of(context);

@@ -56,9 +56,15 @@ import 'package:work_hu/features/reading_plan/view/article_edit_page.dart';
 import 'package:work_hu/features/reading_plan/view/article_reader_page.dart';
 import 'package:work_hu/features/reading_plan/view/psalm_reader_page.dart';
 import 'package:work_hu/features/reading_plan/view/psalms_page.dart';
+import 'package:work_hu/features/reading_plan/view/reported_notes_page.dart';
+import 'package:work_hu/features/bible/data/model/bible_model.dart' show parseVerseRange;
+import 'package:work_hu/features/bible/view/bible_chapter_page.dart';
+import 'package:work_hu/features/bible/view/bible_page.dart';
+import 'package:work_hu/features/bible/view/bible_annotations_page.dart';
 import 'package:work_hu/features/reading_plan/view/reading_plan_articles_admin_page.dart';
 import 'package:work_hu/features/rounds/view/round_edit_page.dart';
 import 'package:work_hu/features/rounds/view/rounds_page.dart';
+import 'package:work_hu/features/start/view/start_page.dart';
 import 'package:work_hu/features/status/view/status_page.dart';
 import 'package:work_hu/features/top_up/view/top_up_page.dart';
 import 'package:work_hu/features/top_ups/view/top_ups_page.dart';
@@ -76,7 +82,7 @@ import '../../features/profile/view/theme_picker_page.dart';
 import 'package:work_hu/app/platform/adaptive.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
+final _shellNavigatorStartKey = GlobalKey<NavigatorState>(debugLabel: 'shellStart');
 final _shellNavigatorAdminKey = GlobalKey<NavigatorState>(debugLabel: 'shellAdmin');
 final _shellNavigatorLiveKey = GlobalKey<NavigatorState>(debugLabel: 'shellLive');
 final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellHome');
@@ -91,7 +97,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     refreshListenable: userNotifier,
     navigatorKey: navigatorKey,
-    initialLocation: "/status",
+    initialLocation: "/home",
     routes: [
       GoRoute(path: '/login', builder: (context, state) => LoginPage()),
 
@@ -101,7 +107,30 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ScaffoldWithNestedNavigation(navigationShell: navigationShell);
         },
         branches: [
-          // Branch 1: User Status (The default page after login)
+          // Branch 0: Home, the first tab (live banner, reading challenge, the church's status, the Bible)
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorStartKey,
+            routes: [GoRoute(path: '/home', builder: (context, state) => const StartPage())],
+          ),
+          // Branch 1: Status
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorStatusKey,
+            routes: [
+              GoRoute(
+                path: '/status',
+                builder: (context, state) => StatusPage(),
+                routes: [
+                  GoRoute(
+                    path: 'transactions/:id',
+                    pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(
+                      child: UserTransactionsPage(userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // Branch 2: Balance
           StatefulShellBranch(
             navigatorKey: _shellNavigatorHomeKey,
             routes: [
@@ -122,24 +151,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          StatefulShellBranch(
-            navigatorKey: _shellNavigatorStatusKey,
-            routes: [
-              GoRoute(
-                path: '/status',
-                builder: (context, state) => StatusPage(),
-                routes: [
-                  GoRoute(
-                    path: 'transactions/:id',
-                    pageBuilder: (BuildContext context, GoRouterState state) => NoTransitionPage(
-                      child: UserTransactionsPage(userId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          // Jobs: registering for jobs. Creating and running them is in the admin (/admin/jobs).
+          // Branch 3: Jobs: registering for jobs. Creating and running them is in the admin (/admin/jobs).
           StatefulShellBranch(
             navigatorKey: _shellNavigatorJobsKey,
             routes: [
@@ -165,92 +177,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // Branch 2: Profile
-          StatefulShellBranch(
-            navigatorKey: _shellNavigatorProfileKey,
-            routes: [
-              GoRoute(
-                path: '/profile',
-                builder: (context, state) => const ProfilePage(),
-                routes: [
-                  GoRoute(
-                    path: "activities",
-                    builder: (BuildContext context, GoRouterState state) => const ActivitiesPage(),
-                    routes: [
-                      GoRoute(
-                        path: ':id/items',
-                        builder: (BuildContext context, GoRouterState state) {
-                          return ActivityItemsPage(activityId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
-                        },
-                      ),
-                      GoRoute(
-                        path: 'createActivity',
-                        builder: (BuildContext context, GoRouterState state) => const CreateActivityPage(),
-                      ),
-                      GoRoute(
-                        path: ':id/edit',
-                        builder: (BuildContext context, GoRouterState state) =>
-                            CreateActivityPage(id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
-                      ),
-                    ],
-                  ),
-                  GoRoute(
-                    path: "jobs",
-                    redirect: _oldJobsLocation,
-                    routes: [
-                      GoRoute(
-                        path: ':id',
-                        redirect: _oldJobsLocation,
-                        routes: [GoRoute(path: 'chat', redirect: _oldJobsLocation)],
-                      ),
-                    ],
-                  ),
-                  GoRoute(
-                    path: 'notifications',
-                    builder: (BuildContext context, GoRouterState state) => const NotificationPreferencesPage(),
-                  ),
-                  GoRoute(
-                    path: 'theme',
-                    pageBuilder: (context, state) {
-                      return CustomTransitionPage(
-                        key: state.pageKey,
-                        child: const ThemePickerPage(),
-                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                          // Animate from the bottom up
-                          const begin = Offset(0.0, 1.0);
-                          const end = Offset.zero;
-                          const curve = Curves.easeInOut;
-                          final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-                          return SlideTransition(position: animation.drive(tween), child: child);
-                        },
-                      );
-                    },
-                  ),
-                  GoRoute(
-                    path: 'language',
-                    pageBuilder: (context, state) {
-                      return CustomTransitionPage(
-                        key: state.pageKey,
-                        child: const LanguagePickerPage(),
-                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                          // Animate from the bottom up
-                          const begin = Offset(0.0, 1.0);
-                          const end = Offset.zero;
-                          const curve = Curves.easeInOut;
-                          final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-                          return SlideTransition(position: animation.drive(tween), child: child);
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          // Branch 3: Admin
+          // Branch 4: Admin
           StatefulShellBranch(
             navigatorKey: _shellNavigatorAdminKey,
             routes: [GoRoute(path: '/admin', builder: (context, state) => const AdminPage())],
@@ -262,6 +189,81 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [GoRoute(path: '/live', builder: (context, state) => const LivePage())],
           ),
         ],
+      ),
+      // The profile: the tabs' avatar opens it as a sheet; /profile (links, notifications) opens it as a page, and its
+      // pages are siblings with full paths, so they open above the sheet and back leads to it
+      GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
+      GoRoute(
+        path: "/profile/activities",
+        builder: (BuildContext context, GoRouterState state) => const ActivitiesPage(),
+        routes: [
+          GoRoute(
+            path: ':id/items',
+            builder: (BuildContext context, GoRouterState state) {
+              return ActivityItemsPage(activityId: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0);
+            },
+          ),
+          GoRoute(
+            path: 'createActivity',
+            builder: (BuildContext context, GoRouterState state) => const CreateActivityPage(),
+          ),
+          GoRoute(
+            path: ':id/edit',
+            builder: (BuildContext context, GoRouterState state) =>
+                CreateActivityPage(id: num.tryParse(state.pathParameters["id"] ?? "0") ?? 0),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: "/profile/jobs",
+        redirect: _oldJobsLocation,
+        routes: [
+          GoRoute(
+            path: ':id',
+            redirect: _oldJobsLocation,
+            routes: [GoRoute(path: 'chat', redirect: _oldJobsLocation)],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/profile/notifications',
+        builder: (BuildContext context, GoRouterState state) => const NotificationPreferencesPage(),
+      ),
+      GoRoute(
+        path: '/profile/theme',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const ThemePickerPage(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              // Animate from the bottom up
+              const begin = Offset(0.0, 1.0);
+              const end = Offset.zero;
+              const curve = Curves.easeInOut;
+              final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(position: animation.drive(tween), child: child);
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: '/profile/language',
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const LanguagePickerPage(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              // Animate from the bottom up
+              const begin = Offset(0.0, 1.0);
+              const end = Offset.zero;
+              const curve = Curves.easeInOut;
+              final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+              return SlideTransition(position: animation.drive(tween), child: child);
+            },
+          );
+        },
       ),
       GoRoute(path: '/tos', builder: (context, state) => const ToSPage()),
       GoRoute(path: '/privacy', builder: (context, state) => const PrivacyPolicy()),
@@ -372,9 +374,31 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      // The Bible: outside the tab shell like the psalms, for every signed-in user
+      GoRoute(
+        path: '/bible',
+        builder: (context, state) => const BiblePage(),
+        routes: [
+          // "notes" must stay before ":book/:chapter"
+          GoRoute(path: 'notes', builder: (context, state) => const BibleAnnotationsPage()),
+          GoRoute(
+            path: ':book/:chapter',
+            builder: (context, state) {
+              final verses = parseVerseRange(state.uri.queryParameters['verse']);
+              return BibleChapterPage(
+                osis: state.pathParameters['book'] ?? 'Gen',
+                chapter: int.tryParse(state.pathParameters['chapter'] ?? '') ?? 1,
+                focusVerse: verses?.start,
+                focusEnd: verses?.end,
+              );
+            },
+          ),
+        ],
+      ),
       // The articles of the reading plan; "new" must stay before ":id"
       GoRoute(path: "/admin/readingPlan", builder: (context, state) => const ReadingPlanArticlesAdminPage()),
       GoRoute(path: "/admin/readingPlan/new", builder: (context, state) => const ArticleEditPage()),
+      GoRoute(path: "/admin/readingPlan/reported", builder: (context, state) => const ReportedNotesPage()),
       GoRoute(
         path: "/admin/readingPlan/:id",
         builder: (context, state) => ArticleEditPage(id: num.tryParse(state.pathParameters["id"] ?? "")),
@@ -482,15 +506,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         return DeepLink.consume();
       }
 
-      // Users outside a church only have the balance and the profile (also covers the initial "/status").
+      // Users outside a church only have Home (with the Bible), the balance and the profile.
       if (loggedIn && !user.hasChurch()) {
         final location = state.matchedLocation;
-        if (location == '/' || ['/status', '/jobs', '/admin', '/live'].any(location.startsWith)) return '/balance';
+        if (location == '/' || ['/status', '/jobs', '/admin', '/live'].any(location.startsWith)) return '/home';
         if (location.startsWith('/profile/activities')) return '/profile';
       }
 
       if (loggedIn && state.matchedLocation == '/') {
-        return '/status';
+        return '/home';
       }
       return null;
     },
@@ -522,9 +546,9 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
       (
         branch: 0,
         item: BottomNavigationBarItem(
-          activeIcon: const Icon(Icons.account_balance_wallet),
-          icon: const Icon(Icons.account_balance_wallet_outlined),
-          label: 'nav_bar_home'.i18n(),
+          activeIcon: const Icon(Icons.home),
+          icon: const Icon(Icons.home_outlined),
+          label: 'nav_bar_start'.i18n(),
         ),
       ),
       if (church)
@@ -536,9 +560,17 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
             label: 'nav_bar_status'.i18n(),
           ),
         ),
+      (
+        branch: 2,
+        item: BottomNavigationBarItem(
+          activeIcon: const Icon(Icons.account_balance_wallet),
+          icon: const Icon(Icons.account_balance_wallet_outlined),
+          label: 'nav_bar_home'.i18n(),
+        ),
+      ),
       if (church)
         (
-          branch: 2,
+          branch: 3,
           item: BottomNavigationBarItem(
             activeIcon: const Icon(Icons.work),
             icon: const Icon(Icons.work_outline),
@@ -554,14 +586,6 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
             label: 'nav_bar_live'.i18n(),
           ),
         ),
-      (
-        branch: 3,
-        item: BottomNavigationBarItem(
-          activeIcon: const Icon(Icons.person_2_rounded),
-          icon: const Icon(Icons.person_2_outlined),
-          label: 'nav_bar_profile'.i18n(),
-        ),
-      ),
       if (church && user.hasAdminAccess())
         (
           branch: 4,

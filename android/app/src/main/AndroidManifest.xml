@@ -43,6 +43,20 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+        <!-- dukapp://app/<route> from the payment return page: back to the app, closing the Custom Tab -->
+        <activity
+            android:name=".PaymentReturnActivity"
+            android:exported="true"
+            android:noHistory="true"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="dukapp" android:host="app"/>
+            </intent-filter>
+        </activity>
         <!-- Background audio of the live stream (just_audio_background) -->
         <service
             android:name="com.ryanheise.audioservice.AudioService"
@@ -72,4 +86,15 @@
             android:value="2" />
     </application>
 
+    <!-- Android 11+ package visibility: lets url_launcher find a browser with Custom Tabs for the payment page
+         (LaunchMode.inAppBrowserView) and browsers for https links -->
+    <queries>
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
+    </queries>
 </manifest>

@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
-import 'package:url_launcher/url_launcher.dart';
+import 'package:work_hu/features/payments/pending_payment_button.dart';
+import 'package:work_hu/features/payments/checkout_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
@@ -89,9 +90,7 @@ class TopUpPageState extends BasePageState<TopUpPage, TopUpState, TopUpDataNotif
                   ) async {
                     if (status.modelState.isSuccess && state.hostedUrl != null && state.hostedUrl!.isNotEmpty) {
                       Uri uri = Uri.parse(state.hostedUrl.toString());
-                      if (!await launchUrl(uri, mode: LaunchMode.inAppWebView, webOnlyWindowName: "_self")) {
-                        throw Exception('top_up_failed_to_launch'.i18n([uri.toString()]));
-                      }
+                      await CheckoutLauncher.open(uri, successRoute: ref.read(provider.notifier).lastSuccessRoute);
                     }
                   });
                 }
@@ -99,6 +98,7 @@ class TopUpPageState extends BasePageState<TopUpPage, TopUpState, TopUpDataNotif
               child: Text('top_up_confirm_amount'.i18n(), style: Theme.of(context).textTheme.bodyLarge),
             ),
           ),
+          const PendingPaymentButton(),
           SizedBox(height: 16.sp),
           Center(
             child: Text('top_up_immediate'.i18n(), textAlign: TextAlign.center, style: theme.textTheme.bodySmall),

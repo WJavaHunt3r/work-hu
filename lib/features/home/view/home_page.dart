@@ -20,6 +20,7 @@ import 'package:work_hu/features/bufe/data/model/sumup_transactions.dart';
 import 'package:work_hu/features/bufe_transaction_items/view/bufe_transaction_items_page.dart';
 import 'package:work_hu/features/home/data/state/home_state.dart';
 import 'package:work_hu/features/home/providers/home_provider.dart';
+import 'package:work_hu/features/profile/view/profile_sheet.dart';
 import 'package:work_hu/features/utils.dart';
 
 class HomePage extends BasePage {
@@ -301,9 +302,18 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'home_welcome_title'.i18n([locator<UserProvider>().user!.firstname]),
-            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          // No app bar on this page: the profile button sits next to the greeting
+          Row(
+            children: [
+              const ProfileAvatarButton(),
+              SizedBox(width: 12.sp),
+              Expanded(
+                child: Text(
+                  'home_welcome_title'.i18n([locator<UserProvider>().user!.firstname]),
+                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 8.sp),
           Text('home_welcome_subtitle'.i18n(), style: theme.textTheme.bodyMedium),

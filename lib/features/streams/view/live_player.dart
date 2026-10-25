@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -14,6 +16,9 @@ import 'package:work_hu/features/streams/data/model/live_stream_model.dart';
 /// The stream address belongs to the live input, so it survives the encoder dropping and reconnecting; what does not
 /// survive is the player's current connection. So a watchdog looks every few seconds, and when the picture or sound
 /// has stopped moving (or the player reports an error) it opens the same address again until it plays.
+///
+/// The picture's fullscreen button opens [LiveFullscreenPage]: landscape, without the system bars, showing whichever
+/// connection the watchdog has open ([_videoNow]), and closed again when this player goes away.
 class LivePlayer extends StatefulWidget {
   const LivePlayer({super.key, required this.stream, required this.audioOnly});
 
@@ -29,6 +34,10 @@ class _LivePlayerState extends State<LivePlayer> {
   static const _stuckTicksBeforeRestart = 3;
 
   VideoPlayerController? _video;
+
+  /// The video connection for the fullscreen page; it changes whenever the watchdog reconnects.
+  final _videoNow = ValueNotifier<VideoPlayerController?>(null);
+  Route<void>? _fullscreen;
   AudioPlayer? _audio;
   Timer? _watchdog;
   bool _wantPlaying = true;
@@ -59,8 +68,18 @@ class _LivePlayerState extends State<LivePlayer> {
   void dispose() {
     _watchdog?.cancel();
     _generation++;
+    final fullscreen = _fullscreen;
+    if (fullscreen != null && fullscreen.isActive) fullscreen.navigator?.removeRoute(fullscreen);
     _release();
+    _videoNow.dispose();
     super.dispose();
+  }
+
+  Future<void> _openFullscreen() async {
+    final route = MaterialPageRoute<void>(builder: (context) => LiveFullscreenPage(video: _videoNow));
+    _fullscreen = route;
+    await Navigator.of(context, rootNavigator: true).push(route);
+    _fullscreen = null;
   }
 
   void _release() {
@@ -68,6 +87,7 @@ class _LivePlayerState extends State<LivePlayer> {
     final audio = _audio;
     _video = null;
     _audio = null;
+    _videoNow.value = null;
     video?.dispose();
     audio?.dispose();
   }
@@ -100,7 +120,10 @@ class _LivePlayerState extends State<LivePlayer> {
         if (generation != _generation) return;
         if (_wantPlaying) await video.play();
       }
-      if (generation == _generation && mounted) setState(() => _connecting = false);
+      if (generation == _generation && mounted) {
+        _videoNow.value = _video;
+        setState(() => _connecting = false);
+      }
     } catch (_) {
       // Not available (yet): the watchdog tries again on its next tick
       if (generation == _generation && mounted) setState(() => _connecting = true);
@@ -169,6 +192,17 @@ class _LivePlayerState extends State<LivePlayer> {
                       ],
                     ),
                   if (!_wantPlaying) Icon(Icons.pause_circle_outline, size: 64.sp, color: Colors.white70),
+                  if (showVideo)
+                    Positioned(
+                      right: 4.sp,
+                      bottom: 4.sp,
+                      child: IconButton(
+                        tooltip: "live_fullscreen".i18n(),
+                        color: Colors.white,
+                        icon: const Icon(Icons.fullscreen),
+                        onPressed: _openFullscreen,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -183,6 +217,64 @@ class _LivePlayerState extends State<LivePlayer> {
           onPressed: _togglePlay,
         ),
       ],
+    );
+  }
+}
+
+/// The live picture on the whole screen: landscape, without the status and navigation bars. Shows the player's current
+/// connection ([video]), so a reconnect while fullscreen goes on seamlessly. The rest of the app is portrait only
+/// (main.dart), so leaving puts portrait and the bars back.
+class LiveFullscreenPage extends StatefulWidget {
+  const LiveFullscreenPage({super.key, required this.video});
+
+  final ValueListenable<VideoPlayerController?> video;
+
+  @override
+  State<LiveFullscreenPage> createState() => _LiveFullscreenPageState();
+}
+
+class _LiveFullscreenPageState extends State<LiveFullscreenPage> {
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Center(
+            child: ValueListenableBuilder<VideoPlayerController?>(
+              valueListenable: widget.video,
+              builder: (context, video, _) => video != null && video.value.isInitialized
+                  ? AspectRatio(aspectRatio: video.value.aspectRatio, child: VideoPlayer(video))
+                  : const CircularProgressIndicator(color: Colors.white),
+            ),
+          ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: IconButton(
+                tooltip: "live_fullscreen_exit".i18n(),
+                color: Colors.white,
+                icon: const Icon(Icons.fullscreen_exit),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

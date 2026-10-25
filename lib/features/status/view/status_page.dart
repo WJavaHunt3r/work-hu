@@ -14,13 +14,12 @@ import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
 import 'package:work_hu/features/status/data/state/status_state.dart';
 import 'package:work_hu/features/status/providers/status_providers.dart';
-import 'package:work_hu/features/reading_plan/view/reading_plan_card.dart';
-import 'package:work_hu/features/streams/view/live_page.dart';
+import 'package:work_hu/features/user_rounds/data/model/user_round_head_model.dart';
 import 'package:work_hu/features/user_transactions/widgets/points_list_item.dart';
 import 'package:work_hu/features/utils.dart';
 
 class StatusPage extends BasePage {
-  const StatusPage({super.key, super.title = "status_title"});
+  const StatusPage({super.key, super.title = "status_title", super.showProfileButton = true});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -42,63 +41,7 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const LiveBanner(),
-        const ReadingPlanCard(),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'status_local_status'.i18n(),
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 4.sp),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withAlpha(25),
-                    borderRadius: BorderRadius.circular(20.sp),
-                  ),
-                  child: Text(
-                    'status_monthly_goal'.i18n([Utils.percentFormatting(state.userRoundHead.localMyShareGoal)]),
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.primary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8.sp),
-            // Both cards as tall as the taller one, however the titles wrap
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: _OnTrackStatus(
-                      title: "status_local_on_track_title".i18n(),
-                      data: "status_local_on_track_data".i18n([state.userRoundHead.onTrackCount.toString()]),
-                      subData: "status_local_on_track_subData".i18n([state.userRoundHead.goalCount.toString()]),
-                      icon: Icons.stacked_line_chart,
-                    ),
-                  ),
-                  SizedBox(width: 16.sp),
-                  Expanded(
-                    child: _OnTrackStatus(
-                      title: "status_local_required_title".i18n(),
-                      data: "status_local_required_data".i18n([state.userRoundHead.toOnTrackCount.toString()]),
-                      subData: "status_local_required_subData".i18n([state.userRoundHead.churchGoal.toString()]),
-                      icon: Icons.stars,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 16.sp),
+        // The church's status (LocalStatusSection) is on the Home page
         if (state.statuses.isNotEmpty)
           Text('status_my_status'.i18n(), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         SizedBox(height: 8.sp),
@@ -276,6 +219,74 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
 
   @override
   BaseState get status => state.status;
+}
+
+/// The church's status this month (how many are on track, how many more are needed), on the Home page.
+class LocalStatusSection extends StatelessWidget {
+  const LocalStatusSection({super.key, required this.head});
+
+  final UserRoundHeadModel head;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // the heading gives way (wraps) before the goal chip does
+            Expanded(
+              child: Text(
+                'status_local_status'.i18n(),
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(width: 8.sp),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 4.sp),
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withAlpha(25),
+                borderRadius: BorderRadius.circular(20.sp),
+              ),
+              child: Text(
+                'status_monthly_goal'.i18n([Utils.percentFormatting(head.localMyShareGoal)]),
+                style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.primary),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 8.sp),
+        // Both cards as tall as the taller one, however the titles wrap
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _OnTrackStatus(
+                  title: "status_local_on_track_title".i18n(),
+                  data: "status_local_on_track_data".i18n([head.onTrackCount.toString()]),
+                  subData: "status_local_on_track_subData".i18n([head.goalCount.toString()]),
+                  icon: Icons.stacked_line_chart,
+                ),
+              ),
+              SizedBox(width: 16.sp),
+              Expanded(
+                child: _OnTrackStatus(
+                  title: "status_local_required_title".i18n(),
+                  data: "status_local_required_data".i18n([head.toOnTrackCount.toString()]),
+                  subData: "status_local_required_subData".i18n([head.churchGoal.toString()]),
+                  icon: Icons.stars,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _OnTrackStatus extends StatelessWidget {

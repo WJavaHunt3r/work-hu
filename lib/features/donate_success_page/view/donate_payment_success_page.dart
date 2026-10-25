@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/features/payment_success/view/payment_detail_row.dart';
+import 'package:work_hu/features/payments/checkout_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
@@ -36,6 +38,7 @@ class DonatePaymentSuccessStatePage
     extends BasePageState<DonatePaymentSuccessPage, DonatePaymentSuccessState, DonatePaymentSuccessDataNotifier> {
   @override
   void postInit(WidgetRef ref) {
+    CheckoutLauncher.returned();
     ref.watch(provider.notifier).refreshPayment(checkoutReference: widget.checkoutReference ?? "");
   }
 
@@ -136,11 +139,11 @@ class DonatePaymentSuccessStatePage
         BaseContainer(
           child: Column(
             children: [
-              _DetailRow(label: 'payment_success_transaction_id'.i18n(), value: payment.description),
+              PaymentDetailRow(label: 'payment_success_transaction_id'.i18n(), value: payment.description),
               Divider(height: 24.sp),
-              _DetailRow(label: 'payment_success_date_time'.i18n(), value: payment.date ?? ''),
+              PaymentDetailRow(label: 'payment_success_date_time'.i18n(), value: payment.date ?? ''),
               //  Divider(height: 24.sp),
-              // _DetailRow(
+              // PaymentDetailRow(
               //   label: 'payment_success_payment_method'.i18n(),
               //   value: payment.!,
               //   icon: payment.entryMode == 'APPLE_PAY'
@@ -260,31 +263,6 @@ class DonatePaymentSuccessStatePage
           ),
         ),
         SizedBox(height: 48.sp),
-      ],
-    );
-  }
-}
-
-class _DetailRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData? icon;
-
-  const _DetailRow({required this.label, required this.value}) : icon = null;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor)),
-        Row(
-          children: [
-            if (icon != null) ...[Icon(icon, size: 20.sp, color: theme.colorScheme.onSurface), SizedBox(width: 8.sp)],
-            Text(value, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-          ],
-        ),
       ],
     );
   }

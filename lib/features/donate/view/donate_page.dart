@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:work_hu/features/payments/pending_payment_button.dart';
+import 'package:work_hu/features/payments/checkout_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/models/mode_state.dart';
@@ -56,6 +57,7 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
               _buildDonateCard(theme),
               const SizedBox(height: 40),
               _buildConfirmButton(theme),
+              const PendingPaymentButton(),
             ],
           );
   }
@@ -76,9 +78,7 @@ class DonatePageState extends BasePageState<DonatePage, DonateState, DonateDataN
             ref.watch(provider.notifier).createCheckout(int.tryParse(_amountController.text) ?? 0).then((value) async {
               if (status.modelState.isSuccess && state.hosted_url != null && state.hosted_url!.isNotEmpty) {
                 Uri uri = Uri.parse(state.hosted_url.toString());
-                if (!await launchUrl(uri, mode: LaunchMode.inAppWebView, webOnlyWindowName: "_self")) {
-                  throw Exception('top_up_failed_to_launch'.i18n([uri.toString()]));
-                }
+                await CheckoutLauncher.open(uri, successRoute: ref.read(provider.notifier).lastSuccessRoute);
               }
             });
           }

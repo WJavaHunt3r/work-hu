@@ -8,7 +8,9 @@
           { "/": "/jobs*" },
           { "/": "/status*" },
           { "/": "/balance*" },
-          { "/": "/mentees*" }
+          { "/": "/mentees*" },
+          { "/": "/bible*" },
+          { "/": "/psalms*" }
         ]
       }
     ]

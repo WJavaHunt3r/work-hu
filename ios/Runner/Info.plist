@@ -32,6 +32,15 @@
 				<string>com.googleusercontent.apps.470140408680-2dg6ue0blbf8ulh8e0to5bbmtkaseqqj</string>
 			</array>
 		</dict>
+		<!-- dukapp://app/<route>: the payment return page (web/payment-return.html) opens the app with it -->
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.ktk.dukapp</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>dukapp</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
@@ -82,9 +91,12 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<!-- Landscape only for the live stream's fullscreen page (LiveFullscreenPage); main.dart keeps the rest portrait -->
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 </dict>
 </plist>

@@ -7,6 +7,7 @@ import 'package:localization/localization.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/features/reading_plan/data/model/reading_plan_model.dart';
+import 'package:work_hu/features/reading_plan/providers/public_notes_provider.dart';
 import 'package:work_hu/features/reading_plan/providers/reading_plan_provider.dart';
 
 /// The reading challenge: the 150 psalms to tick off, the ranking and the plan.
@@ -65,6 +66,7 @@ class _ReadTab extends ConsumerWidget {
     final theme = Theme.of(context);
     final week = plan.weekOn(DateTime.now());
     final next = plan.nextUnread;
+    final publicNoteCounts = ref.watch(publicNoteCountsProvider(plan.id)).value ?? const <int, int>{};
     return RefreshIndicator.adaptive(
       onRefresh: () => ref.read(readingPlanProvider.notifier).load(),
       child: ListView(
@@ -131,7 +133,12 @@ class _ReadTab extends ConsumerWidget {
             itemCount: plan.itemCount,
             itemBuilder: (context, index) {
               final n = index + 1;
-              return _PsalmTile(n: n, done: plan.myItems.contains(n), thisWeek: week?.contains(n) ?? false);
+              return _PsalmTile(
+                n: n,
+                done: plan.myItems.contains(n),
+                thisWeek: week?.contains(n) ?? false,
+                publicNotes: publicNoteCounts[n] ?? 0,
+              );
             },
           ),
         ],
@@ -141,11 +148,14 @@ class _ReadTab extends ConsumerWidget {
 }
 
 class _PsalmTile extends StatelessWidget {
-  const _PsalmTile({required this.n, required this.done, required this.thisWeek});
+  const _PsalmTile({required this.n, required this.done, required this.thisWeek, this.publicNotes = 0});
 
   final int n;
   final bool done;
   final bool thisWeek;
+
+  /// How many shared notes the psalm has: a small badge in the corner.
+  final int publicNotes;
 
   @override
   Widget build(BuildContext context) {
@@ -170,15 +180,39 @@ class _PsalmTile extends StatelessWidget {
                 width: thisWeek && !done ? 2 : 1,
               ),
             ),
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+            child: Stack(
               children: [
-                Text(
-                  "$n",
-                  style: TextStyle(fontWeight: FontWeight.w700, color: done ? scheme.onPrimary : scheme.onSurface),
+                Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "$n",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: done ? scheme.onPrimary : scheme.onSurface,
+                        ),
+                      ),
+                      if (done) Icon(Icons.check, size: 14.sp, color: scheme.onPrimary),
+                    ],
+                  ),
                 ),
-                if (done) Icon(Icons.check, size: 14.sp, color: scheme.onPrimary),
+                if (publicNotes > 0)
+                  Positioned(
+                    top: 3.sp,
+                    right: 4.sp,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.forum, size: 9.sp, color: done ? scheme.onPrimary : scheme.primary),
+                        SizedBox(width: 1.sp),
+                        Text(
+                          "$publicNotes",
+                          style: TextStyle(fontSize: 9.sp, color: done ? scheme.onPrimary : scheme.primary),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),

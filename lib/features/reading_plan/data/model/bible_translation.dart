@@ -72,3 +72,25 @@ BibleTranslation defaultTranslationFor(String? languageCode) =>
 
 BibleTranslation translationById(String? id) =>
     bibleTranslations.firstWhere((t) => t.id == id, orElse: () => bibleTranslations.first);
+
+/// The Book of Psalms' name and short name in a translation's language (the bundled files have no book names).
+({String name, String abbreviation}) psalmsBookName(String languageCode) => switch (languageCode) {
+  'hu' => (name: 'Zsoltárok', abbreviation: 'Zsolt'),
+  'de' => (name: 'Psalmen', abbreviation: 'Ps'),
+  'nb' => (name: 'Salmene', abbreviation: 'Sal'),
+  _ => (name: 'Psalms', abbreviation: 'Ps'),
+};
+
+/// The psalms whose title counts as verse 1 in Károli and Norsk (verse numbering label "heb" in the backend's full
+/// Bible files, see scripts/bible/build_bible.py); every other psalm, and every psalm in the other translations, is
+/// numbered like KJV ("kjv").
+const _titledPsalms = {
+  3, 4, 5, 6, 7, 8, 9, 12, 18, 19, 20, 21, 22, 30, 31, 34, 36, 38, 39, 40, 41, 42, 44, 45, 46, 47, 48, 49, 51, 52, //
+  53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 67, 68, 69, 70, 75, 76, 77, 80, 81, 83, 84, 85, 88, 89, 92, //
+  102, 108, 140, 142,
+};
+const _titleIsVerse = {'kar', 'nb1930'};
+
+/// The verse numbering label of [psalm] in [translationId]: highlights and notes are shown where it is the same.
+String psalmNumbering(String translationId, int psalm) =>
+    _titleIsVerse.contains(translationId) && _titledPsalms.contains(psalm) ? 'heb' : 'kjv';

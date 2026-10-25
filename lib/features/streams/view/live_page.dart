@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/features/profile/view/profile_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/features/streams/data/model/live_stream_model.dart';
@@ -111,6 +112,7 @@ class _LivePageState extends ConsumerState<LivePage> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const ProfileAvatarButton(),
         title: Text("live_title".i18n(), style: const TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: ListView(

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/widgets/base_confirm_dialog.dart';
+import 'package:work_hu/features/profile/view/profile_sheet.dart';
 import 'package:work_hu/features/utils.dart';
 
 import '../../../models/mode_state.dart';
@@ -20,6 +21,8 @@ abstract class BasePage extends ConsumerStatefulWidget {
     this.hasAppBar = true,
     this.canRefresh = true,
     this.titleArgs = const [],
+    this.showProfileButton = false,
+    this.showBackButton = true,
   });
 
   final Object title;
@@ -31,6 +34,12 @@ abstract class BasePage extends ConsumerStatefulWidget {
   final Widget? leading;
   final bool hasAppBar;
   final bool canRefresh;
+
+  /// A tab page: the header starts with the profile button (avatar), which opens the profile as a sheet.
+  final bool showProfileButton;
+
+  /// False where the page has its own way out (a sheet with a close button).
+  final bool showBackButton;
 }
 
 abstract class BasePageState<P extends BasePage, S extends dynamic, N extends StateNotifier<S>>
@@ -79,7 +88,7 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
         appBar: !widget.hasAppBar
             ? null
             : AppBar(
-                automaticallyImplyLeading: true,
+                automaticallyImplyLeading: widget.showBackButton,
                 title: (widget.title is Widget
                     ? widget.title as Widget
                     : InkWell(
@@ -90,7 +99,7 @@ abstract class BasePageState<P extends BasePage, S extends dynamic, N extends St
                         ),
                       )),
                 leadingWidth: widget.leading == null ? null : 80.sp,
-                leading: widget.leading,
+                leading: widget.leading ?? (widget.showProfileButton ? const ProfileAvatarButton() : null),
                 actions: buildActions(context, ref),
                 actionsPadding: EdgeInsets.symmetric(horizontal: 12.sp),
               ),

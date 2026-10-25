@@ -23,7 +23,7 @@ import 'package:work_hu/features/utils.dart';
 /// The job list. The Jobs tab ([manage] false) is for registering; the admin list ([manage] true) adds creating jobs
 /// and every status, and opens the jobs with their management actions.
 class JobsPage extends BaseListPage {
-  const JobsPage({super.key, this.manage = false, super.title = "jobs_title"});
+  const JobsPage({super.key, this.manage = false, super.title = "jobs_title"}) : super(showProfileButton: !manage);
 
   final bool manage;
 

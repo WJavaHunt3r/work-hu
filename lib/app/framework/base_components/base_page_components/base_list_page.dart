@@ -12,6 +12,7 @@ abstract class BaseListPage extends BasePage {
     super.hasHeadData = false,
     super.canPop = true,
     super.titleArgs,
+    super.showProfileButton,
   }) : super();
 }
 

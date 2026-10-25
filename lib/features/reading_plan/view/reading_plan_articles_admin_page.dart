@@ -19,6 +19,13 @@ class ReadingPlanArticlesAdminPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("reading_plan_admin_title".i18n(), style: const TextStyle(fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(
+            tooltip: "reading_plan_reported_title".i18n(),
+            icon: const Icon(Icons.flag_outlined),
+            onPressed: () => context.push('/admin/readingPlan/reported'),
+          ),
+        ],
       ),
       floatingActionButton: plan == null
           ? null

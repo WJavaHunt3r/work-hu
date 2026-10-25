@@ -17,7 +17,7 @@ import 'package:work_hu/features/admin/providers/admin_provider.dart';
 import '../../../app/widgets/base_list_item.dart';
 
 class AdminPage extends BasePage {
-  const AdminPage({super.key, super.title = "Admin"});
+  const AdminPage({super.key, super.title = "Admin", super.showProfileButton = true});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -52,13 +53,20 @@ class DonateDataNotifier extends BaseDataNotifier<DonateState> {
     );
   }
 
+  /// The result page of the checkout created last (`/donate/<id>/success/<reference>`).
+  String? lastSuccessRoute;
+
   Future<void> createCheckout(int amount) async {
     var reference = "donation_${state.donation!.id!}_${UniqueKey().toString().replaceAll("#", "")}";
+    final successRoute = "/donate/${state.donation!.id}/success/$reference";
+    lastSuccessRoute = successRoute;
     var response = await donateRepository.createCheckout(
       amount: amount,
       checkoutReference: reference,
       description: state.donation!.description!,
-      redirectUrl: "donate/${state.donation!.id}/success/$reference",
+      // Relative, as the donation service has always been given it (it puts the web app's address in front); the
+      // apps come back through the return page, which opens the app (CheckoutLauncher)
+      redirectUrl: kIsWeb ? successRoute.substring(1) : "payment-return.html?to=$successRoute",
     );
 
     var payment = PaymentsModel(

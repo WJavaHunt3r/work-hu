@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:work_hu/features/payments/checkout_launcher.dart';
 import 'package:work_hu/app/models/payment_status.dart';
 import 'package:work_hu/app/widgets/list_separator.dart';
 import 'package:work_hu/app/widgets/number_pin.dart';
@@ -285,8 +285,6 @@ class NumberPinLayout extends StatelessWidget {
   }
 
   Future<void> _launchUrl(Uri uri) async {
-    if (!await launchUrl(uri, mode: LaunchMode.inAppWebView, webOnlyWindowName: "_self")) {
-      throw Exception('Could not launch $uri');
-    }
+    await CheckoutLauncher.open(uri);
   }
 }
