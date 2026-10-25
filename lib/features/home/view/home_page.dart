@@ -8,9 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:localization/localization.dart' show LocalizationExtension;
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/providers/locale_provider.dart';
-import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_alert_dialog.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_item.dart';
@@ -40,7 +38,7 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildWelcomeTitle(theme),
+        _buildHeader(theme),
         _buildBalanceCard(theme),
         SizedBox(height: 24.sp),
         _buildSaleCard(theme),
@@ -295,28 +293,20 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
     );
   }
 
-  Widget _buildWelcomeTitle(ThemeData theme) {
+  /// No app bar on this page: the profile button sits next to the page title, as in the other tabs' headers.
+  Widget _buildHeader(ThemeData theme) {
     return Padding(
       padding: EdgeInsets.only(top: 24.sp, bottom: 20.sp),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          // No app bar on this page: the profile button sits next to the greeting
-          Row(
-            children: [
-              const ProfileAvatarButton(),
-              SizedBox(width: 12.sp),
-              Expanded(
-                child: Text(
-                  'home_welcome_title'.i18n([locator<UserProvider>().user!.firstname]),
-                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
+          const ProfileAvatarButton(),
+          SizedBox(width: 12.sp),
+          Expanded(
+            child: Text(
+              'nav_bar_home'.i18n(),
+              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
           ),
-          SizedBox(height: 8.sp),
-          Text('home_welcome_subtitle'.i18n(), style: theme.textTheme.bodyMedium),
         ],
       ),
     );

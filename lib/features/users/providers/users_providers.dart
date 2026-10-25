@@ -191,8 +191,17 @@ class UserDetailNotifier extends BaseDataNotifier<UserDetailState> {
     return deleted == true;
   }
 
-  Future<void> resetUserPassword(num userId) async {
-    await executeApiCall(() => usersRepository.resetPassword(userId, currentUser!.id));
+  /// E-mails the user a one-time link to set a new password (the backend's reason is shown when it can't, e.g. no
+  /// e-mail address). Returns whether the mail went out.
+  Future<bool> resetUserPassword(num userId) async {
+    final sent = await executeApiCall<bool>(
+      () => guardApi(() async {
+        await usersRepository.resetPassword(userId, currentUser!.id);
+        return true;
+      }),
+      onError: (message) async => showApiError(message),
+    );
+    return sent == true;
   }
 
   @override

@@ -228,7 +228,7 @@ class UserDetails extends ConsumerWidget {
                             // backgroundColor: WidgetStateColor.resolveWith((states) => AppColors.primary),
                             foregroundColor: WidgetStateColor.resolveWith((states) => AppColors.white),
                           ),
-                          onPressed: () => ref.watch(userDetailProvider.notifier).resetUserPassword(user.id),
+                          onPressed: () => _sendResetLink(context, ref, user),
                           child: Text(
                             "user_details_reset_password".i18n(),
                             style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
@@ -333,5 +333,32 @@ class _RolesSection extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+/// Admin "reset password": e-mails the user a one-time link to set a new one, after asking.
+Future<void> _sendResetLink(BuildContext context, WidgetRef ref, UserModel user) async {
+  final email = user.email ?? "";
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AdaptiveAlertDialog(
+      title: Text("user_details_reset_password".i18n()),
+      content: Text(
+        email.isEmpty ? "user_details_reset_no_email".i18n() : "user_details_reset_question".i18n([email]),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        ),
+        if (email.isNotEmpty)
+          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text("security_send".i18n())),
+      ],
+    ),
+  );
+  if (confirmed != true) return;
+  final sent = await ref.read(userDetailProvider.notifier).resetUserPassword(user.id);
+  if (sent && context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("user_details_reset_sent".i18n([email]))));
   }
 }

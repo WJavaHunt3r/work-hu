@@ -39,6 +39,9 @@ abstract class UserModel with _$UserModel {
     /// Null for users who don't belong to a church: they only get the balance and the profile.
     num? churchId,
 
+    /// The church's name (null without one), shown on the profile details.
+    String? churchName,
+
     /// True while the first or last name is the backend's placeholder (e.g. Google sent no last name).
     @Default(false) bool profileIncomplete,
 

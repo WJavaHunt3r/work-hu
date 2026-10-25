@@ -55,7 +55,9 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
         userProvider.setToken(data['token']);
         executeApiCall(
           () => _loginRepository.getProfile().then((userData) async {
-            userProvider.setUser(userData);
+            await userProvider.setUser(userData);
+            // Not null: executeApiCall counts a null result as a failure
+            return userData;
           }),
         );
       },
@@ -96,7 +98,9 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
         userProvider.setToken(data['token']);
         executeApiCall(
           () => _loginRepository.getProfile().then((userData) async {
-            userProvider.setUser(userData);
+            await userProvider.setUser(userData);
+            // Not null: executeApiCall counts a null result as a failure
+            return userData;
           }),
         );
       },
@@ -111,7 +115,9 @@ class LoginDataNotifier extends BaseDataNotifier<LoginState> {
     userProvider.setToken(data['token']);
     executeApiCall(
       () => _loginRepository.getUserByUsername(data['username']).then((userData) async {
-        userProvider.setUser(userData);
+        await userProvider.setUser(userData);
+        // Not null: executeApiCall counts a null result as a failure
+        return userData;
       }),
     );
   }

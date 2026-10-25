@@ -3,9 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:work_hu/app/framework/api_exception.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/features/bible/providers/bible_provider.dart';
+import 'package:work_hu/features/login/providers/login_provider.dart';
 import 'package:work_hu/features/profile/view/profile_sheet.dart';
 import 'package:work_hu/features/reading_plan/providers/reading_plan_provider.dart';
 import 'package:work_hu/features/reading_plan/view/reading_plan_card.dart';
@@ -14,7 +17,7 @@ import 'package:work_hu/features/status/view/status_page.dart' show LocalStatusS
 import 'package:work_hu/features/streams/view/live_page.dart';
 
 /// The first tab (`/home`): for church members the live broadcast banner, the reading challenge, the church's status
-/// this month and the Bible; for users without a church only the Bible. The header's avatar opens the profile.
+/// this month, their activities and room booking, and the Bible; for users without a church only the Bible. The header's avatar opens the profile.
 class StartPage extends ConsumerWidget {
   const StartPage({super.key});
 
@@ -41,6 +44,8 @@ class StartPage extends ConsumerWidget {
               const ReadingPlanCard(),
               const _LocalStatus(),
               SizedBox(height: 16.sp),
+              const _QuickLinks(),
+              SizedBox(height: 16.sp),
             ],
             const _BibleCard(),
           ],
@@ -56,6 +61,55 @@ class _LocalStatus extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) =>
       LocalStatusSection(head: ref.watch(statusDataProvider.select((s) => s.userRoundHead)));
+}
+
+/// Activities (Munkalapok) and room booking, for church members.
+class _QuickLinks extends ConsumerWidget {
+  const _QuickLinks();
+
+  Future<void> _openBooking(WidgetRef ref) async {
+    final String token;
+    try {
+      token = await guardApi(() => ref.read(loginRepoProvider).getBookingToken());
+    } on ApiException catch (e) {
+      showApiError(e.message);
+      return;
+    } catch (_) {
+      showApiError("api_unknown_error".i18n());
+      return;
+    }
+    final uri = Uri.parse("https://booking.bcc-ktk.org?token=$token");
+    if (!await launchUrl(uri, mode: LaunchMode.inAppBrowserView, webOnlyWindowName: "_self")) {
+      showApiError('booking_failed_to_launch'.i18n([uri.toString()]));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    return BaseContainer(
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 4.sp),
+            leading: Icon(Icons.list_alt, color: theme.colorScheme.primary),
+            title: Text("profile_my_activities".i18n(), style: const TextStyle(fontWeight: FontWeight.bold)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/profile/activities'),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 4.sp),
+            leading: Icon(Icons.hotel_outlined, color: theme.colorScheme.primary),
+            title: Text("profile_booking".i18n(), style: const TextStyle(fontWeight: FontWeight.bold)),
+            trailing: const Icon(Icons.open_in_new, size: 20),
+            onTap: () => _openBooking(ref),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// The Bible: "Continue" at the last chapter read (its name remembered, so nothing is downloaded for it), else open.

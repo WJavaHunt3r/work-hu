@@ -6,15 +6,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_page.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
-import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/models/app_theme_mode.dart';
 import 'package:work_hu/app/providers/locale_provider.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
-import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_list_view.dart';
 import 'package:work_hu/app/widgets/settings_tile.dart';
 import 'package:work_hu/features/profile/data/state/profile_state.dart';
@@ -51,7 +48,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
   Widget buildLayout() {
     var theme = Theme.of(context);
     var colorScheme = theme.colorScheme;
-    var user = locator<UserProvider>().user;
+    var user = ref.watch(userDataProvider).user;
     final currentLocale = ref.watch(localeProvider);
 
     final localeNames = LocaleNames.of(context)!;
@@ -71,6 +68,8 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
               SizedBox(height: 16.sp),
               Text(user!.getFullName(), style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
               SizedBox(height: 4.sp),
+              if (user.churchName != null)
+                Text(user.churchName!, style: theme.textTheme.bodyMedium?.copyWith(color: theme.hintColor)),
             ],
           ),
         ),
@@ -80,62 +79,39 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
         // Users without a church have no Status page, so its reading challenge card (for those who may see it) is here
         if (!user.hasChurch()) ...[const ReadingPlanCard(), SizedBox(height: 8.sp)],
 
-        // Personal Information Section
-        BaseContainer(
-          padding: const EdgeInsets.all(0),
-          child: Column(
-            children: [
-              _InfoTile(label: 'profile_full_name'.i18n(), value: user.getFullName()),
-              const Divider(height: 1),
-              _InfoTile(label: 'profile_email'.i18n(), value: user.email ?? ""),
-              const Divider(height: 1),
-              _InfoTile(label: 'profile_phone'.i18n(), value: "${user.phoneNumber ?? ""}"),
-            ],
-          ),
+        // Personal details: their own page, where the name, gender and birth date are edited
+        BaseListView(
+          hasBottomPadding: false,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            SettingsTile(
+              label: 'profile_details_title'.i18n(),
+              icon: Icons.person_outline,
+              onTap: () => context.push('/profile/details'),
+              index: 0,
+              isLast: true,
+            ),
+          ],
         ),
 
         SizedBox(height: 32.sp),
-
-        // Account Settings Section: activities and room booking are for users who belong to a church
-        if (user.hasChurch()) ...[
-          BaseListView(
-            hasBottomPadding: false,
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              SettingsTile(
-                label: 'profile_my_activities'.i18n(),
-                icon: Icons.list_alt,
-                onTap: () => context.push('/profile/activities'),
-                index: 0,
-              ),
-              Divider(height: 1.sp),
-              SettingsTile(
-                label: 'profile_booking'.i18n(),
-                icon: Icons.book_outlined,
-                onTap: () {
-                  openLink();
-                },
-                isLast: true,
-              ),
-            ],
-          ),
-
-          SizedBox(height: 32.sp),
-        ],
 
         // App Settings Section
         BaseListView(
           hasBottomPadding: false,
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            SettingsTile(label: 'profile_password_security'.i18n(), icon: Icons.shield_outlined, index: 0),
-            const Divider(height: 1),
+            SettingsTile(
+              label: 'profile_password_security'.i18n(),
+              icon: Icons.shield_outlined,
+              onTap: () => context.push('/profile/security'),
+              index: 0,
+            ),
             SettingsTile(
               label: 'profile_notifications'.i18n(),
               icon: Icons.notifications_none,
               onTap: () => context.push('/profile/notifications'),
             ),
-            const Divider(height: 1),
             SettingsTile(
               label: 'profile_language'.i18n(),
               icon: Icons.language,
@@ -144,7 +120,6 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
                 context.push('/profile/language');
               },
             ),
-            const Divider(height: 1),
             SettingsTile(
               label: 'profile_dark_mode'.i18n(),
               icon: Icons.dark_mode_outlined,
@@ -153,9 +128,7 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
                 context.push('/profile/theme');
               },
             ),
-            const Divider(height: 1),
             SettingsTile(label: 'profile_help_support'.i18n(), icon: Icons.help_outline),
-            const Divider(height: 1),
             SettingsTile(
               label: 'profile_delete_account'.i18n(),
               icon: Icons.delete_forever_outlined,
@@ -208,39 +181,4 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
 
   @override
   BaseState get status => state.status;
-
-  Future<void> openLink() async {
-    var token = await ref.read(provider.notifier).token();
-    Uri uri = Uri.parse("https://booking.bcc-ktk.org?token=$token");
-    if (!await launchUrl(uri, mode: LaunchMode.inAppBrowserView, webOnlyWindowName: "_self")) {
-      throw Exception('booking_failed_to_launch'.i18n([uri.toString()]));
-    }
-  }
-}
-
-class _InfoTile extends StatelessWidget {
-  final String label, value;
-
-  const _InfoTile({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(18.sp),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: Theme.of(context).textTheme.bodySmall),
-              SizedBox(height: 4.sp),
-              Text(value, style: Theme.of(context).textTheme.bodyLarge),
-            ],
-          ),
-          Icon(Icons.edit_outlined, size: 20.sp, color: Theme.of(context).hintColor.withValues(alpha: 0.3)),
-        ],
-      ),
-    );
-  }
 }

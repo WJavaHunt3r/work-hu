@@ -51,7 +51,10 @@ import 'package:work_hu/features/notification_admin/view/schedule_edit_page.dart
 import 'package:work_hu/features/notification_admin/view/send_notification_page.dart';
 import 'package:work_hu/features/notifications/view/notification_preferences_page.dart';
 import 'package:work_hu/features/profile/view/language_picker_page.dart';
+import 'package:work_hu/features/change_password/view/reset_password_page.dart';
+import 'package:work_hu/features/profile/view/profile_details_page.dart';
 import 'package:work_hu/features/profile/view/profile_page.dart';
+import 'package:work_hu/features/profile/view/security_page.dart';
 import 'package:work_hu/features/reading_plan/view/article_edit_page.dart';
 import 'package:work_hu/features/reading_plan/view/article_reader_page.dart';
 import 'package:work_hu/features/reading_plan/view/psalm_reader_page.dart';
@@ -93,7 +96,9 @@ final _shellNavigatorJobsKey = GlobalKey<NavigatorState>(debugLabel: 'shellJobs'
 String _oldJobsLocation(BuildContext context, GoRouterState state) =>
     state.uri.toString().replaceFirst('/profile/jobs', '/jobs');
 final routerProvider = Provider<GoRouter>((ref) {
-  final userNotifier = ref.watch(userDataProvider);
+  // read, not watch: watching the ChangeNotifier built a new router (back at /home) on every user change, e.g. after
+  // saving the profile details; refreshListenable already re-runs the redirects
+  final userNotifier = ref.read(userDataProvider);
   return GoRouter(
     refreshListenable: userNotifier,
     navigatorKey: navigatorKey,
@@ -225,6 +230,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      GoRoute(path: '/profile/details', builder: (context, state) => const ProfileDetailsPage()),
+      GoRoute(path: '/profile/security', builder: (context, state) => const SecurityPage()),
       GoRoute(
         path: '/profile/notifications',
         builder: (BuildContext context, GoRouterState state) => const NotificationPreferencesPage(),
@@ -266,6 +273,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(path: '/tos', builder: (context, state) => const ToSPage()),
+      // The one-time link from the "forgot password" / admin reset e-mail
+      GoRoute(
+        path: '/reset-password',
+        builder: (context, state) => ResetPasswordPage(token: state.uri.queryParameters['token'] ?? ''),
+      ),
       GoRoute(path: '/privacy', builder: (context, state) => const PrivacyPolicy()),
       GoRoute(
         path: "/balance/topUp",
@@ -489,7 +501,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           state.matchedLocation.startsWith('/login') ||
           state.matchedLocation.startsWith('/tos') ||
           state.matchedLocation.startsWith('/privacy') ||
-          state.matchedLocation.startsWith('/donate'); // Crucial for your success page
+          state.matchedLocation.startsWith('/donate') || // Crucial for your success page
+          state.matchedLocation.startsWith('/reset-password');
+
+      // A reset link works whoever is signed in on this device (it ends at the login page anyway)
+      if (state.matchedLocation.startsWith('/reset-password')) return null;
 
       if (loggedIn && !user.changedPassword) {
         return '/change-password';
@@ -506,11 +522,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         return DeepLink.consume();
       }
 
+      // Signed in (e.g. just now on the login page): nothing to do on /login any more
+      if (loggedIn && state.matchedLocation.startsWith('/login')) return '/home';
+
       // Users outside a church only have Home (with the Bible), the balance and the profile.
       if (loggedIn && !user.hasChurch()) {
         final location = state.matchedLocation;
         if (location == '/' || ['/status', '/jobs', '/admin', '/live'].any(location.startsWith)) return '/home';
-        if (location.startsWith('/profile/activities')) return '/profile';
+        if (location.startsWith('/profile/activities')) return '/home';
       }
 
       if (loggedIn && state.matchedLocation == '/') {

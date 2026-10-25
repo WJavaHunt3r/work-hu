@@ -10,7 +10,8 @@
           { "/": "/balance*" },
           { "/": "/mentees*" },
           { "/": "/bible*" },
-          { "/": "/psalms*" }
+          { "/": "/psalms*" },
+          { "/": "/reset-password*" }
         ]
       }
     ]
