@@ -197,6 +197,28 @@ class Utils {
     String description,
     List<UserModel> users,
   ) async {
+    Uint8List bytes = Uint8List.fromList(utf8.encode(creditCsv(items, date, description, users)));
+
+    if (kIsWeb) {
+      await FileSaver.instance.saveFile(
+        name: '${dateToString(date).replaceAll("-", "")}_${changeSpecChars(description)}',
+        bytes: bytes,
+        fileExtension: 'csv',
+        mimeType: MimeType.csv,
+      );
+    } else {
+      await FileSaver.instance.saveAs(
+        name: '${dateToString(date).replaceAll("-", "")}_${changeSpecChars(description)}',
+        bytes: bytes,
+        fileExtension: 'csv',
+        mimeType: MimeType.csv,
+      );
+    }
+  }
+
+  /// The MyShare credit import file. Numbers are written as whole numbers: a double such as `hours * 1000` prints as
+  /// "4000" on the web (JavaScript) but "4000.0" in the apps (Dart VM), and the MyShare import refused the latter.
+  static String creditCsv(List<TransactionItemModel> items, DateTime date, String description, List<UserModel> users) {
     var headers = [
       "UserId",
       "Age",
@@ -215,35 +237,18 @@ class Utils {
     for (var transaction in items) {
       var user = users.firstWhere((e) => e.id == transaction.userId);
       list.add([
-        user.myShareID,
+        user.myShareID?.round(),
         (DateTime.now().difference(user.birthDate ?? DateTime.now()).inDays / 365).ceil() - 1,
         user.firstname,
         user.lastname,
         3964,
         "BUK Vácduka",
-        transaction.credit,
+        transaction.credit.round(),
         '${date.day}/${date.month}/${date.year}',
         description,
       ]);
     }
-    String csv = Csv(autoDetect: false).encode(list);
-    Uint8List bytes = Uint8List.fromList(utf8.encode(csv));
-
-    if (kIsWeb) {
-      await FileSaver.instance.saveFile(
-        name: '${dateToString(date).replaceAll("-", "")}_${changeSpecChars(description)}',
-        bytes: bytes,
-        fileExtension: 'csv',
-        mimeType: MimeType.csv,
-      );
-    } else {
-      await FileSaver.instance.saveAs(
-        name: '${dateToString(date).replaceAll("-", "")}_${changeSpecChars(description)}',
-        bytes: bytes,
-        fileExtension: 'csv',
-        mimeType: MimeType.csv,
-      );
-    }
+    return Csv(autoDetect: false).encode(list);
   }
 
   static String getMonthFromDate(DateTime date, BuildContext context) {
