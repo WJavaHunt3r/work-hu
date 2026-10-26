@@ -102,4 +102,6 @@ Folder names are not fully consistent (`provider` vs `providers`, `widget` vs `w
 
 **Sizing:** `flutter_screenutil` uses a 360×640 design size, so use `.w`, `.h`, `.sp`.
 
+**MyShare credit CSV:** `Utils.creditCsv` builds it (Munkalapok, transaction items, new transactions) with whole-number amounts: a double prints "4000.0" in the apps but "4000" on the web, and the MyShare import refuses the former. On Android `Utils.createCreditCsv` saves it straight into Downloads (`AndroidDownloads`, channel `dukapp/downloads` in `MainActivity.saveToDownloads`) as `text/csv`, setting the type again after publishing: through file_saver's "save as" dialog Android registered it as `text/comma-separated-values`, and the import's file picker (asking for text/csv) greyed it out. The web downloads it, iOS keeps the save sheet.
+
 **Misc:** `lib/features/utils.dart` has shared helpers (date formatting, secure-storage `saveData`/`getData`, unit labels). Firebase messaging and local notifications are dependencies used for push notifications.
