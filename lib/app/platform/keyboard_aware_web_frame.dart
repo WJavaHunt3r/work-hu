@@ -5,11 +5,7 @@ import 'package:flutter_web_frame/flutter_web_frame.dart';
 /// MediaQuery with `viewInsets` set to zero, so in a phone browser nothing (pages, bottom sheets) made room for the
 /// on-screen keyboard and it covered the text fields (job chat, shared notes). This puts the real insets back.
 class KeyboardAwareWebFrame extends StatelessWidget {
-  const KeyboardAwareWebFrame({
-    super.key,
-    required this.builder,
-    this.backgroundColor,
-  });
+  const KeyboardAwareWebFrame({super.key, required this.builder, this.backgroundColor});
 
   final WidgetBuilder builder;
   final Color? backgroundColor;
