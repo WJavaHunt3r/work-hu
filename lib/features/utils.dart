@@ -6,11 +6,14 @@ import 'package:csv/csv.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart';
 import 'package:pointycastle/api.dart';
 import 'package:work_hu/app/data/models/transaction_type.dart';
+import 'package:work_hu/app/platform/android_downloads.dart';
+import 'package:work_hu/app/providers/router_provider.dart' show navigatorKey;
 import 'package:work_hu/app/widgets/error_dialog.dart';
 import 'package:work_hu/features/activities/data/model/activity_model.dart';
 import 'package:work_hu/features/login/data/model/user_model.dart';
@@ -206,6 +209,26 @@ class Utils {
         fileExtension: 'csv',
         mimeType: MimeType.csv,
       );
+    } else if (defaultTargetPlatform == TargetPlatform.android) {
+      // Straight into Downloads as text/csv: from the "save as" dialog Android registers it as
+      // text/comma-separated-values, and the MyShare import's file picker greys it out
+      final context = navigatorKey.currentContext;
+      try {
+        final saved = await AndroidDownloads.save(
+          name: '${dateToString(date).replaceAll("-", "")}_${changeSpecChars(description)}.csv',
+          mimeType: 'text/csv',
+          bytes: bytes,
+        );
+        if (context != null && context.mounted) {
+          ScaffoldMessenger.maybeOf(
+            context,
+          )?.showSnackBar(SnackBar(content: Text("csv_saved_to_downloads".i18n([saved]))));
+        }
+      } on PlatformException catch (e) {
+        if (context != null && context.mounted) {
+          showErrorDialog(context, content: e.message ?? "api_unknown_error".i18n());
+        }
+      }
     } else {
       await FileSaver.instance.saveAs(
         name: '${dateToString(date).replaceAll("-", "")}_${changeSpecChars(description)}',

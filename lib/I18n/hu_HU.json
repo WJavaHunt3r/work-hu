@@ -1024,5 +1024,6 @@
   "biometric_locked_title": "A DukApp zárolva",
   "biometric_locked_hint": "Oldd fel Face ID-val, ujjlenyomattal vagy a telefonod kódjával.",
   "biometric_unlock": "Feloldás",
-  "biometric_use_password": "Belépés jelszóval"
+  "biometric_use_password": "Belépés jelszóval",
+  "csv_saved_to_downloads": "Elmentve a Letöltések mappába: %s"
 }

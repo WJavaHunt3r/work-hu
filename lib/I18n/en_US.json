@@ -1027,5 +1027,6 @@
   "biometric_locked_title": "DukApp is locked",
   "biometric_locked_hint": "Unlock it with Face ID, your fingerprint or your phone's passcode.",
   "biometric_unlock": "Unlock",
-  "biometric_use_password": "Sign in with password"
+  "biometric_use_password": "Sign in with password",
+  "csv_saved_to_downloads": "Saved to Downloads: %s"
 }
