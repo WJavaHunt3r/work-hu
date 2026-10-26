@@ -3,16 +3,17 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/cupertino.dart' show CupertinoThemeData;
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart' show FlutterQuillLocalizations;
+import 'package:flutter_quill/flutter_quill.dart'
+    show FlutterQuillLocalizations;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_web_frame/flutter_web_frame.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/models/app_theme_mode.dart';
 import 'package:work_hu/app/providers/router_provider.dart';
 import 'package:work_hu/app/providers/theme_provider.dart';
+import 'package:work_hu/app/platform/keyboard_aware_web_frame.dart';
 import 'package:work_hu/app/session/biometric_gate.dart';
 import 'package:work_hu/app/style/app_colors.dart';
 import 'package:work_hu/app/style/app_style.dart';
@@ -33,15 +34,25 @@ ThemeData _withChipStyle(ThemeData theme) {
     // The web keeps Material also in an iPhone browser; only the iOS app gets Cupertino widgets
     platform: kIsWeb ? TargetPlatform.android : null,
     // Cupertino switches, tab bar etc. in the iOS app take the app color instead of iOS blue/green
-    cupertinoOverrideTheme: CupertinoThemeData(primaryColor: scheme.primary, applyThemeToAll: true),
-    chipTheme: theme.chipTheme.copyWith(selectedColor: scheme.primaryContainer, showCheckmark: false),
+    cupertinoOverrideTheme: CupertinoThemeData(
+      primaryColor: scheme.primary,
+      applyThemeToAll: true,
+    ),
+    chipTheme: theme.chipTheme.copyWith(
+      selectedColor: scheme.primaryContainer,
+      showCheckmark: false,
+    ),
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected) ? scheme.primaryContainer : null,
+          (states) => states.contains(WidgetState.selected)
+              ? scheme.primaryContainer
+              : null,
         ),
         foregroundColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected) ? scheme.onPrimaryContainer : scheme.onSurface,
+          (states) => states.contains(WidgetState.selected)
+              ? scheme.onPrimaryContainer
+              : scheme.onSurface,
         ),
       ),
     ),
@@ -71,7 +82,9 @@ class DukApp extends ConsumerWidget {
               child: SizedBox(
                 width: _columnWidth,
                 child: MediaQuery(
-                  data: media.copyWith(size: Size(_columnWidth, math.min(media.size.height, 1000))),
+                  data: media.copyWith(
+                    size: Size(_columnWidth, math.min(media.size.height, 1000)),
+                  ),
                   child: ScreenUtilInit(
                     designSize: const Size(360, 640),
                     minTextAdapt: true,
@@ -95,7 +108,7 @@ class DukApp extends ConsumerWidget {
       );
     }
 
-    return FlutterWebFrame(
+    return KeyboardAwareWebFrame(
       backgroundColor: AppColors.backgroundColor,
       builder: (context) {
         return ScreenUtilInit(
@@ -107,12 +120,13 @@ class DukApp extends ConsumerWidget {
           splitScreenMode: false,
           builder: (context, child) {
             return Center(
-              child: ClipRect(child: SizedBox(width: 500, child: buildMaterial(ref))),
+              child: ClipRect(
+                child: SizedBox(width: 500, child: buildMaterial(ref)),
+              ),
             );
           },
         );
       },
-      maximumSize: const Size(500, 1000),
     );
   }
 
@@ -139,7 +153,11 @@ class DukApp extends ConsumerWidget {
 
         return MaterialApp.router(
           scrollBehavior: const MaterialScrollBehavior().copyWith(
-            dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.trackpad},
+            dragDevices: {
+              PointerDeviceKind.mouse,
+              PointerDeviceKind.touch,
+              PointerDeviceKind.trackpad,
+            },
           ),
           scaffoldMessengerKey: _scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
@@ -147,7 +165,8 @@ class DukApp extends ConsumerWidget {
           darkTheme: _withChipStyle(theme.globalDarkTheme),
           themeMode: AppThemeMode.getThemeMode(appThemeMode),
           routerConfig: router,
-          builder: (context, child) => WebUpdateChecker(child: BiometricGate(child: child!)),
+          builder: (context, child) =>
+              WebUpdateChecker(child: BiometricGate(child: child!)),
           locale: currentLocale,
           supportedLocales: supportedLocales,
           localizationsDelegates: [
