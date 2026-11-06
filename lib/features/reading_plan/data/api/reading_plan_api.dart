@@ -17,10 +17,12 @@ class ReadingPlanApi {
   Future<Map<String, dynamic>> unmark(num planId, int item) async =>
       (await _dioClient.dio.delete("/reading-plan/$planId/items/$item")).data as Map<String, dynamic>;
 
-  Future<Map<String, dynamic>> getLeaderboard(num planId, {int page = 0, int size = 100}) async =>
+  /// Members and guests are ranked apart: without [group] the caller's own group, "members" or "guests" only for
+  /// managers (READING_PLAN_MANAGE).
+  Future<Map<String, dynamic>> getLeaderboard(num planId, {int page = 0, int size = 100, String? group}) async =>
       (await _dioClient.dio.get(
             "/reading-plan/$planId/leaderboard",
-            queryParameters: {"page": page, "size": size},
+            queryParameters: {"page": page, "size": size, "group": ?group},
           )).data
           as Map<String, dynamic>;
 

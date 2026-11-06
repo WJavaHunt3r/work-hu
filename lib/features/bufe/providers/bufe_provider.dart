@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:work_hu/app/models/mode_state.dart';
 import 'package:work_hu/features/bufe/data/api/bufe_api.dart';
+import 'package:work_hu/features/bufe/data/model/kiosk_catalog.dart';
 import 'package:work_hu/features/bufe/data/model/sumup_transactions.dart';
 import 'package:work_hu/features/bufe/data/model/sumup_user_model.dart';
 import 'package:work_hu/features/bufe/data/repository/bufe_repository.dart';
@@ -12,6 +13,16 @@ import 'package:work_hu/features/bufe/data/state/bufe_state.dart';
 final bufeApiProvider = Provider<BufeApi>((ref) => BufeApi());
 
 final bufeRepoProvider = Provider<BufeRepository>((ref) => BufeRepository(ref.read(bufeApiProvider)));
+
+/// The kiosk's sales points, for the menu page.
+final kioskLocationsProvider = FutureProvider.autoDispose<List<KioskLocation>>(
+  (ref) => ref.read(bufeRepoProvider).getLocations(),
+);
+
+/// Categories and products of one sales point.
+final kioskCatalogProvider = FutureProvider.autoDispose.family<KioskCatalog, String>(
+  (ref, locationId) => ref.read(bufeRepoProvider).getCatalog(locationId),
+);
 
 final bufeDataProvider = StateNotifierProvider<BufeDataNotifier, BufeState>(
   (ref) => BufeDataNotifier(ref.read(bufeRepoProvider)),

@@ -10,9 +10,21 @@ import 'paged_state.dart';
 /// Owns the items, paging, filter and sort of a server-paged list.
 ///
 /// Subclasses implement [fetch]; the query lives in the state, so every reload and every next page
-/// uses the current filter and sort. Starts loading the first page on creation.
+/// uses the current filter and sort. Starts loading the first page on creation; [cachedItems] (e.g. from
+/// `UserDataCache`) are shown as that page until it is there, without a next page.
 abstract class PagedListNotifier<T, F> extends BaseDataNotifier<PagedState<T, F>> {
-  PagedListNotifier(ListQuery<F> initialQuery) : super(PagedState(query: initialQuery)) {
+  PagedListNotifier(ListQuery<F> initialQuery, {List<T>? cachedItems})
+    : super(
+        cachedItems == null
+            ? PagedState(query: initialQuery)
+            : PagedState(
+                query: initialQuery,
+                items: cachedItems,
+                page: 0,
+                totalPages: 1,
+                totalElements: cachedItems.length,
+              ),
+      ) {
     reload();
   }
 

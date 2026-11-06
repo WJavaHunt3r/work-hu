@@ -40,7 +40,7 @@ class TestUser extends ChangeNotifier implements UserProvider {
     role: Role.USER,
     changedPassword: true,
     churchId: church ? 1 : null,
-    permissions: ['READING_PLAN', if (manager) 'READING_PLAN_MANAGE'],
+    permissions: ['READING_PLAN', if (church) 'MEMBER_AREA', if (manager) 'READING_PLAN_MANAGE'],
   );
 
   @override

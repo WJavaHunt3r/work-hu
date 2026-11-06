@@ -81,4 +81,6 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.5"
+    // LiveCastOptionsProvider (the Cast plugin keeps the SDK to itself); same version as flutter_chrome_cast uses
+    implementation "com.google.android.gms:play-services-cast-framework:21.5.0"
 }

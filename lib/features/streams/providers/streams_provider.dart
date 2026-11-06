@@ -17,7 +17,7 @@ final streamsProvider = FutureProvider.autoDispose<List<StreamModel>>(
 /// (users who belong to a church): for everybody else nothing is asked and nothing is live.
 final liveStreamsProvider = StreamProvider.autoDispose<List<LiveStreamModel>>((ref) async* {
   final user = ref.watch(userDataProvider).user;
-  if (user == null || !user.hasChurch()) {
+  if (user == null || !user.isMember()) {
     yield const <LiveStreamModel>[];
     return;
   }

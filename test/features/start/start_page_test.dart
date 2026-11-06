@@ -32,7 +32,7 @@ class TestUser extends ChangeNotifier implements UserProvider {
     role: Role.USER,
     changedPassword: true,
     churchId: church ? 1 : null,
-    permissions: const ['READING_PLAN'],
+    permissions: ['READING_PLAN', if (church) 'MEMBER_AREA'],
   );
 
   @override
@@ -131,12 +131,12 @@ void main() {
     expect(find.text('Biblia'), findsOneWidget);
   });
 
-  testWidgets('users without a church only get the Bible, and their status is not asked for', (tester) async {
+  testWidgets('non-members get the reading challenge and the Bible, and their status is not asked for', (tester) async {
     final opened = await pumpStart(tester, church: false);
 
     expect(find.text('Biblia'), findsOneWidget);
+    expect(find.text('Zsoltárok olvasási terv'), findsOneWidget);
     expect(find.text('Helyi státusz'), findsNothing);
-    expect(find.text('Zsoltárok olvasási terv'), findsNothing);
     expect(FakeStatus.created, 0);
 
     await tester.tap(find.text('Biblia'));

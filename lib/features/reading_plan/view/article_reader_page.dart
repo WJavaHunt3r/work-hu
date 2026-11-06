@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/framework/api_exception.dart';
+import 'package:work_hu/features/reading_plan/data/store/reading_plan_cache.dart';
 import 'package:work_hu/features/reading_plan/view/article_body.dart';
 import 'package:work_hu/features/reading_plan/providers/reading_plan_provider.dart';
 
@@ -26,10 +27,11 @@ class _ArticleReaderPageState extends ConsumerState<ArticleReaderPage> {
       ref.invalidate(articleProvider((planId: planId, id: widget.articleId)));
       ref.invalidate(articlesProvider(planId));
       ref.invalidate(leaderboardProvider(planId));
+      ref.invalidate(leaderboardOfGroupProvider);
     } on ApiException catch (e) {
       showApiError(e.message);
-    } catch (_) {
-      showApiError("api_unknown_error".i18n());
+    } catch (e) {
+      showApiError((isOfflineError(e) ? "reading_plan_offline_action" : "api_unknown_error").i18n());
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -56,7 +58,9 @@ class _ArticleReaderPageState extends ConsumerState<ArticleReaderPage> {
           child: Padding(
             padding: EdgeInsets.all(24.sp),
             child: Text(
-              error is ApiException ? error.message : "api_unknown_error".i18n(),
+              error is ApiException
+                  ? error.message
+                  : (isOfflineError(error) ? "reading_plan_offline_action" : "api_unknown_error").i18n(),
               textAlign: TextAlign.center,
             ),
           ),

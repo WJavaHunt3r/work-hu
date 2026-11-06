@@ -167,6 +167,7 @@ void main() {
       'myCount': 9,
       'myPoints': 14,
       'myArticlePoints': 5,
+      'group': 'members',
     });
     final older = LeaderboardModel.fromJson({
       'entries': [
@@ -181,5 +182,7 @@ void main() {
     expect(newer.entries.single.articlePoints, 5);
     expect(older.myPoints, 9); // the points were the items
     expect(older.entries.single.articlePoints, 0);
+    expect(newer.group, 'members'); // members and guests are ranked apart
+    expect(older.group, isNull); // an older backend ranked everybody together
   });
 }

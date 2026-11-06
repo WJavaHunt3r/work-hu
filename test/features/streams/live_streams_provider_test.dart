@@ -29,8 +29,15 @@ class _FakeUser extends ChangeNotifier implements UserProvider {
   final num? churchId;
 
   @override
-  UserModel? get user =>
-      UserModel(id: 1, firstname: 'T', lastname: 'U', role: Role.USER, changedPassword: true, churchId: churchId);
+  UserModel? get user => UserModel(
+    id: 1,
+    firstname: 'T',
+    lastname: 'U',
+    role: Role.USER,
+    changedPassword: true,
+    churchId: churchId,
+    permissions: [if (churchId != null) 'MEMBER_AREA'],
+  );
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;

@@ -7,8 +7,14 @@ class JobChatRepository {
 
   final JobChatApi _api;
 
-  Future<JobChatModel> getChat(num jobId, {num? after, num? before}) =>
-      guardApi(() async => JobChatModel.fromJson(await _api.getChat(jobId, after: after, before: before)));
+  Future<JobChatModel> getChat(num jobId, {num? after, num? before, String? reactionsSince}) => guardApi(
+    () async =>
+        JobChatModel.fromJson(await _api.getChat(jobId, after: after, before: before, reactionsSince: reactionsSince)),
+  );
+
+  /// [reaction] null takes the user's reaction back.
+  Future<JobChatReactionsModel> react(num jobId, num messageId, JobChatReaction? reaction) =>
+      guardApi(() async => JobChatReactionsModel.fromJson(await _api.react(jobId, messageId, reaction?.apiName)));
 
   Future<JobChatMessageModel> send(num jobId, String text) =>
       guardApi(() async => JobChatMessageModel.fromJson(await _api.send(jobId, text)));

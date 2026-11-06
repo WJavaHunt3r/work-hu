@@ -12,6 +12,9 @@ abstract class SumupUserModel with _$SumupUserModel {
     required num spent,
     String? customer_code,
     String? staff_barcode,
+
+    /// "YYYY-MM-DD" as the kiosk has it; null when unknown (the kiosk then refuses age-restricted products).
+    String? birth_date,
   }) = _SumupUserModel;
 
   factory SumupUserModel.fromJson(Map<String, dynamic> json) => _$SumupUserModelFromJson(json);

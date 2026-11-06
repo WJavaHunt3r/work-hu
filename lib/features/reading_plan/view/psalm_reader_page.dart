@@ -9,6 +9,7 @@ import 'package:work_hu/features/bible/view/bible_chapter_page.dart' show BibleV
 import 'package:work_hu/features/reading_plan/data/model/bible_translation.dart';
 import 'package:work_hu/features/reading_plan/providers/public_notes_provider.dart';
 import 'package:work_hu/features/reading_plan/providers/reading_plan_provider.dart';
+import 'package:work_hu/features/reading_plan/view/offline_hint.dart';
 import 'package:work_hu/features/reading_plan/view/public_notes_section.dart';
 
 /// One psalm in a bundled translation (the user's pick, else by app language), with previous / next and the "read it"
@@ -166,6 +167,7 @@ class _PsalmReaderPageState extends ConsumerState<PsalmReaderPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    ReadingPlanOfflineHint(padding: EdgeInsets.only(bottom: 4.sp)),
                     SizedBox(
                       width: double.infinity,
                       child: done

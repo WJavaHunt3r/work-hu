@@ -157,6 +157,7 @@ class LeaderboardModel {
     required this.myCount,
     required this.myPoints,
     this.myArticlePoints = 0,
+    this.group,
   });
 
   final List<LeaderboardEntry> entries;
@@ -170,6 +171,9 @@ class LeaderboardModel {
   final int myPoints;
   final int myArticlePoints;
 
+  /// "members" or "guests": the two are ranked apart. Null from an older backend, which ranked everybody together.
+  final String? group;
+
   factory LeaderboardModel.fromJson(Map<String, dynamic> json) => LeaderboardModel(
     entries: [
       for (final e in (json['entries'] as List? ?? const [])) LeaderboardEntry.fromJson(e as Map<String, dynamic>),
@@ -180,6 +184,7 @@ class LeaderboardModel {
     // An older backend has no points: they were the items
     myPoints: (json['myPoints'] as num?)?.toInt() ?? (json['myCount'] as num?)?.toInt() ?? 0,
     myArticlePoints: (json['myArticlePoints'] as num?)?.toInt() ?? 0,
+    group: json['group'] as String?,
   );
 }
 

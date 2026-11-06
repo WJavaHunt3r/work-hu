@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:work_hu/app/notifications/deep_link.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
+import 'package:work_hu/features/bufe/view/kiosk_menu_page.dart';
 import 'package:work_hu/features/activities/view/activities_page.dart';
 import 'package:work_hu/features/audit_log/view/audit_log_page.dart';
 import 'package:work_hu/features/job_chat/view/job_chat_page.dart';
@@ -68,6 +69,7 @@ import 'package:work_hu/features/reading_plan/view/reading_plan_articles_admin_p
 import 'package:work_hu/features/rounds/view/round_edit_page.dart';
 import 'package:work_hu/features/rounds/view/rounds_page.dart';
 import 'package:work_hu/features/start/view/start_page.dart';
+import 'package:work_hu/features/status/providers/status_providers.dart';
 import 'package:work_hu/features/status/view/status_page.dart';
 import 'package:work_hu/features/top_up/view/top_up_page.dart';
 import 'package:work_hu/features/top_ups/view/top_ups_page.dart';
@@ -99,7 +101,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   // read, not watch: watching the ChangeNotifier built a new router (back at /home) on every user change, e.g. after
   // saving the profile details; refreshListenable already re-runs the redirects
   final userNotifier = ref.read(userDataProvider);
-  return GoRouter(
+  final router = GoRouter(
     refreshListenable: userNotifier,
     navigatorKey: navigatorKey,
     initialLocation: "/home",
@@ -144,6 +146,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => HomePage(),
                 routes: [
                   GoRoute(path: "topUps", builder: (BuildContext context, GoRouterState state) => const TopUpsPage()),
+                  GoRoute(path: "menu", builder: (BuildContext context, GoRouterState state) => const KioskMenuPage()),
                   GoRoute(
                     path: "transfer",
                     builder: (BuildContext context, GoRouterState state) => const TransferAmountPage(),
@@ -525,11 +528,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Signed in (e.g. just now on the login page): nothing to do on /login any more
       if (loggedIn && state.matchedLocation.startsWith('/login')) return '/home';
 
-      // Users outside a church only have Home (with the Bible), the balance and the profile.
-      if (loggedIn && !user.hasChurch()) {
+      // Non-members only have Home (reading challenge, Bible), the balance and the profile.
+      if (loggedIn && !user.isMember()) {
         final location = state.matchedLocation;
         if (location == '/' || ['/status', '/jobs', '/admin', '/live'].any(location.startsWith)) return '/home';
         if (location.startsWith('/profile/activities')) return '/home';
+      }
+
+      // Members without a goal have an empty Status page; while that is still being asked nobody is sent away
+      if (loggedIn && state.matchedLocation.startsWith('/status') && ref.read(hasStatusGoalProvider).value == false) {
+        return '/home';
       }
 
       if (loggedIn && state.matchedLocation == '/') {
@@ -538,6 +546,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
   );
+  // Sends a user who is on /status away once it turns out there is no goal
+  ref.listen(hasStatusGoalProvider, (_, next) {
+    if (next.value == false) router.refresh();
+  });
+  return router;
 });
 
 List<String> teamLeaderScreens = ["/admin", "/admin/userStatus", "/admin/fraKareWeeks", "/admin/fraKareWeeks/"];
@@ -559,8 +572,12 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
 
   /// The tabs this user sees, each with the index of its branch in the shell route. Hidden tabs leave gaps, so an
   /// item's position in the bar is not its branch index.
-  List<({int branch, BottomNavigationBarItem item})> _tabs(UserModel user, {required bool showLive}) {
-    final church = user.hasChurch();
+  List<({int branch, BottomNavigationBarItem item})> _tabs(
+    UserModel user, {
+    required bool showStatus,
+    required bool showLive,
+  }) {
+    final member = user.isMember();
     return [
       (
         branch: 0,
@@ -570,7 +587,7 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
           label: 'nav_bar_start'.i18n(),
         ),
       ),
-      if (church)
+      if (member && showStatus)
         (
           branch: 1,
           item: BottomNavigationBarItem(
@@ -587,7 +604,7 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
           label: 'nav_bar_home'.i18n(),
         ),
       ),
-      if (church)
+      if (member)
         (
           branch: 3,
           item: BottomNavigationBarItem(
@@ -596,7 +613,7 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
             label: 'nav_bar_jobs'.i18n(),
           ),
         ),
-      if (church && showLive)
+      if (member && showLive)
         (
           branch: 5,
           item: BottomNavigationBarItem(
@@ -605,7 +622,7 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
             label: 'nav_bar_live'.i18n(),
           ),
         ),
-      if (church && user.hasAdminAccess())
+      if (member && user.hasAdminAccess())
         (
           branch: 4,
           item: BottomNavigationBarItem(
@@ -622,7 +639,14 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
     final user = ref.watch(userDataProvider).user;
     // The Live tab is there while something is on the air, and stays while it is open
     final onAir = ref.watch(liveStreamsProvider).value?.isNotEmpty ?? false;
-    final tabs = _tabs(user!, showLive: onAir || navigationShell.currentIndex == 5);
+    // The Status tab only for users with a goal (theirs or a child's): it stays hidden until that is known, and stays
+    // while it is open, like Live
+    final hasGoal = ref.watch(hasStatusGoalProvider).value ?? false;
+    final tabs = _tabs(
+      user!,
+      showStatus: hasGoal || navigationShell.currentIndex == 1,
+      showLive: onAir || navigationShell.currentIndex == 5,
+    );
     final selected = tabs.indexWhere((t) => t.branch == navigationShell.currentIndex);
     return Scaffold(
       // The navigation shell contains the page for the current branch; the gate asks for a missing name first

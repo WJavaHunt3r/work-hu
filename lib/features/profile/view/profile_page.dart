@@ -17,7 +17,6 @@ import 'package:work_hu/app/widgets/settings_tile.dart';
 import 'package:work_hu/features/profile/data/state/profile_state.dart';
 import 'package:work_hu/features/profile/view/account_deletion.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
-import 'package:work_hu/features/reading_plan/view/reading_plan_card.dart';
 
 class ProfilePage extends BasePage {
   const ProfilePage({super.key, super.title = "profile_title", super.canRefresh = false, this.inSheet = false})
@@ -75,9 +74,6 @@ class ProfilePageState extends BasePageState<ProfilePage, ProfileState, ProfileD
         ),
 
         SizedBox(height: 40.sp),
-
-        // Users without a church have no Status page, so its reading challenge card (for those who may see it) is here
-        if (!user.hasChurch()) ...[const ReadingPlanCard(), SizedBox(height: 8.sp)],
 
         // Personal details: their own page, where the name, gender and birth date are edited
         BaseListView(

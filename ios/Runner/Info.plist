@@ -59,8 +59,13 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_googlecast._tcp</string>
+		<string>_CC1AD845._googlecast._tcp</string>
+	</array>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Used to reach the development backend on your local network.</string>
+	<string>DukApp looks for Chromecast and Google TV devices on your Wi-Fi network, so you can watch the live broadcast on your TV.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

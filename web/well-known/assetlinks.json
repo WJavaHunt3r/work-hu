@@ -1,0 +1,17 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ktk.dukapp",
+      "sha256_cert_fingerprints": [
+        "31:90:97:B8:6A:D2:DD:29:75:CC:08:13:27:39:6F:B9:5A:C7:4D:B8:0F:4D:86:F8:F4:36:FB:62:9D:35:94:D5",
+        "B7:45:4B:57:2E:30:55:43:A2:0D:93:72:CD:40:3E:F1:88:A4:41:DC:9E:8B:22:32:C9:41:81:36:B2:3B:83:06",
+        "EB:23:82:70:A3:62:14:61:A7:FA:C9:97:BB:80:E9:0B:90:38:C5:1D:D7:2B:29:7A:D1:D3:92:EE:BD:13:30:C4"
+      ]
+    }
+  }
+]

@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:injectable/injectable.dart';
 import 'package:work_hu/api/dio_client.dart';
+import 'package:work_hu/app/cache/user_data_cache.dart';
 import 'package:work_hu/app/locator.dart';
 import 'package:work_hu/app/notifications/push_service.dart';
 import 'package:work_hu/app/session/biometric_lock.dart';
@@ -28,6 +31,9 @@ class UserProvider extends ChangeNotifier {
       await Utils.saveData('jwt_token', '');
       _token = null;
       clearTabSession();
+      await UserDataCache.instance.clear();
+    } else {
+      await _remember(user);
     }
     final signedIn = _user == null && user != null;
     _user = user;
@@ -56,29 +62,79 @@ class UserProvider extends ChangeNotifier {
       return;
     }
 
-    if (token.isNotEmpty) {
-      try {
-        final res = await _dio.dio.get("/user/me");
-
-        _user = UserModel.fromJson(res.data);
-        PushService.instance.onSignedIn();
-      } on DioException catch (e) {
-        // Expired or revoked sessions are cleared by DioClient's refresh handling.
-        // Keep the tokens on network errors or timeouts so the next start can restore the session.
-        final status = e.response?.statusCode;
-        if (status == 401 || status == 403) {
-          await Utils.deleteData('jwt_token');
-        }
-        _user = null;
-      } catch (e) {
-        _user = null;
-      }
+    if (token.isEmpty) {
+      // Nobody signed in: nothing of a previous session stays on the device
+      await UserDataCache.instance.clear();
+      return;
     }
+
+    // The user as last seen: the app starts at once, /user/me updates it in the background
+    final cached = await _cachedUser();
+    if (cached != null) {
+      _user = cached;
+      PushService.instance.onSignedIn();
+      unawaited(refreshUser());
+      return;
+    }
+
+    try {
+      final res = await _dio.dio.get("/user/me");
+
+      _user = UserModel.fromJson(res.data);
+      await _remember(_user!);
+      PushService.instance.onSignedIn();
+    } on DioException catch (e) {
+      // Expired or revoked sessions are cleared by DioClient's refresh handling.
+      // Keep the tokens on network errors or timeouts so the next start can restore the session.
+      final status = e.response?.statusCode;
+      if (status == 401 || status == 403) {
+        await Utils.deleteData('jwt_token');
+      }
+      _user = null;
+    } catch (e) {
+      _user = null;
+    }
+  }
+
+  /// Fetches the signed-in user again (`/user/me`) and keeps the answer. Any failure keeps the user as it is (the cached
+  /// one after a start offline): a rejected session is signed out by DioClient's refresh handling, which keeps it on
+  /// network and server errors.
+  Future<void> refreshUser() async {
+    final before = _user;
+    if (before == null) return;
+    try {
+      final res = await _dio.dio.get("/user/me");
+      final fresh = UserModel.fromJson(res.data);
+      // Signed out or someone else signed in meanwhile
+      if (_user?.id != before.id) return;
+      if (fresh == _user) {
+        await _remember(fresh);
+      } else {
+        await setUser(fresh);
+      }
+    } catch (_) {
+      // Keep the user we have
+    }
+  }
+
+  /// The user stored by the last session ([UserDataCache]), with the rest of their cache loaded; null when there is
+  /// none or it no longer parses (an older app version's shape).
+  Future<UserModel?> _cachedUser() async {
+    final cache = UserDataCache.instance;
+    return cache.parse(await cache.load(), UserDataCache.user, UserModel.fromJson);
+  }
+
+  /// Keeps [user] for the next start; switching to another user deletes the previous user's cached data.
+  Future<void> _remember(UserModel user) async {
+    final cache = UserDataCache.instance;
+    await cache.open(user.id);
+    await cache.write(user.id, UserDataCache.user, user);
   }
 
   // Call this during your standard login method
   Future<void> loginSuccess(UserModel user, String token) async {
     await Utils.saveData('jwt_token', token);
+    await _remember(user);
     _user = user;
   }
 

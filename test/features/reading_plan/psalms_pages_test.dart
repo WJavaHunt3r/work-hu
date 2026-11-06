@@ -169,7 +169,7 @@ class FakeApi implements ReadingPlanApi {
   Future<void> deleteArticle(num planId, num id) async {}
 
   @override
-  Future<Map<String, dynamic>> getLeaderboard(num planId, {int page = 0, int size = 100}) async => {
+  Future<Map<String, dynamic>> getLeaderboard(num planId, {int page = 0, int size = 100, String? group}) async => {
     'entries': [
       {'rank': 1, 'userId': 11, 'name': 'Kovács Éva', 'count': 12, 'articlePoints': 0},
       {'rank': 2, 'userId': 12, 'name': 'Nagy Béla', 'count': 6, 'articlePoints': 3},

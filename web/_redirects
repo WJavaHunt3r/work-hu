@@ -1,2 +1,6 @@
+# The upload to Netlify leaves out hidden folders such as .well-known, so these files live at visible paths and are
+# served at the addresses Apple and Google ask for. Keep these above the app's catch-all rule.
 /.well-known/apple-developer-merchantid-domain-association  /apple-developer-merchantid-domain-association  200
+/.well-known/apple-app-site-association  /well-known/apple-app-site-association  200
+/.well-known/assetlinks.json  /well-known/assetlinks.json  200
 /* /index.html    200

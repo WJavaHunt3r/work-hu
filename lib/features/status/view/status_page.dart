@@ -31,6 +31,7 @@ class StatusPageState extends BasePageState<StatusPage, StatusState, StatusDataN
   @override
   void onRefresh() {
     ref.read(statusDataProvider.notifier).getUserInfoAndUserRounds();
+    ref.invalidate(hasStatusGoalProvider);
   }
 
   @override

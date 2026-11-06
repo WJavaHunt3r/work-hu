@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:work_hu/app/cache/user_data_cache.dart';
 import 'package:work_hu/app/framework/api_exception.dart';
 import 'package:work_hu/app/framework/base_components/base_page_components/base_state.dart';
 import 'package:work_hu/app/framework/base_components/paged_list/list_query.dart';
@@ -40,17 +41,26 @@ final jobDetailProvider = StateNotifierProvider.autoDispose.family<JobDetailNoti
 );
 
 class JobsDataNotifier extends PagedListNotifier<JobModel, JobFilter> {
-  JobsDataNotifier(this.jobRepository, this.user, {required bool manage})
-    : super(
-        ListQuery(
-          // The Jobs tab only lists what the user may register for; the admin list lists everything
-          filter: JobFilter(status: JobStatus.OPEN, eligibleOnly: !manage),
-          sort: const [SortOrder("jobDateTime")],
-        ),
-      );
+  JobsDataNotifier(this.jobRepository, this.user, {required this.manage})
+    : super(_defaultQuery(manage), cachedItems: manage ? null : _cached(user));
 
   final JobRepository jobRepository;
   final UserModel? user;
+  final bool manage;
+
+  static ListQuery<JobFilter> _defaultQuery(bool manage) => ListQuery(
+    // The Jobs tab only lists what the user may register for; the admin list lists everything
+    filter: JobFilter(status: JobStatus.OPEN, eligibleOnly: !manage),
+    sort: const [SortOrder("jobDateTime")],
+  );
+
+  /// The Jobs tab's first page as the user saw it last time ([UserDataCache.jobs], with their registrations), shown
+  /// until the API answers. Only the tab's unfiltered list is cached, not the admin list.
+  static List<JobModel>? _cached(UserModel? user) => UserDataCache.instance.parse(
+    user?.id,
+    UserDataCache.jobs,
+    (json) => [for (final j in json['items'] as List) JobModel.fromJson(j)],
+  );
 
   @override
   List<SortOption> get sortOptions => const [
@@ -59,8 +69,17 @@ class JobsDataNotifier extends PagedListNotifier<JobModel, JobFilter> {
 
   /// "Only mine" is resolved per request, so the filter in the state stays what the user picked.
   @override
-  Future<PaginatedResponse<JobModel>> fetch(ListQuery<JobFilter> query, int page) =>
-      jobRepository.getJobs(query, page: page, registeredUserId: query.filter.onlyMine ? user?.id : null);
+  Future<PaginatedResponse<JobModel>> fetch(ListQuery<JobFilter> query, int page) async {
+    final result = await jobRepository.getJobs(
+      query,
+      page: page,
+      registeredUserId: query.filter.onlyMine ? user?.id : null,
+    );
+    if (!manage && page == 0 && query == _defaultQuery(manage)) {
+      UserDataCache.instance.write(user?.id, UserDataCache.jobs, {'items': result.content});
+    }
+    return result;
+  }
 }
 
 class JobDetailNotifier extends BaseDataNotifier<JobDetailState> {

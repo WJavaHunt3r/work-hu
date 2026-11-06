@@ -2,7 +2,7 @@ name: work_hu
 description: See the status of the competition. Follow your MyShare status and much more.
 publish_to: 'none'
 
-version: 2.0.39+41
+version: 2.0.47+49
 
 environment:
   sdk: '>=3.8.0<4.0.0'
@@ -67,6 +67,7 @@ dependencies:
   just_audio_background: ^0.0.1-beta.17
   in_app_update: ^5.0.0
   local_auth: ^3.0.2
+  flutter_chrome_cast: ^2.0.0
 
 
 dev_dependencies:

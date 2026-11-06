@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -11,6 +13,7 @@ import 'package:work_hu/app/platform/adaptive.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/app/widgets/base_text_from_field.dart';
+import 'package:work_hu/features/bufe/providers/bufe_provider.dart';
 import 'package:work_hu/features/profile/data/state/profile_state.dart';
 import 'package:work_hu/features/profile/providers/profile_providers.dart';
 import 'package:work_hu/features/users/providers/users_providers.dart';
@@ -85,6 +88,11 @@ class ProfileDetailsPageState extends BasePageState<ProfileDetailsPage, ProfileS
             ),
       );
       await userProvider.setUser(updated);
+      // The kiosk checks the age for restricted products: give it the new birth date at once, not only when the
+      // balance is opened next (a failure is caught up there)
+      if (updated.birthDate != user.birthDate) {
+        unawaited(ref.read(bufeRepoProvider).syncBirthDate(updated, null).catchError((_) => null));
+      }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("profile_details_saved".i18n())));
     } on ApiException catch (e) {

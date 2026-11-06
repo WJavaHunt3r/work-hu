@@ -70,6 +70,9 @@ class JobChatNotifier extends StateNotifier<JobChatState> {
   Timer? _timer;
   bool _polling = false;
 
+  /// The last answer's `reactionsNext`: the next poll asks for the reactions changed since then.
+  String? _reactionsNext;
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -80,6 +83,7 @@ class JobChatNotifier extends StateNotifier<JobChatState> {
     try {
       final chat = await _repository.getChat(jobId);
       if (!mounted) return;
+      _reactionsNext = chat.reactionsNext;
       state = state.copyWith(
         messages: chat.messages,
         muted: chat.muted,
@@ -104,10 +108,13 @@ class JobChatNotifier extends StateNotifier<JobChatState> {
         await load();
         return;
       }
-      final chat = await _repository.getChat(jobId, after: last);
+      final chat = await _repository.getChat(jobId, after: last, reactionsSince: _reactionsNext);
       if (!mounted) return;
+      _reactionsNext = chat.reactionsNext ?? _reactionsNext;
+      final merged = chat.messages.isEmpty ? state.messages : _merge(state.messages, chat.messages);
+      final withReactions = applyReactions(merged, chat.reactionChanges);
       state = state.copyWith(
-        messages: chat.messages.isEmpty ? null : _merge(state.messages, chat.messages),
+        messages: identical(withReactions, state.messages) ? null : withReactions,
         muted: chat.muted,
         archived: chat.archived,
       );
@@ -144,6 +151,52 @@ class JobChatNotifier extends StateNotifier<JobChatState> {
       if (mounted) state = state.copyWith(sending: false);
       return "api_unknown_error";
     }
+  }
+
+  /// Tapping a reaction: the same one again takes it back, the other one replaces it. Shown at once and set back
+  /// when the backend refuses; returns the backend's reason then (e.g. the chat was archived meanwhile).
+  Future<String?> toggleReaction(JobChatMessageModel message, JobChatReaction reaction) async {
+    final wanted = message.myReaction == reaction ? null : reaction;
+    final before = JobChatReactionsModel(
+      messageId: message.id,
+      likes: message.likes,
+      dislikes: message.dislikes,
+      myReaction: message.myReaction,
+    );
+    state = state.copyWith(messages: applyReactions(state.messages, [optimistic(before, wanted)]));
+    try {
+      final result = await _repository.react(jobId, message.id, wanted);
+      if (mounted) state = state.copyWith(messages: applyReactions(state.messages, [result]));
+      return null;
+    } on ApiException catch (e) {
+      if (mounted) state = state.copyWith(messages: applyReactions(state.messages, [before]));
+      return e.message;
+    } catch (_) {
+      if (mounted) state = state.copyWith(messages: applyReactions(state.messages, [before]));
+      return "api_unknown_error";
+    }
+  }
+
+  /// The counts after the user's reaction changes from [current]'s to [wanted] (null = none).
+  static JobChatReactionsModel optimistic(JobChatReactionsModel current, JobChatReaction? wanted) {
+    int count(JobChatReaction r, int n) => n - (current.myReaction == r ? 1 : 0) + (wanted == r ? 1 : 0);
+    return JobChatReactionsModel(
+      messageId: current.messageId,
+      likes: count(JobChatReaction.like, current.likes),
+      dislikes: count(JobChatReaction.dislike, current.dislikes),
+      myReaction: wanted,
+    );
+  }
+
+  /// [messages] with the [changes] applied; the same list when none of them is loaded.
+  static List<JobChatMessageModel> applyReactions(
+    List<JobChatMessageModel> messages,
+    List<JobChatReactionsModel> changes,
+  ) {
+    if (changes.isEmpty) return messages;
+    final byId = {for (final c in changes) c.messageId: c};
+    if (!messages.any((m) => byId.containsKey(m.id))) return messages;
+    return [for (final m in messages) byId.containsKey(m.id) ? m.withReactions(byId[m.id]!) : m];
   }
 
   Future<void> setMuted(bool muted) async {

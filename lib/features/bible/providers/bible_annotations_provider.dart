@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -49,6 +50,9 @@ class BibleAnnotationsNotifier extends StateNotifier<Map<String, BibleAnnotation
   /// After this long without a sync, everything is asked for again (the backend forgets deletions after 90 days).
   static const fullSyncAfter = Duration(days: 60);
 
+  /// How long to wait before syncing again when the server could not be reached and changes wait to be sent.
+  static const retryAfter = Duration(minutes: 1);
+
   /// The answers that mean the server will never take a change: it is dropped from the queue.
   static const refusedForGood = {400, 409, 413, 422};
 
@@ -60,6 +64,14 @@ class BibleAnnotationsNotifier extends StateNotifier<Map<String, BibleAnnotation
   DateTime? _lastSync;
   bool _syncing = false;
   bool _again = false;
+  Timer? _retry;
+
+  @override
+  void dispose() {
+    _retry?.cancel();
+    super.dispose();
+  }
+
   Future<void>? _loading;
 
   String get _key => 'bible_annotations_$_userId';
@@ -119,6 +131,8 @@ class BibleAnnotationsNotifier extends StateNotifier<Map<String, BibleAnnotation
       return;
     }
     _syncing = true;
+    _retry?.cancel();
+    var reached = false;
     try {
       if (!await _push()) return;
       final full = _next == null || _lastSync == null || DateTime.now().difference(_lastSync!) > fullSyncAfter;
@@ -140,11 +154,14 @@ class BibleAnnotationsNotifier extends StateNotifier<Map<String, BibleAnnotation
       }
       _next = answer['next'] as String?;
       _lastSync = DateTime.now();
+      reached = true;
       if (mounted) state = Map.unmodifiable(_items);
     } catch (_) {
       // Offline or the server failed: the next sync tries again
     } finally {
       _syncing = false;
+      // Offline with changes waiting: try again later, not only on the next start or change
+      if (!reached && _pending.isNotEmpty && mounted) _retry = Timer(retryAfter, sync);
       await _save();
       if (_again && mounted) {
         _again = false;

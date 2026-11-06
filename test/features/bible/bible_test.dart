@@ -684,6 +684,22 @@ void main() {
       expect(background(tester, 'A föld pedig'), isNull);
     });
 
+    testWidgets('offline, waiting changes are sent by themselves a while after the connection is back', (tester) async {
+      final server = FakeAnnotationApi()..offline = true;
+      await pumpBible(tester, api: FakeBibleApi(), annotations: server, location: '/bible/Gen/1');
+
+      await tester.tap(find.text('Kezdetben'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.bookmark_add_outlined));
+      await tester.pumpAndSettle();
+      expect(server.rows, isEmpty);
+
+      server.offline = false;
+      await tester.pump(BibleAnnotationsNotifier.retryAfter);
+      await tester.pumpAndSettle();
+      expect(server.rows.values.where((r) => r['type'] == 'BOOKMARK'), hasLength(1));
+    });
+
     testWidgets('a backend without the endpoints (404) keeps changes queued; a real refusal (400) drops them', (
       tester,
     ) async {

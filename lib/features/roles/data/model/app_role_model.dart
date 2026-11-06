@@ -23,7 +23,7 @@ abstract class AppRoleModel with _$AppRoleModel {
   const AppRoleModel._();
 
   /// The roles the backend creates itself: they can't be renamed or deleted.
-  bool get isBuiltIn => Role.values.any((r) => r.name == name);
+  bool get isBuiltIn => name == 'GUEST' || Role.values.any((r) => r.name == name);
 
   /// The ADMIN role is fixed and always holds every permission.
   bool get isAdminRole => name == Role.ADMIN.name;

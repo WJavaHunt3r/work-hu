@@ -78,6 +78,8 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
           ],
         ),
         SizedBox(height: 16.sp),
+        _buildMenuLink(theme),
+        SizedBox(height: 16.sp),
         if (state.familiyAccounts.isNotEmpty) _buildFamilyAccounts(theme),
         SizedBox(height: 32.sp),
         if (state.donations.isNotEmpty) _buildDonations(theme),
@@ -176,11 +178,43 @@ class HomePageState extends BasePageState<HomePage, HomeState, HomeDataNotifier>
               child: Icon(icon, color: Theme.of(context).colorScheme.onPrimary),
             ),
             const Spacer(),
-            Text(title, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            // One line, shrunk when it doesn't fit: a single long word ("Feltöltések") was broken inside the word.
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(title, maxLines: 1, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            ),
             SizedBox(height: 4.sp),
             Text(subtitle, style: theme.textTheme.bodySmall),
           ],
         ),
+      ),
+    );
+  }
+
+  /// What the kiosk's sales points sell, with this user's prices.
+  Widget _buildMenuLink(ThemeData theme) {
+    return BaseContainer(
+      padding: EdgeInsets.all(16.sp),
+      onTap: () => context.push("/balance/menu"),
+      child: Row(
+        children: [
+          Icon(Icons.storefront_outlined, color: theme.colorScheme.primary),
+          SizedBox(width: 12.sp),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'kiosk_menu_title'.i18n(),
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Text('kiosk_menu_link_subtitle'.i18n(), style: theme.textTheme.bodySmall),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right),
+        ],
       ),
     );
   }

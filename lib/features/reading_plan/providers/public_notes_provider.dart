@@ -13,7 +13,7 @@ final publicNoteApiProvider = Provider<PublicNoteApi>((ref) => PublicNoteApi());
 final publicNotesAccessProvider = Provider<({bool read, bool manage})>((ref) {
   final user = ref.watch(userDataProvider).user;
   final manage = user?.hasPermission(Permission.READING_PLAN_MANAGE) ?? false;
-  return (read: (user?.hasChurch() ?? false) || manage, manage: manage);
+  return (read: (user?.isMember() ?? false) || manage, manage: manage);
 });
 
 /// The visible public notes per item of a plan, for the psalm grid. Nothing is asked without access.

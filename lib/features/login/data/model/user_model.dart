@@ -36,7 +36,7 @@ abstract class UserModel with _$UserModel {
     num? points,
     String? email,
 
-    /// Null for users who don't belong to a church: they only get the balance and the profile.
+    /// Null for users who don't belong to a church (shown on the profile; access comes from [isMember]).
     num? churchId,
 
     /// The church's name (null without one), shown on the profile details.
@@ -77,8 +77,10 @@ abstract class UserModel with _$UserModel {
     return role == Role.ADMIN;
   }
 
-  /// Users outside a church only see the balance and the profile (no status, jobs or admin).
-  bool hasChurch() => churchId != null;
+  /// Members (`MEMBER_AREA`, the backend's USER role: users who belong to a church) get Status, Jobs, Live, Admin and
+  /// the church's part of Home; everybody else (GUEST) only Home with the reading challenge and the Bible, the balance
+  /// and the profile.
+  bool isMember() => hasPermission(Permission.MEMBER_AREA);
 
   /// Whether the admin tab has anything to show: team leaders, admins and anyone holding a permission that has an entry
   /// on the admin page (add a permission here when the admin page gets an entry for it).

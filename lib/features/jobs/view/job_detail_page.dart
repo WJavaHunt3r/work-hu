@@ -289,6 +289,8 @@ class JobDetailPageState extends BasePageState<JobDetailPage, JobDetailState, Jo
               : Utils.dateToStringWithTime(job.cancellationDeadline!),
         ),
         _InfoRow("jobs_places", places),
+        // Also for people already registered, so they see how much room is left for others
+        if (job.freePlaces != null) _InfoRow("jobs_free_places", "${job.freePlaces}"),
         if (job.waitlistEnabled) _InfoRow("jobs_waitlist", "${job.waitlistCount}"),
         if (job.hasAgeLimit) _InfoRow("jobs_age", "${job.minAge ?? "-"} - ${job.maxAge ?? "-"}"),
         if (job.genderRestriction != null) _InfoRow("jobs_gender", job.genderRestriction!.label.i18n()),

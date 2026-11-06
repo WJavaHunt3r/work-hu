@@ -4,11 +4,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:localization/localization.dart';
+import 'package:work_hu/app/models/permission.dart';
+import 'package:work_hu/app/platform/adaptive.dart';
 import 'package:work_hu/app/providers/user_provider.dart';
 import 'package:work_hu/app/widgets/base_container.dart';
 import 'package:work_hu/features/reading_plan/data/model/reading_plan_model.dart';
+import 'package:work_hu/features/reading_plan/data/store/reading_plan_cache.dart';
 import 'package:work_hu/features/reading_plan/providers/public_notes_provider.dart';
 import 'package:work_hu/features/reading_plan/providers/reading_plan_provider.dart';
+import 'package:work_hu/features/reading_plan/view/offline_hint.dart';
 
 /// The reading challenge: the 150 psalms to tick off, the ranking and the plan.
 class PsalmsPage extends ConsumerWidget {
@@ -43,12 +47,19 @@ class PsalmsPage extends ConsumerWidget {
                   child: Text(state.error ?? "reading_plan_none".i18n(), textAlign: TextAlign.center),
                 ),
               )
-            : TabBarView(
+            : Column(
                 children: [
-                  _ReadTab(plan: plan),
-                  _ArticlesTab(plan: plan),
-                  _RankingTab(plan: plan),
-                  _PlanTab(plan: plan),
+                  const ReadingPlanOfflineHint(),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _ReadTab(plan: plan),
+                        _ArticlesTab(plan: plan),
+                        _RankingTab(plan: plan),
+                        _PlanTab(plan: plan),
+                      ],
+                    ),
+                  ),
                 ],
               ),
       ),
@@ -222,35 +233,69 @@ class _PsalmTile extends StatelessWidget {
   }
 }
 
-class _RankingTab extends ConsumerWidget {
+/// The ranking of the user's own group: members and guests are ranked apart. Managers (READING_PLAN_MANAGE) can switch
+/// between the two groups.
+class _RankingTab extends ConsumerStatefulWidget {
   const _RankingTab({required this.plan});
 
   final ReadingPlanModel plan;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final board = ref.watch(leaderboardProvider(plan.id));
-    final myId = ref.watch(userDataProvider).user?.id;
+  ConsumerState<_RankingTab> createState() => _RankingTabState();
+}
+
+class _RankingTabState extends ConsumerState<_RankingTab> {
+  /// The group a manager picked; null = the user's own.
+  String? _group;
+
+  @override
+  Widget build(BuildContext context) {
+    final plan = widget.plan;
+    final user = ref.watch(userDataProvider).user;
+    final manager = user?.hasPermission(Permission.READING_PLAN_MANAGE) ?? false;
+    final group = _group;
+    final board = group == null
+        ? ref.watch(leaderboardProvider(plan.id))
+        : ref.watch(leaderboardOfGroupProvider((planId: plan.id, group: group)));
+    // The user's own group: their place is only shown there (a manager looking at the other group has none)
+    final ownGroup = group == null ? null : ref.watch(leaderboardProvider(plan.id)).value?.group;
+    final myId = user?.id;
     final theme = Theme.of(context);
     return RefreshIndicator.adaptive(
-      onRefresh: () async => ref.refresh(leaderboardProvider(plan.id).future),
+      onRefresh: () async => group == null
+          ? ref.refresh(leaderboardProvider(plan.id).future)
+          : ref.refresh(leaderboardOfGroupProvider((planId: plan.id, group: group)).future),
       child: board.when(
         loading: () => const Center(child: CircularProgressIndicator.adaptive()),
-        error: (_, _) => ListView(
-          children: [Padding(padding: EdgeInsets.all(24.sp), child: Text("api_unknown_error".i18n()))],
+        error: (error, _) => ListView(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(24.sp),
+              child: Text((isOfflineError(error) ? "reading_plan_offline_action" : "api_unknown_error").i18n()),
+            ),
+          ],
         ),
         data: (data) => ListView(
           padding: EdgeInsets.all(16.sp),
           children: [
-            BaseContainer(
-              padding: EdgeInsets.all(16.sp),
-              child: Text(
-                data.myRank == null
-                    ? "reading_plan_my_rank_none".i18n()
-                    : "reading_plan_my_rank".i18n([data.myRank.toString(), data.myPoints.toString()]),
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            if (manager && data.group != null) ...[
+              AdaptiveSegmented<String>(
+                options: {"members": "reading_plan_group_members".i18n(), "guests": "reading_plan_group_guests".i18n()},
+                selected: data.group,
+                onChanged: (value) => setState(() => _group = value),
               ),
-            ),
+              SizedBox(height: 12.sp),
+            ],
+            if (ownGroup == null || data.group == ownGroup)
+              BaseContainer(
+                padding: EdgeInsets.all(16.sp),
+                child: Text(
+                  data.myRank == null
+                      ? "reading_plan_my_rank_none".i18n()
+                      : "reading_plan_my_rank".i18n([data.myRank.toString(), data.myPoints.toString()]),
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
             if (data.myArticlePoints > 0)
               Padding(
                 padding: EdgeInsets.only(top: 6.sp, left: 4.sp),
@@ -396,8 +441,13 @@ class _ArticlesTab extends ConsumerWidget {
       onRefresh: () async => ref.refresh(articlesProvider(plan.id).future),
       child: articles.when(
         loading: () => const Center(child: CircularProgressIndicator.adaptive()),
-        error: (_, _) => ListView(
-          children: [Padding(padding: EdgeInsets.all(24.sp), child: Text("api_unknown_error".i18n()))],
+        error: (error, _) => ListView(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(24.sp),
+              child: Text((isOfflineError(error) ? "reading_plan_offline_action" : "api_unknown_error").i18n()),
+            ),
+          ],
         ),
         data: (list) => list.isEmpty
             ? ListView(

@@ -39,6 +39,14 @@ class BufeApi {
     }
   }
 
+  /// The active sales points.
+  Future<List<dynamic>> getLocations() async => (await _dioClient.dio.get("external-locations")).data as List<dynamic>;
+
+  /// Categories and products of one sales point (404 when it is gone or inactive).
+  Future<Map<String, dynamic>> getCatalog(String locationId) async =>
+      (await _dioClient.dio.get("external-catalog", queryParameters: {"location_id": locationId})).data
+          as Map<String, dynamic>;
+
   Future<List<dynamic>> getDukappImages() async {
     try {
       final res = await _dioClient.dio.get("external-dukapp-images");
@@ -97,11 +105,18 @@ class BufeApi {
     }
   }
 
-  Future<dynamic> createCustomer({required String fullname, required num dukappId, required String email}) async {
+  /// Creates the kiosk customer, or returns the existing one. With [birthDate] ("YYYY-MM-DD", in the past) it also sets
+  /// an existing customer's birth date, which the kiosk needs for age-restricted products.
+  Future<dynamic> createCustomer({
+    required String fullname,
+    required num dukappId,
+    required String email,
+    String? birthDate,
+  }) async {
     try {
       final res = await _dioClient.dio.post(
         "/external-create-customer",
-        data: {"full_name": fullname, "dukapp_id": dukappId.toString(), "email": email},
+        data: {"full_name": fullname, "dukapp_id": dukappId.toString(), "email": email, "birth_date": ?birthDate},
       );
       return res.data;
     } catch (e) {

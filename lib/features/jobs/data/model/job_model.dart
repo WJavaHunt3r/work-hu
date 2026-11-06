@@ -106,6 +106,10 @@ abstract class JobModel with _$JobModel {
 
   bool get isOpen => status == JobStatus.OPEN;
 
+  /// Places nobody holds yet (0 when full); null for a job without a limit.
+  num? get freePlaces =>
+      maxParticipants == null ? null : (maxParticipants! - registeredCount).clamp(0, maxParticipants!);
+
   /// "17:00 → 21:00", or just the start time when there is no end time.
   String get timeRange {
     final format = DateFormat("HH:mm");

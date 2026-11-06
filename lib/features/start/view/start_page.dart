@@ -17,14 +17,14 @@ import 'package:work_hu/features/status/view/status_page.dart' show LocalStatusS
 import 'package:work_hu/features/streams/view/live_page.dart';
 
 /// The first tab (`/home`): for church members the live broadcast banner, the reading challenge, the church's status
-/// this month, their activities and room booking, and the Bible; for users without a church only the Bible. The header's avatar opens the profile.
+/// this month, their activities and room booking, and the Bible; for users without a church the reading challenge and the Bible. The header's avatar opens the profile.
 class StartPage extends ConsumerWidget {
   const StartPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final church = ref.watch(userDataProvider).user?.hasChurch() ?? false;
+    final member = ref.watch(userDataProvider).user?.isMember() ?? false;
     return Scaffold(
       appBar: AppBar(
         leading: const ProfileAvatarButton(),
@@ -32,16 +32,19 @@ class StartPage extends ConsumerWidget {
       ),
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
-          if (church) ref.read(statusDataProvider.notifier).getUserInfoAndUserRounds();
+          if (member) {
+            ref.read(statusDataProvider.notifier).getUserInfoAndUserRounds();
+            ref.invalidate(hasStatusGoalProvider); // a goal set since then brings the Status tab
+          }
           await ref.read(readingPlanProvider.notifier).load();
         },
         child: ListView(
           padding: EdgeInsets.all(16.sp),
           children: [
-            if (church) ...[
-              // Each shows itself only when there is something to show (a broadcast, a plan the user may see)
-              const LiveBanner(),
-              const ReadingPlanCard(),
+            // Each shows itself only when there is something to show (a broadcast, a plan the user may see)
+            if (member) const LiveBanner(),
+            const ReadingPlanCard(),
+            if (member) ...[
               const _LocalStatus(),
               SizedBox(height: 16.sp),
               const _QuickLinks(),
